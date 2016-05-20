@@ -40,10 +40,10 @@ setup (name =  punx.__package_name__,        # punx
        platforms='any',
        install_requires = punx.__install_requires__,
        package_dir = {'': 'src'},
-       packages = ['punx', 'punx.plugins', ],
+       packages = ['punx', ],
        #packages=find_packages(),
        package_data = {
-                       'punx': ['data/*'],
+                       'punx': ['cache/*'],
                        },
        classifiers = punx.__classifiers__,
        entry_points={

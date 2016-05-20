@@ -11,6 +11,9 @@ Python Utilities for NeXus HDF5 files
 :git:       https://github.com/prjemian/punx
 :PyPI:      https://pypi.python.org/pypi/punx/ 
 
+
+NOTE: project is under initial construction
+
 Project Goals
 #############
 

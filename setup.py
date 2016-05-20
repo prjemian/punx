@@ -27,8 +27,9 @@ long_description = open('README.rst', 'r').read()
 
 
 setup (name =  punx.__package_name__,        # punx
-       version = versioneer.get_version(),
-       cmdclass=versioneer.get_cmdclass(),
+       version = punx.__version__,
+       #version = versioneer.get_version(),
+       #cmdclass=versioneer.get_cmdclass(),
        license = punx.__license__,
        description = punx.__description__,
        long_description = long_description,

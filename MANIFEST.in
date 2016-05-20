@@ -1,0 +1,4 @@
+include README.rst
+include src/punx/LICENSE.txt
+include versioneer.py
+include src/punx/_version.py

@@ -4,7 +4,7 @@ maintain the local cache of NeXus NXDL and XML Schema files
 '''
 
 import datetime
-import lxml.etree
+import json
 import os
 import StringIO
 import sys
@@ -14,6 +14,7 @@ import zipfile
 SOURCE_CACHE_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), 'cache'))
 GITHUB_ORGANIZATION = 'nexusformat'
 GITHUB_REPOSITORY = 'definitions'
+CACHE_INFO_FILENAME = 'cache-info.txt'
 
 
 def gmt():
@@ -31,32 +32,21 @@ def githubMasterInfo(org, repo):
     key       meaning
     ========  ================================================
     datetime  ISO-8601-compatible timestamp
-    sha       short (7 character) hash tag of latest commit
+    sha       hash tag of latest commit
     zip       URL of downloadable ZIP file
     ========  ================================================
     '''
-    url = 'https://github.com/%s/%s' % (org, repo)
-    commit_xpath_str = '//div[@class="commit-tease js-details-container"]'
-    sha_xpath_str = '//a[@class="commit-tease-sha"]'
-    timestamp_xpath_str = '//relative-time'
-    
-    def get_node(parent, xpath_str):
-        node_list = parent.xpath(xpath_str)
-        # raise IndexError if list is empty
-        return node_list[0]
+    # get repository information via GitHub API
+    url = 'https://api.github.com/repos/%s/%s/commits' % (org, repo)
     
     text = urllib.urlopen(url).read()
-    parser = lxml.etree.HTMLParser()
-    tree = lxml.etree.parse(StringIO.StringIO(text), parser)
-    
-    try:
-        commit_node = get_node(tree, commit_xpath_str)
-    except IndexError:
-        return None
-    # print lxml.etree.tostring(commit_node, pretty_print=True)
-    sha = get_node(commit_node, sha_xpath_str).text.strip()
-    iso8601 = get_node(commit_node, timestamp_xpath_str).attrib['datetime']
-    zip_url = url + '/archive/master.zip'
+
+    buf = json.loads(text)
+
+    latest = buf[0]
+    sha = latest['sha']
+    iso8601 = latest['commit']['committer']['date']
+    zip_url = 'https://github.com/%s/%s/archive/master.zip' % (org, repo)
     
     return dict(sha=sha, datetime=iso8601, zip=zip_url)
 
@@ -65,7 +55,7 @@ def updateCache(info, path):
     '''
     download the repository ZIP file and extract the NXDL XML, XSL, and XSD files to the path
     '''
-    info_file = os.path.join(path, 'info.txt')
+    info_file = os.path.join(path, CACHE_INFO_FILENAME)
     cache_subdir = os.path.join(path, 'definitions-master')
 
     cache_info = read_info(info_file)
@@ -98,7 +88,7 @@ def write_info(info, fname):
     describe the current cache contents in file
     '''
     f = open(fname, 'w')
-    f.write('# file: info.txt\n')
+    f.write('# file: %s\n' % CACHE_INFO_FILENAME)
     f.write('# written: %s\n' % str(datetime.datetime.now()))
     f.write('# GMT: %s\n\n' % gmt())
     for k, v in info.items():

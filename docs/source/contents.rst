@@ -10,6 +10,8 @@ Contents
    :maxdepth: 2
    :glob:
    
+   validate
+   h5structure
    install
    changes
    license

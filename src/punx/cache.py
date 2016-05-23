@@ -11,10 +11,33 @@ import sys
 import urllib
 import zipfile
 
-SOURCE_CACHE_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), 'cache'))
+SOURCE_CACHE_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), 'cache'))
 GITHUB_ORGANIZATION = 'nexusformat'
 GITHUB_REPOSITORY = 'definitions'
+GITHUB_BRANCH = 'master'
 CACHE_INFO_FILENAME = 'cache-info.txt'
+NXDL_CACHE_SUBDIR = GITHUB_REPOSITORY + '_' + GITHUB_BRANCH
+
+
+__cache_root__ = None
+
+
+def NXDL_path():
+    '''return the path of the NXDL cache'''
+    return os.path.join(cache_path(), NXDL_CACHE_SUBDIR)
+
+
+def cache_path():
+    '''return the root path of the NXDL cache'''
+    global __cache_root__       # singleton
+
+    # TODO: look for a local cache in a user directory
+
+    if __cache_root__ is None:
+        # For now, only use cache in source tree
+        __cache_root__ = os.path.abspath(SOURCE_CACHE_ROOT)
+
+    return __cache_root__
 
 
 def gmt():
@@ -24,7 +47,7 @@ def gmt():
 
 def githubMasterInfo(org, repo):
     '''
-    get information about the organization's repository master branch from the HTML page
+    get information about the repository master branch
     
     :returns: dict (as below) or None if could not get info
     
@@ -113,10 +136,10 @@ def read_info(fname):
     return db
 
 
-def update_NXDL_Cache(path=SOURCE_CACHE_PATH):
+def update_NXDL_Cache(path=SOURCE_CACHE_ROOT):
     info = githubMasterInfo(GITHUB_ORGANIZATION, GITHUB_REPOSITORY)
     if info is not None:
-        updateCache(info, SOURCE_CACHE_PATH)
+        updateCache(info, SOURCE_CACHE_ROOT)
 
 
 if __name__ == '__main__':

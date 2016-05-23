@@ -12,6 +12,7 @@ Contents
    
    validate
    h5structure
+   nxdlstructure
    install
    changes
    license

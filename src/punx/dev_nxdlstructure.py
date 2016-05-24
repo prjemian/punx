@@ -25,7 +25,6 @@ import nxdlstructure
 # find the directory of this python file
 BASEDIR = cache.NXDL_path()
 
-
 nxdl = os.path.join(BASEDIR, 'base_classes', 'NXentry.nxdl.xml')
 # nxdl = os.path.join(BASEDIR, 'base_classes', 'NXcrystal.nxdl.xml')
 # nxdl = os.path.join(BASEDIR, 'base_classes', 'NXdata.nxdl.xml')

@@ -12,7 +12,7 @@
 #-----------------------------------------------------------------------------
 
 '''
-Describe the structure of a NeXus NXDL class specification
+Load and/or document the structure of a NeXus NXDL class specification
 
 * :class:`NXDL_specification`: the structure
 * define a text renderer method for that class
@@ -43,6 +43,49 @@ class NXDL_mixin(object):
 
     def __str__(self):
         return '-tba-'
+    
+    def get_group_data(self, node, ns, category):
+        self.attrs = {}
+        self.fields = {}
+        self.groups = {}
+        self.links = {}
+
+        for subnode in node.xpath('nx:attribute', namespaces=ns):
+            obj = NX_attribute(subnode, ns)
+            self.add_object(self.attrs, obj)
+
+        for subnode in node.xpath('nx:field', namespaces=ns):
+            obj = NX_field(subnode, ns, category)
+            self.add_object(self.fields, obj)
+
+        for subnode in node.xpath('nx:group', namespaces=ns):
+            obj = NX_group(subnode, ns, category)
+            self.add_object(self.groups, obj)
+        
+        for subnode in node.xpath('nx:link', namespaces=ns):
+            obj = NX_link(subnode, ns, category)
+            self.add_object(self.links, obj)
+    
+    def add_object(self, db, obj):
+        name = obj.name
+        if name in db:
+            name += '_1'
+        db[name] = obj
+
+    def render_group(self, group):
+        indentation = ' '*2
+        t = []
+        for _k, v in sorted(group.attrs.items()):
+            t.append(str(v))
+        for _k, v in sorted(group.fields.items()):
+            t.append(str(v))
+        for _k, v in sorted(group.links.items()):
+            t.append(str(v))
+        for _k, v in sorted(group.groups.items()):
+            t.append(str(v))
+            for line in group.render_group(v).splitlines():
+                t.append(indentation + line)
+        return '\n'.join(t)
 
 
 class NXDL_specification(NXDL_mixin):
@@ -56,22 +99,13 @@ class NXDL_specification(NXDL_mixin):
         self.category = None
         self.ns = None
         
-        self.attrs = {}
-        self.fields = {}
-        self.groups = {}
-        self.links = {}
-        
         self.parse_xml()
     
     def render(self):
         indentation = ' '*2
         t = [self.title,]
-        for k, v in sorted(self.attrs.items()):
-            t.append(indentation + str(v))
-        for k, v in sorted(self.fields.items()):
-            t.append(indentation + str(v))
-        for k, v in sorted(self.groups.items()):
-            t.append(indentation + str(v))
+        for line in self.render_group(self).splitlines():
+            t.append(indentation + line)
         return '\n'.join(t)
         
     def parse_xml(self):
@@ -94,19 +128,7 @@ class NXDL_specification(NXDL_mixin):
                      'contributed': 'contributed definition',
                      }[root.attrib["category"]]
 
-        for subnode in root.xpath('nx:attribute', namespaces=self.ns):
-            obj = NX_attribute(subnode, self.ns)
-            self.attrs[obj.name] = obj
-
-        for subnode in root.xpath('nx:field', namespaces=self.ns):
-            obj = NX_field(subnode, self.ns, self.category)
-            self.fields[obj.name] = obj
-
-        for subnode in root.xpath('nx:group', namespaces=self.ns):
-            obj = NX_group(subnode, self.ns, self.category, level=0)
-            self.groups[obj.name] = obj
-        
-        # TODO: parse links
+        self.get_group_data(root, self.ns, self.category)
 
 
 class NX_attribute(NXDL_mixin):
@@ -116,11 +138,16 @@ class NX_attribute(NXDL_mixin):
         self.nx_type = self.get_NX_type(node)
         self.units = self.get_NX_units(node)
         self.enum = []
-        for n in node.xpath('nx:enumeration', namespaces=ns):
-            self.enum.append( str(n) )
+        for n in node.xpath('nx:enumeration/nx:item', namespaces=ns):
+            self.enum.append( n.attrib['value'] )
 
     def __str__(self):
-        return '@' + self.name + ' : ' + self.nx_type
+        s = '@' + self.name
+        s += ' : ' + self.nx_type
+        if len(self.enum):
+            s += ' = '
+            s += ' | '.join(self.enum)
+        return s
 
 
 class NX_field(NXDL_mixin):
@@ -134,7 +161,7 @@ class NX_field(NXDL_mixin):
             self.minOccurs = node.get('minOccurs', 1)
         self.optional = self.minOccurs in ('0', 0)
         
-        self.dims = self.analyzeDimensions(node, ns)
+        self.dims = self.field_dimensions(node, ns)
 
         self.nx_type = self.get_NX_type(node)
         self.units = self.get_NX_units(node)
@@ -157,7 +184,7 @@ class NX_field(NXDL_mixin):
             s += ' = ' + ' | '.join(self.enum)
         return s
     
-    def analyzeDimensions( self, parent, ns ):
+    def field_dimensions( self, parent, ns ):
         node_list = parent.xpath('nx:dimensions', namespaces=ns)
         if len(node_list) != 1:
             return []
@@ -168,6 +195,9 @@ class NX_field(NXDL_mixin):
             value = subnode.get('value')
             if not value:
                 value = 'ref(%s)' % subnode.get('ref')
+            if index == 0:
+                # index="0": cannot know to which dimension this applies a priori
+                value = '*' + str(value) + '*'
             dims[index] = value
         
         if min(dims.keys()) == 0 and len(dims) == 1:
@@ -176,7 +206,6 @@ class NX_field(NXDL_mixin):
                 ``1 <= dataRank <= NX_MAXRANK=32``.  
                 At least one ``dim`` must have length ``n``.
             '''
-            # TODO: devise a way to note this
             pass    # index="0": cannot know to which dimension this applies a priori
         elif min(dims.keys()) != 1 or max(dims.keys()) != len(dims):
             msg = 'dimensions not specified properly: ' + str(dims)
@@ -187,24 +216,29 @@ class NX_field(NXDL_mixin):
 
 class NX_group(NXDL_mixin):
 
-    def __init__(self, node, ns, category, level):
+    def __init__(self, node, ns, category):
         self.name = node.get('name', '')
         self.NX_class = node.get('type', None)
         if self.NX_class is None:
             msg = 'group has no type, this is an error, name = ' + self.name
             raise ValueError(msg)
 
-        self.flexible_name = False
+        if category in ('base class', ):
+            self.flexible_name = True
+        else:
+            self.flexible_name = False
+
         if len(self.name) == 0:
             self.flexible_name = True
             self.name = '{' + self.NX_class[2:] + '}'
+
+        if category in ('base class',):
+            minOccurs = node.get('minOccurs', 0)
+        else:
+            minOccurs = node.get('minOccurs', 1)
+        self.optional = minOccurs in ('0', 0)
         
-        self.optional = None        # TODO:
-        
-        # TODO: parse attributes
-        # TODO: parse fields
-        # TODO: parse links
-        # TODO: parse groups
+        self.get_group_data(node, ns, category)
 
     def __str__(self):
         s = self.name
@@ -215,152 +249,11 @@ class NX_group(NXDL_mixin):
 class NX_link(NXDL_mixin):
 
     def __init__(self, node, ns, category):
-        pass
-
-
-# --------------------------------------
-# older interface - to be removed
-
-def fmtTyp( node ):
-    typ = node.get('type', 'NX_CHAR`') # per default
-#     if typ.startswith('NX_'):
-#         typ = ':ref:`%s <%s>`' % (typ, typ)
-    return typ
-
-
-def fmtUnits( node ):
-    units = node.get('units', '')
-    if not units:
-        return ''
-#     if units.startswith('NX_'):
-#         units = '\ :ref:`%s <%s>`' % (units, units)
-    return ' {units=%s}' % units
-
-
-def analyzeDimensions( ns, parent ):
-    node_list = parent.xpath('nx:dimensions', namespaces=ns)
-    if len(node_list) != 1:
-        return ''
-    node = node_list[0]
-    # rank = node.get('rank') # ignore this
-    node_list = node.xpath('nx:dim', namespaces=ns)
-    dims = []
-    for subnode in node_list:
-        value = subnode.get('value')
-        if not value:
-            value = 'ref(%s)' % subnode.get('ref')
-        dims.append( value )
-    return '[%s]' % ( ', '.join(dims) )
-
-
-def printEnumeration( indent, ns, parent ):
-    node_list = parent.xpath('nx:item', namespaces=ns)
-    if len(node_list) == 0:
-        return ''
-
-
-def printAttribute( ns, kind, node, indent ):
-    name = node.get('name')
-    print( '%s**@%s**: %s%s\n' % (
-        indent, name, fmtTyp(node), fmtUnits(node) ) )
-    node_list = node.xpath('nx:enumeration', namespaces=ns)
-    if len(node_list) == 1:
-        printEnumeration( indent+INDENTATION_UNIT, ns, node_list[0] )
-
-
-def printFullTree(ns, parent, name, indent):
-    '''
-    recursively print the full tree structure
-
-    :param dict ns: dictionary of namespaces for use in XPath expressions
-    :param lxml_element_node parent: parent node to be documented
-    :param str name: name of elements, such as NXentry/NXuser
-    :param indent: to keep track of indentation level
-    '''
-    global listing_category
-
-    for node in parent.xpath('nx:field', namespaces=ns):
-        name = node.get('name')
-        dims = analyzeDimensions(ns, node)
-        minOccurs = node.get('minOccurs', None)
-        if minOccurs is not None and minOccurs in ('0',) and listing_category in ('application definition', 'contributed definition'):
-            optional_text = '(optional) '
-        else:
-            optional_text = ''
-#         print( '%s.. index:: %s (field)\n' %
-#                ( indent, index_name ) )
-        print( '%s**%s%s**: %s%s%s\n' % (
-            indent, name, dims, optional_text, fmtTyp(node), fmtUnits(node) ) )
-
-        node_list = node.xpath('nx:enumeration', namespaces=ns)
-        if len(node_list) == 1:
-            printEnumeration( indent+INDENTATION_UNIT, ns, node_list[0] )
-
-        for subnode in node.xpath('nx:attribute', namespaces=ns):
-            printAttribute( ns, 'field', subnode, indent+INDENTATION_UNIT )
-
-    for node in parent.xpath('nx:group', namespaces=ns):
-        name = node.get('name', '')
-        typ = node.get('type', 'untyped (this is an error; please report)')
-        minOccurs = node.get('minOccurs', None)
-        if minOccurs is not None and minOccurs in ('0',) and listing_category in ('application definition', 'contributed definition'):
-            optional_text = '(optional) '
-        else:
-            optional_text = ''
-        if typ.startswith('NX'):
-            if name is '':
-                name = '(%s)' % typ.lstrip('NX')
-#             typ = ':ref:`%s`' % typ
-        print( '%s**%s**: %s%s\n' % (indent, name, optional_text, typ ) )
-
-        for subnode in node.xpath('nx:attribute', namespaces=ns):
-            printAttribute( ns, 'group', subnode, indent+INDENTATION_UNIT )
-
-        nodename = '%s/%s' % (name, node.get('type'))
-        printFullTree(ns, node, nodename, indent+INDENTATION_UNIT)
-
-    for node in parent.xpath('nx:link', namespaces=ns):
-        print( '%s**%s** --> %s\n' % (
-            indent, node.get('name'), node.get('target') ) )
-
-
-def print_rst_from_nxdl(nxdl_file):
-    '''
-    print restructured text from the named .nxdl.xml file
-    '''
-    global listing_category
-    # parse input file into tree
-    tree = lxml.etree.parse(nxdl_file)
-
-    ns = {'nx': NXDL_XML_NAMESPACE}
-
-    root = tree.getroot()
-    name = root.get('name')
-    title = name
-    if len(name)<2 or name[0:2]!='NX':
-        raise Exception( 'Unexpected class name "%s"; does not start with NX' %
-                         ( name ) )
-
-    # retrieve category from directory
-    #subdir = os.path.split(os.path.split(tree.docinfo.URL)[0])[1]
-    subdir = root.attrib["category"]
-    # TODO: check for consistency with root.get('category')
-    listing_category = {
-                 'base': 'base class',
-                 'application': 'application definition',
-                 'contributed': 'contributed definition',
-                 }[subdir]
-
-    print( '.. _%s:\n' % name )
-    print( '='*len(title) )
-    print( title )
-    print( '='*len(title) )
-
-    # print full tree
-    print( '**Structure**:\n' )
-    for subnode in root.xpath('nx:attribute', namespaces=ns):
-        printAttribute( ns, 'file', subnode, INDENTATION_UNIT )
-    printFullTree(ns, root, name, INDENTATION_UNIT)
+        self.name = node.get('name')
+        self.target = node.get('target')
+    
+    def __str__(self):
+        return self.name + ' --> ' + self.target
 
 
 def parse_command_line_arguments():
@@ -374,7 +267,6 @@ def parse_command_line_arguments():
 
     parser.add_argument('infile', 
                     action='store', 
-#                     nargs='+', 
                     help="NXDL file name")
 
     parser.add_argument('-v', 
@@ -399,7 +291,6 @@ def main():
     # TODO: validate NXDL first
     nxdl = NXDL_specification(nxdl_file)
     print nxdl.render()
-    # print_rst_from_nxdl(nxdl_file)
 
 
 if __name__ == '__main__':

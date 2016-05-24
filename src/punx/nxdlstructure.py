@@ -94,6 +94,7 @@ class NXDL_specification(NXDL_mixin):
         self.nxdl_file_name = nxdl_file
         if not os.path.exists(nxdl_file):
             raise IOError('file does not exist: ' + nxdl_file)
+        validate.validate_NXDL(nxdl_file)
         
         self.title = None
         self.category = None
@@ -116,12 +117,6 @@ class NXDL_specification(NXDL_mixin):
         root = tree.getroot()
         self.title = root.get('name')
         
-        # TODO: error checks will be unnecessary if NXDL is validated first
-        if not self.title.startswith('NX'):
-            msg = 'Class name does not start with NX, found: '
-            msg += self.title
-            raise ValueError(msg)
-
         self.category = {
                      'base': 'base class',
                      'application': 'application definition',
@@ -288,7 +283,6 @@ def main():
         print( 'Cannot find %s' % nxdl_file )
         exit()
 
-    validate.validate_NXDL(nxdl_file)
     nxdl = NXDL_specification(nxdl_file)
     print nxdl.render()
 

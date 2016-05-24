@@ -33,7 +33,7 @@ nxdl = os.path.join(BASEDIR, 'base_classes', 'NXentry.nxdl.xml')
 # nxdl = os.path.join(BASEDIR, 'applications', 'NXsas.nxdl.xml')
 # nxdl = os.path.join(BASEDIR, 'applications', 'NXarpes.nxdl.xml')
 # nxdl = os.path.join(BASEDIR, 'contributed_definitions', 'NXmagnetic_kicker.nxdl.xml')
-# nxdl = os.path.join(BASEDIR, 'contributed_definitions', 'NXcanSAS.nxdl.xml')
+nxdl = os.path.join(BASEDIR, 'contributed_definitions', 'NXcanSAS.nxdl.xml')
 
 if len(sys.argv) == 1:
     sys.argv.append(nxdl)

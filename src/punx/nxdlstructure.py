@@ -89,6 +89,9 @@ class NXDL_mixin(object):
 
 
 class NXDL_specification(NXDL_mixin):
+    '''
+    Contains the complete structure of the NXDL specification, without documentation
+    '''
     
     def __init__(self, nxdl_file):
         self.nxdl_file_name = nxdl_file
@@ -101,6 +104,9 @@ class NXDL_specification(NXDL_mixin):
         self.ns = None
         
         self.parse_xml()
+    
+    def __str__(self):
+        return self.title + ' : ' + self.category
     
     def render(self):
         indentation = ' '*2
@@ -195,7 +201,11 @@ class NX_field(NXDL_mixin):
                 value = '*' + str(value) + '*'
             dims[index] = value
         
-        if min(dims.keys()) == 0 and len(dims) == 1:
+        if len(dims) == 0:
+            # TODO: read the "rank" attribute and create array of that length with "0" values
+            rank = int(node_list[0].get('rank'))
+            return ['*' for _ in range(rank)]
+        if len(dims) == 1 and min(dims.keys()) == 0:
             '''
                 The rank of the ``data`` must satisfy
                 ``1 <= dataRank <= NX_MAXRANK=32``.  

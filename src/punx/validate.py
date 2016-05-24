@@ -17,10 +17,37 @@ validate NeXus NXDL and HDF5 data files
 
 import lxml.etree
 import os
-import sys
+import cache
 
 
 __url__ = 'http://punx.readthedocs.org/en/latest/validate.html'
+XML_SCHEMA_FILE = 'nxdl.xsd'
+
+
+def validate_NXDL(nxdl_file_name):
+    '''
+    Validate a NeXus NXDL file
+    '''
+    schema_file = os.path.join(cache.NXDL_path(), XML_SCHEMA_FILE)
+    validate_xml(nxdl_file_name, schema_file)
+
+
+def validate_xml(xml_file_name, XSD_Schema_file):
+    '''
+    validate an NXDL XML file against an XML Schema file
+
+    :param str xml_file_name: name of XML file
+    :param str XSD_Schema_file: name of XSD Schema file (local to package directory)
+    '''
+    xml_tree = lxml.etree.parse(xml_file_name)
+
+    if not os.path.exists(XSD_Schema_file):
+        raise IOError('Could not find XML Schema file: ' + XSD_Schema_file)
+    
+    xsd_doc = lxml.etree.parse(XSD_Schema_file)
+    xsd = lxml.etree.XMLSchema(xsd_doc)
+
+    return xsd.assertValid(xml_tree)
 
 
 def parse_command_line_arguments():

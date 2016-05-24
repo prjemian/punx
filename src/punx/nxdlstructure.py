@@ -23,8 +23,8 @@ __url__ = 'http://punx.readthedocs.org/en/latest/nxdlstructure.html'
 # testing:  see file dev_nxdl2rst.py
 
 import os
-import re
 import lxml.etree
+import validate
 
 
 PROGRAM_NAME = 'nxdlstructure'
@@ -288,7 +288,7 @@ def main():
         print( 'Cannot find %s' % nxdl_file )
         exit()
 
-    # TODO: validate NXDL first
+    validate.validate_NXDL(nxdl_file)
     nxdl = NXDL_specification(nxdl_file)
     print nxdl.render()
 

@@ -30,7 +30,7 @@ digraph G {
   NXdisk_chopper -> NXgeometry [weight=1];
   NXentry -> NXcharacterization [weight=1];
   NXentry -> NXcollection [weight=5];
-  NXentry -> NXdata [weight=33,shape=box,style=filled,color=red];
+  NXentry -> NXdata [weight=133,shape=box,style=filled,color=red];
   NXentry -> NXevent_data [weight=1];
   NXentry -> NXinstrument [weight=36];
   NXentry -> NXmonitor [weight=20];

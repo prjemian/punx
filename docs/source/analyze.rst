@@ -21,6 +21,12 @@ the NeXus base class hierarchy.
         NeXus base class hierarchy.  Red indicates
         required components.  All others are optional.
 
+Output from the :func:`analyze.base_class_hierarchy` 
+function is used as input
+to the ``dot`` program (from the ``graphviz`` package)
+to generate the image file::
+
+    dot -Tpng base_class_hierarchy.dot -o base_class_hierarchy.png
 
 ----
 

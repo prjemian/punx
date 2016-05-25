@@ -1,14 +1,14 @@
 .. _h5structure:
 
 h5structure
-########
+###########
 
 Command line tool to print the structure of an HDF5 file
 
 .. index:: examples; h5structure
 
 How to use **h5structure**
-***********************
+**************************
 
 Print the HDF5 tree of a file::
 

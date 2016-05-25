@@ -44,7 +44,7 @@ setup (name =  punx.__package_name__,        # punx
        packages = ['punx', ],
        #packages=find_packages(),
        package_data = {
-                       'punx': ['cache/*'],
+                       'punx': ['cache/*', 'cache/*/*', 'cache/*/*/*'],
                        },
        classifiers = punx.__classifiers__,
        entry_points={

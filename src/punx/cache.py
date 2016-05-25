@@ -94,7 +94,11 @@ def updateCache(info, path):
     cache_subdir = os.path.join(path, 'definitions-master')
 
     cache_info = read_info(info_file)
-    if (info['datetime'] <= cache_info['datetime']) and os.path.exists(cache_subdir):
+    same_sha = str(info['sha']) == str(cache_info['sha'])
+    same_datetime = str(info['datetime']) == str(cache_info['datetime'])
+    cache_subdir_exists = os.path.exists(cache_subdir)
+    do_not_update = same_sha and same_datetime and cache_subdir_exists
+    if do_not_update:
         return
     
     url = info['zip']
@@ -144,7 +148,7 @@ def read_info(fname):
             if len(line) == 0:
                 continue
             pos = line.find(': ')
-            db[ line[:pos] ] = line[pos+1:]
+            db[ line[:pos] ] = line[pos+1:].strip()
     return db
 
 

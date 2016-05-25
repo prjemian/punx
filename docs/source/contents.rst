@@ -13,6 +13,7 @@ Contents
    validate
    h5structure
    nxdlstructure
+   analyze
    install
    changes
    license

@@ -67,5 +67,5 @@ def base_class_hierarchy(nxdl_dict):
 
 
 if __name__ == '__main__':
-    nxdl_dict = nxdlstructure.get_NXDL_specs()
+    nxdl_dict = nxdlstructure.get_NXDL_specifications()
     base_class_hierarchy(nxdl_dict)

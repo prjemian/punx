@@ -278,7 +278,7 @@ class NX_link(NXDL_mixin):
         return self.name + ' --> ' + self.target
 
 
-def get_NXDL_specs():
+def get_NXDL_specifications():
     '''
     return a dictionary of NXDL structures, keyed by NX_class name
     '''

@@ -73,7 +73,11 @@ def githubMasterInfo(org, repo):
     # get repository information via GitHub API
     url = 'https://api.github.com/repos/%s/%s/commits' % (org, repo)
     
-    text = urllib.urlopen(url).read()
+    try:
+        text = urllib.urlopen(url).read()
+    except IOError:
+        # IOError: [Errno socket error] [Errno -2] Name or service not known -- (no network)
+        return None
 
     buf = json.loads(text)
 
@@ -87,20 +91,8 @@ def githubMasterInfo(org, repo):
 
 def updateCache(info, path):
     '''
-    download the repository ZIP file and extract the NXDL XML, XSL, and XSD files to the path
+    download the repository ZIP file and extract the NXDL (XML, XSL, & XSD) files to the path
     '''
-    info_file = os.path.join(path, CACHE_INFO_FILENAME)
-    cache_subdir = os.path.join(path, 'definitions-master')
-
-    # TODO: move all info decisions to update_NXDL_Cache()
-    cache_info = read_info(info_file)
-    same_sha = str(info['sha']) == str(cache_info['sha'])
-    same_datetime = str(info['datetime']) == str(cache_info['datetime'])
-    cache_subdir_exists = os.path.exists(cache_subdir)
-    do_not_update = same_sha and same_datetime and cache_subdir_exists
-    if do_not_update:
-        return
-    
     url = info['zip']
     u = urllib.urlopen(url)
     content = u.read()
@@ -113,13 +105,13 @@ def updateCache(info, path):
         parts = item.rstrip('/').split('/')
         if len(parts) == 2:             # get the XML Schema files
             if os.path.splitext(parts[1])[-1] in ('.xsd',):
-                zip_content.extract(item, 'cache')
+                zip_content.extract(item, path)
         elif len(parts) == 3:         # get the NXDL files
             if parts[1] in categories:    # the NXDL categories
                 if os.path.splitext(parts[2])[-1] in ('.xml .xsl'.split()):
-                    zip_content.extract(item, 'cache')
+                    zip_content.extract(item, path)
     
-    write_info(info, info_file)
+    write_info(info, info['file'])
 
 
 def write_info(info, fname):
@@ -153,10 +145,25 @@ def read_info(fname):
 
 
 def update_NXDL_Cache(path=SOURCE_CACHE_ROOT):
-    # TODO: bring all info decisions here
+    '''
+    update the local cache of NeXus NXDL files
+    '''
     info = githubMasterInfo(GITHUB_ORGANIZATION, GITHUB_REPOSITORY)
-    if info is not None:
-        updateCache(info, SOURCE_CACHE_ROOT)
+    if info is None:
+        return
+    info['file'] = os.path.join(path, CACHE_INFO_FILENAME)
+    
+    cache_info = read_info(info['file'])
+    cache_subdir = os.path.join(path, 'definitions-master')
+
+    same_sha = str(info['sha']) == str(cache_info['sha'])
+    same_datetime = str(info['datetime']) == str(cache_info['datetime'])
+    cache_subdir_exists = os.path.exists(cache_subdir)
+    do_not_update = same_sha and same_datetime and cache_subdir_exists
+    if do_not_update:
+        return
+
+    updateCache(info, path)
 
 
 if __name__ == '__main__':

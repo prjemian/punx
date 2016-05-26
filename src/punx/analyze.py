@@ -70,6 +70,9 @@ def ab_groups(p, g):
         ab_groups(sub.NX_class, sub)
 
 def base_class_hierarchy(nxdl_dict):
+    '''
+    print commands to generate a directed graph (for graphviz) of the base class hierarchy
+    '''
     # print len(nxdl_dict)
     for v in nxdl_dict.values():
         ab_groups(v.title, v)

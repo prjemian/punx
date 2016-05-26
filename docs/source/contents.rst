@@ -14,6 +14,7 @@ Contents
    h5structure
    nxdlstructure
    analyze
+   cache
    install
    changes
    license

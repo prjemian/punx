@@ -22,8 +22,10 @@ __url__ = 'http://punx.readthedocs.org/en/latest/nxdlstructure.html'
 
 # testing:  see file dev_nxdl2rst.py
 
-import os
+import collections
 import lxml.etree
+import os
+import cache
 import validate
 
 
@@ -274,6 +276,31 @@ class NX_link(NXDL_mixin):
     
     def __str__(self):
         return self.name + ' --> ' + self.target
+
+
+def get_NXDL_specs():
+    '''
+    return a dictionary of NXDL structures, keyed by NX_class name
+    '''
+    basedir = cache.NXDL_path()
+    path_list = [
+        os.path.join(basedir, 'base_classes'),
+        os.path.join(basedir, 'applications'),
+        os.path.join(basedir, 'contributed_definitions'),
+    ]
+    nxdl_file_list = []
+    for path in path_list:
+        for fname in sorted(os.listdir(path)):
+            if fname.endswith('.nxdl.xml'):
+                nxdl_file_list.append(os.path.join(path, fname))
+    
+    nxdl_dict = collections.OrderedDict()
+    for nxdl_file_name in nxdl_file_list:
+        # k = os.path.basename(nxdl_file_name)
+        obj = NXDL_specification(nxdl_file_name)
+        nxdl_dict[obj.title] = obj
+
+    return nxdl_dict
 
 
 def parse_command_line_arguments():

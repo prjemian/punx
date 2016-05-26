@@ -14,38 +14,11 @@
 '''
 Perform various analyses on the NXDL files
 
-First off, load ALL the NXDL classes and prepare a directed graph of the base class inheritance.
+1. load ALL the NXDL classes and prepare directed graph of the base class inheritance.
 '''
 
 
-import collections
-import os
-import cache
 import nxdlstructure
-
-# find the directory of this python file
-BASEDIR = cache.NXDL_path()
-
-
-def prep():
-    path_list = [
-        os.path.join(BASEDIR, 'base_classes'),
-        os.path.join(BASEDIR, 'applications'),
-        os.path.join(BASEDIR, 'contributed_definitions'),
-    ]
-    nxdl_file_list = []
-    for path in path_list:
-        for fname in sorted(os.listdir(path)):
-            if fname.endswith('.nxdl.xml'):
-                nxdl_file_list.append(os.path.join(path, fname))
-    
-    nxdl_dict = collections.OrderedDict()
-    for nxdl_file_name in nxdl_file_list:
-        # k = os.path.basename(nxdl_file_name)
-        obj = nxdlstructure.NXDL_specification(nxdl_file_name)
-        nxdl_dict[obj.title] = obj
-
-    return nxdl_dict
 
 
 ab = {}
@@ -68,6 +41,7 @@ def ab_groups(p, g):
         if nxdl_dict[p].category in ('base class',):
             ab_counter(p, sub.NX_class)
         ab_groups(sub.NX_class, sub)
+
 
 def base_class_hierarchy(nxdl_dict):
     '''
@@ -93,5 +67,5 @@ def base_class_hierarchy(nxdl_dict):
 
 
 if __name__ == '__main__':
-    nxdl_dict = prep()
+    nxdl_dict = nxdlstructure.get_NXDL_specs()
     base_class_hierarchy(nxdl_dict)

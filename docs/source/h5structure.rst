@@ -1,7 +1,7 @@
 .. _h5structure:
 
-h5structure
-###########
+h5structure: HDF5 Data File Structure
+#####################################
 
 Command line tool to print the structure of an HDF5 file
 

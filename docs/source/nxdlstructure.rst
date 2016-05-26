@@ -1,5 +1,5 @@
-NXDL Structure
-##############
+nxdlstructure: NXDL File Structure
+##################################
 
 Print the structure of a NeXus NXDL definition language file
 

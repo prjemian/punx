@@ -34,6 +34,9 @@ NXDL_XML_NAMESPACE = 'http://definition.nexusformat.org/nxdl/3.1'
 
 
 class NXDL_mixin(object):
+    '''
+    common components available to all subclasses
+    '''
     
     def get_NX_type(self, node):
         return node.get('type', 'NX_CHAR')
@@ -133,6 +136,9 @@ class NXDL_specification(NXDL_mixin):
 
 
 class NX_attribute(NXDL_mixin):
+    '''
+    NXDL attribute
+    '''
 
     def __init__(self, node, ns):
         self.name = node.get('name')
@@ -152,6 +158,9 @@ class NX_attribute(NXDL_mixin):
 
 
 class NX_field(NXDL_mixin):
+    '''
+    NXDL field
+    '''
 
     def __init__(self, node, ns, category):
         self.name = node.get('name')
@@ -220,6 +229,9 @@ class NX_field(NXDL_mixin):
 
 
 class NX_group(NXDL_mixin):
+    '''
+    NXDL group
+    '''
 
     def __init__(self, node, ns, category):
         self.name = node.get('name', '')
@@ -252,6 +264,9 @@ class NX_group(NXDL_mixin):
 
 
 class NX_link(NXDL_mixin):
+    '''
+    NXDL link
+    '''
 
     def __init__(self, node, ns, category):
         self.name = node.get('name')

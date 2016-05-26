@@ -19,7 +19,6 @@ import datetime
 import json
 import os
 import StringIO
-import sys
 import urllib
 import zipfile
 
@@ -93,6 +92,7 @@ def updateCache(info, path):
     info_file = os.path.join(path, CACHE_INFO_FILENAME)
     cache_subdir = os.path.join(path, 'definitions-master')
 
+    # TODO: move all info decisions to update_NXDL_Cache()
     cache_info = read_info(info_file)
     same_sha = str(info['sha']) == str(cache_info['sha'])
     same_datetime = str(info['datetime']) == str(cache_info['datetime'])
@@ -139,7 +139,7 @@ def read_info(fname):
     '''
     read current cache contents from file
     '''
-    db = dict(datetime='0')
+    db = dict(datetime='0', sha='')
     if os.path.exists(fname):
         for line in open(fname, 'r').readlines():
             line = line.strip()
@@ -153,6 +153,7 @@ def read_info(fname):
 
 
 def update_NXDL_Cache(path=SOURCE_CACHE_ROOT):
+    # TODO: bring all info decisions here
     info = githubMasterInfo(GITHUB_ORGANIZATION, GITHUB_REPOSITORY)
     if info is not None:
         updateCache(info, SOURCE_CACHE_ROOT)

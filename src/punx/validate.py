@@ -86,7 +86,10 @@ class Data_File_Validator(object):
         '''
         nx_class = group.attrs.get('NX_class', None)
         if nx_class is None:
-            self.new_finding(group, finding.NOTE, 'hdf5 group has no `NX_class` attribute')
+            if nxdl_classname == 'NXroot':
+                self.new_finding(group, finding.OK, 'hdf5 file')
+            else:
+                self.new_finding(group, finding.NOTE, 'hdf5 group has no `NX_class` attribute')
         else:
             self.new_finding(group, finding.OK, nx_class)
         defined_nxdl_list = self.nxdl_dict[nxdl_classname].getSubGroup_NX_class_list()

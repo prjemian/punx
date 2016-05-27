@@ -27,16 +27,16 @@ class Finding(object):
     '''
     a single observation noticed while validating
     
-    :param obj h5_object: h5py object
+    :param str h5_address: address of h5py item
     :param int severity: one of: OK NOTE WARNING ERROR TODO
     :param str comment: description
     '''
     
-    def __init__(self, h5_object, severity, comment):
+    def __init__(self, h5_address, severity, comment):
         if severity not in VALID_SEVERITY_LIST:
             msg = 'unknown severity value: ' + severity
             raise ValueError(msg)
-        self.h5_address = str(h5_object.name)
+        self.h5_address = h5_address
         self.severity = SEVERITIES[severity]
         self.comment = comment
     

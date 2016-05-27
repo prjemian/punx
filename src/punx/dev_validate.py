@@ -28,17 +28,24 @@ TEST_DATA_FILE = os.path.join(TEST_DATA_DIR, 'writer_1_3.hdf5')
 # TEST_DATA_FILE = os.path.join(TEST_DATA_DIR, 'writer_2_1.hdf5')
 
 
-def examine_group(group, nxdl_dict, classes=[]):
+def examine_group(group, nxdl_classname, nxdl_dict):
+    '''
+    check this group against the specification of nxdl_group
+    
+    :param obj group: instance of h5py.Group
+    :param str nxdl_classname: name of NXDL class this group should match
+    '''
     nx_class = group.attrs.get('NX_class', None)
-    print itemname, nx_class, 
-    print nx_class in classes   and   nx_class in nxdl_dict.keys()
+    print group, nx_class
+    nxdl_list = nxdl_dict[nxdl_classname].getSubGroup_NX_class_list()
+    for item in sorted(group):
+        obj = group.get(item)
+        if h5structure.isHdf5Group(obj):
+            nx_class = obj.attrs.get('NX_class', None)
+            if nx_class in nxdl_list:
+                examine_group(obj, nx_class, nxdl_dict)
 
 
 nxdl_dict = nxdlstructure.get_NXDL_specifications()
 h5_file_object = h5py.File(TEST_DATA_FILE, 'r')
-print h5_file_object
-for itemname in sorted(h5_file_object):
-    h5_obj = h5_file_object.get(itemname)
-    is_h5_group = h5structure.isHdf5Group(h5_obj)
-    if is_h5_group:
-        examine_group(h5_obj, nxdl_dict, ('NXentry',))
+examine_group(h5_file_object, 'NXroot', nxdl_dict)

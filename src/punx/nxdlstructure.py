@@ -136,6 +136,12 @@ class NXDL_specification(NXDL_mixin):
 
         self.get_group_data(root, self.ns, self.category)
 
+    def getSubGroup_NX_class_list(self):
+        '''
+        list the groups used in this NXDL specification by NX_class name
+        ''' 
+        return sorted({v.NX_class: None for v in self.groups.values()}.keys())
+
 
 class NX_attribute(NXDL_mixin):
     '''

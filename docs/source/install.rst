@@ -29,10 +29,11 @@ To install in an alternate location::
 Required Libraries
 ##################
 
-========  =============================
-Library   URL
-========  =============================
-h5py      http://www.h5py.org
-lxml      http://lxml.de
-numpy     http://numpy.scipy.org
-========  =============================
+============  ===================================
+Library       URL
+============  ===================================
+h5py          http://www.h5py.org
+lxml          http://lxml.de
+numpy         http://numpy.scipy.org
+pyRestTable   http://pyresttable.readthedocs.io
+============  ===================================

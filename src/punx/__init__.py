@@ -26,7 +26,7 @@ __url__          = u'http://punx.readthedocs.org'
 #__download_url__ = u'https://github.com/prjemian/spec2nexus/tarball/' + __version__
 __keywords__     = ['NeXus', 'HDF5']
 
-__install_requires__ = ('h5py', 'lxml', 'lxml.etree', 'numpy', )
+__install_requires__ = ('h5py', 'lxml', 'lxml.etree', 'numpy', 'pyRestTable',)
 __classifiers__ = [
      'Development Status :: 5 - Production/Stable',
      'Environment :: Console',
@@ -52,12 +52,13 @@ __classifiers__ = [
 __version__ = '0.0.1'
 __release__ = __version__
 
-# import os
-# on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
-# from ._version import get_versions
-# __version__ = get_versions()['version']
-# del get_versions
-# if on_rtd:
-#     # special handling for readthedocs.org, remove distracting info
-#     __version__ = __version__.split('+')[0]
-# __release__   = __version__
+if False:   # False while in development phase
+    import os
+    on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
+    from ._version import get_versions
+    __version__ = get_versions()['version']
+    del get_versions
+    if on_rtd:
+        # special handling for readthedocs.org, remove distracting info
+        __version__ = __version__.split('+')[0]
+    __release__   = __version__

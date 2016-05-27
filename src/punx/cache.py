@@ -22,7 +22,9 @@ import StringIO
 import urllib
 import zipfile
 
-SOURCE_CACHE_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), 'cache'))
+
+PKG_DIR = os.path.abspath(os.path.dirname(__file__))
+SOURCE_CACHE_ROOT = os.path.join(PKG_DIR, 'cache')
 GITHUB_ORGANIZATION = 'nexusformat'
 GITHUB_REPOSITORY = 'definitions'
 GITHUB_BRANCH = 'master'

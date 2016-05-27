@@ -33,5 +33,6 @@ Required Libraries
 Library   URL
 ========  =============================
 h5py      http://www.h5py.org
-numpy     http://numpy.scipy.org/
+lxml      http://lxml.de
+numpy     http://numpy.scipy.org
 ========  =============================

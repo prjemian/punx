@@ -15,9 +15,13 @@
 validate NeXus NXDL and HDF5 data files
 '''
 
+import h5py
 import lxml.etree
 import os
+
 import cache
+import h5structure
+import nxdlstructure
 
 
 __url__ = 'http://punx.readthedocs.org/en/latest/validate.html'
@@ -48,6 +52,51 @@ def validate_xml(xml_file_name, XSD_Schema_file):
     xsd = lxml.etree.XMLSchema(xsd_doc)
 
     return xsd.assertValid(xml_tree)
+
+
+def validate_h5data(fname):
+    nxdl_dict = nxdlstructure.get_NXDL_specifications()
+    h5_file_object = h5py.File(fname, 'r')
+    examine_group(h5_file_object, 'NXroot', nxdl_dict)
+
+
+# list of Finding() instances
+findings = []
+
+
+class Finding(object):
+    '''
+    a single observation noticed while validating
+    
+    :param obj h5_object: h5py object
+    :param str severity: one of: OK NOTE WARNING ERROR
+    '''
+    
+    def __init__(self, h5_object, severity, comment):
+        self.h5_address = h5_object.name
+        self.severity = severity
+        self.comment = comment
+    
+    def __str__(self, *args, **kwargs):
+        return self.h5_address + ' ' + self.severity
+
+
+def examine_group(group, nxdl_classname, nxdl_dict):
+    '''
+    check this group against the specification of nxdl_group
+    
+    :param obj group: instance of h5py.Group
+    :param str nxdl_classname: name of NXDL class this group should match
+    '''
+    nx_class = group.attrs.get('NX_class', None)
+    print group, nx_class
+    defined_nxdl_list = nxdl_dict[nxdl_classname].getSubGroup_NX_class_list()
+    for item in sorted(group):
+        obj = group.get(item)
+        if h5structure.isHdf5Group(obj):
+            obj_nx_class = obj.attrs.get('NX_class', None)
+            if obj_nx_class in defined_nxdl_list:
+                examine_group(obj, obj_nx_class, nxdl_dict)
 
 
 def parse_command_line_arguments():

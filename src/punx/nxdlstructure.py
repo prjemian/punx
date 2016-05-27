@@ -288,6 +288,8 @@ def get_NXDL_specifications():
     '''
     return a dictionary of NXDL structures, keyed by NX_class name
     '''
+    # TODO: This step takes some time, optimize it.
+    # TODO: check if this dict is already created and up to date
     basedir = cache.NXDL_path()
     path_list = [
         os.path.join(basedir, 'base_classes'),

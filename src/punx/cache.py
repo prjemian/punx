@@ -113,6 +113,10 @@ def updateCache(info, path):
                 if os.path.splitext(parts[2])[-1] in ('.xml .xsl'.split()):
                     zip_content.extract(item, path)
     
+    # TODO: parse using:  nxdl_dict = nxdlstructure.get_NXDL_specifications()
+    # TODO: cache_this = dict(nxdl_dict=nxdl_dict, info=info)
+    # TODO: info['nxdl_dict'] = os.path.join(path, 'nxdl_dict.file')
+    # TODO: write cache_this to info['nxdl_dict']
     write_info(info, info['file'])
 
 

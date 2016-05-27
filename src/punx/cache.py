@@ -15,12 +15,14 @@
 maintain the local cache of NeXus NXDL and XML Schema files
 '''
 
+import cPickle as pickle
 import datetime
 import json
 import os
 import StringIO
 import urllib
 import zipfile
+import nxdlstructure
 
 
 PKG_DIR = os.path.abspath(os.path.dirname(__file__))
@@ -29,6 +31,7 @@ GITHUB_ORGANIZATION = 'nexusformat'
 GITHUB_REPOSITORY = 'definitions'
 GITHUB_BRANCH = 'master'
 CACHE_INFO_FILENAME = 'cache-info.txt'
+PICKLE_FILE = 'nxdl.p'
 NXDL_CACHE_SUBDIR = GITHUB_REPOSITORY + '-' + GITHUB_BRANCH
 
 
@@ -113,10 +116,12 @@ def updateCache(info, path):
                 if os.path.splitext(parts[2])[-1] in ('.xml .xsl'.split()):
                     zip_content.extract(item, path)
     
-    # TODO: parse using:  nxdl_dict = nxdlstructure.get_NXDL_specifications()
-    # TODO: cache_this = dict(nxdl_dict=nxdl_dict, info=info)
-    # TODO: info['nxdl_dict'] = os.path.join(path, 'nxdl_dict.file')
-    # TODO: write cache_this to info['nxdl_dict']
+    # optimization: write the parsed NXDL specifications to a file
+    info['pickle_file'] = os.path.join(path, PICKLE_FILE)
+    nxdl_dict = nxdlstructure.get_NXDL_specifications()
+    pickle_data = dict(nxdl_dict=nxdl_dict, info=info)
+    pickle.dump(pickle_data, open(info['pickle_file'], 'wb'))
+
     write_info(info, info['file'])
 
 

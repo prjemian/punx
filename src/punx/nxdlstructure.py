@@ -23,6 +23,7 @@ __url__ = 'http://punx.readthedocs.org/en/latest/nxdlstructure.html'
 # testing:  see file dev_nxdl2rst.py
 
 import collections
+import cPickle as pickle
 import lxml.etree
 import os
 import cache
@@ -288,8 +289,20 @@ def get_NXDL_specifications():
     '''
     return a dictionary of NXDL structures, keyed by NX_class name
     '''
-    # TODO: This step takes some time, optimize it.
-    # TODO: check if this dict is already created and up to date
+    path = cache.cache_path()
+    fname = os.path.join(path, cache.CACHE_INFO_FILENAME)
+    info = cache.read_info(fname)
+    if 'pickle_file' in info:
+        # hope that we can read a cached version of nxdl_dict
+        if os.path.exists(info['pickle_file']):
+            pickle_data = pickle.load(open(info['pickle_file'], 'rb'))
+            if 'info' in pickle_data:
+                # any more tests to qualify this?
+                if info['sha'] == pickle_data['info']['sha']:
+                    # declare victory!
+                    return pickle_data['nxdl_dict']
+
+    # build the nxdl_dict by parsing all the NXDL specifications
     basedir = cache.NXDL_path()
     path_list = [
         os.path.join(basedir, 'base_classes'),

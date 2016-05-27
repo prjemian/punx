@@ -21,23 +21,28 @@ import sys
 import cache
 import nxdlstructure
 
+if False:
+    # find the directory of this python file
+    BASEDIR = cache.NXDL_path()
+    
+    nxdl = os.path.join(BASEDIR, 'base_classes', 'NXentry.nxdl.xml')
+    # nxdl = os.path.join(BASEDIR, 'base_classes', 'NXcrystal.nxdl.xml')
+    # nxdl = os.path.join(BASEDIR, 'base_classes', 'NXdata.nxdl.xml')
+    # nxdl = os.path.join(BASEDIR, 'base_classes', 'NXobject.nxdl.xml')
+    # nxdl = os.path.join(BASEDIR, 'applications', 'NXarchive.nxdl.xml')
+    # nxdl = os.path.join(BASEDIR, 'applications', 'NXsas.nxdl.xml')
+    # nxdl = os.path.join(BASEDIR, 'applications', 'NXarpes.nxdl.xml')
+    # nxdl = os.path.join(BASEDIR, 'contributed_definitions', 'NXmagnetic_kicker.nxdl.xml')
+    nxdl = os.path.join(BASEDIR, 'contributed_definitions', 'NXcanSAS.nxdl.xml')
+    
+    if len(sys.argv) == 1:
+        sys.argv.append(nxdl)
+    elif len(sys.argv) > 1:
+        sys.argv[1] = nxdl
+    
+    nxdlstructure.main()
 
-# find the directory of this python file
-BASEDIR = cache.NXDL_path()
 
-nxdl = os.path.join(BASEDIR, 'base_classes', 'NXentry.nxdl.xml')
-# nxdl = os.path.join(BASEDIR, 'base_classes', 'NXcrystal.nxdl.xml')
-# nxdl = os.path.join(BASEDIR, 'base_classes', 'NXdata.nxdl.xml')
-# nxdl = os.path.join(BASEDIR, 'base_classes', 'NXobject.nxdl.xml')
-# nxdl = os.path.join(BASEDIR, 'applications', 'NXarchive.nxdl.xml')
-# nxdl = os.path.join(BASEDIR, 'applications', 'NXsas.nxdl.xml')
-# nxdl = os.path.join(BASEDIR, 'applications', 'NXarpes.nxdl.xml')
-# nxdl = os.path.join(BASEDIR, 'contributed_definitions', 'NXmagnetic_kicker.nxdl.xml')
-nxdl = os.path.join(BASEDIR, 'contributed_definitions', 'NXcanSAS.nxdl.xml')
-
-if len(sys.argv) == 1:
-    sys.argv.append(nxdl)
-elif len(sys.argv) > 1:
-    sys.argv[1] = nxdl
-
-nxdlstructure.main()
+if True:
+    nxdl_dict = nxdlstructure.get_NXDL_specifications()
+    print len(nxdl_dict)

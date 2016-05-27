@@ -18,8 +18,9 @@ OK = 0
 NOTE = 1
 WARNING = 2
 ERROR = 3
-VALID_SEVERITY_LIST = (OK, NOTE, WARNING, ERROR)
-SEVERITIES = 'OK NOTE WARNING ERROR'.split()
+TODO = 4
+VALID_SEVERITY_LIST = (OK, NOTE, WARNING, ERROR, TODO)
+SEVERITIES = 'OK NOTE WARNING ERROR TODO'.split()
 
 
 class Finding(object):
@@ -27,7 +28,7 @@ class Finding(object):
     a single observation noticed while validating
     
     :param obj h5_object: h5py object
-    :param int severity: one of: OK NOTE WARNING ERROR
+    :param int severity: one of: OK NOTE WARNING ERROR TODO
     :param str comment: description
     '''
     

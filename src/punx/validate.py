@@ -78,7 +78,7 @@ class Data_File_Validator(object):
         f = finding.Finding(h5_object, severity, comment)
         self.findings.append(f)
 
-    def get_attribute(self, obj, attribute, default=None):
+    def get_hdf5_attribute(self, obj, attribute, default=None):
         '''
         HDF5 attribute strings might be coded in several ways
         '''
@@ -94,26 +94,61 @@ class Data_File_Validator(object):
         :param obj group: instance of h5py.Group
         :param str nxdl_classname: name of NXDL class this group should match
         '''
-        nx_class = self.get_attribute(group, 'NX_class')
+        nx_class = self.get_hdf5_attribute(group, 'NX_class')
         if nx_class is None:
             if nxdl_classname == 'NXroot':
-                self.new_finding(group, finding.OK, 'hdf5 file')
+                self.new_finding(group, finding.TODO, 'hdf5 file')
             else:
                 self.new_finding(group, finding.NOTE, 'hdf5 group has no `NX_class` attribute')
         else:
             self.new_finding(group, finding.OK, 'NX_class=' + nx_class)
+        
+        # HDF5 group attributes
+        for item in sorted(group.attrs.keys()):
+            if item not in ('NX_class',):
+                self.new_finding(group, finding.TODO, '@' + item + ': --TBA--')
+
+        # TODO: special case for NXentry
+        # TODO: special case for NXsubentry
+        # TODO: special case for NXdata
+
+        # get a list of the NXDL subgroups defined in this group
         nxdl_class_obj = self.nxdl_dict[nxdl_classname]
         defined_nxdl_list = nxdl_class_obj.getSubGroup_NX_class_list()
+        
+        # HDF5 group children
         for item in sorted(group):
             obj = group.get(item)
             if h5structure.isHdf5Group(obj):
-                obj_nx_class = self.get_attribute(obj, 'NX_class')
+                obj_nx_class = self.get_hdf5_attribute(obj, 'NX_class')
                 if obj_nx_class in defined_nxdl_list:
                     self.examine_group(obj, obj_nx_class)
                 else:
                     self.new_finding(obj, finding.NOTE, 'not defined in ' + nxdl_classname)
+            elif h5structure.isHdf5Dataset(obj):
+                self.examine_dataset(obj, group)
             else:
-                self.new_finding(obj, finding.NOTE, '--TBA--')
+                self.new_finding(obj, finding.TODO, '--TBA--')
+
+    
+    def examine_dataset(self, dataset, group):
+        '''
+        check dataset against the specification of group NXDL specification
+        
+        :param obj dataset: instance of h5py.Dataset
+        :param obj group: instance of h5py.Group
+        '''
+        nx_class = self.get_hdf5_attribute(group, 'NX_class')
+        nxdl_class_obj = self.nxdl_dict[nx_class]
+        ds_name = dataset.name.split('/')[-1]
+        if ds_name not in nxdl_class_obj.fields:
+            self.new_finding(dataset, finding.NOTE, 'unspecified field')
+        else:
+            self.new_finding(dataset, finding.TODO, '--TBA--')
+
+        # HDF5 dataset attributes
+        for item in sorted(dataset.attrs.keys()):
+            self.new_finding(dataset, finding.TODO, '@' + item + ': --TBA--')
 
 
 def parse_command_line_arguments():

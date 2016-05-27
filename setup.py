@@ -27,31 +27,33 @@ long_description = open('README.rst', 'r').read()
 
 
 setup (name =  punx.__package_name__,        # punx
-       version = punx.__version__,
-       #version = versioneer.get_version(),
-       #cmdclass=versioneer.get_cmdclass(),
-       license = punx.__license__,
-       description = punx.__description__,
+       version          = punx.__version__,
+       license          = punx.__license__,
+       description      = punx.__description__,
        long_description = long_description,
-       author=punx.__author_name__,
-       author_email=punx.__author_email__,
-       url=punx.__url__,
-       #download_url=punx.__download_url__,
-       keywords=punx.__keywords__,
-       platforms='any',
+       author           = punx.__author_name__,
+       author_email     = punx.__author_email__,
+       url              = punx.__url__,
+       #download_url     = punx.__download_url__,
+       keywords         = punx.__keywords__,
+       platforms        = 'any',
        install_requires = punx.__install_requires__,
-       package_dir = {'': 'src'},
-       packages = ['punx', ],
+       package_dir      = {'': 'src'},
+       packages         = ['punx', ],
        #packages=find_packages(),
-       package_data = {
-                       'punx': ['cache/*', 'cache/*/*', 'cache/*/*/*'],
-                       },
-       classifiers = punx.__classifiers__,
-       entry_points={
+       package_data     = {
+                           'punx': ['cache/*', 
+                                    'cache/*/*', 
+                                    'cache/*/*/*'],
+                        },
+       classifiers      = punx.__classifiers__,
+       entry_points     = {
             # create & install scripts in <python>/bin
             'console_scripts': [
                 # 'punx=punx.nexus:main',
 			],
             #'gui_scripts': [],
        },
+       #version          = versioneer.get_version(),
+       #cmdclass         = versioneer.get_cmdclass(),
       )

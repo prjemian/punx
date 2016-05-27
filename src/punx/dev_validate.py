@@ -25,7 +25,9 @@ import nxdlstructure
 PKG_DIR = os.path.abspath(os.path.dirname(__file__))
 TEST_DATA_DIR = os.path.join(PKG_DIR, 'data')
 TEST_DATA_FILE = os.path.join(TEST_DATA_DIR, 'writer_1_3.hdf5')
-# TEST_DATA_FILE = os.path.join(TEST_DATA_DIR, 'writer_2_1.hdf5')
+TEST_DATA_FILE = os.path.join(TEST_DATA_DIR, 'writer_2_1.hdf5')
+# TEST_DATA_FILE = os.path.join(TEST_DATA_DIR, 'compression.h5')
+# TEST_DATA_FILE = os.path.join(TEST_DATA_DIR, 'Data_Q.h5')
 
 
 def examine_group(group, nxdl_classname, nxdl_dict):
@@ -37,13 +39,13 @@ def examine_group(group, nxdl_classname, nxdl_dict):
     '''
     nx_class = group.attrs.get('NX_class', None)
     print group, nx_class
-    nxdl_list = nxdl_dict[nxdl_classname].getSubGroup_NX_class_list()
+    defined_nxdl_list = nxdl_dict[nxdl_classname].getSubGroup_NX_class_list()
     for item in sorted(group):
         obj = group.get(item)
         if h5structure.isHdf5Group(obj):
-            nx_class = obj.attrs.get('NX_class', None)
-            if nx_class in nxdl_list:
-                examine_group(obj, nx_class, nxdl_dict)
+            obj_nx_class = obj.attrs.get('NX_class', None)
+            if obj_nx_class in defined_nxdl_list:
+                examine_group(obj, obj_nx_class, nxdl_dict)
 
 
 nxdl_dict = nxdlstructure.get_NXDL_specifications()

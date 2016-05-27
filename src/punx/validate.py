@@ -20,6 +20,7 @@ import lxml.etree
 import os
 
 import cache
+import finding
 import h5structure
 import nxdlstructure
 
@@ -54,49 +55,51 @@ def validate_xml(xml_file_name, XSD_Schema_file):
     return xsd.assertValid(xml_tree)
 
 
-def validate_h5data(fname):
-    nxdl_dict = nxdlstructure.get_NXDL_specifications()
-    h5_file_object = h5py.File(fname, 'r')
-    examine_group(h5_file_object, 'NXroot', nxdl_dict)
-
-
-# list of Finding() instances
-findings = []
-
-
-class Finding(object):
+class Data_File_Validator(object):
     '''
-    a single observation noticed while validating
-    
-    :param obj h5_object: h5py object
-    :param str severity: one of: OK NOTE WARNING ERROR
+    manage the validation of a NeXus HDF5 data file
     '''
     
-    def __init__(self, h5_object, severity, comment):
-        self.h5_address = h5_object.name
-        self.severity = severity
-        self.comment = comment
+    def __init__(self, fname):
+        self.fname = fname
+        self.findings = []      # list of Finding() instances
+        self.nxdl_dict = nxdlstructure.get_NXDL_specifications()
+        self.h5 = h5py.File(fname, 'r')
     
-    def __str__(self, *args, **kwargs):
-        return self.h5_address + ' ' + self.severity
+    def validate(self):
+        '''start the validation process'''
+        self.examine_group(self.h5, 'NXroot')
 
+    def new_finding(self, h5_object, severity, comment):
+        '''
+        accumulate a list of findings
+        '''
+        f = finding.Finding(h5_object, severity, comment)
+        self.findings.append(f)
 
-def examine_group(group, nxdl_classname, nxdl_dict):
-    '''
-    check this group against the specification of nxdl_group
-    
-    :param obj group: instance of h5py.Group
-    :param str nxdl_classname: name of NXDL class this group should match
-    '''
-    nx_class = group.attrs.get('NX_class', None)
-    print group, nx_class
-    defined_nxdl_list = nxdl_dict[nxdl_classname].getSubGroup_NX_class_list()
-    for item in sorted(group):
-        obj = group.get(item)
-        if h5structure.isHdf5Group(obj):
-            obj_nx_class = obj.attrs.get('NX_class', None)
-            if obj_nx_class in defined_nxdl_list:
-                examine_group(obj, obj_nx_class, nxdl_dict)
+    def examine_group(self, group, nxdl_classname):
+        '''
+        check group against the specification of nxdl_classname
+        
+        :param obj group: instance of h5py.Group
+        :param str nxdl_classname: name of NXDL class this group should match
+        '''
+        nx_class = group.attrs.get('NX_class', None)
+        if nx_class is None:
+            self.new_finding(group, finding.NOTE, 'hdf5 group has no `NX_class` attribute')
+        else:
+            self.new_finding(group, finding.OK, nx_class)
+        defined_nxdl_list = self.nxdl_dict[nxdl_classname].getSubGroup_NX_class_list()
+        for item in sorted(group):
+            obj = group.get(item)
+            if h5structure.isHdf5Group(obj):
+                obj_nx_class = obj.attrs.get('NX_class', None)
+                if obj_nx_class in defined_nxdl_list:
+                    self.examine_group(obj, obj_nx_class)
+                else:
+                    self.new_finding(obj, finding.NOTE, 'not defined in ' + nxdl_classname)
+            else:
+                self.new_finding(obj, finding.NOTE, '--TBA--')
 
 
 def parse_command_line_arguments():

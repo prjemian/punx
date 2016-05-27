@@ -17,6 +17,7 @@ Developers: use this code to develop and test validate.py
 
 
 import os
+import pyRestTable
 import validate
 
 
@@ -28,4 +29,14 @@ TEST_DATA_FILE = os.path.join(TEST_DATA_DIR, 'writer_2_1.hdf5')
 # TEST_DATA_FILE = os.path.join(TEST_DATA_DIR, 'Data_Q.h5')
 
 
-validate.validate_h5data(TEST_DATA_FILE)
+v = validate.Data_File_Validator(TEST_DATA_FILE)
+v.validate()
+
+# report the findings from the validation
+print 'file: ' + os.path.basename(v.fname)
+print ''
+t = pyRestTable.Table()
+t.labels = 'status address comment(s)'.split()
+for f in v.findings:
+    t.rows.append((f.severity, f.h5_address, f.comment))
+print t.reST()

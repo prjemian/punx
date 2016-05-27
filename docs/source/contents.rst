@@ -10,12 +10,13 @@ Contents
    :maxdepth: 2
    :glob:
    
-   validate
-   h5structure
-   nxdlstructure
    analyze
    cache
+   finding
+   h5structure
    install
+   nxdlstructure
+   validate
    changes
    license
 

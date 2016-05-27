@@ -17,6 +17,7 @@ validate NeXus NXDL and HDF5 data files
 
 import h5py
 import lxml.etree
+import numpy
 import os
 
 import cache
@@ -77,6 +78,15 @@ class Data_File_Validator(object):
         f = finding.Finding(h5_object, severity, comment)
         self.findings.append(f)
 
+    def get_attribute(self, obj, attribute, default=None):
+        '''
+        HDF5 attribute strings might be coded in several ways
+        '''
+        a = obj.attrs.get('NX_class', default)
+        if isinstance(a, numpy.ndarray):
+            a = a[0]
+        return a
+
     def examine_group(self, group, nxdl_classname):
         '''
         check group against the specification of nxdl_classname
@@ -84,19 +94,20 @@ class Data_File_Validator(object):
         :param obj group: instance of h5py.Group
         :param str nxdl_classname: name of NXDL class this group should match
         '''
-        nx_class = group.attrs.get('NX_class', None)
+        nx_class = self.get_attribute(group, 'NX_class')
         if nx_class is None:
             if nxdl_classname == 'NXroot':
                 self.new_finding(group, finding.OK, 'hdf5 file')
             else:
                 self.new_finding(group, finding.NOTE, 'hdf5 group has no `NX_class` attribute')
         else:
-            self.new_finding(group, finding.OK, nx_class)
-        defined_nxdl_list = self.nxdl_dict[nxdl_classname].getSubGroup_NX_class_list()
+            self.new_finding(group, finding.OK, 'NX_class=' + nx_class)
+        nxdl_class_obj = self.nxdl_dict[nxdl_classname]
+        defined_nxdl_list = nxdl_class_obj.getSubGroup_NX_class_list()
         for item in sorted(group):
             obj = group.get(item)
             if h5structure.isHdf5Group(obj):
-                obj_nx_class = obj.attrs.get('NX_class', None)
+                obj_nx_class = self.get_attribute(obj, 'NX_class')
                 if obj_nx_class in defined_nxdl_list:
                     self.examine_group(obj, obj_nx_class)
                 else:

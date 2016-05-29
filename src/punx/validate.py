@@ -121,7 +121,9 @@ class Data_File_Validator(object):
         for item in sorted(group):
             # TODO: check item name against regular expression
             obj = group.get(item)
-            if h5structure.isHdf5Group(obj):
+            if h5structure.isNeXusLink(obj):
+                self.new_finding(obj.name, finding.OK, '--> ' + obj.attrs['target'])
+            elif h5structure.isHdf5Group(obj):
                 obj_nx_class = self.get_hdf5_attribute(obj, 'NX_class')
                 if obj_nx_class in defined_nxdl_list:
                     self.examine_group(obj, obj_nx_class)

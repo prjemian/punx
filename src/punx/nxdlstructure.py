@@ -291,16 +291,13 @@ def get_NXDL_specifications():
     '''
     path = cache.cache_path()
     fname = os.path.join(path, cache.CACHE_INFO_FILENAME)
-    info = cache.read_info(fname)
+    info = cache.read_info_file(fname)
     if 'pickle_file' in info:
         # hope that we can read a cached version of nxdl_dict
         if os.path.exists(info['pickle_file']):
-            pickle_data = pickle.load(open(info['pickle_file'], 'rb'))
-            if 'info' in pickle_data:
-                # any more tests to qualify this?
-                if info['sha'] == pickle_data['info']['sha']:
-                    # declare victory!
-                    return pickle_data['nxdl_dict']
+            nxdl_dict = cache.read_pickle_file(info)
+            if nxdl_dict is not None:      # declare victory!
+                return nxdl_dict
 
     # build the nxdl_dict by parsing all the NXDL specifications
     basedir = cache.NXDL_path()

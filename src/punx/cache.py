@@ -144,15 +144,34 @@ def updateCache(info, path):
                     zip_content.extract(item, path)
     
     # optimization: write the parsed NXDL specifications to a file
+    write_pickle_file(info, path)
+    write_info_file(info, info['file'])
+
+
+def write_pickle_file(info, path):
+    '''
+    write the parsed nxdl_dict and info to a Python pickle file
+    '''
     info['pickle_file'] = os.path.join(path, PICKLE_FILE)
     nxdl_dict = nxdlstructure.get_NXDL_specifications()
     pickle_data = dict(nxdl_dict=nxdl_dict, info=info)
     pickle.dump(pickle_data, open(info['pickle_file'], 'wb'))
 
-    write_info(info, info['file'])
+
+def read_pickle_file(info):
+    '''
+    read the parsed nxdl_dict and info from a Python pickle file
+    '''
+    pickle_data = pickle.load(open(info['pickle_file'], 'rb'))
+    if 'info' in pickle_data:
+        # any other tests to qualify this?
+        if info['sha'] == pickle_data['info']['sha']:
+            # declare victory!
+            return pickle_data['nxdl_dict']
+    return None
 
 
-def write_info(info, fname):
+def write_info_file(info, fname):
     '''
     describe the current cache contents in file
     '''
@@ -165,7 +184,7 @@ def write_info(info, fname):
     f.close()
 
 
-def read_info(fname):
+def read_info_file(fname):
     '''
     read current cache contents from file
     '''
@@ -191,7 +210,7 @@ def update_NXDL_Cache(path=SOURCE_CACHE_ROOT):
         return
     info['file'] = os.path.join(path, CACHE_INFO_FILENAME)
     
-    cache_info = read_info(info['file'])
+    cache_info = read_info_file(info['file'])
     cache_subdir = os.path.join(path, 'definitions-master')
 
     same_sha = str(info['sha']) == str(cache_info['sha'])

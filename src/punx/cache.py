@@ -38,9 +38,30 @@ NXDL_CACHE_SUBDIR = GITHUB_REPOSITORY + '-' + GITHUB_BRANCH
 __cache_root__ = None
 
 
+def __is_developer_source_path_(path):
+    '''
+    check if path points at source cache
+    
+    path must have these strings: ``eclipse``, ``punx``, ``src``
+    '''
+    if 'eclipse' not in path:   # developer uses eclipse IDE
+        return False
+    if 'punx' not in path:      # project name
+        return False
+    if 'src' not in path:      # project name
+        return False
+    return 'jemian' in path.lower() or 'pete' in path.lower()
+
+
 def NXDL_path():
     '''return the path of the NXDL cache'''
-    return os.path.join(cache_path(), NXDL_CACHE_SUBDIR)
+    path = os.path.join(cache_path(), NXDL_CACHE_SUBDIR)
+    if not os.path.exists(path):
+        if __is_developer_source_path_(path):
+            update_NXDL_Cache(os.path.dirname(path))
+        else:
+            raise IOError('directory does not exist: ' + path)
+    return path
 
 
 def cache_path():
@@ -51,7 +72,13 @@ def cache_path():
 
     if __cache_root__ is None:
         # For now, only use cache in source tree
-        __cache_root__ = os.path.abspath(SOURCE_CACHE_ROOT)
+        p = os.path.abspath(SOURCE_CACHE_ROOT)
+        if not os.path.exists(p):
+            if __is_developer_source_path_(p):
+                os.mkdir(p)
+            else:
+                raise IOError('directory does not exist: ' + __cache_root__)
+        __cache_root__ = p
 
     return __cache_root__
 

@@ -69,6 +69,7 @@ class Data_File_Validator(object):
     
     def validate(self):
         '''start the validation process'''
+        # TODO: establish the criteria to validate
         self.examine_group(self.h5, 'NXroot')
 
     def new_finding(self, h5_address, severity, comment):
@@ -112,6 +113,7 @@ class Data_File_Validator(object):
         # TODO: special case for NXentry
         # TODO: special case for NXsubentry
         # TODO: special case for NXdata
+        # TODO: special case for NXcollection
 
         # get a list of the NXDL subgroups defined in this group
         nxdl_class_obj = self.nxdl_dict[nxdl_classname]

@@ -16,6 +16,7 @@ Contents
    h5structure
    install
    nxdlstructure
+   settings
    validate
    changes
    license

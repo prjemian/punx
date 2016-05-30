@@ -26,6 +26,10 @@ __url__          = u'http://punx.readthedocs.org'
 #__download_url__ = u'https://github.com/prjemian/spec2nexus/tarball/' + __version__
 __keywords__     = ['NeXus', 'HDF5']
 
+# used by QSettings to store configuration and user cache
+__settings_organization__ = __package_name__
+__settings_package__ = __package_name__
+
 __install_requires__ = ('h5py', 'lxml', 'lxml.etree', 'numpy', 'pyRestTable',)
 __classifiers__ = [
      'Development Status :: 5 - Production/Stable',

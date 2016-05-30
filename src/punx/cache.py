@@ -13,6 +13,16 @@
 
 '''
 maintain the local cache of NeXus NXDL and XML Schema files
+
+A key component necessary to validate both NeXus data files and 
+NXDL class files is a current set of the NXDL definitions.
+This code maintains two sets of the definitions.  One is the set 
+provided with the package at installation.  This set is updated
+by the developer prior to packaging the source for distribution.
+The second set is updated in a directory that can be written by 
+the user.  This set is checked for updated versions periodically 
+when a network connection allows the code to contact the GitHub
+source code repository.
 '''
 
 import cPickle as pickle
@@ -22,17 +32,18 @@ import os
 import StringIO
 import urllib
 import zipfile
+
 import nxdlstructure
 
 
 PKG_DIR = os.path.abspath(os.path.dirname(__file__))
 SOURCE_CACHE_ROOT = os.path.join(PKG_DIR, 'cache')
-GITHUB_ORGANIZATION = 'nexusformat'
-GITHUB_REPOSITORY = 'definitions'
-GITHUB_BRANCH = 'master'
+GITHUB_NXDL_ORGANIZATION = 'nexusformat'
+GITHUB_NXDL_REPOSITORY = 'definitions'
+GITHUB_NXDL_BRANCH = 'master'
 CACHE_INFO_FILENAME = 'cache-info.txt'
 PICKLE_FILE = 'nxdl.p'
-NXDL_CACHE_SUBDIR = GITHUB_REPOSITORY + '-' + GITHUB_BRANCH
+NXDL_CACHE_SUBDIR = GITHUB_NXDL_REPOSITORY + '-' + GITHUB_NXDL_BRANCH
 
 
 __cache_root__ = None
@@ -165,8 +176,8 @@ def read_pickle_file(info):
     pickle_data = pickle.load(open(info['pickle_file'], 'rb'))
     if 'info' in pickle_data:
         # any other tests to qualify this?
-        if info['sha'] == pickle_data['info']['sha']:
-            # declare victory!
+        if info['sha'] == pickle_data['info']['sha']:   # declare victory!
+            # do not need to return ``info`` since it matches
             return pickle_data['nxdl_dict']
     return None
 
@@ -205,7 +216,7 @@ def update_NXDL_Cache(path=SOURCE_CACHE_ROOT):
     '''
     update the local cache of NeXus NXDL files
     '''
-    info = githubMasterInfo(GITHUB_ORGANIZATION, GITHUB_REPOSITORY)
+    info = githubMasterInfo(GITHUB_NXDL_ORGANIZATION, GITHUB_NXDL_REPOSITORY)
     if info is None:
         return
     info['file'] = os.path.join(path, CACHE_INFO_FILENAME)

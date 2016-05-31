@@ -23,6 +23,12 @@ The second set is updated in a directory that can be written by
 the user.  This set is checked for updated versions periodically 
 when a network connection allows the code to contact the GitHub
 source code repository.
+
+.. rubric:: Public Interface
+
+* :meth:`~punx.cache.cache_path`
+* :meth:`~punx.cache.NXDL_path`
+* :meth:`~punx.cache.update_NXDL_Cache`
 '''
 
 import cPickle as pickle

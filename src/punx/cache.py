@@ -40,6 +40,7 @@ import urllib
 import zipfile
 
 import nxdlstructure
+import settings
 
 
 PKG_DIR = os.path.abspath(os.path.dirname(__file__))
@@ -86,6 +87,8 @@ def cache_path():
     global __cache_root_singleton__       # singleton
 
     # TODO: look for a local cache in a user directory
+    qset = settings.qsettings()
+    qset_path = settings.directory()    # the user cache directory
 
     if __cache_root_singleton__ is None:
         # For now, only use cache in source tree
@@ -94,7 +97,7 @@ def cache_path():
             if __is_developer_source_path_(p):
                 os.mkdir(p)
             else:
-                raise IOError('directory does not exist: ' + __cache_root_singleton__)
+                raise IOError('directory does not exist: ' + p)
         __cache_root_singleton__ = p
 
     return __cache_root_singleton__

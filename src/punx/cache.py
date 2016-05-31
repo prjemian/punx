@@ -26,9 +26,9 @@ source code repository.
 
 .. rubric:: Public Interface
 
-* :meth:`~punx.cache.cache_path`
-* :meth:`~punx.cache.NXDL_path`
-* :meth:`~punx.cache.update_NXDL_Cache`
+:cache directory in use:                   :meth:`~punx.cache.cache_path`
+:directory with NXDL definitions:          :meth:`~punx.cache.NXDL_path`
+:get new NXDL definitions from GitHub:     :meth:`~punx.cache.update_NXDL_Cache`
 '''
 
 import cPickle as pickle

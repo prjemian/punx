@@ -4,14 +4,9 @@ manage the settings file for this application
 
 .. rubric:: Public Interface
 
-    
-==================  =================
-item                Python code
-==================  =================
-settings object     :meth:`qsettings`
-settings file       :meth:`filename`
-settings directory  :meth:`directory`
-==================  =================
+:settings object:     :meth:`qsettings`
+:settings file:       :meth:`filename`
+:settings directory:  :meth:`directory`
 '''
 
 #-----------------------------------------------------------------------------

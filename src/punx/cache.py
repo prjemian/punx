@@ -46,7 +46,7 @@ PICKLE_FILE = 'nxdl.p'
 NXDL_CACHE_SUBDIR = GITHUB_NXDL_REPOSITORY + '-' + GITHUB_NXDL_BRANCH
 
 
-__cache_root__ = None
+__cache_root_singleton__ = None
 
 
 def __is_developer_source_path_(path):
@@ -77,21 +77,21 @@ def NXDL_path():
 
 def cache_path():
     '''return the root path of the NXDL cache'''
-    global __cache_root__       # singleton
+    global __cache_root_singleton__       # singleton
 
     # TODO: look for a local cache in a user directory
 
-    if __cache_root__ is None:
+    if __cache_root_singleton__ is None:
         # For now, only use cache in source tree
         p = os.path.abspath(SOURCE_CACHE_ROOT)
         if not os.path.exists(p):
             if __is_developer_source_path_(p):
                 os.mkdir(p)
             else:
-                raise IOError('directory does not exist: ' + __cache_root__)
-        __cache_root__ = p
+                raise IOError('directory does not exist: ' + __cache_root_singleton__)
+        __cache_root_singleton__ = p
 
-    return __cache_root__
+    return __cache_root_singleton__
 
 
 def gmt():

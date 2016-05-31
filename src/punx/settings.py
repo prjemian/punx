@@ -31,6 +31,20 @@ appName = __init__.__settings_package__
 GLOBAL_GROUP = '___global___'
 
 
+__settings_singleton__ = None
+
+
+def settings():
+    '''return the QSettings instance'''
+    global __settings_singleton__
+
+    # TODO: look for a local cache in a user directory
+
+    if __settings_singleton__ is None:
+        __settings_singleton__ = ApplicationQSettings()
+
+    return __settings_singleton__
+
 
 class ApplicationQSettings(QtCore.QSettings):
     '''
@@ -118,3 +132,8 @@ class ApplicationQSettings(QtCore.QSettings):
 
     def getGroupName(self, window, group):
         return group or window.__class__.__name__ + '_geometry'
+
+
+if __name__ == '__main__':
+    qset = settings()
+    print qset

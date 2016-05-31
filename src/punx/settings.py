@@ -54,7 +54,7 @@ def qsettings():
 
 def filename():
     '''file name of settings file'''
-    return qsettings().fileName()
+    return str(qsettings().fileName())
 
 
 def directory():
@@ -62,32 +62,10 @@ def directory():
     return os.path.dirname(filename())
 
 
-class ApplicationQSettings(QtCore.QSettings):
+class QSettingsMixin(object):
     '''
-    manage and preserve default settings for this application using QSettings
-    
-    Use the .ini file format and save under user directory
-
-    :see: http://doc.qt.io/qt-4.8/qsettings.html
+    utility methods
     '''
-    
-    def __init__(self):
-        QtCore.QSettings.__init__(self, 
-                                  QtCore.QSettings.IniFormat, 
-                                  QtCore.QSettings.UserScope, 
-                                  orgName, 
-                                  appName)
-        self.init_global_keys()
-    
-    def init_global_keys(self):
-        d = dict(
-            version = 1.0,
-            timestamp = str(datetime.datetime.now()),
-            # TODO: next cache update check
-        )
-        for k, v in d.items():
-            if self.getKey(GLOBAL_GROUP + '/' + k) in ('', None):
-                self.setValue(GLOBAL_GROUP + '/' + k, v)
 
     def _keySplit_(self, full_key):
         '''
@@ -133,8 +111,10 @@ class ApplicationQSettings(QtCore.QSettings):
         self.beginGroup(group)
         self.setValue(k, value)
         self.endGroup()
-        if key != 'timestamp':
+        if key not in ('timestamp', 'gmt'):
             self.updateTimeStamp()
+            self.updateTimeStamp(gmt=True)
+            print key
  
     def resetDefaults(self):
         '''
@@ -144,13 +124,48 @@ class ApplicationQSettings(QtCore.QSettings):
             self.remove(key)
         self.init_global_keys()
     
-    def updateTimeStamp(self):
-        ''' '''
-        self.setKey('timestamp', str(datetime.datetime.now()))
+    def updateTimeStamp(self, gmt=False):
+        '''date/time file was written'''
+        if gmt:
+            # current ISO8601 time in GMT, matches format from GitHub
+            key = 'gmt'
+            ts = str(datetime.datetime.utcnow())
+            ts = 'T'.join(ts.split()).split('.')[0] + 'Z'
+        else:
+            # current ISO8601 time in local time
+            key = 'timestamp'
+            ts = str(datetime.datetime.now())
+        self.setKey(key, ts)
 
-    def getGroupName(self, window, group):
-        return group or window.__class__.__name__ + '_geometry'
 
-# if __name__ == '__main__':
-#     qset = qsettings()
-#     print qset, filename()
+class ApplicationQSettings(QtCore.QSettings, QSettingsMixin):
+    '''
+    manage and preserve default settings for this application using QSettings
+    
+    Use the .ini file format and save under user directory
+
+    :see: http://doc.qt.io/qt-4.8/qsettings.html
+    '''
+    
+    def __init__(self):
+        QtCore.QSettings.__init__(self, 
+                                  QtCore.QSettings.IniFormat, 
+                                  QtCore.QSettings.UserScope, 
+                                  orgName, 
+                                  appName)
+        self.init_global_keys()
+    
+    def init_global_keys(self):
+        d = dict(
+            version = '1.0',
+            timestamp = str(datetime.datetime.now()),
+            # TODO: next cache update check
+        )
+        for k, v in d.items():
+            if self.getKey(GLOBAL_GROUP + '/' + k) in ('', None):
+                self.setValue(GLOBAL_GROUP + '/' + k, v)
+
+
+if __name__ == '__main__':
+    qset = qsettings()
+    print filename()

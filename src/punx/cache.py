@@ -39,9 +39,20 @@ import StringIO
 import urllib
 import zipfile
 
+on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
+if on_rtd:
+    from mock_PyQt4 import QtCore
+else:
+    from PyQt4 import QtCore
+
 import nxdlstructure
 import settings
+import __init__
 
+
+orgName = __init__.__settings_organization__
+appName = __init__.__settings_package__
+GLOBAL_GROUP = '___global___'
 
 PKG_DIR = os.path.abspath(os.path.dirname(__file__))
 SOURCE_CACHE_ROOT = os.path.join(PKG_DIR, 'cache')
@@ -243,5 +254,101 @@ def update_NXDL_Cache(path=SOURCE_CACHE_ROOT):
     updateCache(info, path)
 
 
+class SourceCacheInfo(QtCore.QSettings):
+    '''
+    manage the source cache info file
+    
+    ::
+
+        # file: cache-info.txt
+        # written: 2016-05-31 15:38:15.756000
+        # GMT: 2016-05-31T20:38:15Z
+        
+        sha: 4538b34b61be4f1214b09985418a771fa703d776
+        pickle_file: C:\Users\Pete\Documents\eclipse\punx\src\punx\cache\nxdl.p
+        file: C:\Users\Pete\Documents\eclipse\punx\src\punx\cache\cache-info.txt
+        zip: https://github.com/nexusformat/definitions/archive/master.zip
+        datetime: 2016-05-31T15:34:52Z
+    
+    '''
+    
+    def __init__(self):
+        path = os.path.join(SOURCE_CACHE_ROOT, CACHE_INFO_FILENAME)
+        QtCore.QSettings.__init__(self, path, QtCore.QSettings.IniFormat)
+        self.init_global_keys()
+
+    def init_global_keys(self):
+        d = dict(
+            version = '1.0',
+            gmt = gmt(),
+            sha = '___?___',
+            file = str(self.fileName()),
+        )
+        for k, v in sorted(d.items()):
+            if self.getKey(GLOBAL_GROUP + '/' + k) in ('', None):
+                self.setValue(GLOBAL_GROUP + '/' + k, v)
+
+    def _keySplit_(self, full_key):
+        '''
+        split full_key into (group, key) tuple
+        
+        :param str full_key: either `key` or `group/key`, default group (unspecified) is GLOBAL_GROUP
+        '''
+        if len(full_key) == 0:
+            raise KeyError, 'must supply a key'
+        parts = full_key.split('/')
+        if len(parts) > 2:
+            raise KeyError, 'too many "/" separators: ' + full_key
+        if len(parts) == 1:
+            group, key = GLOBAL_GROUP, str(parts[0])
+        elif len(parts) == 2:
+            group, key = map(str, parts)
+        return group, key
+    
+    def keyExists(self, key):
+        '''does the named key exist?'''
+        return key in self.allKeys()
+
+    def getKey(self, key):
+        '''
+        return the Python value (not a QVariant) of key or None if not found
+        
+        :raises TypeError: if key is None
+        '''
+        return self.value(key).toPyObject()
+    
+    def setKey(self, key, value):
+        '''
+        set the value of a configuration key, creates the key if it does not exist
+        
+        :param str key: either `key` or `group/key`
+        
+        Complement:  self.value(key)  returns value of key
+        '''
+        group, k = self._keySplit_(key)
+        if group is None:
+            group = GLOBAL_GROUP
+        self.remove(key)
+        self.beginGroup(group)
+        self.setValue(k, value)
+        self.endGroup()
+        if key != 'timestamp':
+            self.updateTimeStamp()
+ 
+    def resetDefaults(self):
+        '''
+        Reset all application settings to default values.
+        '''
+        for key in self.allKeys():
+            self.remove(key)
+        self.init_global_keys()
+    
+    def updateTimeStamp(self):
+        ''' '''
+        self.setKey('timestamp', str(datetime.datetime.now()))
+
+
 if __name__ == '__main__':
     update_NXDL_Cache()
+#     sci = SourceCacheInfo()
+#     print sci.fileName()

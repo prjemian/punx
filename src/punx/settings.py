@@ -2,8 +2,16 @@
 '''
 manage the settings file for this application
 
-Applications should *only* call :meth:`~punx.settings.qsettings`
-to get the settings object.
+.. rubric:: Public Interface
+
+    
+==================  =================
+item                Python code
+==================  =================
+settings object     :meth:`qsettings`
+settings file       :meth:`filename`
+settings directory  :meth:`directory`
+==================  =================
 '''
 
 #-----------------------------------------------------------------------------
@@ -40,22 +48,23 @@ __settings_singleton__ = None
 def qsettings():
     '''
     return the QSettings instance
-    
-    ==================  ==================================================
-    item                Python code
-    ==================  ==================================================
-    settings file       ``settings.qsettings().fileName()``
-    settings directory  ``os.path.dirname(settings.qsettings().fileName())``
-    ==================  ==================================================
     '''
     global __settings_singleton__
-
-    # TODO: look for a local cache in a user directory
 
     if __settings_singleton__ is None:
         __settings_singleton__ = ApplicationQSettings()
 
     return __settings_singleton__
+
+
+def filename():
+    '''file name of settings file'''
+    return qsettings().fileName()
+
+
+def directory():
+    '''directory name of settings file'''
+    return os.path.dirname(filename())
 
 
 class ApplicationQSettings(QtCore.QSettings):
@@ -145,7 +154,6 @@ class ApplicationQSettings(QtCore.QSettings):
     def getGroupName(self, window, group):
         return group or window.__class__.__name__ + '_geometry'
 
-
 # if __name__ == '__main__':
 #     qset = qsettings()
-#     print qset, qset.fileName()
+#     print qset, filename()

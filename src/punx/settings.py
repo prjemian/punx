@@ -1,6 +1,9 @@
 
 '''
 manage the settings file for this application
+
+Applications should *only* call :meth:`~punx.settings.qsettings`
+to get the settings object.
 '''
 
 #-----------------------------------------------------------------------------
@@ -34,8 +37,17 @@ GLOBAL_GROUP = '___global___'
 __settings_singleton__ = None
 
 
-def settings():
-    '''return the QSettings instance'''
+def qsettings():
+    '''
+    return the QSettings instance
+    
+    ==================  ==================================================
+    item                Python code
+    ==================  ==================================================
+    settings file       ``settings.qsettings().fileName()``
+    settings directory  ``os.path.dirname(settings.qsettings().fileName())``
+    ==================  ==================================================
+    '''
     global __settings_singleton__
 
     # TODO: look for a local cache in a user directory
@@ -134,6 +146,6 @@ class ApplicationQSettings(QtCore.QSettings):
         return group or window.__class__.__name__ + '_geometry'
 
 
-if __name__ == '__main__':
-    qset = settings()
-    print qset
+# if __name__ == '__main__':
+#     qset = qsettings()
+#     print qset, qset.fileName()

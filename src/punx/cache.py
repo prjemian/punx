@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+# TODO: refactor to select between user and source cache
+
 #-----------------------------------------------------------------------------
 # :author:    Pete R. Jemian
 # :email:     prjemian@gmail.com
@@ -32,7 +34,6 @@ source code repository.
 '''
 
 import cPickle as pickle
-import datetime
 import json
 import os
 import StringIO
@@ -59,9 +60,12 @@ SOURCE_CACHE_ROOT = os.path.join(PKG_DIR, 'cache')
 GITHUB_NXDL_ORGANIZATION = 'nexusformat'
 GITHUB_NXDL_REPOSITORY = 'definitions'
 GITHUB_NXDL_BRANCH = 'master'
-CACHE_INFO_FILENAME = 'cache-info.txt'
+SOURCE_CACHE_SETTINGS_FILENAME = 'punx.ini'
 PICKLE_FILE = 'nxdl.p'
 NXDL_CACHE_SUBDIR = GITHUB_NXDL_REPOSITORY + '-' + GITHUB_NXDL_BRANCH
+
+__source_cache_settings_singleton__ = None
+
 
 
 __cache_root_singleton__ = None
@@ -87,19 +91,15 @@ def NXDL_path():
     path = os.path.join(cache_path(), NXDL_CACHE_SUBDIR)
     if not os.path.exists(path):
         if __is_developer_source_path_(path):
-            update_NXDL_Cache(os.path.dirname(path))
+            update_NXDL_Cache(use_source_cache=True)
         else:
-            raise IOError('directory does not exist: ' + path)
+            update_NXDL_Cache(use_source_cache=False)
     return path
 
 
 def cache_path():
     '''return the root path of the NXDL cache'''
     global __cache_root_singleton__       # singleton
-
-    # TODO: look for a local cache in a user directory
-    qset = settings.qsettings()
-    qset_path = settings.directory()    # the user cache directory
 
     if __cache_root_singleton__ is None:
         # For now, only use cache in source tree
@@ -114,9 +114,9 @@ def cache_path():
     return __cache_root_singleton__
 
 
-def gmt():
-    'current ISO8601 time in GMT, matches format from GitHub'
-    return 'T'.join(str(datetime.datetime.utcnow()).split()).split('.')[0] + 'Z'
+# def gmt():
+#     'current ISO8601 time in GMT, matches format from GitHub'
+#     return 'T'.join(str(datetime.datetime.utcnow()).split()).split('.')[0] + 'Z'
 
 
 def githubMasterInfo(org, repo):
@@ -128,7 +128,7 @@ def githubMasterInfo(org, repo):
     ========  ================================================
     key       meaning
     ========  ================================================
-    datetime  ISO-8601-compatible timestamp
+    git_time  ISO-8601-compatible timestamp from GitHub
     sha       hash tag of latest commit
     zip       URL of downloadable ZIP file
     ========  ================================================
@@ -149,10 +149,10 @@ def githubMasterInfo(org, repo):
     iso8601 = latest['commit']['committer']['date']
     zip_url = 'https://github.com/%s/%s/archive/master.zip' % (org, repo)
     
-    return dict(sha=sha, datetime=iso8601, zip=zip_url)
+    return dict(sha=sha, git_time=iso8601, zip=zip_url)
 
 
-def updateCache(info, path):
+def updateCache(info, path, qset):
     '''
     download the repository ZIP file and extract the NXDL (XML, XSL, & XSD) files to the path
     '''
@@ -176,7 +176,7 @@ def updateCache(info, path):
     
     # optimization: write the parsed NXDL specifications to a file
     write_pickle_file(info, path)
-    write_info_file(info, info['file'])
+    qset.updateGroupKeys(info)
 
 
 def write_pickle_file(info, path):
@@ -202,153 +202,68 @@ def read_pickle_file(info):
     return None
 
 
-def write_info_file(info, fname):
-    '''
-    describe the current cache contents in file
-    '''
-    f = open(fname, 'w')
-    f.write('# file: %s\n' % CACHE_INFO_FILENAME)
-    f.write('# written: %s\n' % str(datetime.datetime.now()))
-    f.write('# GMT: %s\n\n' % gmt())
-    for k, v in info.items():
-        f.write('%s: %s\n' % (k, v))
-    f.close()
-
-
-def read_info_file(fname):
-    '''
-    read current cache contents from file
-    '''
-    db = dict(datetime='0', sha='')
-    if os.path.exists(fname):
-        for line in open(fname, 'r').readlines():
-            line = line.strip()
-            if line.startswith('#'):
-                continue
-            if len(line) == 0:
-                continue
-            pos = line.find(': ')
-            db[ line[:pos] ] = line[pos+1:].strip()
-    return db
-
-
-def update_NXDL_Cache(path=SOURCE_CACHE_ROOT):
+def update_NXDL_Cache(use_source_cache=False):
     '''
     update the local cache of NeXus NXDL files
     '''
     info = githubMasterInfo(GITHUB_NXDL_ORGANIZATION, GITHUB_NXDL_REPOSITORY)
     if info is None:
         return
-    info['file'] = os.path.join(path, CACHE_INFO_FILENAME)
-    
-    cache_info = read_info_file(info['file'])
-    cache_subdir = os.path.join(path, 'definitions-master')
 
-    same_sha = str(info['sha']) == str(cache_info['sha'])
-    same_datetime = str(info['datetime']) == str(cache_info['datetime'])
-    cache_subdir_exists = os.path.exists(cache_subdir)
-    do_not_update = same_sha and same_datetime and cache_subdir_exists
+    if use_source_cache:
+        qset = source_cache_settings()
+    else:
+        qset = user_cache_settings()
+    info['file'] = str(qset.fileName())
+    path = os.path.dirname(info['file'])
+    nxdl_subdir = os.path.join(path, 'definitions-master')
+
+    same_sha = str(info['sha']) == str(qset.getKey('sha'))
+    same_git_time = str(info['git_time']) == str(qset.getKey('git_time'))
+    nxdl_subdir_exists = os.path.exists(nxdl_subdir)
+    do_not_update = same_sha and same_git_time and nxdl_subdir_exists
     if do_not_update:
         return
 
-    updateCache(info, path)
+    updateCache(info, path, qset)
 
 
-class SourceCacheInfo(QtCore.QSettings):
+# -------------------------------------------------
+
+# both user cache and source cache are singleton instances of QSettings
+
+def user_cache_settings():
+    '''manage the user cache info file as an .ini file'''
+    # TODO: fall back to source cache if cannot access or update user cache 
+    return settings.qsettings()
+
+
+def source_cache_settings():
+    '''manage the source cache info file as an .ini file'''
+    global __source_cache_settings_singleton__       # singleton
+
+    if __source_cache_settings_singleton__ is None:
+        __source_cache_settings_singleton__ = SourceCacheInfo()
+
+    return __source_cache_settings_singleton__
+
+
+class SourceCacheInfo(QtCore.QSettings, settings.QSettingsMixin):
     '''
-    manage the source cache info file
-    
-    ::
-
-        # file: cache-info.txt
-        # written: 2016-05-31 15:38:15.756000
-        # GMT: 2016-05-31T20:38:15Z
-        
-        sha: 4538b34b61be4f1214b09985418a771fa703d776
-        pickle_file: C:\Users\Pete\Documents\eclipse\punx\src\punx\cache\nxdl.p
-        file: C:\Users\Pete\Documents\eclipse\punx\src\punx\cache\cache-info.txt
-        zip: https://github.com/nexusformat/definitions/archive/master.zip
-        datetime: 2016-05-31T15:34:52Z
-    
+    manage the source cache info file as an .ini file
     '''
     
     def __init__(self):
-        path = os.path.join(SOURCE_CACHE_ROOT, CACHE_INFO_FILENAME)
+        path = os.path.join(SOURCE_CACHE_ROOT, SOURCE_CACHE_SETTINGS_FILENAME)
         QtCore.QSettings.__init__(self, path, QtCore.QSettings.IniFormat)
         self.init_global_keys()
 
     def init_global_keys(self):
-        d = dict(
-            version = '1.0',
-            gmt = gmt(),
-            sha = '___?___',
-            file = str(self.fileName()),
-        )
-        for k, v in sorted(d.items()):
-            if self.getKey(GLOBAL_GROUP + '/' + k) in ('', None):
-                self.setValue(GLOBAL_GROUP + '/' + k, v)
-
-    def _keySplit_(self, full_key):
-        '''
-        split full_key into (group, key) tuple
-        
-        :param str full_key: either `key` or `group/key`, default group (unspecified) is GLOBAL_GROUP
-        '''
-        if len(full_key) == 0:
-            raise KeyError, 'must supply a key'
-        parts = full_key.split('/')
-        if len(parts) > 2:
-            raise KeyError, 'too many "/" separators: ' + full_key
-        if len(parts) == 1:
-            group, key = GLOBAL_GROUP, str(parts[0])
-        elif len(parts) == 2:
-            group, key = map(str, parts)
-        return group, key
-    
-    def keyExists(self, key):
-        '''does the named key exist?'''
-        return key in self.allKeys()
-
-    def getKey(self, key):
-        '''
-        return the Python value (not a QVariant) of key or None if not found
-        
-        :raises TypeError: if key is None
-        '''
-        return self.value(key).toPyObject()
-    
-    def setKey(self, key, value):
-        '''
-        set the value of a configuration key, creates the key if it does not exist
-        
-        :param str key: either `key` or `group/key`
-        
-        Complement:  self.value(key)  returns value of key
-        '''
-        group, k = self._keySplit_(key)
-        if group is None:
-            group = GLOBAL_GROUP
-        self.remove(key)
-        self.beginGroup(group)
-        self.setValue(k, value)
-        self.endGroup()
-        if key != 'timestamp':
-            self.updateTimeStamp()
- 
-    def resetDefaults(self):
-        '''
-        Reset all application settings to default values.
-        '''
-        for key in self.allKeys():
-            self.remove(key)
-        self.init_global_keys()
-    
-    def updateTimeStamp(self):
-        ''' '''
-        self.setKey('timestamp', str(datetime.datetime.now()))
+        self.updateGroupKeys({'file': str(self.fileName())})
+        self.updateGroupKeys({'version': '1.0'})
 
 
 if __name__ == '__main__':
-    update_NXDL_Cache()
-#     sci = SourceCacheInfo()
-#     print sci.fileName()
+    update_NXDL_Cache(use_source_cache=True)
+    # print user_cache_settings().fileName()
+    # print source_cache_settings().fileName()

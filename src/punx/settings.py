@@ -66,6 +66,11 @@ class QSettingsMixin(object):
     '''
     utility methods
     '''
+    
+    def updateGroupKeys(self, group_dict={}, group=GLOBAL_GROUP):
+        for k, v in sorted(group_dict.items()):
+            if self.getKey(group + '/' + k) in ('', None):
+                self.setKey(group + '/' + k, v)
 
     def _keySplit_(self, full_key):
         '''
@@ -111,10 +116,9 @@ class QSettingsMixin(object):
         self.beginGroup(group)
         self.setValue(k, value)
         self.endGroup()
-        if key not in ('timestamp', 'gmt'):
+        if key not in ('written', 'written_gmt'):
             self.updateTimeStamp()
             self.updateTimeStamp(gmt=True)
-            print key
  
     def resetDefaults(self):
         '''
@@ -126,14 +130,14 @@ class QSettingsMixin(object):
     
     def updateTimeStamp(self, gmt=False):
         '''date/time file was written'''
+        key = 'written'
         if gmt:
             # current ISO8601 time in GMT, matches format from GitHub
-            key = 'gmt'
+            key += '_gmt'
             ts = str(datetime.datetime.utcnow())
             ts = 'T'.join(ts.split()).split('.')[0] + 'Z'
         else:
             # current ISO8601 time in local time
-            key = 'timestamp'
             ts = str(datetime.datetime.now())
         self.setKey(key, ts)
 
@@ -156,14 +160,8 @@ class ApplicationQSettings(QtCore.QSettings, QSettingsMixin):
         self.init_global_keys()
     
     def init_global_keys(self):
-        d = dict(
-            version = '1.0',
-            timestamp = str(datetime.datetime.now()),
-            # TODO: next cache update check
-        )
-        for k, v in d.items():
-            if self.getKey(GLOBAL_GROUP + '/' + k) in ('', None):
-                self.setValue(GLOBAL_GROUP + '/' + k, v)
+        self.updateGroupKeys({'file': str(self.fileName())})
+        self.updateGroupKeys({'version': '1.0'})
 
 
 if __name__ == '__main__':

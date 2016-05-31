@@ -67,6 +67,8 @@ class ApplicationQSettings(QtCore.QSettings):
     manage and preserve default settings for this application using QSettings
     
     Use the .ini file format and save under user directory
+
+    :see: http://doc.qt.io/qt-4.8/qsettings.html
     '''
     
     def __init__(self):

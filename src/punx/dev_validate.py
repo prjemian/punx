@@ -36,7 +36,8 @@ v.validate()
 print 'file: ' + os.path.basename(v.fname)
 print ''
 t = pyRestTable.Table()
-t.labels = 'status address comment(s)'.split()
+t.labels = 'status address test comment(s)'.split()
 for f in v.findings:
-    t.rows.append((f.severity, f.h5_address, f.comment))
+    if f.severity not in ('xOK', ):
+        t.rows.append((f.severity, f.h5_address, f.test_name, f.comment))
 print t.reST()

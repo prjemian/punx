@@ -301,5 +301,5 @@ class Mock(object):
         else:
             return Mock()
 
-for mod_name in punx.__install_requires__:
+for mod_name in punx.__sphinx_mock_list__:
     sys.modules[mod_name] = Mock()

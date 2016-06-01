@@ -43,8 +43,9 @@ setup (name =  punx.__package_name__,        # punx
        #packages=find_packages(),
        package_data     = {
                            'punx': ['cache/*', 
-                                    'cache/*/*', 
-                                    'cache/*/*/*'],
+                                    'cache/*/*',    # FIXME: subdirs not included yet
+                                    'cache/*/*/*',
+                                    ],
                         },
        classifiers      = punx.__classifiers__,
        entry_points     = {

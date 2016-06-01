@@ -137,6 +137,7 @@ class Data_File_Validator(object):
         self.findings = []      # list of Finding() instances
 
         # open the NXDL rules files
+        cache.update_NXDL_Cache()
         self.nxdl_xsd = lxml.etree.parse(abs_NXDL_filename(NXDL_SCHEMA_FILE))
         self.nxdlTypes_xsd = lxml.etree.parse(abs_NXDL_filename(NXDL_TYPES_SCHEMA_FILE))
 

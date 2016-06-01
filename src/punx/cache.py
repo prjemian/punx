@@ -143,7 +143,7 @@ def update_NXDL_Cache(force_update=False):
         info['next_update'] = up
         
     qset = qsettings()
-    checkpoint = str(qset.getKey('next_update'))
+    checkpoint = str(qset.getKey('next_update') or -1)
     ts_now = str(datetime.datetime.now())
     if checkpoint is not None and ts_now < checkpoint and not force_update:
         return

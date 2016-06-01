@@ -38,6 +38,6 @@ print ''
 t = pyRestTable.Table()
 t.labels = 'status address test comment(s)'.split()
 for f in v.findings:
-    if f.severity not in ('xOK', ):
+    if f.severity not in ('OK', ):
         t.rows.append((f.severity, f.h5_address, f.test_name, f.comment))
 print t.reST()

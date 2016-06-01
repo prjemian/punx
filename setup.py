@@ -42,11 +42,14 @@ setup (name =  punx.__package_name__,        # punx
        packages         = ['punx', ],
        #packages=find_packages(),
        package_data     = {
-                           'punx': ['cache/*', 
-                                    'cache/*/*',    # FIXME: subdirs not included yet
-                                    'cache/*/*/*',
-                                    ],
-                        },
+                            'punx': ['cache/*.p', 
+                                     'cache/*.ini', 
+                                     'cache/*.zip', 
+                                     'cache/*/*.xsd',
+                                     'cache/*/*/*.xml',
+                                     'cache/*/*/*.xsl',
+                                     ],
+                         },
        classifiers      = punx.__classifiers__,
        entry_points     = {
             # create & install scripts in <python>/bin

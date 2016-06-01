@@ -27,7 +27,7 @@ TEST_DATA_FILE = os.path.join(TEST_DATA_DIR, 'writer_1_3.hdf5')
 TEST_DATA_FILE = os.path.join(TEST_DATA_DIR, 'writer_2_1.hdf5')
 # TEST_DATA_FILE = os.path.join(TEST_DATA_DIR, 'compression.h5')
 # TEST_DATA_FILE = os.path.join(TEST_DATA_DIR, 'Data_Q.h5')
-
+TEST_DATA_FILE = os.path.join(TEST_DATA_DIR, '02_03_setup.h5')
 
 v = validate.Data_File_Validator(TEST_DATA_FILE)
 v.validate()

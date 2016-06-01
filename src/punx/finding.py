@@ -27,6 +27,7 @@ class Finding(object):
     '''
     a single observation noticed while validating
     
+    :param str test_name: one-word description of the test
     :param str h5_address: address of h5py item
     :param int severity: one of: OK NOTE WARNING ERROR TODO
     :param str comment: description

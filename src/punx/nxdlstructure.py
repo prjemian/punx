@@ -23,7 +23,6 @@ __url__ = 'http://punx.readthedocs.org/en/latest/nxdlstructure.html'
 # testing:  see file dev_nxdl2rst.py
 
 import collections
-import cPickle as pickle
 import lxml.etree
 import os
 import cache
@@ -289,18 +288,18 @@ def get_NXDL_specifications():
     '''
     return a dictionary of NXDL structures, keyed by NX_class name
     '''
-    path = cache.cache_path()
-    fname = os.path.join(path, cache.CACHE_INFO_FILENAME)
-    info = cache.read_info_file(fname)
-    if 'pickle_file' in info:
+    qset = cache.qsettings()
+    pfile = qset.getKey('pickle_file')
+    if pfile is not None and os.path.exists(pfile):
         # hope that we can read a cached version of nxdl_dict
-        if os.path.exists(info['pickle_file']):
-            nxdl_dict = cache.read_pickle_file(info)
-            if nxdl_dict is not None:      # declare victory!
-                return nxdl_dict
+        nxdl_dict = cache.read_pickle_file(pfile, qset.getKey('sha'))
+        if nxdl_dict is not None:      # declare victory!
+            return nxdl_dict
 
+    # cache.update_NXDL_Cache()   # FIXME: infinite loop
+    
     # build the nxdl_dict by parsing all the NXDL specifications
-    basedir = cache.NXDL_path()
+    basedir = qset.nxdl_dir()
     path_list = [
         os.path.join(basedir, 'base_classes'),
         os.path.join(basedir, 'applications'),
@@ -308,6 +307,8 @@ def get_NXDL_specifications():
     ]
     nxdl_file_list = []
     for path in path_list:
+        if not os.path.exists(path):
+            raise IOError('no definition available, cannot find ' + path)
         for fname in sorted(os.listdir(path)):
             if fname.endswith('.nxdl.xml'):
                 nxdl_file_list.append(os.path.join(path, fname))

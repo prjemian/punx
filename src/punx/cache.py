@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# TODO: refactor to select between user and source cache
-
 #-----------------------------------------------------------------------------
 # :author:    Pete R. Jemian
 # :email:     prjemian@gmail.com
@@ -28,8 +26,7 @@ source code repository.
 
 .. rubric:: Public Interface
 
-:cache directory in use:                   :meth:`~punx.cache.cache_path`
-:directory with NXDL definitions:          :meth:`~punx.cache.NXDL_path`
+:settings object:     :meth:`~punx.cache.qsettings`
 :get new NXDL definitions from GitHub:     :meth:`~punx.cache.update_NXDL_Cache`
 '''
 
@@ -53,22 +50,13 @@ import __init__
 
 orgName = __init__.__settings_organization__
 appName = __init__.__settings_package__
-GLOBAL_GROUP = '___global___'
 
 PKG_DIR = os.path.abspath(os.path.dirname(__file__))
-SOURCE_CACHE_ROOT = os.path.join(PKG_DIR, 'cache')
-GITHUB_NXDL_ORGANIZATION = 'nexusformat'
-GITHUB_NXDL_REPOSITORY = 'definitions'
-GITHUB_NXDL_BRANCH = 'master'
-SOURCE_CACHE_SETTINGS_FILENAME = 'punx.ini'
-PICKLE_FILE = 'nxdl.p'
-NXDL_CACHE_SUBDIR = GITHUB_NXDL_REPOSITORY + '-' + GITHUB_NXDL_BRANCH
+SOURCE_CACHE_ROOT = os.path.join(PKG_DIR, __init__.CACHE_SUBDIR)
 
-__source_cache_settings_singleton__ = None
-
-
-
-__cache_root_singleton__ = None
+__singleton_cache_settings_source__ = None
+__singleton_cache_settings_user__ = None
+__singleton_settings__ = None
 
 
 def __is_developer_source_path_(path):
@@ -77,46 +65,14 @@ def __is_developer_source_path_(path):
     
     path must have these strings: ``eclipse``, ``punx``, ``src``
     '''
+    # TODO: improve this check
     if 'eclipse' not in path:   # developer uses eclipse IDE
         return False
     if 'punx' not in path:      # project name
         return False
     if 'src' not in path:      # project name
         return False
-    return 'jemian' in path.lower() or 'pete' in path.lower()
-
-
-def NXDL_path():
-    '''return the path of the NXDL cache'''
-    path = os.path.join(cache_path(), NXDL_CACHE_SUBDIR)
-    if not os.path.exists(path):
-        if __is_developer_source_path_(path):
-            update_NXDL_Cache(use_source_cache=True)
-        else:
-            update_NXDL_Cache(use_source_cache=False)
-    return path
-
-
-def cache_path():
-    '''return the root path of the NXDL cache'''
-    global __cache_root_singleton__       # singleton
-
-    if __cache_root_singleton__ is None:
-        # For now, only use cache in source tree
-        p = os.path.abspath(SOURCE_CACHE_ROOT)
-        if not os.path.exists(p):
-            if __is_developer_source_path_(p):
-                os.mkdir(p)
-            else:
-                raise IOError('directory does not exist: ' + p)
-        __cache_root_singleton__ = p
-
-    return __cache_root_singleton__
-
-
-# def gmt():
-#     'current ISO8601 time in GMT, matches format from GitHub'
-#     return 'T'.join(str(datetime.datetime.utcnow()).split()).split('.')[0] + 'Z'
+    return 'jemian' in path.lower() or 'pete' in path.lower() or 'mintadmin' in path.lower()
 
 
 def githubMasterInfo(org, repo):
@@ -130,7 +86,7 @@ def githubMasterInfo(org, repo):
     ========  ================================================
     git_time  ISO-8601-compatible timestamp from GitHub
     sha       hash tag of latest commit
-    zip       URL of downloadable ZIP file
+    zip_url   URL of downloadable ZIP file
     ========  ================================================
     '''
     # get repository information via GitHub API
@@ -149,20 +105,62 @@ def githubMasterInfo(org, repo):
     iso8601 = latest['commit']['committer']['date']
     zip_url = 'https://github.com/%s/%s/archive/master.zip' % (org, repo)
     
-    return dict(sha=sha, git_time=iso8601, zip=zip_url)
+    return dict(sha=sha, git_time=iso8601, zip_url=zip_url)
 
 
-def updateCache(info, path, qset):
+def write_pickle_file(info, path):
     '''
-    download the repository ZIP file and extract the NXDL (XML, XSL, & XSD) files to the path
+    write the parsed nxdl_dict and info to a Python pickle file
     '''
-    url = info['zip']
+    info['pickle_file'] = os.path.join(path, __init__.PICKLE_FILE)
+    nxdl_dict = nxdlstructure.get_NXDL_specifications()
+    pickle_data = dict(nxdl_dict=nxdl_dict, info=info)
+    pickle.dump(pickle_data, open(info['pickle_file'], 'wb'))
+
+
+def read_pickle_file(pfile, sha):
+    '''
+    read the parsed nxdl_dict and info from a Python pickle file
+    '''
+    pickle_data = pickle.load(open(pfile, 'rb'))
+    if 'info' in pickle_data:
+        # any other tests to qualify this?
+        if sha == pickle_data['info']['sha']:   # declare victory!
+            # do not need to return ``info`` since it matches
+            return pickle_data['nxdl_dict']
+    return None
+
+
+def update_NXDL_Cache():
+    '''
+    update the local cache of NeXus NXDL files
+    '''
+    info = githubMasterInfo(__init__.GITHUB_NXDL_ORGANIZATION, 
+                            __init__.GITHUB_NXDL_REPOSITORY)
+    if info is None:
+        return
+
+    qset = qsettings()
+    info['file'] = str(qset.fileName())
+    path = qset.cache_dir()
+    nxdl_subdir = qset.nxdl_dir()
+
+    same_sha = str(info['sha']) == str(qset.getKey('sha'))
+    same_git_time = str(info['git_time']) == str(qset.getKey('git_time'))
+    nxdl_subdir_exists = os.path.exists(nxdl_subdir)
+    do_not_update = same_sha and same_git_time and nxdl_subdir_exists
+    if do_not_update:
+        return
+
+    # download the repository ZIP file 
+    url = info['zip_url']
     u = urllib.urlopen(url)
     content = u.read()
     buf = StringIO.StringIO(content)
     zip_content = zipfile.ZipFile(buf)
     # How to save this zip_content to disk?
     
+    # extract the NXDL (XML, XSL, & XSD) files to the path
     categories = 'base_classes applications contributed_definitions'.split()
     for item in zip_content.namelist():
         parts = item.rstrip('/').split('/')
@@ -179,91 +177,73 @@ def updateCache(info, path, qset):
     qset.updateGroupKeys(info)
 
 
-def write_pickle_file(info, path):
+def qsettings():
     '''
-    write the parsed nxdl_dict and info to a Python pickle file
+    return the QSettings instance, chosen from user or source cache
     '''
-    info['pickle_file'] = os.path.join(path, PICKLE_FILE)
-    nxdl_dict = nxdlstructure.get_NXDL_specifications()
-    pickle_data = dict(nxdl_dict=nxdl_dict, info=info)
-    pickle.dump(pickle_data, open(info['pickle_file'], 'wb'))
+    global __singleton_settings__
+    if __singleton_settings__ is None:
+        if __is_developer_source_path_(PKG_DIR):
+            qset = source_cache_settings()
+        else:
+            qset = user_cache_settings()
+        __singleton_settings__ = qset
+    return __singleton_settings__
 
-
-def read_pickle_file(info):
-    '''
-    read the parsed nxdl_dict and info from a Python pickle file
-    '''
-    pickle_data = pickle.load(open(info['pickle_file'], 'rb'))
-    if 'info' in pickle_data:
-        # any other tests to qualify this?
-        if info['sha'] == pickle_data['info']['sha']:   # declare victory!
-            # do not need to return ``info`` since it matches
-            return pickle_data['nxdl_dict']
-    return None
-
-
-def update_NXDL_Cache(use_source_cache=False):
-    '''
-    update the local cache of NeXus NXDL files
-    '''
-    info = githubMasterInfo(GITHUB_NXDL_ORGANIZATION, GITHUB_NXDL_REPOSITORY)
-    if info is None:
-        return
-
-    if use_source_cache:
-        qset = source_cache_settings()
-    else:
-        qset = user_cache_settings()
-    info['file'] = str(qset.fileName())
-    path = os.path.dirname(info['file'])
-    nxdl_subdir = os.path.join(path, 'definitions-master')
-
-    same_sha = str(info['sha']) == str(qset.getKey('sha'))
-    same_git_time = str(info['git_time']) == str(qset.getKey('git_time'))
-    nxdl_subdir_exists = os.path.exists(nxdl_subdir)
-    do_not_update = same_sha and same_git_time and nxdl_subdir_exists
-    if do_not_update:
-        return
-
-    updateCache(info, path, qset)
-
-
-# -------------------------------------------------
-
-# both user cache and source cache are singleton instances of QSettings
 
 def user_cache_settings():
     '''manage the user cache info file as an .ini file'''
-    # TODO: fall back to source cache if cannot access or update user cache 
-    return settings.qsettings()
+    global __singleton_cache_settings_user__
+    if __singleton_cache_settings_user__ is None:
+        try:
+            qset = UserCacheSettings()
+        except:
+            # fall back to source cache if cannot access user cache 
+            qset = SourceCacheSettings()
+        __singleton_cache_settings_user__ = qset
+    return __singleton_cache_settings_user__
 
 
 def source_cache_settings():
     '''manage the source cache info file as an .ini file'''
-    global __source_cache_settings_singleton__       # singleton
+    global __singleton_cache_settings_source__
+    if __singleton_cache_settings_source__ is None:
+        qset = SourceCacheSettings()
+        __singleton_cache_settings_source__ = qset
+    return __singleton_cache_settings_source__
 
-    if __source_cache_settings_singleton__ is None:
-        __source_cache_settings_singleton__ = SourceCacheInfo()
 
-    return __source_cache_settings_singleton__
-
-
-class SourceCacheInfo(QtCore.QSettings, settings.QSettingsMixin):
+class SourceCacheSettings(QtCore.QSettings, settings.QSettingsMixin):
     '''
-    manage the source cache info file as an .ini file
+    manage the source cache settings file as an .ini file using QSettings
     '''
     
     def __init__(self):
-        path = os.path.join(SOURCE_CACHE_ROOT, SOURCE_CACHE_SETTINGS_FILENAME)
+        path = os.path.join(SOURCE_CACHE_ROOT, 
+                            __init__.SOURCE_CACHE_SETTINGS_FILENAME)
         QtCore.QSettings.__init__(self, path, QtCore.QSettings.IniFormat)
         self.init_global_keys()
 
-    def init_global_keys(self):
-        self.updateGroupKeys({'file': str(self.fileName())})
-        self.updateGroupKeys({'version': '1.0'})
+
+class UserCacheSettings(QtCore.QSettings, settings.QSettingsMixin):
+    '''
+    manage and preserve default settings for this application using QSettings
+    
+    Use the .ini file format and save under user directory
+
+    :see: http://doc.qt.io/qt-4.8/qsettings.html
+    '''
+    
+    def __init__(self):
+        QtCore.QSettings.__init__(self, 
+                                  QtCore.QSettings.IniFormat, 
+                                  QtCore.QSettings.UserScope, 
+                                  orgName, 
+                                  appName)
+        self.init_global_keys()
 
 
 if __name__ == '__main__':
-    update_NXDL_Cache(use_source_cache=True)
+    update_NXDL_Cache()
     # print user_cache_settings().fileName()
     # print source_cache_settings().fileName()

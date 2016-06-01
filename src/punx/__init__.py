@@ -56,6 +56,16 @@ __classifiers__ = [
 __version__ = '0.0.1'
 __release__ = __version__
 
+GITHUB_NXDL_ORGANIZATION        = 'nexusformat'
+GITHUB_NXDL_REPOSITORY          = 'definitions'
+GITHUB_NXDL_BRANCH              = 'master'
+GLOBAL_INI_GROUP                = '___global___'
+CACHE_SUBDIR                    = 'cache'
+SOURCE_CACHE_SETTINGS_FILENAME  = 'punx.ini'
+PICKLE_FILE                     = 'nxdl.p'
+NXDL_CACHE_SUBDIR = GITHUB_NXDL_REPOSITORY + '-' + GITHUB_NXDL_BRANCH
+
+
 if False:   # False while in development phase
     import os
     on_rtd = os.environ.get('READTHEDOCS', None) == 'True'

@@ -7,11 +7,12 @@ The :mod:`punx.cache` module maintains a local copy of the NeXus
 *definitions* (NXDL files and XML Schema) 
 for use in validating NeXus data files.  
 
-.. index: file ``cache-info.txt``
+.. index: file ``punx.ini``
 
-Additionally, the module maintains a ``cache-info.txt`` file that 
+Additionally, the module maintains a ``punx.ini`` file that 
 documents the current cached version of the definitions, and other 
-useful information.
+useful information.  This file is maintained using the
+``PyQt4.QtCore.QSettings`` class.  [#]_
 
 .. index: pickle file
 
@@ -53,12 +54,13 @@ There are two distinct cache directories:
       and compares it with that in the *user cache*.
 
 The :meth:`punx.cache.cache_path` method returns the directory of
-the cache that will be used.  This directory contains the info file, 
+the cache that will be used.  This directory contains the settings file, 
 the pickle file, and the subdirectory with NeXus definitions.
 
 The :meth:`punx.cache.NXDL_path` method returns the directory with
 the NeXus definitions (a subdirectory of :meth:`punx.cache.cache_path`).
 
+.. [#] QtCore.QSettings: http://doc.qt.io/qt-4.8/qsettings.html
 .. [#] Python pickle file: https://docs.python.org/2/library/pickle.html
 
 source code documentation

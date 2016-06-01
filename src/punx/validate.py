@@ -34,7 +34,8 @@ def validate_NXDL(nxdl_file_name):
     '''
     Validate a NeXus NXDL file
     '''
-    schema_file = os.path.join(cache.NXDL_path(), XML_SCHEMA_FILE)
+    qset = cache.qsettings()
+    schema_file = os.path.join(qset.nxdl_dir(), XML_SCHEMA_FILE)
     validate_xml(nxdl_file_name, schema_file)
 
 

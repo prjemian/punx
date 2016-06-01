@@ -21,19 +21,13 @@ import sys
 import cache
 import nxdlstructure
 
-if False:
-    # find the directory of this python file
-    BASEDIR = cache.NXDL_path()
+
+def show_NXDL_structure(category, NX_class):
+    ''''find the directory of this python file'''
+    qset = cache.qsettings()
+    BASEDIR = qset.nxdl_dir()
     
-    nxdl = os.path.join(BASEDIR, 'base_classes', 'NXentry.nxdl.xml')
-    # nxdl = os.path.join(BASEDIR, 'base_classes', 'NXcrystal.nxdl.xml')
-    # nxdl = os.path.join(BASEDIR, 'base_classes', 'NXdata.nxdl.xml')
-    # nxdl = os.path.join(BASEDIR, 'base_classes', 'NXobject.nxdl.xml')
-    # nxdl = os.path.join(BASEDIR, 'applications', 'NXarchive.nxdl.xml')
-    # nxdl = os.path.join(BASEDIR, 'applications', 'NXsas.nxdl.xml')
-    # nxdl = os.path.join(BASEDIR, 'applications', 'NXarpes.nxdl.xml')
-    # nxdl = os.path.join(BASEDIR, 'contributed_definitions', 'NXmagnetic_kicker.nxdl.xml')
-    nxdl = os.path.join(BASEDIR, 'contributed_definitions', 'NXcanSAS.nxdl.xml')
+    nxdl = os.path.join(BASEDIR, category, NX_class + '.nxdl.xml')
     
     if len(sys.argv) == 1:
         sys.argv.append(nxdl)
@@ -43,6 +37,19 @@ if False:
     nxdlstructure.main()
 
 
-if True:
+def get_NXDL_dictionary():
     nxdl_dict = nxdlstructure.get_NXDL_specifications()
     print len(nxdl_dict)
+
+
+# show_NXDL_structure('base_classes', 'NXentry')
+# show_NXDL_structure('base_classes', 'NXcrystal')
+# show_NXDL_structure('base_classes', 'NXdata')
+# show_NXDL_structure('base_classes', 'NXobject')
+# show_NXDL_structure('applications', 'NXarchive')
+# show_NXDL_structure('applications', 'NXsas')
+# show_NXDL_structure('applications', 'NXarpes')
+# show_NXDL_structure('contributed_definitions', 'NXmagnetic_kicker')
+# show_NXDL_structure('contributed_definitions', 'NXcanSAS')
+
+get_NXDL_dictionary()

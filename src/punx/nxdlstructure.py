@@ -26,7 +26,6 @@ import collections
 import lxml.etree
 import os
 
-import __init__
 import cache
 import validate
 

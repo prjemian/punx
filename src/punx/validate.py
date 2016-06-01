@@ -14,7 +14,8 @@
 '''
 validate NeXus NXDL and HDF5 data files
 
-These are the items to consider in the validation of NeXus HDF5 data files:
+These are the items to consider in the validation of NeXus HDF5 data files
+(compare these checks with ``nxdl.xsd`` and ``nxdlTypes.xsd``):
 
 .. rubric:: File
 
@@ -24,10 +25,13 @@ These are the items to consider in the validation of NeXus HDF5 data files:
 
 .. rubric:: Groups
 
-#. compare name with pattern
+#. compare name with pattern *validItemName*
 #. determine NX_class
+#. verify NX_class with pattern *validNXClassName*
 #. verify NX_class in nxdl_dict
 #. is name flexible?
+#. What to do with NXDL symbol tables?
+#. is deprecated?
 #. special cases:
 
     #. NXentry
@@ -36,16 +40,21 @@ These are the items to consider in the validation of NeXus HDF5 data files:
     #. NXcollection
 
 #. check for items defined by NX_class
+#. check for items required by NX_class
 #. check for items not defined by NX_class
+#. observe NXDL setting: ignoreExtraGroups
+#. observe NXDL setting: ignoreExtraFields
+#. observe NXDL setting: ignoreExtraAttributes
 #. validate any attributes
 #. validate any links
 #. validate any fields
 
 .. rubric:: Links
 
-#. compare name with pattern
+#. compare name with pattern *validItemName*
 #. is name flexible?
 #. is target attribute defined?
+#. verify target attribute with pattern *validTargetName*
 #. is target address absolute?
 #. does target address exist?
 
@@ -53,6 +62,7 @@ These are the items to consider in the validation of NeXus HDF5 data files:
 
 #. compare name with pattern
 #. is name flexible?
+#. is deprecated?
 #. is units attribute defined?
 #. check units are consistent against NXDL
 #. check data shape against NXDL
@@ -62,6 +72,7 @@ These are the items to consider in the validation of NeXus HDF5 data files:
 .. rubric:: Attributes
 
 #. compare name with pattern
+#. is deprecated?
 #. check data type against NXDL
 
 '''
@@ -78,16 +89,24 @@ import nxdlstructure
 
 
 __url__ = 'http://punx.readthedocs.org/en/latest/validate.html'
-XML_SCHEMA_FILE = 'nxdl.xsd'
+NXDL_SCHEMA_FILE = 'nxdl.xsd'
+NXDL_TYPES_SCHEMA_FILE = 'nxdlTypes.xsd'
+
+
+def abs_NXDL_filename(file_name):
+    '''return absolute path to file_name, within NXDL directory'''
+    qset = cache.qsettings()
+    absolute_name = os.path.join(qset.nxdl_dir(), file_name)
+    if not os.path.exists(absolute_name):
+        raise IOError('file does not exist: ' + absolute_name)
+    return absolute_name
 
 
 def validate_NXDL(nxdl_file_name):
     '''
     Validate a NeXus NXDL file
     '''
-    qset = cache.qsettings()
-    schema_file = os.path.join(qset.nxdl_dir(), XML_SCHEMA_FILE)
-    validate_xml(nxdl_file_name, schema_file)
+    validate_xml(nxdl_file_name, abs_NXDL_filename(NXDL_SCHEMA_FILE))
 
 
 def validate_xml(xml_file_name, XSD_Schema_file):
@@ -95,7 +114,7 @@ def validate_xml(xml_file_name, XSD_Schema_file):
     validate an NXDL XML file against an XML Schema file
 
     :param str xml_file_name: name of XML file
-    :param str XSD_Schema_file: name of XSD Schema file (local to package directory)
+    :param str XSD_Schema_file: name of XSD Schema file
     '''
     xml_tree = lxml.etree.parse(xml_file_name)
 
@@ -116,6 +135,11 @@ class Data_File_Validator(object):
     def __init__(self, fname):
         self.fname = fname
         self.findings = []      # list of Finding() instances
+
+        # open the NXDL rules files
+        self.nxdl_xsd = lxml.etree.parse(abs_NXDL_filename(NXDL_SCHEMA_FILE))
+        self.nxdlTypes_xsd = lxml.etree.parse(abs_NXDL_filename(NXDL_TYPES_SCHEMA_FILE))
+
         self.nxdl_dict = nxdlstructure.get_NXDL_specifications()
         self.h5 = h5py.File(fname, 'r')
     

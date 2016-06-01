@@ -13,6 +13,57 @@
 
 '''
 validate NeXus NXDL and HDF5 data files
+
+These are the items to consider in the validation of NeXus HDF5 data files:
+
+.. rubric:: File
+
+#. verify file has valid /NXentry/NXdata/signal_data
+#. verify every NXentry has NXdata/signal_data
+#. verify every NXdata has signal_data
+
+.. rubric:: Groups
+
+#. compare name with pattern
+#. determine NX_class
+#. verify NX_class in nxdl_dict
+#. is name flexible?
+#. special cases:
+
+    #. NXentry
+    #. NXsubentry
+    #. NXdata
+    #. NXcollection
+
+#. check for items defined by NX_class
+#. check for items not defined by NX_class
+#. validate any attributes
+#. validate any links
+#. validate any fields
+
+.. rubric:: Links
+
+#. compare name with pattern
+#. is name flexible?
+#. is target attribute defined?
+#. is target address absolute?
+#. does target address exist?
+
+.. rubric:: Fields
+
+#. compare name with pattern
+#. is name flexible?
+#. is units attribute defined?
+#. check units are consistent against NXDL
+#. check data shape against NXDL
+#. check data type against NXDL
+#. check for attributes defined by NXDL
+
+.. rubric:: Attributes
+
+#. compare name with pattern
+#. check data type against NXDL
+
 '''
 
 import h5py
@@ -73,11 +124,11 @@ class Data_File_Validator(object):
         # TODO: establish the criteria to validate
         self.examine_group(self.h5, 'NXroot')
 
-    def new_finding(self, h5_address, severity, comment):
+    def new_finding(self, test_name, h5_address, severity, comment):
         '''
         accumulate a list of findings
         '''
-        f = finding.Finding(str(h5_address), severity, comment)
+        f = finding.Finding(test_name, str(h5_address), severity, comment)
         self.findings.append(f)
 
     def get_hdf5_attribute(self, obj, attribute, default=None):
@@ -99,17 +150,17 @@ class Data_File_Validator(object):
         nx_class = self.get_hdf5_attribute(group, 'NX_class')
         if nx_class is None:
             if nxdl_classname == 'NXroot':
-                self.new_finding(group.name, finding.TODO, 'hdf5 file')
+                self.new_finding('NXroot', group.name, finding.TODO, 'hdf5 file')
             else:
-                self.new_finding(group.name, finding.NOTE, 'hdf5 group has no `NX_class` attribute')
+                self.new_finding('NXroot', group.name, finding.NOTE, 'hdf5 group has no `NX_class` attribute')
         else:
-            self.new_finding(group.name, finding.OK, 'NX_class=' + nx_class)
+            self.new_finding('NX_class', group.name, finding.OK, nx_class)
         
         # HDF5 group attributes
         for item in sorted(group.attrs.keys()):
             # TODO: check item name against regular expression
             if item not in ('NX_class',):
-                self.new_finding(group.name + '@' + item, finding.TODO, '--TBA--')
+                self.new_finding('attribute', group.name + '@' + item, finding.TODO, '--TBA--')
 
         # TODO: special case for NXentry
         # TODO: special case for NXsubentry
@@ -125,18 +176,18 @@ class Data_File_Validator(object):
             # TODO: check item name against regular expression
             obj = group.get(item)
             if h5structure.isNeXusLink(obj):
-                self.new_finding(obj.name, finding.OK, '--> ' + obj.attrs['target'])
+                self.new_finding('link', obj.name, finding.OK, '--> ' + obj.attrs['target'])
             elif h5structure.isHdf5Group(obj):
                 obj_nx_class = self.get_hdf5_attribute(obj, 'NX_class')
                 if obj_nx_class in defined_nxdl_list:
                     self.examine_group(obj, obj_nx_class)
                 else:
                     # TODO: is group name flexible?
-                    self.new_finding(obj.name, finding.NOTE, 'not defined in ' + nxdl_classname)
+                    self.new_finding('defined', obj.name, finding.NOTE, 'not defined in ' + nxdl_classname)
             elif h5structure.isHdf5Dataset(obj):
                 self.examine_dataset(obj, group)
             else:
-                self.new_finding(obj.name, finding.TODO, '--TBA--')
+                self.new_finding('dataset', obj.name, finding.TODO, '--TBA--')
 
     
     def examine_dataset(self, dataset, group):
@@ -149,16 +200,16 @@ class Data_File_Validator(object):
         nx_class = self.get_hdf5_attribute(group, 'NX_class')
         nxdl_class_obj = self.nxdl_dict[nx_class]
         ds_name = dataset.name.split('/')[-1]
-        if ds_name not in nxdl_class_obj.fields:
-            # TODO: is dataset name flexible?
-            self.new_finding(dataset.name, finding.NOTE, 'unspecified field')
+        if ds_name in nxdl_class_obj.fields:
+            self.new_finding('defined', dataset.name, finding.TODO, '--TBA--')
         else:
-            self.new_finding(dataset.name, finding.TODO, '--TBA--')
+            # TODO: is dataset name flexible?
+            self.new_finding('undefined', dataset.name, finding.NOTE, 'unspecified field')
 
         # HDF5 dataset attributes
         for item in sorted(dataset.attrs.keys()):
             # TODO: check item name against regular expression
-            self.new_finding(dataset.name + '@' + item, finding.TODO, '--TBA--')
+            self.new_finding('attribute', dataset.name + '@' + item, finding.TODO, '--TBA--')
 
 
 def parse_command_line_arguments():

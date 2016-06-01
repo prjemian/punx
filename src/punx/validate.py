@@ -146,7 +146,6 @@ class Data_File_Validator(object):
     
     def validate(self):
         '''start the validation process'''
-        # TODO: establish the criteria to validate
         self.examine_group(self.h5, 'NXroot')
 
     def new_finding(self, test_name, h5_address, severity, comment):
@@ -183,14 +182,8 @@ class Data_File_Validator(object):
         
         # HDF5 group attributes
         for item in sorted(group.attrs.keys()):
-            # TODO: check item name against regular expression
             if item not in ('NX_class',):
                 self.new_finding('attribute', group.name + '@' + item, finding.TODO, '--TBA--')
-
-        # TODO: special case for NXentry
-        # TODO: special case for NXsubentry
-        # TODO: special case for NXdata
-        # TODO: special case for NXcollection
 
         # get a list of the NXDL subgroups defined in this group
         nxdl_class_obj = self.nxdl_dict[nxdl_classname]
@@ -198,7 +191,6 @@ class Data_File_Validator(object):
         
         # HDF5 group children
         for item in sorted(group):
-            # TODO: check item name against regular expression
             obj = group.get(item)
             if h5structure.isNeXusLink(obj):
                 self.new_finding('link', obj.name, finding.OK, '--> ' + obj.attrs['target'])
@@ -207,7 +199,6 @@ class Data_File_Validator(object):
                 if obj_nx_class in defined_nxdl_list:
                     self.examine_group(obj, obj_nx_class)
                 else:
-                    # TODO: is group name flexible?
                     self.new_finding('defined', obj.name, finding.NOTE, 'not defined in ' + nxdl_classname)
             elif h5structure.isHdf5Dataset(obj):
                 self.examine_dataset(obj, group)
@@ -228,12 +219,10 @@ class Data_File_Validator(object):
         if ds_name in nxdl_class_obj.fields:
             self.new_finding('defined', dataset.name, finding.TODO, '--TBA--')
         else:
-            # TODO: is dataset name flexible?
             self.new_finding('undefined', dataset.name, finding.NOTE, 'unspecified field')
 
         # HDF5 dataset attributes
         for item in sorted(dataset.attrs.keys()):
-            # TODO: check item name against regular expression
             self.new_finding('attribute', dataset.name + '@' + item, finding.TODO, '--TBA--')
 
 

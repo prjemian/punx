@@ -32,10 +32,11 @@ class Finding(object):
     :param str comment: description
     '''
     
-    def __init__(self, h5_address, severity, comment):
+    def __init__(self, test_name, h5_address, severity, comment):
         if severity not in VALID_SEVERITY_LIST:
             msg = 'unknown severity value: ' + severity
             raise ValueError(msg)
+        self.test_name = str(test_name)
         self.h5_address = h5_address
         self.severity = SEVERITIES[severity]
         self.comment = comment
@@ -43,5 +44,6 @@ class Finding(object):
     def __str__(self, *args, **kwargs):
         s = self.severity
         s += ' ' + self.h5_address 
+        s += ': ' + self.test_name
         s += ': ' + self.comment
         return s

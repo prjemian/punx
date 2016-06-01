@@ -25,6 +25,8 @@ __url__ = 'http://punx.readthedocs.org/en/latest/nxdlstructure.html'
 import collections
 import lxml.etree
 import os
+
+import __init__
 import cache
 import validate
 
@@ -33,6 +35,7 @@ PROGRAM_NAME = 'nxdlstructure'
 INDENTATION_UNIT = '  '
 listing_category = None
 NXDL_XML_NAMESPACE = 'http://definition.nexusformat.org/nxdl/3.1'
+getting_nxdl = False        # to avoid infinite loop while updating
 
 
 class NXDL_mixin(object):
@@ -288,15 +291,21 @@ def get_NXDL_specifications():
     '''
     return a dictionary of NXDL structures, keyed by NX_class name
     '''
+    global getting_nxdl
     qset = cache.qsettings()
+
+    if not getting_nxdl:
+        # infinite loop avoided
+        getting_nxdl = True
+        cache.update_NXDL_Cache()
+    getting_nxdl = False
+
     pfile = qset.getKey('pickle_file')
     if pfile is not None and os.path.exists(pfile):
         # hope that we can read a cached version of nxdl_dict
-        nxdl_dict = cache.read_pickle_file(pfile, qset.getKey('sha'))
+        nxdl_dict = cache.read_pickle_file(pfile, qset.getKey('git_sha'))
         if nxdl_dict is not None:      # declare victory!
             return nxdl_dict
-
-    # cache.update_NXDL_Cache()   # FIXME: infinite loop
     
     # build the nxdl_dict by parsing all the NXDL specifications
     basedir = qset.nxdl_dir()

@@ -66,6 +66,10 @@ class QSettingsMixin(object):
         
         :raises TypeError: if key is None
         '''
+        group, k = self._keySplit_(key)
+        if group is None:
+            group = __init__.GLOBAL_INI_GROUP
+        key = group + '/' + k
         return self.value(key).toPyObject()
     
     def setKey(self, key, value):
@@ -101,11 +105,10 @@ class QSettingsMixin(object):
         if gmt:
             # current ISO8601 time in GMT, matches format from GitHub
             key += '_gmt'
-            ts = str(datetime.datetime.utcnow())
-            ts = 'T'.join(ts.split()).split('.')[0] + 'Z'
+            ts = gmt_github_style()
         else:
             # current ISO8601 time in local time
-            ts = str(datetime.datetime.now())
+            ts = timestamp()
         self.setKey(key, ts)
     
     def cache_dir(self):
@@ -115,3 +118,16 @@ class QSettingsMixin(object):
     def nxdl_dir(self):
         '''return the absolute path of the NXDL directory'''
         return os.path.join(self.cache_dir(), __init__.NXDL_CACHE_SUBDIR)
+
+
+def gmt_github_style():
+    '''current ISO8601 time in GMT, matches format from GitHub'''
+    ts = str(datetime.datetime.utcnow())
+    ts = 'T'.join(ts.split()).split('.')[0] + 'Z'
+    return ts
+
+
+def timestamp():
+    '''current ISO8601 time in GMT, matches format from GitHub'''
+    ts = str(datetime.datetime.now())
+    return ts

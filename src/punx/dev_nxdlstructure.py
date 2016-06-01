@@ -50,6 +50,6 @@ def get_NXDL_dictionary():
 # show_NXDL_structure('applications', 'NXsas')
 # show_NXDL_structure('applications', 'NXarpes')
 # show_NXDL_structure('contributed_definitions', 'NXmagnetic_kicker')
-# show_NXDL_structure('contributed_definitions', 'NXcanSAS')
+show_NXDL_structure('contributed_definitions', 'NXcanSAS')
 
-get_NXDL_dictionary()
+# get_NXDL_dictionary()

@@ -31,6 +31,7 @@ source code repository.
 '''
 
 import cPickle as pickle
+import datetime
 import json
 import os
 import StringIO
@@ -57,6 +58,7 @@ SOURCE_CACHE_ROOT = os.path.join(PKG_DIR, __init__.CACHE_SUBDIR)
 __singleton_cache_settings_source__ = None
 __singleton_cache_settings_user__ = None
 __singleton_settings__ = None
+UPDATE_RECHECK_INTERVAL = datetime.timedelta(days=1)
 
 
 def __is_developer_source_path_(path):
@@ -85,7 +87,7 @@ def githubMasterInfo(org, repo):
     key       meaning
     ========  ================================================
     git_time  ISO-8601-compatible timestamp from GitHub
-    sha       hash tag of latest commit
+    git_sha   hash tag of latest GitHub commit
     zip_url   URL of downloadable ZIP file
     ========  ================================================
     '''
@@ -105,7 +107,7 @@ def githubMasterInfo(org, repo):
     iso8601 = latest['commit']['committer']['date']
     zip_url = 'https://github.com/%s/%s/archive/master.zip' % (org, repo)
     
-    return dict(sha=sha, git_time=iso8601, zip_url=zip_url)
+    return dict(git_sha=sha, git_time=iso8601, zip_url=zip_url)
 
 
 def write_pickle_file(info, path):
@@ -125,31 +127,43 @@ def read_pickle_file(pfile, sha):
     pickle_data = pickle.load(open(pfile, 'rb'))
     if 'info' in pickle_data:
         # any other tests to qualify this?
-        if sha == pickle_data['info']['sha']:   # declare victory!
+        if sha == pickle_data['info']['git_sha']:   # declare victory!
             # do not need to return ``info`` since it matches
             return pickle_data['nxdl_dict']
     return None
 
 
-def update_NXDL_Cache():
+def update_NXDL_Cache(force_update=False):
     '''
     update the local cache of NeXus NXDL files
     '''
+    def set_next_update_checkpoint():
+        up = str(datetime.datetime.now() + UPDATE_RECHECK_INTERVAL)
+        qset.setKey('next_update', up)
+        info['next_update'] = up
+        
+    qset = qsettings()
+    checkpoint = str(qset.getKey('next_update'))
+    ts_now = str(datetime.datetime.now())
+    if checkpoint is not None and ts_now < checkpoint and not force_update:
+        return
+
+    # check with GitHub for any updates
     info = githubMasterInfo(__init__.GITHUB_NXDL_ORGANIZATION, 
                             __init__.GITHUB_NXDL_REPOSITORY)
     if info is None:
         return
 
-    qset = qsettings()
     info['file'] = str(qset.fileName())
     path = qset.cache_dir()
     nxdl_subdir = qset.nxdl_dir()
 
-    same_sha = str(info['sha']) == str(qset.getKey('sha'))
+    same_sha = str(info['git_sha']) == str(qset.getKey('git_sha'))
     same_git_time = str(info['git_time']) == str(qset.getKey('git_time'))
     nxdl_subdir_exists = os.path.exists(nxdl_subdir)
     do_not_update = same_sha and same_git_time and nxdl_subdir_exists
     if do_not_update:
+        set_next_update_checkpoint()
         return
 
     # download the repository ZIP file 
@@ -173,6 +187,7 @@ def update_NXDL_Cache():
                     zip_content.extract(item, path)
     
     # optimization: write the parsed NXDL specifications to a file
+    set_next_update_checkpoint()
     write_pickle_file(info, path)
     qset.updateGroupKeys(info)
 

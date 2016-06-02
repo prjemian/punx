@@ -187,7 +187,11 @@ class Data_File_Validator(object):
         h5_addr = obj.name
         short_name = h5_addr.split('/')[-1]
 
+        # TODO: do this search only once for this class
         r = self.nxdl_xpath('//*[@name="validItemName"]/xs:restriction')
+        if r is None or len(r) != 1:
+            msg = 'could not read *validItemName* from *nxdl.xsd*'
+            raise ValueError(msg)
 
         maxLength = int(r[0].find('xs:maxLength', self.ns).attrib.get('value', -1))
         length_ok = result_dict[len(short_name) <= maxLength]

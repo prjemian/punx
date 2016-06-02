@@ -133,6 +133,33 @@ def validate_xml(xml_file_name, XSD_Schema_file):
     return xsd.assertValid(xml_tree)
 
 
+class NxdlPattern(object):
+    '''
+    common regular expression pattern for validation
+    
+    :param obj parent: instance of :class:`Data_File_Validator`
+    :param str pname: pattern identifying name
+    :param str xpath_str: XPath search string, expect list of length = 1
+    '''
+    
+    def __init__(self, parent, pname, xpath_str):
+        self.name = pname
+        self.xpath_str = xpath_str
+
+        r = parent.nxdl_xsd.xpath(xpath_str, namespaces=parent.ns)
+
+        if r is None or len(r) != 1:
+            msg = 'could not read *' + pname + '* from *nxdl.xsd*'
+            raise ValueError(msg)
+
+        self.pattern_str = r[0].attrib.get('value', None)
+        self.re_obj = re.compile(self.pattern_str)
+    
+    def match(self, text):
+        '''regular expression search'''
+        return self.re_obj.match(text)
+
+
 class Data_File_Validator(object):
     '''
     manage the validation of a NeXus HDF5 data file
@@ -150,6 +177,16 @@ class Data_File_Validator(object):
 
         self.nxdl_dict = nxdlstructure.get_NXDL_specifications()
         self.h5 = h5py.File(fname, 'r')
+        self._init_patterns()
+    
+    def _init_patterns(self):
+        self.patterns = {}
+        for item in ('validItemName', 'validNXClassName', 
+                     'validTargetName'):
+            xps = '//*[@name="' # XPath String query
+            xps += item
+            xps += '"]/xs:restriction/xs:pattern'
+            self.patterns[item] = NxdlPattern(self, item, xps)
     
     def validate(self):
         '''start the validation process'''
@@ -182,27 +219,17 @@ class Data_File_Validator(object):
         '''
         validate *obj* name using *validItemName* regular expression
         '''
+        key = 'validItemName'
         result_dict = {True: finding.OK, False: finding.ERROR}
 
         h5_addr = obj.name
         short_name = h5_addr.split('/')[-1]
 
-        # TODO: do this search only once for this class
-        r = self.nxdl_xpath('//*[@name="validItemName"]/xs:restriction')
-        if r is None or len(r) != 1:
-            msg = 'could not read *validItemName* from *nxdl.xsd*'
-            raise ValueError(msg)
-
-        maxLength = int(r[0].find('xs:maxLength', self.ns).attrib.get('value', -1))
-        length_ok = result_dict[len(short_name) <= maxLength]
-
-        pattern = r[0].find('xs:pattern', self.ns).attrib.get('value', None)
-        p = re.compile(pattern + '$')   # append $ to require full string string
+        p = self.patterns[key]
         m = p.match(short_name)
         name_ok = result_dict[m is not None and m.string == short_name]
 
-        self.new_finding('maxLength', h5_addr, length_ok, '<=' + str(maxLength))
-        self.new_finding('validItemName', h5_addr, name_ok, 're: ' + pattern)
+        self.new_finding(key, h5_addr, name_ok, 're: ' + p.pattern_str)
 
     def examine_group(self, group, nxdl_classname):
         '''

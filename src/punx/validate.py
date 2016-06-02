@@ -77,7 +77,7 @@ Checkboxes indicate which steps have been implemented in code below.
 #. [ ] check units are consistent against NXDL
 #. [ ] check data shape against NXDL
 #. [ ] check data type against NXDL
-#. [ ] check for attributes defined by NXDL
+#. [x] check for attributes defined by NXDL
 
 .. rubric:: Attributes
 
@@ -268,6 +268,7 @@ class Data_File_Validator(object):
                 self.new_finding('HDF5 group', group.name, finding.NOTE, 'hdf5 group has no `NX_class` attribute')
         else:
             self.new_finding('NX_class check', group.name, finding.TODO, nx_class)
+            self.validate_attributes(group, nx_class)
         
         # HDF5 group attributes
         for item in sorted(group.attrs.keys()):
@@ -318,11 +319,7 @@ class Data_File_Validator(object):
             else:
                 self.new_finding('undefined', dataset.name, finding.NOTE, 'unspecified field')
 
-        # HDF5 dataset attributes
-        for item in sorted(dataset.attrs.keys()):
-            if item not in ('NX_class',):
-                addr = dataset.name + '@' + item
-                self.new_finding('attribute', addr, finding.TODO, finding.TODO.description)
+        self.validate_attributes(dataset, nx_class)
 
     def validate_link(self, link, group):
         '''
@@ -355,14 +352,18 @@ class Data_File_Validator(object):
         # get list of all possible attributes from data file and NXDL spec
         h5_attrs = h5_obj.attrs.keys() + nxdl_class_obj.attrs.keys()
         h5_attrs = map(str, {k:None for k in h5_attrs}.keys())      # remove extras
+        if 'NX_class' in h5_attrs:
+            h5_attrs.remove('NX_class')
 
         for k in sorted(h5_attrs):
             aname = h5_obj.name + '@' + k
+            data_type_checked = False
             if k in nxdl_class_obj.attrs:
                 msg = 'defined in ' + nxdl_class
                 severity = tf_result[k in h5_obj.attrs]
 
                 if k in h5_obj.attrs:                # check expected NXDL data type
+                    data_type_checked = True
                     obj_attr = h5_obj.attrs[k]
                     nxdl_attr = nxdl_class_obj.attrs[k]
                     nx_type = nxdl_attr.nx_type
@@ -373,7 +374,7 @@ class Data_File_Validator(object):
             # TODO: need to learn *minOccurs* from NXDL
             msg += ' (optional)'
             self.new_finding(checkup_name, aname, severity, msg)
-            if k in h5_obj.attrs and k in h5_obj.attrs:
+            if data_type_checked:
                 msg = str(type(obj_attr)) + ' : ' + nx_type
                 self.new_finding('NXDL NX_type', aname, finding.TF_RESULT[data_type_ok], msg)
 

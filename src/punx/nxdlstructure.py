@@ -28,6 +28,7 @@ __url__ = 'http://punx.readthedocs.org/en/latest/nxdlstructure.html'
 #     ignoreExtraGroups
 #     ignoreExtraFields
 #     ignoreExtraAttributes
+#     minOccurs
 
 
 import collections

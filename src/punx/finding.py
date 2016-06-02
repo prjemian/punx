@@ -14,13 +14,22 @@ document each item during validation
 '''
 
 
+import collections
+
+SEVERITY_DESCRIPTION = collections.OrderedDict()
+SEVERITY_DESCRIPTION['OK'] =      'meets NeXus specification'
+SEVERITY_DESCRIPTION['NOTE'] =    'does not meet NeXus specification, but acceptable'
+SEVERITY_DESCRIPTION['WARNING'] = 'does not meet NeXus specification, as mentioned in the manual'
+SEVERITY_DESCRIPTION['ERROR'] =   'violates NeXus specification'
+SEVERITY_DESCRIPTION['TODO'] =    'validation not implemented yet'
+SEVERITIES = SEVERITY_DESCRIPTION.keys()
+# TODO: can these definitions be created from dictionary above?
 OK = 0
 NOTE = 1
 WARNING = 2
 ERROR = 3
 TODO = 4
 VALID_SEVERITY_LIST = (OK, NOTE, WARNING, ERROR, TODO)
-SEVERITIES = 'OK NOTE WARNING ERROR TODO'.split()
 TF_RESULT = {True: OK, False: ERROR}
 
 

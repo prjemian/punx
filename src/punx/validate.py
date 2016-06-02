@@ -114,6 +114,19 @@ NXDL_TYPES_SCHEMA_FILE = 'nxdlTypes.xsd'
 NXDL_NAMESPACE = 'http://definition.nexusformat.org/nxdl/3.1'
 XSD_NAMESPACE = 'http://www.w3.org/2001/XMLSchema'
 
+# TODO: is there a better way to define these?  Using nxdlTypes.xsd?
+NXDL_DATA_TYPES = {
+    'NX_CHAR': (str, unicode),
+    'NX_INT':  (int, ),
+    'NX_FLOAT':  (float, ),
+    'NX_BINARY': (None, ),     # FIXME:
+    'NX_BOOLEAN': (None, ),     # FIXME:
+}
+NXDL_DATA_TYPES['NX_UINT']   = NXDL_DATA_TYPES['NX_INT']
+NXDL_DATA_TYPES['NX_POSINT'] = NXDL_DATA_TYPES['NX_INT']
+NXDL_DATA_TYPES['NX_NUMBER'] = NXDL_DATA_TYPES['NX_INT'] + NXDL_DATA_TYPES['NX_FLOAT']
+NXDL_DATA_TYPES['ISO8601']   = NXDL_DATA_TYPES['NX_CHAR']
+
 
 def abs_NXDL_filename(file_name):
     '''return absolute path to file_name, within NXDL directory'''
@@ -315,7 +328,7 @@ class Data_File_Validator(object):
         '''
         check link against the specification of nxdl_classname
         
-        :param obj link: instance of h5py.Link ???correct object type???
+        :param obj link: instance of h5py.Group or h5py.Dataset
         :param obj group: instance of h5py.Group, needed to check against NXDL
         '''
         target = link.attrs.get('target', None)
@@ -337,21 +350,32 @@ class Data_File_Validator(object):
         '''
         nxdl_class_obj = self.nxdl_dict[nxdl_class]
         checkup_name = nxdl_class + ' attributes'
-        tf_result = {True: finding.OK, False: finding.NOTE}
+        tf_result = {True: finding.OK, False: finding.UNUSED}
 
+        # get list of all possible attributes from data file and NXDL spec
         h5_attrs = h5_obj.attrs.keys() + nxdl_class_obj.attrs.keys()
-        h5_attrs = map(str, {k:None for k in h5_attrs}.keys())
+        h5_attrs = map(str, {k:None for k in h5_attrs}.keys())      # remove extras
 
         for k in sorted(h5_attrs):
             aname = h5_obj.name + '@' + k
             if k in nxdl_class_obj.attrs:
                 msg = 'defined in ' + nxdl_class
                 severity = tf_result[k in h5_obj.attrs]
+
+                if k in h5_obj.attrs:                # check expected NXDL data type
+                    obj_attr = h5_obj.attrs[k]
+                    nxdl_attr = nxdl_class_obj.attrs[k]
+                    nx_type = nxdl_attr.nx_type
+                    data_type_ok = nx_type in NXDL_DATA_TYPES and type(obj_attr) in NXDL_DATA_TYPES[nx_type]
             else:
+                severity = finding.NOTE
                 msg = 'not defined in ' + nxdl_class
             # TODO: need to learn *minOccurs* from NXDL
             msg += ' (optional)'
             self.new_finding(checkup_name, aname, severity, msg)
+            if k in h5_obj.attrs and k in h5_obj.attrs:
+                msg = str(type(obj_attr)) + ' : ' + nx_type
+                self.new_finding('NXDL NX_type', aname, finding.TF_RESULT[data_type_ok], msg)
 
     def collect_names(self, h5_object):
         '''
@@ -401,7 +425,7 @@ class Data_File_Validator(object):
         key = 'validItemName'
 
         # h5_addr = obj.name
-        short_name = h5_addr.split('/')[-1].rstrip('@')
+        short_name = h5_addr.split('/')[-1].lstrip('@')
 
         p = self.patterns[key]
         m = p.match(short_name)

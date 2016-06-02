@@ -23,6 +23,7 @@ These are the items to consider in the validation of NeXus HDF5 data files
 #. verify every NXentry has NXdata/signal_data
 #. verify every NXdata has signal_data
 #. verify file level as group using NX_class = NXroot
+#. identify any fields at root level are not NeXus (which is OK), per NXroot
 
 .. rubric:: Groups
 
@@ -191,6 +192,7 @@ class Data_File_Validator(object):
     
     def validate(self):
         '''start the validation process'''
+        # TODO: apply above steps to root, then validate each group
         self.examine_group(self.h5, 'NXroot')
 
     def new_finding(self, test_name, h5_address, severity, comment):
@@ -216,14 +218,29 @@ class Data_File_Validator(object):
         '''locate item(s) in nxdl.xsd using XPath queries'''
         return self.nxdl_xsd.xpath(expr, namespaces=self.ns)
 
-    def validate_item_name(self, obj):
+    def validate_item_name(self, h5_addr):
         '''
-        validate *obj* name using *validItemName* regular expression
+        validate *h5_addr* using *validItemName* regular expression
+        
+        This is used for the names of groups, fields, links, and attributes.
+        
+        :param str h5_addr: full HDF5 address of item, for reference only,
+            for attributes, use an @ symbol, such as these examples:
+            
+            =============================    ============
+            *h5_addr*                        *short_name*
+            =============================    ============
+            ``/entry/user``                  ``user``
+            ``/entry/data01/data``           ``data``
+            ``/entry/data01/data@signal``    ``signal``
+            =============================    ============
+
+        This method will separate out the last part of the name for validation.
         '''
         key = 'validItemName'
 
-        h5_addr = obj.name
-        short_name = h5_addr.split('/')[-1]
+        # h5_addr = obj.name
+        short_name = h5_addr.split('/')[-1].rstrip('@')
 
         p = self.patterns[key]
         m = p.match(short_name)
@@ -238,7 +255,7 @@ class Data_File_Validator(object):
         :param obj group: instance of h5py.Group
         :param str nxdl_classname: name of NXDL class this group should match
         '''
-        self.validate_item_name(group)
+        self.validate_item_name(group.name)
         nx_class = self.get_hdf5_attribute(group, 'NX_class')
         if nx_class is None:
             if nxdl_classname == 'NXroot':
@@ -251,7 +268,9 @@ class Data_File_Validator(object):
         # HDF5 group attributes
         for item in sorted(group.attrs.keys()):
             if item not in ('NX_class',):
-                self.new_finding('attribute', group.name + '@' + item, finding.TODO, '--TBA--')
+                aname = group.name + '@' + item
+                self.validate_item_name(aname)
+                # self.new_finding('attribute', aname, finding.TODO, '--TBA--')
 
         # get a list of the NXDL subgroups defined in this group
         nxdl_class_obj = self.nxdl_dict[nxdl_classname]
@@ -281,7 +300,7 @@ class Data_File_Validator(object):
         :param obj dataset: instance of h5py.Dataset
         :param obj group: instance of h5py.Group
         '''
-        self.validate_item_name(dataset)
+        self.validate_item_name(dataset.name)
         nx_class = self.get_hdf5_attribute(group, 'NX_class')
         nxdl_class_obj = self.nxdl_dict[nx_class]
         ds_name = dataset.name.split('/')[-1]
@@ -301,7 +320,7 @@ class Data_File_Validator(object):
         :param obj link: instance of h5py.Link ???
         :param obj group: instance of h5py.Group
         '''
-        self.validate_item_name(link)
+        self.validate_item_name(link.name)
         target = link.attrs.get('target', None)
         if target is not None:
             self.new_finding('link', link.name, finding.OK, '--> ' + target)

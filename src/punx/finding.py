@@ -65,3 +65,18 @@ class Finding(object):
         s += ': ' + self.test_name
         s += ': ' + self.comment
         return s
+
+
+class CheckupResults(object):
+    '''
+    various checkups for a single hdf5 address (absolute path)
+    
+    :param str h5_address: address of h5py item
+    '''
+    
+    def __init__(self, h5_address):
+        self.h5_address = h5_address
+        self.findings = []      # keep list of all findings for this address
+    
+    def __str__(self, *args, **kwargs):
+        return self.h5_address

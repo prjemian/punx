@@ -25,8 +25,8 @@ PKG_DIR = os.path.abspath(os.path.dirname(__file__))
 TEST_DATA_DIR = os.path.join(PKG_DIR, 'data')
 TEST_DATA_FILE = os.path.join(TEST_DATA_DIR, 'writer_1_3.hdf5')
 TEST_DATA_FILE = os.path.join(TEST_DATA_DIR, 'writer_2_1.hdf5')
-# TEST_DATA_FILE = os.path.join(TEST_DATA_DIR, 'compression.h5')
-# TEST_DATA_FILE = os.path.join(TEST_DATA_DIR, 'Data_Q.h5')
+TEST_DATA_FILE = os.path.join(TEST_DATA_DIR, 'compression.h5')
+TEST_DATA_FILE = os.path.join(TEST_DATA_DIR, 'Data_Q.h5')
 # TEST_DATA_FILE = os.path.join(TEST_DATA_DIR, '02_03_setup.h5')
 
 v = validate.Data_File_Validator(TEST_DATA_FILE)
@@ -38,6 +38,6 @@ print ''
 t = pyRestTable.Table()
 t.labels = 'status address test comment(s)'.split()
 for f in v.findings:
-    if f.severity not in ('xOK', 'TODO', ):
+    if f.severity not in ('OK', 'xTODO', ):
         t.rows.append((f.severity, f.h5_address, f.test_name, f.comment))
 print t.reST()

@@ -237,7 +237,7 @@ class Data_File_Validator(object):
         for item in sorted(group.attrs.keys()):
             if item not in ('NX_class',):
                 aname = group.name + '@' + item
-                self.new_finding('attribute', aname, finding.TODO, finding.SEVERITY_DESCRIPTION['TODO'])
+                self.new_finding('attribute', aname, finding.TODO, finding.TODO.description)
 
         # get a list of the NXDL subgroups defined in this group
         nxdl_class_obj = self.nxdl_dict[nxdl_classname]
@@ -258,7 +258,7 @@ class Data_File_Validator(object):
             elif h5structure.isHdf5Dataset(obj):
                 self.validate_dataset(obj, group)
             else:
-                self.new_finding('dataset', obj.name, finding.TODO, finding.SEVERITY_DESCRIPTION['TODO'])
+                self.new_finding('dataset', obj.name, finding.TODO, finding.TODO.description)
 
     
     def validate_dataset(self, dataset, group):
@@ -272,13 +272,13 @@ class Data_File_Validator(object):
         nxdl_class_obj = self.nxdl_dict[nx_class]
         ds_name = dataset.name.split('/')[-1]
         if ds_name in nxdl_class_obj.fields:
-            self.new_finding('defined', dataset.name, finding.TODO, finding.SEVERITY_DESCRIPTION['TODO'])
+            self.new_finding('defined', dataset.name, finding.TODO, finding.TODO.description)
         else:
             self.new_finding('undefined', dataset.name, finding.NOTE, 'unspecified field')
 
         # HDF5 dataset attributes
         for item in sorted(dataset.attrs.keys()):
-            self.new_finding('attribute', dataset.name + '@' + item, finding.TODO, finding.SEVERITY_DESCRIPTION['TODO'])
+            self.new_finding('attribute', dataset.name + '@' + item, finding.TODO, finding.TODO.description)
 
     def validate_link(self, link, group):
         '''

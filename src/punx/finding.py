@@ -14,21 +14,28 @@ document each item during validation
 '''
 
 
-import collections
+class Severity(object):
+    '''
+    summary result of a Finding
+    
+    :param str key: short name
+    :param str description: one-line summary
+    '''
+    
+    def __init__(self, key, description):
+        self.key = key
+        self.description = description
+    
+    def __str__(self, *args, **kwargs):
+        return self.key
 
-SEVERITY_DESCRIPTION = collections.OrderedDict()
-SEVERITY_DESCRIPTION['OK'] =      'meets NeXus specification'
-SEVERITY_DESCRIPTION['NOTE'] =    'does not meet NeXus specification, but acceptable'
-SEVERITY_DESCRIPTION['WARNING'] = 'does not meet NeXus specification, as mentioned in the manual'
-SEVERITY_DESCRIPTION['ERROR'] =   'violates NeXus specification'
-SEVERITY_DESCRIPTION['TODO'] =    'validation not implemented yet'
-SEVERITIES = SEVERITY_DESCRIPTION.keys()
-# TODO: can these definitions be created from dictionary above?
-OK = 0
-NOTE = 1
-WARNING = 2
-ERROR = 3
-TODO = 4
+
+OK      = Severity('OK',      'meets NeXus specification')
+NOTE    = Severity('NOTE',    'does not meet NeXus specification, but acceptable')
+WARNING = Severity('WARNING', 'does not meet NeXus specification, not generally acceptable')
+ERROR   = Severity('ERROR',   'violates NeXus specification')
+TODO    = Severity('TODO',    'validation not implemented yet')
+
 VALID_SEVERITY_LIST = (OK, NOTE, WARNING, ERROR, TODO)
 TF_RESULT = {True: OK, False: ERROR}
 
@@ -49,7 +56,7 @@ class Finding(object):
             raise ValueError(msg)
         self.test_name = str(test_name)
         self.h5_address = h5_address
-        self.severity = SEVERITIES[severity]
+        self.severity = severity
         self.comment = comment
     
     def __str__(self, *args, **kwargs):

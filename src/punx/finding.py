@@ -19,24 +19,27 @@ class Severity(object):
     summary result of a Finding
     
     :param str key: short name
+    :param str color: suggested color for GUI
     :param str description: one-line summary
     '''
     
-    def __init__(self, key, description):
+    def __init__(self, key, color, description):
         self.key = key
+        self.color = color
         self.description = description
     
     def __str__(self, *args, **kwargs):
         return self.key
 
 
-OK      = Severity('OK',      'meets NeXus specification')
-NOTE    = Severity('NOTE',    'does not meet NeXus specification, but acceptable')
-WARN    = Severity('WARN',    'does not meet NeXus specification, not generally acceptable')
-ERROR   = Severity('ERROR',   'violates NeXus specification')
-TODO    = Severity('TODO',    'validation not implemented yet')
+OK      = Severity('OK',     'green',     'meets NeXus specification')
+NOTE    = Severity('NOTE',   'palegreen', 'does not meet NeXus specification, but acceptable')
+WARN    = Severity('WARN',   'yellow',    'does not meet NeXus specification, not generally acceptable')
+ERROR   = Severity('ERROR',  'red',       'violates NeXus specification')
+TODO    = Severity('TODO',   'blue',      'validation not implemented yet')
+UNUSED  = Severity('UNUSED', 'grey',      'optional NeXus item not used in data file')
 
-VALID_SEVERITY_LIST = (OK, NOTE, WARN, ERROR, TODO)
+VALID_SEVERITY_LIST = (OK, NOTE, WARN, ERROR, TODO, UNUSED)
 TF_RESULT = {True: OK, False: ERROR}
 
 

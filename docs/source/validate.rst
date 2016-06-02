@@ -9,19 +9,22 @@ and compares it with standards to check that the item is valid
 within that standard.  Each test is assigned a result, a
 class:`~punx.finding.Severity` object, with these values and meanings:
 
-=====   =============================================================
-value   meaning
-=====   =============================================================
-OK      meets NeXus specification
-NOTE    does not meet NeXus specification, but acceptable
-WARN    does not meet NeXus specification, not generally acceptable
-ERROR   violates NeXus specification
-TODO    validation not implemented yet
-=====   =============================================================
+=======  =========  ==========================================================
+value    color      meaning
+=======  =========  ==========================================================
+OK       green      meets NeXus specification
+NOTE     palegreen  does not meet NeXus specification, but acceptable
+WARN     yellow     does not meet NeXus specification, not generally acceptable
+ERROR    red        violates NeXus specification
+TODO     blue       validation not implemented yet
+UNUSED   grey       optional NeXus item not used in data file
+=======  =========  ==========================================================
 
 Items marked with the WARN *severity* status are as noted in either the
 NeXus manual [#]_, the NXDL language specification [#]_, or
 the NeXus Definition Language (NXDL) files [#]_.
+
+The *color* is a suggestion for use in a GUI.
 
 
 NeXus HDF5 Data Files

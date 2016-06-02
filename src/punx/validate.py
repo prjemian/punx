@@ -17,13 +17,18 @@ validate NeXus NXDL and HDF5 data files
 These are the items to consider in the validation of NeXus HDF5 data files
 (compare these checks with ``nxdl.xsd`` and ``nxdlTypes.xsd``):
 
+* make a list of all address nodes in the file to be evaluated
+* attributes are also in this list
+* use a structure to hold results for each node
+
 .. rubric:: File
 
+#. verify attributes
+#. verify file level as group using NX_class = NXroot
+#. identify any fields at root level are not NeXus (which is OK), per NXroot
 #. verify file has valid /NXentry/NXdata/signal_data
 #. verify every NXentry has NXdata/signal_data
 #. verify every NXdata has signal_data
-#. verify file level as group using NX_class = NXroot
-#. identify any fields at root level are not NeXus (which is OK), per NXroot
 
 .. rubric:: Groups
 
@@ -170,6 +175,7 @@ class Data_File_Validator(object):
     def __init__(self, fname):
         self.fname = fname
         self.findings = []      # list of Finding() instances
+        self.addresses = []     # list of all HDF5 address nodes in the data file
 
         # open the NXDL rules files
         cache.update_NXDL_Cache()
@@ -189,34 +195,130 @@ class Data_File_Validator(object):
             xps += item
             xps += '"]/xs:restriction/xs:pattern'
             self.patterns[item] = NxdlPattern(self, item, xps)
-    
+
     def validate(self):
-        '''start the validation process'''
+        '''
+        start the validation process from the file root
+        '''
         # TODO: apply above steps to root, then validate each group
-        self.examine_group(self.h5, 'NXroot')
+        self.collect_names(self.h5)
 
-    def new_finding(self, test_name, h5_address, severity, comment):
-        '''
-        accumulate a list of findings
-        '''
-        f = finding.Finding(test_name, str(h5_address), severity, comment)
-        self.findings.append(f)
+        # HDF5 group attributes
+        for item in sorted(self.h5.attrs.keys()):
+            aname = self.h5.name + '@' + item
+            self.addresses.append(aname)
 
-    def get_hdf5_attribute(self, obj, attribute, default=None):
+        # for review with the relevant NXDL specification: NXroot
+        nxdl_class_obj = self.nxdl_dict['NXroot']
+        defined_nxdl_list = nxdl_class_obj.getSubGroup_NX_class_list()
+
+        for item in sorted(self.h5):
+            obj = self.h5.get(item)
+
+        self.validate_group(self.h5, 'NXroot')
+
+    def validate_group(self, group, nxdl_classname):
         '''
-        HDF5 attribute strings might be coded in several ways
+        check group against the specification of nxdl_classname
+        
+        :param obj group: instance of h5py.Group
+        :param str nxdl_classname: name of NXDL class this group should match
         '''
-        a = obj.attrs.get(attribute, default)
-        if isinstance(a, numpy.ndarray):
-            gname = obj.name + '@' + attribute
-            msg = 'original: ' + str(a)
-            self.new_finding('[variable length string]', gname, finding.NOTE, msg)
-            a = a[0]
-        return a
+        nx_class = self.get_hdf5_attribute(group, 'NX_class')
+        if nx_class is None:
+            if nxdl_classname == 'NXroot':
+                self.new_finding('hdf5 file', group.name, finding.OK, 'NXroot')
+            else:
+                self.new_finding('HDF5 group', group.name, finding.NOTE, 'hdf5 group has no `NX_class` attribute')
+        else:
+            self.new_finding('NX_class', group.name, finding.OK, nx_class)
+        
+        # HDF5 group attributes
+        for item in sorted(group.attrs.keys()):
+            if item not in ('NX_class',):
+                aname = group.name + '@' + item
+                self.new_finding('attribute', aname, finding.TODO, finding.SEVERITY_DESCRIPTION['TODO'])
+
+        # get a list of the NXDL subgroups defined in this group
+        nxdl_class_obj = self.nxdl_dict[nxdl_classname]
+        defined_nxdl_list = nxdl_class_obj.getSubGroup_NX_class_list()
+        
+        # HDF5 group children
+        for item in sorted(group):
+            obj = group.get(item)
+            if h5structure.isNeXusLink(obj):
+                # pull these out BEFORE groups & fields
+                self.validate_link(obj, group)
+            elif h5structure.isHdf5Group(obj):
+                obj_nx_class = self.get_hdf5_attribute(obj, 'NX_class')
+                if obj_nx_class in defined_nxdl_list:
+                    self.validate_group(obj, obj_nx_class)
+                else:
+                    self.new_finding('defined', obj.name, finding.NOTE, 'not defined in ' + nxdl_classname)
+            elif h5structure.isHdf5Dataset(obj):
+                self.validate_dataset(obj, group)
+            else:
+                self.new_finding('dataset', obj.name, finding.TODO, finding.SEVERITY_DESCRIPTION['TODO'])
+
     
-    def nxdl_xpath(self, expr):
-        '''locate item(s) in nxdl.xsd using XPath queries'''
-        return self.nxdl_xsd.xpath(expr, namespaces=self.ns)
+    def validate_dataset(self, dataset, group):
+        '''
+        check dataset against the specification of group NXDL specification
+        
+        :param obj dataset: instance of h5py.Dataset
+        :param obj group: instance of h5py.Group
+        '''
+        nx_class = self.get_hdf5_attribute(group, 'NX_class')
+        nxdl_class_obj = self.nxdl_dict[nx_class]
+        ds_name = dataset.name.split('/')[-1]
+        if ds_name in nxdl_class_obj.fields:
+            self.new_finding('defined', dataset.name, finding.TODO, finding.SEVERITY_DESCRIPTION['TODO'])
+        else:
+            self.new_finding('undefined', dataset.name, finding.NOTE, 'unspecified field')
+
+        # HDF5 dataset attributes
+        for item in sorted(dataset.attrs.keys()):
+            self.new_finding('attribute', dataset.name + '@' + item, finding.TODO, finding.SEVERITY_DESCRIPTION['TODO'])
+
+    def validate_link(self, link, group):
+        '''
+        check link against the specification of nxdl_classname
+        
+        :param obj link: instance of h5py.Link ???
+        :param obj group: instance of h5py.Group
+        '''
+        target = link.attrs.get('target', None)
+        if target is not None:
+            self.new_finding('link', link.name, finding.OK, '--> ' + target)
+            target_exists = target in self.h5
+            target_exists = finding.TF_RESULT[target_exists]
+            self.new_finding('link', link.name, target_exists, 'target exists?')
+            # TODO: construct target as nexus classpath and match with NXDL
+        else:
+            self.new_finding('link', link.name, finding.ERROR, 'no target')
+    
+    def collect_names(self, h5_object):
+        '''
+        get the fullname of this object and any of its children
+        '''
+        self.addresses.append(h5_object.name)
+        if not h5structure.isHdf5File(h5_object):
+            self.validate_item_name(h5_object.name)
+        for item in sorted(h5_object.attrs.keys()):
+            aname = h5_object.name + '@' + item
+            self.addresses.append(aname)
+            self.validate_item_name(aname)
+        
+        if h5structure.isHdf5Group(h5_object):
+            for item in sorted(h5_object):
+                obj = h5_object.get(item)
+                if h5structure.isNeXusLink(obj):
+                    # pull these out BEFORE groups & fields
+                    self.addresses.append(obj.name)
+                    self.validate_item_name(obj.name)
+                else:
+                    # anything else
+                    self.collect_names(obj)
 
     def validate_item_name(self, h5_addr):
         '''
@@ -248,88 +350,24 @@ class Data_File_Validator(object):
 
         self.new_finding(key, h5_addr, name_ok, 're: ' + p.pattern_str)
 
-    def examine_group(self, group, nxdl_classname):
+    def new_finding(self, test_name, h5_address, severity, comment):
         '''
-        check group against the specification of nxdl_classname
-        
-        :param obj group: instance of h5py.Group
-        :param str nxdl_classname: name of NXDL class this group should match
+        accumulate a list of findings
         '''
-        self.validate_item_name(group.name)
-        nx_class = self.get_hdf5_attribute(group, 'NX_class')
-        if nx_class is None:
-            if nxdl_classname == 'NXroot':
-                self.new_finding('hdf5 file', group.name, finding.OK, 'NXroot')
-            else:
-                self.new_finding('HDF5 group', group.name, finding.NOTE, 'hdf5 group has no `NX_class` attribute')
-        else:
-            self.new_finding('NX_class', group.name, finding.OK, nx_class)
-        
-        # HDF5 group attributes
-        for item in sorted(group.attrs.keys()):
-            if item not in ('NX_class',):
-                aname = group.name + '@' + item
-                self.validate_item_name(aname)
-                # self.new_finding('attribute', aname, finding.TODO, '--TBA--')
+        f = finding.Finding(test_name, str(h5_address), severity, comment)
+        self.findings.append(f)
 
-        # get a list of the NXDL subgroups defined in this group
-        nxdl_class_obj = self.nxdl_dict[nxdl_classname]
-        defined_nxdl_list = nxdl_class_obj.getSubGroup_NX_class_list()
-        
-        # HDF5 group children
-        for item in sorted(group):
-            obj = group.get(item)
-            if h5structure.isNeXusLink(obj):
-                self.examine_link(obj, group)
-            elif h5structure.isHdf5Group(obj):
-                obj_nx_class = self.get_hdf5_attribute(obj, 'NX_class')
-                if obj_nx_class in defined_nxdl_list:
-                    self.examine_group(obj, obj_nx_class)
-                else:
-                    self.new_finding('defined', obj.name, finding.NOTE, 'not defined in ' + nxdl_classname)
-            elif h5structure.isHdf5Dataset(obj):
-                self.examine_dataset(obj, group)
-            else:
-                self.new_finding('dataset', obj.name, finding.TODO, '--TBA--')
-
-    
-    def examine_dataset(self, dataset, group):
+    def get_hdf5_attribute(self, obj, attribute, default=None):
         '''
-        check dataset against the specification of group NXDL specification
-        
-        :param obj dataset: instance of h5py.Dataset
-        :param obj group: instance of h5py.Group
+        HDF5 attribute strings might be coded in several ways
         '''
-        self.validate_item_name(dataset.name)
-        nx_class = self.get_hdf5_attribute(group, 'NX_class')
-        nxdl_class_obj = self.nxdl_dict[nx_class]
-        ds_name = dataset.name.split('/')[-1]
-        if ds_name in nxdl_class_obj.fields:
-            self.new_finding('defined', dataset.name, finding.TODO, '--TBA--')
-        else:
-            self.new_finding('undefined', dataset.name, finding.NOTE, 'unspecified field')
-
-        # HDF5 dataset attributes
-        for item in sorted(dataset.attrs.keys()):
-            self.new_finding('attribute', dataset.name + '@' + item, finding.TODO, '--TBA--')
-
-    def examine_link(self, link, group):
-        '''
-        check link against the specification of nxdl_classname
-        
-        :param obj link: instance of h5py.Link ???
-        :param obj group: instance of h5py.Group
-        '''
-        self.validate_item_name(link.name)
-        target = link.attrs.get('target', None)
-        if target is not None:
-            self.new_finding('link', link.name, finding.OK, '--> ' + target)
-            target_exists = target in self.h5
-            target_exists = finding.TF_RESULT[target_exists]
-            self.new_finding('link', link.name, target_exists, 'target exists?')
-            # TODO: construct target as nexus classpath and match with NXDL
-        else:
-            self.new_finding('link', link.name, finding.ERROR, 'no target')
+        a = obj.attrs.get(attribute, default)
+        if isinstance(a, numpy.ndarray):
+            gname = obj.name + '@' + attribute
+            msg = '[variable length string]: ' + str(a)
+            self.new_finding('attribute data type', gname, finding.NOTE, msg)
+            a = a[0]
+        return a
 
 
 def parse_command_line_arguments():

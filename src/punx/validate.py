@@ -220,14 +220,13 @@ class Data_File_Validator(object):
         validate *obj* name using *validItemName* regular expression
         '''
         key = 'validItemName'
-        result_dict = {True: finding.OK, False: finding.ERROR}
 
         h5_addr = obj.name
         short_name = h5_addr.split('/')[-1]
 
         p = self.patterns[key]
         m = p.match(short_name)
-        name_ok = result_dict[m is not None and m.string == short_name]
+        name_ok = finding.TF_RESULT[m is not None and m.string == short_name]
 
         self.new_finding(key, h5_addr, name_ok, 're: ' + p.pattern_str)
 
@@ -266,7 +265,7 @@ class Data_File_Validator(object):
                 if target is not None:
                     self.new_finding('link', obj.name, finding.OK, '--> ' + target)
                     target_exists = target in self.h5
-                    target_exists = {True: finding.OK, False: finding.ERROR}[target_exists]
+                    target_exists = finding.TF_RESULT[target_exists]
                     self.new_finding('link', obj.name, target_exists, 'target exists?')
                 else:
                     self.new_finding('link', obj.name, finding.ERROR, 'no target')

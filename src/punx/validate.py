@@ -17,9 +17,9 @@ validate NeXus NXDL and HDF5 data files
 These are the items to consider in the validation of NeXus HDF5 data files
 (compare these checks with ``nxdl.xsd`` and ``nxdlTypes.xsd``):
 
-* make a list of all address nodes in the file to be evaluated
-* attributes are also in this list
-* use a structure to hold results for each node
+* [x] make a list of all address nodes in the file to be evaluated
+* [x] attributes are also in this list
+* [x] use a structure to hold results for each node
 
 .. rubric:: File
 
@@ -201,7 +201,6 @@ class Data_File_Validator(object):
         '''
         start the validation process from the file root
         '''
-        # TODO: apply above steps to root, then validate each group
         self.collect_names(self.h5)
 
         # HDF5 group attributes

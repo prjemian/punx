@@ -43,6 +43,7 @@ print ''
 t = pyRestTable.Table()
 t.labels = 'address test status comment(s)'.split()
 ignore_these = (finding.OK, finding.TODO, finding.UNUSED)
+ignore_these = (finding.OK, finding.NOTE, finding.UNUSED)
 # ignore_these = (finding.OK, finding.TODO)
 # ignore_these = ()
 for f in v.findings:

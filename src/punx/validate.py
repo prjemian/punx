@@ -345,6 +345,12 @@ class Data_File_Validator(object):
         :param obj obj: instance of h5py object with attributes
         :param str nxdl_class: NXDL class name
         '''
+        if nxdl_class not in self.nxdl_dict:
+            severity = finding.ERROR
+            msg = 'unknown: ' + nxdl_class
+            self.new_finding('NXDL NX_class', h5_obj, severity, msg)
+            return
+
         nxdl_class_obj = self.nxdl_dict[nxdl_class]
         checkup_name = nxdl_class + ' attributes'
         tf_result = {True: finding.OK, False: finding.UNUSED}

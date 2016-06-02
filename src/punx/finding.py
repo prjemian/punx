@@ -32,11 +32,11 @@ class Severity(object):
 
 OK      = Severity('OK',      'meets NeXus specification')
 NOTE    = Severity('NOTE',    'does not meet NeXus specification, but acceptable')
-WARNING = Severity('WARNING', 'does not meet NeXus specification, not generally acceptable')
+WARN    = Severity('WARN',    'does not meet NeXus specification, not generally acceptable')
 ERROR   = Severity('ERROR',   'violates NeXus specification')
 TODO    = Severity('TODO',    'validation not implemented yet')
 
-VALID_SEVERITY_LIST = (OK, NOTE, WARNING, ERROR, TODO)
+VALID_SEVERITY_LIST = (OK, NOTE, WARN, ERROR, TODO)
 TF_RESULT = {True: OK, False: ERROR}
 
 

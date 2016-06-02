@@ -22,6 +22,7 @@ These are the items to consider in the validation of NeXus HDF5 data files
 #. verify file has valid /NXentry/NXdata/signal_data
 #. verify every NXentry has NXdata/signal_data
 #. verify every NXdata has signal_data
+#. verify file level as group using NX_class = NXroot
 
 .. rubric:: Groups
 
@@ -81,6 +82,7 @@ import h5py
 import lxml.etree
 import numpy
 import os
+import re
 
 import cache
 import finding
@@ -91,6 +93,10 @@ import nxdlstructure
 __url__ = 'http://punx.readthedocs.org/en/latest/validate.html'
 NXDL_SCHEMA_FILE = 'nxdl.xsd'
 NXDL_TYPES_SCHEMA_FILE = 'nxdlTypes.xsd'
+
+# TODO: get these from nxdl.xsd?  they are well-known anyway
+NXDL_NAMESPACE = 'http://definition.nexusformat.org/nxdl/3.1'
+XSD_NAMESPACE = 'http://www.w3.org/2001/XMLSchema'
 
 
 def abs_NXDL_filename(file_name):
@@ -138,6 +144,7 @@ class Data_File_Validator(object):
 
         # open the NXDL rules files
         cache.update_NXDL_Cache()
+        self.ns = dict(xs=XSD_NAMESPACE, nx=NXDL_NAMESPACE)
         self.nxdl_xsd = lxml.etree.parse(abs_NXDL_filename(NXDL_SCHEMA_FILE))
         self.nxdlTypes_xsd = lxml.etree.parse(abs_NXDL_filename(NXDL_TYPES_SCHEMA_FILE))
 
@@ -159,10 +166,39 @@ class Data_File_Validator(object):
         '''
         HDF5 attribute strings might be coded in several ways
         '''
-        a = obj.attrs.get('NX_class', default)
+        a = obj.attrs.get(attribute, default)
         if isinstance(a, numpy.ndarray):
+            gname = obj.name + '@' + attribute
+            msg = 'original: ' + str(a)
+            self.new_finding('[variable length string]', gname, finding.NOTE, msg)
             a = a[0]
         return a
+    
+    def nxdl_xpath(self, expr):
+        '''locate item(s) in nxdl.xsd using XPath queries'''
+        return self.nxdl_xsd.xpath(expr, namespaces=self.ns)
+
+    def validate_item_name(self, obj):
+        '''
+        validate *obj* name using *validItemName* regular expression
+        '''
+        result_dict = {True: finding.OK, False: finding.ERROR}
+
+        h5_addr = obj.name
+        short_name = h5_addr.split('/')[-1]
+
+        r = self.nxdl_xpath('//*[@name="validItemName"]/xs:restriction')
+
+        maxLength = int(r[0].find('xs:maxLength', self.ns).attrib.get('value', -1))
+        length_ok = result_dict[len(short_name) <= maxLength]
+
+        pattern = r[0].find('xs:pattern', self.ns).attrib.get('value', None)
+        p = re.compile(pattern + '$')   # append $ to require full string string
+        m = p.match(short_name)
+        name_ok = result_dict[m is not None and m.string == short_name]
+
+        self.new_finding('maxLength', h5_addr, length_ok, '<=' + str(maxLength))
+        self.new_finding('validItemName', h5_addr, name_ok, 're: ' + pattern)
 
     def examine_group(self, group, nxdl_classname):
         '''
@@ -171,12 +207,13 @@ class Data_File_Validator(object):
         :param obj group: instance of h5py.Group
         :param str nxdl_classname: name of NXDL class this group should match
         '''
+        self.validate_item_name(group)
         nx_class = self.get_hdf5_attribute(group, 'NX_class')
         if nx_class is None:
             if nxdl_classname == 'NXroot':
-                self.new_finding('NXroot', group.name, finding.TODO, 'hdf5 file')
+                self.new_finding('hdf5 file', group.name, finding.OK, 'NXroot')
             else:
-                self.new_finding('NXroot', group.name, finding.NOTE, 'hdf5 group has no `NX_class` attribute')
+                self.new_finding('HDF5 group', group.name, finding.NOTE, 'hdf5 group has no `NX_class` attribute')
         else:
             self.new_finding('NX_class', group.name, finding.OK, nx_class)
         
@@ -193,7 +230,15 @@ class Data_File_Validator(object):
         for item in sorted(group):
             obj = group.get(item)
             if h5structure.isNeXusLink(obj):
-                self.new_finding('link', obj.name, finding.OK, '--> ' + obj.attrs['target'])
+                self.validate_item_name(obj)
+                target = obj.attrs.get('target', None)
+                if target is not None:
+                    self.new_finding('link', obj.name, finding.OK, '--> ' + target)
+                    target_exists = target in self.h5
+                    target_exists = {True: finding.OK, False: finding.ERROR}[target_exists]
+                    self.new_finding('link', obj.name, target_exists, 'target exists?')
+                else:
+                    self.new_finding('link', obj.name, finding.ERROR, 'no target')
             elif h5structure.isHdf5Group(obj):
                 obj_nx_class = self.get_hdf5_attribute(obj, 'NX_class')
                 if obj_nx_class in defined_nxdl_list:
@@ -213,6 +258,7 @@ class Data_File_Validator(object):
         :param obj dataset: instance of h5py.Dataset
         :param obj group: instance of h5py.Group
         '''
+        self.validate_item_name(dataset)
         nx_class = self.get_hdf5_attribute(group, 'NX_class')
         nxdl_class_obj = self.nxdl_dict[nx_class]
         ds_name = dataset.name.split('/')[-1]

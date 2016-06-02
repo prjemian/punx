@@ -1,6 +1,28 @@
 Validation
 ##########
 
+.. index:: validation
+.. index:: severity
+
+The process of validation compares each item in an HDF5 data file 
+and compares it with standards to check that the item is valid
+within that standard.  Each test is assigned a result, a
+class:`~punx.finding.Severity` object, with these values and meanings:
+
+=====   =============================================================
+value   meaning
+=====   =============================================================
+OK      meets NeXus specification
+NOTE    does not meet NeXus specification, but acceptable
+WARN    does not meet NeXus specification, not generally acceptable
+ERROR   violates NeXus specification
+TODO    validation not implemented yet
+=====   =============================================================
+
+Items marked with the WARN *severity* status are as noted in either the
+NeXus manual [#]_, the NXDL language specification [#]_, or
+the NeXus Definition Language (NXDL) files [#]_.
+
 
 NeXus HDF5 Data Files
 ---------------------
@@ -14,6 +36,19 @@ NeXus NXDL Definition Language Files
 ------------------------------------
 
 NXDL files are XML and are validated against the XML Schema file: ``nxdl.xsd``.
+See the GitHub repository [#]_ for this file.
+
+.. [#] NeXus manual:
+   http://download.nexusformat.org/doc/html/user_manual.html
+
+.. [#] NXDL Language:
+   http://download.nexusformat.org/doc/html/nxdl.html
+
+.. [#] NeXus Class Definitions (NXDL files):
+   http://download.nexusformat.org/doc/html/classes/index.html
+
+.. [#] NeXus GitHub Definitions repository:
+   https://github.com/nexusformat/definitions
 
 ----
 

@@ -26,7 +26,9 @@ def show_NXDL_structure(category, NX_class):
     ''''find the directory of this python file'''
     qset = cache.qsettings()
     BASEDIR = qset.nxdl_dir()
-    
+    if not os.path.exists(BASEDIR):
+        raise IOError('no NXDL cache found, need to create it with an *update*')
+
     nxdl = os.path.join(BASEDIR, category, NX_class + '.nxdl.xml')
     
     if len(sys.argv) == 1:

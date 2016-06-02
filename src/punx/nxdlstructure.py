@@ -34,7 +34,6 @@ PROGRAM_NAME = 'nxdlstructure'
 INDENTATION_UNIT = '  '
 listing_category = None
 NXDL_XML_NAMESPACE = 'http://definition.nexusformat.org/nxdl/3.1'
-getting_nxdl = False        # to avoid infinite loop while updating
 
 
 class NXDL_mixin(object):
@@ -290,14 +289,13 @@ def get_NXDL_specifications():
     '''
     return a dictionary of NXDL structures, keyed by NX_class name
     '''
-    global getting_nxdl
     qset = cache.qsettings()
 
-    if not getting_nxdl:
-        # infinite loop avoided
-        getting_nxdl = True
-        cache.update_NXDL_Cache()
-    getting_nxdl = False
+#     if not getting_nxdl:
+#         # infinite loop avoided
+#         getting_nxdl = True
+#         cache.update_NXDL_Cache()
+#     getting_nxdl = False
 
     pfile = qset.getKey('pickle_file')
     if pfile is not None and os.path.exists(pfile):

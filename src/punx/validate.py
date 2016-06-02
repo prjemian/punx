@@ -14,8 +14,10 @@
 '''
 validate NeXus NXDL and HDF5 data files
 
-These are the items to consider in the validation of NeXus HDF5 data files
-(compare these checks with ``nxdl.xsd`` and ``nxdlTypes.xsd``):
+These are considerata for the validation of NeXus HDF5 data files.
+Compare these validation steps with rules and documentation
+in the NeXus manual and the XML Schema files (``nxdl.xsd`` and ``nxdlTypes.xsd``).
+Checkboxes indicate which steps have been implemented in code below.
 
 * [x] make a list of all address nodes in the file to be evaluated
 * [x] attributes are also in this list
@@ -112,7 +114,10 @@ def abs_NXDL_filename(file_name):
     qset = cache.qsettings()
     absolute_name = os.path.join(qset.nxdl_dir(), file_name)
     if not os.path.exists(absolute_name):
-        raise IOError('file does not exist: ' + absolute_name)
+        if os.path.exists(qset.nxdl_dir()):
+            raise IOError('file does not exist: ' + absolute_name)
+        else:
+            raise IOError('no NXDL cache: need to *update* it')
     return absolute_name
 
 
@@ -179,7 +184,8 @@ class Data_File_Validator(object):
         self.addresses = collections.OrderedDict()     # dictionary of all HDF5 address nodes in the data file
 
         # open the NXDL rules files
-        cache.update_NXDL_Cache()
+        #cache.update_NXDL_Cache()        # let the user control when to update
+
         self.ns = dict(xs=XSD_NAMESPACE, nx=NXDL_NAMESPACE)
         self.nxdl_xsd = lxml.etree.parse(abs_NXDL_filename(NXDL_SCHEMA_FILE))
         self.nxdlTypes_xsd = lxml.etree.parse(abs_NXDL_filename(NXDL_TYPES_SCHEMA_FILE))

@@ -16,13 +16,18 @@ maintain the local cache of NeXus NXDL and XML Schema files
 
 A key component necessary to validate both NeXus data files and 
 NXDL class files is a current set of the NXDL definitions.
-This code maintains two sets of the definitions.  One is the set 
+
+This code maintains two sets of the definitions.
+
+One is the set 
 provided with the package at installation.  This set is updated
 by the developer prior to packaging the source for distribution.
-The second set is updated in a directory that can be written by 
-the user.  This set is checked for updated versions periodically 
+
+The second set is updated into a directory that can be written by 
+the user.  This set is updated on demand by the user and only 
 when a network connection allows the code to contact the GitHub
-source code repository.
+source code repository.  The update process will update content 
+from the repository.
 
 .. rubric:: Public Interface
 
@@ -31,7 +36,6 @@ source code repository.
 '''
 
 import cPickle as pickle
-import datetime
 import json
 import os
 import StringIO
@@ -58,7 +62,6 @@ SOURCE_CACHE_ROOT = os.path.join(PKG_DIR, __init__.CACHE_SUBDIR)
 __singleton_cache_settings_source__ = None
 __singleton_cache_settings_user__ = None
 __singleton_settings__ = None
-UPDATE_RECHECK_INTERVAL = datetime.timedelta(days=1)
 
 
 def __is_developer_source_path_(path):
@@ -133,27 +136,17 @@ def read_pickle_file(pfile, sha):
     return None
 
 
-def update_NXDL_Cache(force_update=False):
+def update_NXDL_Cache():
     '''
-    update the local cache of NeXus NXDL files
+    update the cache of NeXus NXDL files
     '''
-    def set_next_update_checkpoint():
-        up = str(datetime.datetime.now() + UPDATE_RECHECK_INTERVAL)
-        qset.setKey('next_update', up)
-        info['next_update'] = up
-        
-    qset = qsettings()
-    checkpoint = str(qset.getKey('next_update') or -1)
-    ts_now = str(datetime.datetime.now())
-    if checkpoint is not None and ts_now < checkpoint and not force_update:
-        return
-
     # check with GitHub for any updates
     info = githubMasterInfo(__init__.GITHUB_NXDL_ORGANIZATION, 
                             __init__.GITHUB_NXDL_REPOSITORY)
     if info is None:
         return
 
+    qset = qsettings()
     info['file'] = str(qset.fileName())
     path = qset.cache_dir()
     nxdl_subdir = qset.nxdl_dir()
@@ -163,7 +156,6 @@ def update_NXDL_Cache(force_update=False):
     nxdl_subdir_exists = os.path.exists(nxdl_subdir)
     do_not_update = same_sha and same_git_time and nxdl_subdir_exists
     if do_not_update:
-        set_next_update_checkpoint()
         return
 
     # download the repository ZIP file 
@@ -187,7 +179,6 @@ def update_NXDL_Cache(force_update=False):
                     zip_content.extract(item, path)
     
     # optimization: write the parsed NXDL specifications to a file
-    set_next_update_checkpoint()
     write_pickle_file(info, path)
     qset.updateGroupKeys(info)
 
@@ -203,6 +194,8 @@ def qsettings():
         else:
             qset = user_cache_settings()
         __singleton_settings__ = qset
+    if not os.path.exists(__singleton_settings__.cache_dir()):
+        raise IOError('no cache found, need to create it with an *update*')
     return __singleton_settings__
 
 

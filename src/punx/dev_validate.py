@@ -27,7 +27,7 @@ TEST_DATA_FILE = os.path.join(TEST_DATA_DIR, 'writer_1_3.hdf5')
 # TEST_DATA_FILE = os.path.join(TEST_DATA_DIR, 'writer_2_1.hdf5')
 # TEST_DATA_FILE = os.path.join(TEST_DATA_DIR, 'compression.h5')
 # TEST_DATA_FILE = os.path.join(TEST_DATA_DIR, 'Data_Q.h5')
-# TEST_DATA_FILE = os.path.join(TEST_DATA_DIR, '02_03_setup.h5')
+TEST_DATA_FILE = os.path.join(TEST_DATA_DIR, '02_03_setup.h5')
 
 # these two files for testing contain non-standard items and NeXus errors
 # TEST_DATA_FILE = os.path.join(TEST_DATA_DIR, 'draft_1D_NXcanSAS.h5')
@@ -40,8 +40,8 @@ v.validate()
 print 'file: ' + os.path.basename(v.fname)
 print ''
 t = pyRestTable.Table()
-t.labels = 'status address test comment(s)'.split()
+t.labels = 'address test status comment(s)'.split()
 for f in v.findings:
     if f.severity not in ('xOK', 'xTODO', ):
-        t.rows.append((f.severity, f.h5_address, f.test_name, f.comment))
+        t.rows.append((f.h5_address, f.test_name, f.severity, f.comment))
 print t.reST()

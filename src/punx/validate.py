@@ -25,7 +25,7 @@ Checkboxes indicate which steps have been implemented in code below.
 
 .. rubric:: File
 
-#. [ ] verify attributes
+#. [*] verify attributes
 #. [ ] verify file level as group using NX_class = NXroot
 #. [x] identify any objects at root level that are not in NXroot (which is OK)
 #. [ ] verify file has valid /NXentry/NXdata/signal_data
@@ -220,9 +220,12 @@ class Data_File_Validator(object):
             aname = self.h5.name + '@' + item
             self.new_address(aname)
 
+        self.validate_attributes(self.h5, 'NXroot')
+
         # for review with the relevant NXDL specification: NXroot
-        nxdl_class_obj = self.nxdl_dict['NXroot']
-        defined_nxdl_list = nxdl_class_obj.getSubGroup_NX_class_list()
+        # nxdl_class = 'NXroot'
+        # nxdl_class_obj = self.nxdl_dict[nxdl_class]
+        # defined_nxdl_list = nxdl_class_obj.getSubGroup_NX_class_list()
 
         checkup_name = 'hdf5 file root object'
         for item in sorted(self.h5):
@@ -324,7 +327,32 @@ class Data_File_Validator(object):
             # TODO: construct target as nexus classpath and match with NXDL
         else:
             self.new_finding('link', link.name, finding.ERROR, 'no target')
-    
+
+    def validate_attributes(self, h5_obj, nxdl_class):
+        '''
+        check attributes of obj against the specification of nxdl_classname
+        
+        :param obj obj: instance of h5py object with attributes
+        :param str nxdl_class: NXDL class name
+        '''
+        nxdl_class_obj = self.nxdl_dict[nxdl_class]
+        checkup_name = nxdl_class + ' attributes'
+        tf_result = {True: finding.OK, False: finding.NOTE}
+
+        h5_attrs = h5_obj.attrs.keys() + nxdl_class_obj.attrs.keys()
+        h5_attrs = map(str, {k:None for k in h5_attrs}.keys())
+
+        for k in sorted(h5_attrs):
+            aname = h5_obj.name + '@' + k
+            if k in nxdl_class_obj.attrs:
+                msg = 'defined in ' + nxdl_class
+                severity = tf_result[k in h5_obj.attrs]
+            else:
+                msg = 'not defined in ' + nxdl_class
+            # TODO: need to learn *minOccurs* from NXDL
+            msg += ' (optional)'
+            self.new_finding(checkup_name, aname, severity, msg)
+
     def collect_names(self, h5_object):
         '''
         get the fullname of this object and any of its children
@@ -385,9 +413,11 @@ class Data_File_Validator(object):
         '''
         accumulate a list of findings
         '''
-        f = finding.Finding(test_name, str(h5_address), severity, comment)
+        addr = str(h5_address)
+        f = finding.Finding(test_name, addr, severity, comment)
         self.findings.append(f)
-        self.addresses[str(h5_address)].findings.append(f)
+        if addr in self.addresses:
+            self.addresses[addr].findings.append(f)
 
     def new_address(self, h5_address, *args, **kwargs):
         '''

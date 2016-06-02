@@ -23,65 +23,65 @@ These are the items to consider in the validation of NeXus HDF5 data files
 
 .. rubric:: File
 
-#. verify attributes
-#. verify file level as group using NX_class = NXroot
-#. identify any fields at root level are not NeXus (which is OK), per NXroot
-#. verify file has valid /NXentry/NXdata/signal_data
-#. verify every NXentry has NXdata/signal_data
-#. verify every NXdata has signal_data
+#. [ ] verify attributes
+#. [ ] verify file level as group using NX_class = NXroot
+#. [x] identify any objects at root level that are not in NXroot (which is OK)
+#. [ ] verify file has valid /NXentry/NXdata/signal_data
+#. [ ] verify every NXentry has NXdata/signal_data
+#. [ ] verify every NXdata has signal_data
 
 .. rubric:: Groups
 
-#. compare name with pattern *validItemName*
-#. determine NX_class
-#. verify NX_class with pattern *validNXClassName*
-#. verify NX_class in nxdl_dict
-#. is name flexible?
-#. What to do with NXDL symbol tables?
-#. is deprecated?
-#. special cases:
+#. [x] compare name with pattern *validItemName*
+#. [x] determine NX_class, if any
+#. [ ] verify NX_class with pattern *validNXClassName*
+#. [x] verify NX_class in nxdl_dict
+#. [ ] is name flexible?
+#. [ ] What to do with NXDL symbol tables?
+#. [ ] is deprecated?
+#. [ ] special cases:
 
     #. NXentry
     #. NXsubentry
     #. NXdata
     #. NXcollection
 
-#. check for items defined by NX_class
-#. check for items required by NX_class
-#. check for items not defined by NX_class
-#. observe NXDL setting: ignoreExtraGroups
-#. observe NXDL setting: ignoreExtraFields
-#. observe NXDL setting: ignoreExtraAttributes
-#. validate any attributes
-#. validate any links
-#. validate any fields
+#. [ ] check for items defined by NX_class
+#. [ ] check for items required by NX_class
+#. [ ] check for items not defined by NX_class
+#. [ ] observe NXDL setting: ignoreExtraGroups
+#. [ ] observe NXDL setting: ignoreExtraFields
+#. [ ] observe NXDL setting: ignoreExtraAttributes
+#. [x] validate any attributes
+#. [x] validate any links
+#. [x] validate any fields
 
 .. rubric:: Links
 
-#. compare name with pattern *validItemName*
-#. is name flexible?
-#. is target attribute defined?
-#. verify target attribute with pattern *validTargetName*
-#. is target address absolute?
-#. does target address exist?
-#. construct NX classpath from target and compare with NXDL specification
+#. [x] compare name with pattern *validItemName*
+#. [ ] is name flexible?
+#. [ ] is target attribute defined?
+#. [ ] verify target attribute with pattern *validTargetName*
+#. [ ] is target address absolute?
+#. [ ] does target address exist?
+#. [ ] construct NX classpath from target and compare with NXDL specification
 
 .. rubric:: Fields
 
-#. compare name with pattern
-#. is name flexible?
-#. is deprecated?
-#. is units attribute defined?
-#. check units are consistent against NXDL
-#. check data shape against NXDL
-#. check data type against NXDL
-#. check for attributes defined by NXDL
+#. [x] compare name with pattern
+#. [ ] is name flexible?
+#. [ ] is deprecated?
+#. [ ] is units attribute defined?
+#. [ ] check units are consistent against NXDL
+#. [ ] check data shape against NXDL
+#. [ ] check data type against NXDL
+#. [ ] check for attributes defined by NXDL
 
 .. rubric:: Attributes
 
-#. compare name with pattern
-#. is deprecated?
-#. check data type against NXDL
+#. [x] compare name with pattern
+#. [ ] is deprecated?
+#. [ ] check data type against NXDL
 
 '''
 

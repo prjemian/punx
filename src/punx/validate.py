@@ -83,7 +83,7 @@ Checkboxes indicate which steps have been implemented in code below.
 
 #. [x] compare name with pattern
 #. [ ] is deprecated?
-#. [ ] check data type against NXDL
+#. [x] check data type against NXDL
 #. [ ] check nxdl.xsd for how to handle these attributes regarding finding.WARN
 
     #. [ ] restricts

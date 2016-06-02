@@ -22,6 +22,14 @@ __url__ = 'http://punx.readthedocs.org/en/latest/nxdlstructure.html'
 
 # testing:  see file dev_nxdl2rst.py
 
+# TODO: support various attributes
+#     deprecated
+#     restricts
+#     ignoreExtraGroups
+#     ignoreExtraFields
+#     ignoreExtraAttributes
+
+
 import collections
 import lxml.etree
 import os

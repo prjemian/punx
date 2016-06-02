@@ -58,6 +58,7 @@ These are the items to consider in the validation of NeXus HDF5 data files
 #. verify target attribute with pattern *validTargetName*
 #. is target address absolute?
 #. does target address exist?
+#. construct NX classpath from target and compare with NXDL specification
 
 .. rubric:: Fields
 
@@ -260,15 +261,7 @@ class Data_File_Validator(object):
         for item in sorted(group):
             obj = group.get(item)
             if h5structure.isNeXusLink(obj):
-                self.validate_item_name(obj)
-                target = obj.attrs.get('target', None)
-                if target is not None:
-                    self.new_finding('link', obj.name, finding.OK, '--> ' + target)
-                    target_exists = target in self.h5
-                    target_exists = finding.TF_RESULT[target_exists]
-                    self.new_finding('link', obj.name, target_exists, 'target exists?')
-                else:
-                    self.new_finding('link', obj.name, finding.ERROR, 'no target')
+                self.examine_link(obj, group)
             elif h5structure.isHdf5Group(obj):
                 obj_nx_class = self.get_hdf5_attribute(obj, 'NX_class')
                 if obj_nx_class in defined_nxdl_list:
@@ -300,6 +293,24 @@ class Data_File_Validator(object):
         # HDF5 dataset attributes
         for item in sorted(dataset.attrs.keys()):
             self.new_finding('attribute', dataset.name + '@' + item, finding.TODO, '--TBA--')
+
+    def examine_link(self, link, group):
+        '''
+        check link against the specification of nxdl_classname
+        
+        :param obj link: instance of h5py.Link ???
+        :param obj group: instance of h5py.Group
+        '''
+        self.validate_item_name(link)
+        target = link.attrs.get('target', None)
+        if target is not None:
+            self.new_finding('link', link.name, finding.OK, '--> ' + target)
+            target_exists = target in self.h5
+            target_exists = finding.TF_RESULT[target_exists]
+            self.new_finding('link', link.name, target_exists, 'target exists?')
+            # TODO: construct target as nexus classpath and match with NXDL
+        else:
+            self.new_finding('link', link.name, finding.ERROR, 'no target')
 
 
 def parse_command_line_arguments():

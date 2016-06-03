@@ -227,6 +227,11 @@ class Data_File_Validator(object):
         start the validation process from the file root
         '''
         self.collect_names(self.h5)
+        
+        # this will useful for validating rule for default plot, for example
+        # /NXentry/NXdata/<any>@signal
+        # /NXentry/NXdata@signal
+        classpath_dict = {k: v.classpath for k, v in self.addresses.items()}
 
         # HDF5 group attributes
         for item in sorted(self.h5.attrs.keys()):
@@ -455,6 +460,34 @@ class Data_File_Validator(object):
         accumulate a dictionary of HDF5 object addresses
         '''
         self.addresses[h5_address] = finding.CheckupResults(h5_address)
+        self.reconstruct_classpath(h5_address)
+
+    def reconstruct_classpath(self, h5_address, *args, **kwargs):
+        '''
+        build the classpath from the h5_address
+        '''
+        path = h5_address.lstrip('/').split('@')[0]
+        if len(path) == 0:
+            return
+
+        # reconstruct the NeXus classpath
+        cp = ''     # classpath to be built
+        hp = ''     # HDF5 address to be built
+        for item in path.split('/'):
+            hp += '/' + item
+            if hp in self.h5:
+                if h5structure.isHdf5Dataset(self.h5[hp]):
+                    cp += '/' + item
+                else:
+                    obj = self.h5[hp]
+                    nx_class = self.h5[hp].attrs.get('NX_class', '-')
+                    cp += '/' + nx_class
+        if '@' in h5_address:
+            cp += '@' + h5_address.split('@')[-1]
+        
+        if h5_address in self.addresses:
+            self.addresses[h5_address].classpath = cp
+
 
     def get_hdf5_attribute(self, obj, attribute, default=None):
         '''

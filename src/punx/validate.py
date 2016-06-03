@@ -496,6 +496,7 @@ class Data_File_Validator(object):
 
         # h5_addr = obj.name
         short_name = h5_addr.split('/')[-1].lstrip('@')
+        # FIXME: "I14-C-C02_VI_JPEN.1_pressure@name" should be "name"
         
         # strict match: [a-z_][a-z\d_]*
         # flexible match: [A-Za-z_][\w_]*  but gets finding.WARN per manual
@@ -509,6 +510,7 @@ class Data_File_Validator(object):
         else:
             p = self.patterns[key_relaxed]
             m = p.match(short_name)
+            # FIXME: "I14-C-C02_VI_JPEN.1_pressure" matches!
             t = m is not None and m.string == short_name
             # opinion: this is too harsh, NXroot defines attributes that produce such warnings
             name_ok = {True: finding.WARN, False: finding.ERROR}[t]

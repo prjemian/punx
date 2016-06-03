@@ -175,6 +175,7 @@ def get_XML_Schema(XSD_Schema_file):
     
         xsd_doc = lxml.etree.parse(XSD_Schema_file)
         _xml_schema_singleton_ = lxml.etree.XMLSchema(xsd_doc)
+        _xml_schema_filename_singleton_ = XSD_Schema_file
 
     return _xml_schema_singleton_
 

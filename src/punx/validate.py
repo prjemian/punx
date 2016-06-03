@@ -109,8 +109,6 @@ import nxdlstructure
 
 
 __url__ = 'http://punx.readthedocs.org/en/latest/validate.html'
-NXDL_SCHEMA_FILE = 'nxdl.xsd'
-NXDL_TYPES_SCHEMA_FILE = 'nxdlTypes.xsd'
 
 # TODO: get these from nxdl.xsd?  they are well-known anyway
 NXDL_NAMESPACE = 'http://definition.nexusformat.org/nxdl/3.1'
@@ -129,57 +127,12 @@ NXDL_DATA_TYPES['NX_POSINT'] = NXDL_DATA_TYPES['NX_INT']
 NXDL_DATA_TYPES['NX_NUMBER'] = NXDL_DATA_TYPES['NX_INT'] + NXDL_DATA_TYPES['NX_FLOAT']
 NXDL_DATA_TYPES['ISO8601']   = NXDL_DATA_TYPES['NX_CHAR']
 
-__singleton_xml_schema__ = None
-__singleton_nxdl_xsd__ = None
-
-
-def abs_NXDL_filename(file_name):
-    '''return absolute path to file_name, within NXDL directory'''
-    qset = cache.qsettings()
-    absolute_name = os.path.join(qset.nxdl_dir(), file_name)
-    if not os.path.exists(absolute_name):
-        if os.path.exists(qset.nxdl_dir()):
-            raise IOError('file does not exist: ' + absolute_name)
-        else:
-            raise IOError('no NXDL cache: need to *update* it')
-    return absolute_name
-
 
 def validate_NXDL(nxdl_file_name):
     '''
     Validate a NeXus NXDL file
     '''
     validate_xml(nxdl_file_name)
-
-
-def get_nxdl_xsd():
-    '''
-    parse and cache the XML Schema file (nxdl.xsd) as an XML document only once
-    '''
-    global __singleton_nxdl_xsd__
-
-    if __singleton_nxdl_xsd__ is None:
-        xsd_file_name = abs_NXDL_filename(NXDL_SCHEMA_FILE)
-
-        if not os.path.exists(xsd_file_name):
-            msg = 'Could not find XML Schema file: ' + xsd_file_name
-            raise IOError(msg)
-    
-        __singleton_nxdl_xsd__ = lxml.etree.parse(xsd_file_name)
-
-    return __singleton_nxdl_xsd__
-
-
-def get_XML_Schema():
-    '''
-    parse & cache the XML Schema file (nxdl.xsd) as an XML Schema only once
-    '''
-    global __singleton_xml_schema__
-
-    if __singleton_xml_schema__ is None:
-        __singleton_xml_schema__ = lxml.etree.XMLSchema(get_nxdl_xsd())
-
-    return __singleton_xml_schema__
 
 
 def validate_xml(xml_file_name):
@@ -189,7 +142,7 @@ def validate_xml(xml_file_name):
     :param str xml_file_name: name of XML file
     '''
     xml_tree = lxml.etree.parse(xml_file_name)
-    xsd = get_XML_Schema()
+    xsd = cache.get_XML_Schema()
     return xsd.assertValid(xml_tree)
 
 
@@ -234,8 +187,9 @@ class Data_File_Validator(object):
         #cache.update_NXDL_Cache()        # let the user control when to update
 
         self.ns = dict(xs=XSD_NAMESPACE, nx=NXDL_NAMESPACE)
-        self.nxdl_xsd = get_nxdl_xsd()
-        self.nxdlTypes_xsd = lxml.etree.parse(abs_NXDL_filename(NXDL_TYPES_SCHEMA_FILE))
+        self.nxdl_xsd = cache.get_nxdl_xsd()
+        nxdlTypes_xsd_file = cache.abs_NXDL_filename(cache.NXDL_TYPES_SCHEMA_FILE)
+        self.nxdlTypes_xsd = lxml.etree.parse(nxdlTypes_xsd_file)
 
         self.nxdl_dict = nxdlstructure.get_NXDL_specifications()
         self.h5 = h5py.File(fname, 'r')

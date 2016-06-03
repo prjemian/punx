@@ -37,6 +37,7 @@ from the repository.
 
 import cPickle as pickle
 import json
+import lxml
 import os
 import StringIO
 import urllib
@@ -58,10 +59,14 @@ appName = __init__.__settings_package__
 
 PKG_DIR = os.path.abspath(os.path.dirname(__file__))
 SOURCE_CACHE_ROOT = os.path.join(PKG_DIR, __init__.CACHE_SUBDIR)
+NXDL_SCHEMA_FILE = 'nxdl.xsd'
+NXDL_TYPES_SCHEMA_FILE = 'nxdlTypes.xsd'
 
 __singleton_cache_settings_source__ = None
 __singleton_cache_settings_user__ = None
 __singleton_settings__ = None
+__singleton_xml_schema__ = None
+__singleton_nxdl_xsd__ = None
 
 
 def __is_developer_source_path_(path):
@@ -249,6 +254,48 @@ class UserCacheSettings(QtCore.QSettings, settings.QSettingsMixin):
                                   orgName, 
                                   appName)
         self.init_global_keys()
+
+
+def abs_NXDL_filename(file_name):
+    '''return absolute path to file_name, within NXDL directory'''
+    qset = qsettings()
+    absolute_name = os.path.join(qset.nxdl_dir(), file_name)
+    if not os.path.exists(absolute_name):
+        if os.path.exists(qset.nxdl_dir()):
+            raise IOError('file does not exist: ' + absolute_name)
+        else:
+            raise IOError('no NXDL cache: need to *update* it')
+    return absolute_name
+
+
+def get_nxdl_xsd():
+    '''
+    parse and cache the XML Schema file (nxdl.xsd) as an XML document only once
+    '''
+    global __singleton_nxdl_xsd__
+
+    if __singleton_nxdl_xsd__ is None:
+        xsd_file_name = abs_NXDL_filename(NXDL_SCHEMA_FILE)
+
+        if not os.path.exists(xsd_file_name):
+            msg = 'Could not find XML Schema file: ' + xsd_file_name
+            raise IOError(msg)
+    
+        __singleton_nxdl_xsd__ = lxml.etree.parse(xsd_file_name)
+
+    return __singleton_nxdl_xsd__
+
+
+def get_XML_Schema():
+    '''
+    parse & cache the XML Schema file (nxdl.xsd) as an XML Schema only once
+    '''
+    global __singleton_xml_schema__
+
+    if __singleton_xml_schema__ is None:
+        __singleton_xml_schema__ = lxml.etree.XMLSchema(get_nxdl_xsd())
+
+    return __singleton_xml_schema__
 
 
 if __name__ == '__main__':

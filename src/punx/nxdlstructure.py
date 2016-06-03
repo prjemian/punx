@@ -23,6 +23,10 @@ __url__ = 'http://punx.readthedocs.org/en/latest/nxdlstructure.html'
 # testing:  see file dev_nxdl2rst.py
 
 # TODO: support defaults as specified in nxdl.xsd
+# implementation requires analysis using the rules of XML Schema
+# this is no small task
+# It would produce a more robust code but will be complicated to implement.
+# For now, read the rules and write suitable code for each class below
 
 # (covered by above TO DO: support various attributes
 #     deprecated

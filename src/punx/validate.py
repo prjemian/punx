@@ -36,10 +36,10 @@ Checkboxes indicate which steps have been implemented in code below.
 
 #. [x] compare name with pattern *validItemName*
 #. [x] determine NX_class, if any
-#. [ ] verify NX_class with pattern *validNXClassName*
 #. [x] verify NX_class in nxdl_dict
 #. [ ] is name flexible?
 #. [ ] What to do with NXDL symbol tables?
+#. [ ] observe attributes: minOccurs maxOccurs
 #. [ ] is deprecated?
 #. [ ] special cases:
 
@@ -66,12 +66,14 @@ Checkboxes indicate which steps have been implemented in code below.
 #. [ ] verify target attribute with pattern *validTargetName*
 #. [ ] is target address absolute?
 #. [ ] does target address exist?
-#. [ ] construct NX classpath from target and compare with NXDL specification
+#. [ ] construct NX classpath from target
+#. [ ] compare NX classpath with NXDL specification
 
 .. rubric:: Fields
 
 #. [x] compare name with pattern
 #. [ ] is name flexible?
+#. [ ] observe attributes: minOccurs maxOccurs
 #. [ ] is deprecated?
 #. [ ] is units attribute defined?
 #. [ ] check units are consistent against NXDL
@@ -127,6 +129,8 @@ NXDL_DATA_TYPES['NX_POSINT'] = NXDL_DATA_TYPES['NX_INT']
 NXDL_DATA_TYPES['NX_NUMBER'] = NXDL_DATA_TYPES['NX_INT'] + NXDL_DATA_TYPES['NX_FLOAT']
 NXDL_DATA_TYPES['ISO8601']   = NXDL_DATA_TYPES['NX_CHAR']
 
+_xml_schema_singleton_ = None
+_xml_schema_filename_singleton_ = None
 
 def abs_NXDL_filename(file_name):
     '''return absolute path to file_name, within NXDL directory'''
@@ -147,6 +151,34 @@ def validate_NXDL(nxdl_file_name):
     validate_xml(nxdl_file_name, abs_NXDL_filename(NXDL_SCHEMA_FILE))
 
 
+def get_XML_Schema(XSD_Schema_file):
+    '''
+    cache the XML Schema file so it is only parsed once
+    
+    :param str XSD_Schema_file: name of .xsd file
+    '''
+    global _xml_schema_singleton_
+    global _xml_schema_filename_singleton_
+
+    if _xml_schema_singleton_ is None:
+        test1 = _xml_schema_filename_singleton_ != XSD_Schema_file
+        test2 = _xml_schema_filename_singleton_ is not None
+        if test2 and test1:
+            msg = 'Changing XSD file? '
+            msg += ' old: ' + _xml_schema_filename_singleton_
+            msg += ', new: ' + XSD_Schema_file
+            raise ValueError(msg)
+
+        if not os.path.exists(XSD_Schema_file):
+            msg = 'Could not find XML Schema file: ' + XSD_Schema_file
+            raise IOError(msg)
+    
+        xsd_doc = lxml.etree.parse(XSD_Schema_file)
+        _xml_schema_singleton_ = lxml.etree.XMLSchema(xsd_doc)
+
+    return _xml_schema_singleton_
+
+
 def validate_xml(xml_file_name, XSD_Schema_file):
     '''
     validate an NXDL XML file against an XML Schema file
@@ -155,13 +187,7 @@ def validate_xml(xml_file_name, XSD_Schema_file):
     :param str XSD_Schema_file: name of XSD Schema file
     '''
     xml_tree = lxml.etree.parse(xml_file_name)
-
-    if not os.path.exists(XSD_Schema_file):
-        raise IOError('Could not find XML Schema file: ' + XSD_Schema_file)
-    
-    xsd_doc = lxml.etree.parse(XSD_Schema_file)
-    xsd = lxml.etree.XMLSchema(xsd_doc)
-
+    xsd = get_XML_Schema(XSD_Schema_file)
     return xsd.assertValid(xml_tree)
 
 

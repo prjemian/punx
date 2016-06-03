@@ -44,12 +44,10 @@ for k, v in sorted(v_dfv.classpath_dict.items()):
     # looks for NeXus rule identifying default plot
     if v is not None and 'NXdata' in v and '@signal' in v:
         t.rows.append((k, v))
-print 'NeXus classpath map'
+print 'NeXus classpath map for default plot'
 print t.reST()
 
 # report the findings from the validation
-print 'file: ' + os.path.basename(v_dfv.fname)
-print ''
 t = pyRestTable.Table()
 t.labels = 'address test status comment(s)'.split()
 ignore_these = (finding.OK, finding.TODO, finding.UNUSED)
@@ -59,4 +57,5 @@ ignore_these = (finding.OK, finding.NOTE, finding.UNUSED)
 for f in v_dfv.findings:
     if f.severity not in ignore_these:
         t.rows.append((f.h5_address, f.test_name, f.severity, f.comment))
+print 'file: ' + os.path.basename(v_dfv.fname)
 print t.reST()

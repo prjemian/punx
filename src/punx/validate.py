@@ -129,8 +129,9 @@ NXDL_DATA_TYPES['NX_POSINT'] = NXDL_DATA_TYPES['NX_INT']
 NXDL_DATA_TYPES['NX_NUMBER'] = NXDL_DATA_TYPES['NX_INT'] + NXDL_DATA_TYPES['NX_FLOAT']
 NXDL_DATA_TYPES['ISO8601']   = NXDL_DATA_TYPES['NX_CHAR']
 
-_xml_schema_singleton_ = None
-_xml_schema_filename_singleton_ = None
+__singleton_xml_schema__ = None
+__singleton_nxdl_xsd__ = None
+
 
 def abs_NXDL_filename(file_name):
     '''return absolute path to file_name, within NXDL directory'''
@@ -148,47 +149,47 @@ def validate_NXDL(nxdl_file_name):
     '''
     Validate a NeXus NXDL file
     '''
-    validate_xml(nxdl_file_name, abs_NXDL_filename(NXDL_SCHEMA_FILE))
+    validate_xml(nxdl_file_name)
 
 
-def get_XML_Schema(XSD_Schema_file):
+def get_nxdl_xsd():
     '''
-    cache the XML Schema file so it is only parsed once
-    
-    :param str XSD_Schema_file: name of .xsd file
+    parse and cache the XML Schema file (nxdl.xsd) as an XML document only once
     '''
-    global _xml_schema_singleton_
-    global _xml_schema_filename_singleton_
+    global __singleton_nxdl_xsd__
 
-    if _xml_schema_singleton_ is None:
-        test1 = _xml_schema_filename_singleton_ != XSD_Schema_file
-        test2 = _xml_schema_filename_singleton_ is not None
-        if test2 and test1:
-            msg = 'Changing XSD file? '
-            msg += ' old: ' + _xml_schema_filename_singleton_
-            msg += ', new: ' + XSD_Schema_file
-            raise ValueError(msg)
+    if __singleton_nxdl_xsd__ is None:
+        xsd_file_name = abs_NXDL_filename(NXDL_SCHEMA_FILE)
 
-        if not os.path.exists(XSD_Schema_file):
-            msg = 'Could not find XML Schema file: ' + XSD_Schema_file
+        if not os.path.exists(xsd_file_name):
+            msg = 'Could not find XML Schema file: ' + xsd_file_name
             raise IOError(msg)
     
-        xsd_doc = lxml.etree.parse(XSD_Schema_file)
-        _xml_schema_singleton_ = lxml.etree.XMLSchema(xsd_doc)
-        _xml_schema_filename_singleton_ = XSD_Schema_file
+        __singleton_nxdl_xsd__ = lxml.etree.parse(xsd_file_name)
 
-    return _xml_schema_singleton_
+    return __singleton_nxdl_xsd__
 
 
-def validate_xml(xml_file_name, XSD_Schema_file):
+def get_XML_Schema():
+    '''
+    parse & cache the XML Schema file (nxdl.xsd) as an XML Schema only once
+    '''
+    global __singleton_xml_schema__
+
+    if __singleton_xml_schema__ is None:
+        __singleton_xml_schema__ = lxml.etree.XMLSchema(get_nxdl_xsd())
+
+    return __singleton_xml_schema__
+
+
+def validate_xml(xml_file_name):
     '''
     validate an NXDL XML file against an XML Schema file
 
     :param str xml_file_name: name of XML file
-    :param str XSD_Schema_file: name of XSD Schema file
     '''
     xml_tree = lxml.etree.parse(xml_file_name)
-    xsd = get_XML_Schema(XSD_Schema_file)
+    xsd = get_XML_Schema()
     return xsd.assertValid(xml_tree)
 
 
@@ -233,7 +234,7 @@ class Data_File_Validator(object):
         #cache.update_NXDL_Cache()        # let the user control when to update
 
         self.ns = dict(xs=XSD_NAMESPACE, nx=NXDL_NAMESPACE)
-        self.nxdl_xsd = lxml.etree.parse(abs_NXDL_filename(NXDL_SCHEMA_FILE))
+        self.nxdl_xsd = get_nxdl_xsd()
         self.nxdlTypes_xsd = lxml.etree.parse(abs_NXDL_filename(NXDL_TYPES_SCHEMA_FILE))
 
         self.nxdl_dict = nxdlstructure.get_NXDL_specifications()

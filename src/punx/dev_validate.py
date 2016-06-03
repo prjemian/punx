@@ -17,6 +17,9 @@ Developers: use this code to develop and test validate.py
 
 
 import os
+# disable HDF5 library/header mismatch warning for now
+# Headers are 1.8.15, library is 1.8.16
+os.environ['HDF5_DISABLE_VERSION_CHECK'] = '2'
 import pyRestTable
 import validate
 import finding
@@ -31,6 +34,7 @@ TEST_DATA_FILE = os.path.join(TEST_DATA_DIR, '02_03_setup.h5')
 # TEST_DATA_FILE = os.path.join(TEST_DATA_DIR, 'scan101.nxs')
 # TEST_DATA_FILE = os.path.join(TEST_DATA_DIR, 'compression.h5')
 # TEST_DATA_FILE = os.path.join(TEST_DATA_DIR, 'Data_Q.h5')
+# TEST_DATA_FILE = os.path.join(TEST_DATA_DIR, 'USAXS_flyScan_GC_M4_NewD_15.h5')
 
 # these two files for testing contain non-standard items and NeXus errors
 # TEST_DATA_FILE = os.path.join(TEST_DATA_DIR, 'draft_1D_NXcanSAS.h5')

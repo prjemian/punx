@@ -51,6 +51,13 @@ listing_category = None
 NXDL_XML_NAMESPACE = 'http://definition.nexusformat.org/nxdl/3.1'
 
 
+def validate_NXDL(nxdl_file_name):
+    '''
+    Validate a NeXus NXDL file
+    '''
+    validate.validate_xml(nxdl_file_name)
+
+
 class NXDL_mixin(object):
     '''
     common components available to all subclasses
@@ -118,7 +125,7 @@ class NXDL_specification(NXDL_mixin):
         self.nxdl_file_name = nxdl_file
         if not os.path.exists(nxdl_file):
             raise IOError('file does not exist: ' + nxdl_file)
-        validate.validate_NXDL(nxdl_file)
+        validate_NXDL(nxdl_file)
         
         self.title = None
         self.category = None

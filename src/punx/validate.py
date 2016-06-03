@@ -125,13 +125,6 @@ NXDL_DATA_TYPES['NX_NUMBER'] = NXDL_DATA_TYPES['NX_INT'] + NXDL_DATA_TYPES['NX_F
 NXDL_DATA_TYPES['ISO8601']   = NXDL_DATA_TYPES['NX_CHAR']
 
 
-def validate_NXDL(nxdl_file_name):
-    '''
-    Validate a NeXus NXDL file
-    '''
-    validate_xml(nxdl_file_name)
-
-
 def validate_xml(xml_file_name):
     '''
     validate an NXDL XML file against an XML Schema file

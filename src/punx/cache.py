@@ -62,6 +62,12 @@ SOURCE_CACHE_ROOT = os.path.join(PKG_DIR, __init__.CACHE_SUBDIR)
 NXDL_SCHEMA_FILE = 'nxdl.xsd'
 NXDL_TYPES_SCHEMA_FILE = 'nxdlTypes.xsd'
 
+# TODO: get these from nxdl.xsd?  they are well-known anyway
+NXDL_NAMESPACE = 'http://definition.nexusformat.org/nxdl/3.1'
+XSD_NAMESPACE = 'http://www.w3.org/2001/XMLSchema'
+NX_DICT = dict(xs=XSD_NAMESPACE, nx=NXDL_NAMESPACE)
+
+
 __singleton_cache_settings_source__ = None
 __singleton_cache_settings_user__ = None
 __singleton_settings__ = None

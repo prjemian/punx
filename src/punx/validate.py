@@ -110,10 +110,7 @@ import nxdlstructure
 
 __url__ = 'http://punx.readthedocs.org/en/latest/validate.html'
 
-# TODO: get these from nxdl.xsd?  they are well-known anyway
-NXDL_NAMESPACE = 'http://definition.nexusformat.org/nxdl/3.1'
-XSD_NAMESPACE = 'http://www.w3.org/2001/XMLSchema'
-
+# for each NeXus data type, make a list of acceptable Python data types
 # TODO: is there a better way to define these?  Using nxdlTypes.xsd?
 NXDL_DATA_TYPES = {
     'NX_CHAR': (str, unicode, numpy.string_, numpy.ndarray),
@@ -186,7 +183,7 @@ class Data_File_Validator(object):
         # open the NXDL rules files
         #cache.update_NXDL_Cache()        # let the user control when to update
 
-        self.ns = dict(xs=XSD_NAMESPACE, nx=NXDL_NAMESPACE)
+        self.ns = cache.NX_DICT
         self.nxdl_xsd = cache.get_nxdl_xsd()
         nxdlTypes_xsd_file = cache.abs_NXDL_filename(cache.NXDL_TYPES_SCHEMA_FILE)
         self.nxdlTypes_xsd = lxml.etree.parse(nxdlTypes_xsd_file)

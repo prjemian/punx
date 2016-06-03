@@ -110,6 +110,8 @@ import h5structure
 import nxdlstructure
 
 
+# TODO: http://download.nexusformat.org/doc/html/search.html?q=warning&check_keywords=yes&area=default
+
 __url__ = 'http://punx.readthedocs.org/en/latest/validate.html'
 
 # for each NeXus data type, make a list of acceptable Python data types

@@ -219,7 +219,9 @@ class Data_File_Validator(object):
 
         # strict match: [a-z_][a-z\d_]*
         # flexible match: [A-Za-z_][\w_]*  but gets finding.WARN per manual
-        p = CustomNxdlPattern(self, 'validItemName-strict', r'[a-z_][a-z\d_]*')
+        p = CustomNxdlPattern(self, 'validItemName', r'[A-Za-z_][A-Za-z0-9_]*')
+        self.patterns[p.name] = p
+        p = CustomNxdlPattern(self, 'validItemName-strict', r'[a-z_][a-z0-9_]*')
         self.patterns[p.name] = p
     
     def review_with_NXDL(self, group, nx_class):
@@ -495,7 +497,7 @@ class Data_File_Validator(object):
         key_strict = 'validItemName-strict'
 
         # h5_addr = obj.name
-        short_name = h5_addr.split('/')[-1].lstrip('@')
+        short_name = h5_addr.split('/')[-1].split('@')[-1]
         # FIXME: "I14-C-C02_VI_JPEN.1_pressure@name" should be "name"
         
         # strict match: [a-z_][a-z\d_]*
@@ -510,7 +512,10 @@ class Data_File_Validator(object):
         else:
             p = self.patterns[key_relaxed]
             m = p.match(short_name)
-            # FIXME: "I14-C-C02_VI_JPEN.1_pressure" matches!
+            # FIXME: "I14-C-C00__CA__CPT.1__#1" matches!
+            # should fail due to "-"
+            # should fail due to "."
+            # should fail due to "#"
             t = m is not None and m.string == short_name
             # opinion: this is too harsh, NXroot defines attributes that produce such warnings
             name_ok = {True: finding.WARN, False: finding.ERROR}[t]

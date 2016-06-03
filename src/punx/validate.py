@@ -116,8 +116,8 @@ XSD_NAMESPACE = 'http://www.w3.org/2001/XMLSchema'
 
 # TODO: is there a better way to define these?  Using nxdlTypes.xsd?
 NXDL_DATA_TYPES = {
-    'NX_CHAR': (str, unicode),
-    'NX_INT':  (int, ),
+    'NX_CHAR': (str, unicode, numpy.string_, numpy.ndarray),
+    'NX_INT':  (int, numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64),
     'NX_FLOAT':  (float, ),
     'NX_BINARY': (None, ),     # FIXME:
     'NX_BOOLEAN': (None, ),     # FIXME:
@@ -228,10 +228,10 @@ class Data_File_Validator(object):
         '''
         self.collect_names(self.h5)
         
-        # this will useful for validating rule for default plot, for example
+        # this may be useful for validating rule for default plot, for example
         # /NXentry/NXdata/<any>@signal
         # /NXentry/NXdata@signal
-        classpath_dict = {k: v.classpath for k, v in self.addresses.items()}
+        self.classpath_dict = {k: v.classpath for k, v in self.addresses.items()}
 
         # HDF5 group attributes
         for item in sorted(self.h5.attrs.keys()):

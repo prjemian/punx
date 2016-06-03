@@ -155,8 +155,29 @@ class NxdlPattern(object):
             msg = 'could not read *' + pname + '* from *nxdl.xsd*'
             raise ValueError(msg)
 
-        self.pattern_str = r[0].attrib.get('value', None)
-        self.re_obj = re.compile(self.pattern_str)
+        self.regexp_pattern_str = r[0].attrib.get('value', None)
+        self.re_obj = re.compile(self.regexp_pattern_str)
+    
+    def match(self, text):
+        '''regular expression search'''
+        return self.re_obj.match(text)
+
+
+class CustomNxdlPattern(NxdlPattern):
+    '''
+    custom regular expression pattern for validation
+    
+    :param obj parent: instance of :class:`Data_File_Validator`
+    :param str pname: pattern identifying name
+    :param str regexp_pattern_str: regular expression to match
+    '''
+    
+    def __init__(self, parent, pname, regexp_pattern_str):
+        self.name = pname
+        self.xpath_str = None
+
+        self.regexp_pattern_str = regexp_pattern_str
+        self.re_obj = re.compile(self.regexp_pattern_str)
     
     def match(self, text):
         '''regular expression search'''
@@ -193,6 +214,11 @@ class Data_File_Validator(object):
             xps += item
             xps += '"]/xs:restriction/xs:pattern'
             self.patterns[item] = NxdlPattern(self, item, xps)
+
+        # strict match: [a-z_][a-z\d_]*
+        # flexible match: [A-Za-z_][\w_]*  but gets finding.WARN per manual
+        p = CustomNxdlPattern(self, 'validItemName-strict', r'[a-z_][a-z\d_]*')
+        self.patterns[p.name] = p
     
     def review_with_NXDL(self, group, nx_class):
         '''
@@ -448,17 +474,34 @@ class Data_File_Validator(object):
             =============================    ============
 
         This method will separate out the last part of the name for validation.
+        
+        :see: http://download.nexusformat.org/doc/html/datarules.html?highlight=regular%20expression
         '''
-        key = 'validItemName'
+        key_relaxed = 'validItemName'
+        key_strict = 'validItemName-strict'
 
         # h5_addr = obj.name
         short_name = h5_addr.split('/')[-1].lstrip('@')
+        
+        # strict match: [a-z_][a-z\d_]*
+        # flexible match: [A-Za-z_][\w_]*  but gets finding.WARN per manual
 
-        p = self.patterns[key]
+        p = self.patterns[key_strict]
         m = p.match(short_name)
-        name_ok = finding.TF_RESULT[m is not None and m.string == short_name]
+        if m is not None and m.string == short_name:
+            name_ok = finding.OK
+            adjective = 'strict'
+            key = key_strict
+        else:
+            p = self.patterns[key_relaxed]
+            m = p.match(short_name)
+            t = m is not None and m.string == short_name
+            # opinion: this is too harsh, NXroot defines attributes that produce such warnings
+            name_ok = {True: finding.WARN, False: finding.ERROR}[t]
+            adjective = 'relaxed'
+            key = key_relaxed
 
-        self.new_finding(key, h5_addr, name_ok, 're: ' + p.pattern_str)
+        self.new_finding(key, h5_addr, name_ok, adjective +' re: ' + p.regexp_pattern_str)
 
     def new_finding(self, test_name, h5_address, severity, comment):
         '''

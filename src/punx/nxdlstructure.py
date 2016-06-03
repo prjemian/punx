@@ -22,7 +22,9 @@ __url__ = 'http://punx.readthedocs.org/en/latest/nxdlstructure.html'
 
 # testing:  see file dev_nxdl2rst.py
 
-# TODO: support various attributes
+# TODO: support defaults as specified in nxdl.xsd
+
+# (covered by above TO DO: support various attributes
 #     deprecated
 #     restricts
 #     ignoreExtraGroups
@@ -160,6 +162,8 @@ class NX_attribute(NXDL_mixin):
 
     def __init__(self, node, ns):
         self.name = node.get('name')
+        if self.name in ('restricted deprecated minOccurs'.split()):
+            pass
         self.nx_type = self.get_NX_type(node)
         self.units = self.get_NX_units(node)
         self.enum = []
@@ -243,7 +247,6 @@ class NX_field(NXDL_mixin):
             msg = 'dimensions not specified properly: ' + str(dims)
             raise KeyError(msg)
         return [dims[k] for k in sorted(map(int, dims.keys()))]
-
 
 
 class NX_group(NXDL_mixin):

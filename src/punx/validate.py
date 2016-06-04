@@ -500,7 +500,6 @@ class Data_File_Validator(object):
 
         # h5_addr = obj.name
         short_name = h5_addr.split('/')[-1].split('@')[-1]
-        # FIXME: "I14-C-C02_VI_JPEN.1_pressure@name" should be "name"
         
         # strict match: [a-z_][a-z\d_]*
         # flexible match: [A-Za-z_][\w_]*  but gets finding.WARN per manual

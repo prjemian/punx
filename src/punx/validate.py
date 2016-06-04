@@ -160,7 +160,7 @@ class NxdlPattern(object):
             raise ValueError(msg)
 
         self.regexp_pattern_str = r[0].attrib.get('value', None)
-        self.re_obj = re.compile(self.regexp_pattern_str)
+        self.re_obj = re.compile('^' + self.regexp_pattern_str + '$')
     
     def match(self, text):
         '''regular expression search'''
@@ -181,7 +181,7 @@ class CustomNxdlPattern(NxdlPattern):
         self.xpath_str = None
 
         self.regexp_pattern_str = regexp_pattern_str
-        self.re_obj = re.compile(self.regexp_pattern_str)
+        self.re_obj = re.compile('^' + self.regexp_pattern_str + '$')
     
     def match(self, text):
         '''regular expression search'''
@@ -221,8 +221,8 @@ class Data_File_Validator(object):
 
         # strict match: [a-z_][a-z\d_]*
         # flexible match: [A-Za-z_][\w_]*  but gets finding.WARN per manual
-        p = CustomNxdlPattern(self, 'validItemName', r'[A-Za-z_][A-Za-z0-9_]*')
-        self.patterns[p.name] = p
+        #p = CustomNxdlPattern(self, 'validItemName', r'[A-Za-z_][A-Za-z0-9_]*')
+        #self.patterns[p.name] = p
         p = CustomNxdlPattern(self, 'validItemName-strict', r'[a-z_][a-z0-9_]*')
         self.patterns[p.name] = p
     
@@ -513,14 +513,10 @@ class Data_File_Validator(object):
         else:
             p = self.patterns[key_relaxed]
             m = p.match(short_name)
-            # FIXME: "I14-C-C00__CA__CPT.1__#1" matches!
-            # should fail due to "-"
-            # should fail due to "."
-            # should fail due to "#"
             t = m is not None and m.string == short_name
             # opinion: finding.WARN is too harsh
-            # NXroot defines attributes that produce such warnings
-            # capital letters in names are generally acceptable, only a few complain
+            #     NXroot defines attributes that produce such warnings
+            #     capital letters in names are generally acceptable, only a few complain
             name_ok = {True: finding.NOTE, False: finding.ERROR}[t]
             adjective = 'relaxed'
             key = key_relaxed

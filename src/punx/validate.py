@@ -606,6 +606,26 @@ class Data_File_Validator(object):
                 t.rows.append((f.h5_address, f.test_name, f.severity, f.comment))
         return t.reST()
     
+    def report_findings_summary(self):
+        '''
+        make a summary table of the validation findings (count how many of each severity)
+        '''
+        import pyRestTable
+
+        # count each category
+        summary = {str(k): 0 for k in finding.VALID_SEVERITY_LIST}
+        for f in self.findings:
+            k = str(f.severity)
+            summary[k] += 1
+
+        t = pyRestTable.Table()
+        t.labels = 'status count'.split()
+        for k, v in sorted(summary.items()):
+                t.rows.append((k, v))
+        t.rows.append(('--', '--'))
+        t.rows.append(('TOTAL', len(self.findings)))
+        return t.reST()
+    
     def report_classpath(self):
         import pyRestTable
         t = pyRestTable.Table()

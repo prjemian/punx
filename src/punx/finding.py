@@ -42,6 +42,10 @@ UNUSED  = Severity('UNUSED', 'grey',      'optional NeXus item not used in data 
 VALID_SEVERITY_LIST = (OK, NOTE, WARN, ERROR, TODO, UNUSED)
 TF_RESULT = {True: OK, False: ERROR}
 
+SHOW_ALL = VALID_SEVERITY_LIST
+SHOW_ERRORS = (ERROR, WARN)
+SHOW_NOT_OK = (WARN, ERROR, TODO, UNUSED)
+
 
 class Finding(object):
     '''

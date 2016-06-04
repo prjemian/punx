@@ -297,10 +297,17 @@ class Data_File_Validator(object):
         :param str nx_class: name of NeXus NXDL specification
         '''
         self.new_finding('-'*10, group.name, finding.COMMENT, 'review_with_NXDL start' + '-'*10)
+        
+        if not h5structure.isHdf5File(group):
+            nxc = self.get_hdf5_attribute(group, 'NX_class', '<undefined>')
+            f = finding.TF_RESULT[nxc in self.nxdl_dict]
+            msg = nxc  + ' known?'
+            self.new_finding('NX_class known', group.name, f, 'review_with_NXDL start' + '-'*10)
+        
         if nx_class in self.nxdl_dict:
             self.new_finding('NXDL known', group.name, finding.OK, nx_class)
         else:
-            msg = 'unknown NX_class: ' + nx_class
+            msg = 'expected NX_class unknown: ' + nx_class
             self.new_finding('NXDL known', group.name, finding.OK, msg)
             self.new_finding('-'*10, group.name, finding.COMMENT, 'review_with_NXDL bailout' + '-'*10)
             return
@@ -359,16 +366,13 @@ class Data_File_Validator(object):
         counter = 0
         for k, v in sorted(self.classpath_dict.items()):
             # looks for NeXus rule identifying default plot
-            try:
-                if v is not None and v.classpath.find('/NXdata')>=0 and v.classpath.find('@signal')>=0:
-                    f = finding.OK
-                    self.new_finding('NXdata contains @signal', k, f, 'simple: ' + v.classpath)
-                    if v.classpath.find('/NXentry')>=0:
-                        # This test is too simplistic, need to check if value of @signal points
-                        # to an actual field and that field has data of type = NX_NUMBER
-                        counter += 1
-            except AttributeError:
-                pass
+            if v is not None and v.classpath.find('/NXdata')>=0 and v.classpath.find('@signal')>=0:
+                f = finding.OK
+                self.new_finding('NXdata contains @signal', k, f, 'simple: ' + v.classpath)
+                if v.classpath.find('/NXentry')>=0:
+                    # This test is too simplistic, need to check if value of @signal points
+                    # to an actual field and that field has data of type = NX_NUMBER
+                    counter += 1
         f = finding.TF_RESULT[counter > 0]
         self.new_finding('default plot test', '/', f, 'basic NeXus requirement')
         self.new_finding('default plot test', '/', finding.COMMENT, 'needs a more complete test')

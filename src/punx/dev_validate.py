@@ -47,7 +47,7 @@ validator.validate()
 #  finding.SHOW_ALL
 #  finding.SHOW_NOT_OK
 #  finding.SHOW_ERRORS
-show_these = finding.SHOW_ALL
+show_these = finding.SHOW_ERRORS
 print 'Validation findings'
 print ':file: ' + os.path.basename(validator.fname)
 print ':validation results shown: ', ', '.join(sorted(map(str, show_these)))

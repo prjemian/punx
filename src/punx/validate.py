@@ -259,7 +259,27 @@ class Data_File_Validator(object):
             
             :see: http://download.nexusformat.org/doc/html/datarules.html#design-findplottable-niac2014
             '''
+            signal = self.get_hdf5_attribute(group, 'signal')
+            t = signal is not None
+            f = {True: finding.OK, False: finding.NOTE}[t]
+            self.new_finding('v3 @signal exists', group.name, f, 'attribute check')
+            if not t:
+                return False
+
+            t = signal in group
+            f = {True: finding.OK, False: finding.ERROR}[t]
+            self.new_finding('v3 @signal value exists', group.name, f, 'value: ' + signal)
+            if not t:
+                return False
+
+            axes = self.get_hdf5_attribute(group, 'axes')
+            t = axes is not None
+            f = {True: finding.OK, False: finding.NOTE}[t]
+            self.new_finding('v3 @axes exists', group.name, f, 'attribute check')
+            self.new_finding('v3 @axes parsing', group.name, finding.TODO, 'value: ' + axes)
+
             return True
+           
         # - - - - - - - - - -
         
         # identify the NXdata groups to check, do not treat links differently
@@ -283,11 +303,11 @@ class Data_File_Validator(object):
 
         # TODO: search each valid NXdata for a parent NXentry
         msg = 'must be at least one in this data file'
-        self.new_finding('NXentry/NXdata', '/', finding.COMMENT, msg)
+        self.new_finding('NXentry/NXdata', '/', finding.TODO, msg)
         
         # TODO: 
         msg = 'note if this is provided'
-        self.new_finding('/NXroot@default/NXentry@default/NXdata', '/', finding.COMMENT, msg)
+        self.new_finding('/NXroot@default/NXentry@default/NXdata', '/', finding.TODO, msg)
     
     def review_with_NXDL(self, group, nx_class):
         '''

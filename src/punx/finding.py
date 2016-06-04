@@ -14,7 +14,7 @@ document each item during validation
 '''
 
 
-class Severity(object):
+class ValidationResultStatus(object):
     '''
     summary result of a Finding
     
@@ -32,18 +32,18 @@ class Severity(object):
         return self.key
 
 
-OK      = Severity('OK',      'green',     'meets NeXus specification')
-NOTE    = Severity('NOTE',    'palegreen', 'does not meet NeXus specification, but acceptable')
-WARN    = Severity('WARN',    'yellow',    'does not meet NeXus specification, not generally acceptable')
-ERROR   = Severity('ERROR',   'red',       'violates NeXus specification')
-TODO    = Severity('TODO',    'blue',      'validation not implemented yet')
-UNUSED  = Severity('UNUSED',  'grey',      'optional NeXus item not used in data file')
-COMMENT = Severity('COMMENT', 'grey',      'comment from the punx source code')
+OK      = ValidationResultStatus('OK',      'green',     'meets NeXus specification')
+NOTE    = ValidationResultStatus('NOTE',    'palegreen', 'does not meet NeXus specification, but acceptable')
+WARN    = ValidationResultStatus('WARN',    'yellow',    'does not meet NeXus specification, not generally acceptable')
+ERROR   = ValidationResultStatus('ERROR',   'red',       'violates NeXus specification')
+TODO    = ValidationResultStatus('TODO',    'blue',      'validation not implemented yet')
+UNUSED  = ValidationResultStatus('UNUSED',  'grey',      'optional NeXus item not used in data file')
+COMMENT = ValidationResultStatus('COMMENT', 'grey',      'comment from the punx source code')
 
-VALID_SEVERITY_LIST = (OK, NOTE, WARN, ERROR, TODO, UNUSED, COMMENT)
+VALID_STATUS_LIST = (OK, NOTE, WARN, ERROR, TODO, UNUSED, COMMENT)
 TF_RESULT = {True: OK, False: ERROR}
 
-SHOW_ALL = VALID_SEVERITY_LIST
+SHOW_ALL = VALID_STATUS_LIST
 SHOW_ERRORS = (ERROR, WARN)
 SHOW_NOT_OK = (WARN, ERROR, TODO, UNUSED)
 
@@ -54,21 +54,21 @@ class Finding(object):
     
     :param str test_name: one-word description of the test
     :param str h5_address: address of h5py item
-    :param int severity: one of: OK NOTE WARNING ERROR TODO
+    :param int status: one of: OK NOTE WARNING ERROR TODO
     :param str comment: description
     '''
     
-    def __init__(self, test_name, h5_address, severity, comment):
-        if severity not in VALID_SEVERITY_LIST:
-            msg = 'unknown severity value: ' + severity
+    def __init__(self, test_name, h5_address, status, comment):
+        if status not in VALID_STATUS_LIST:
+            msg = 'unknown status value: ' + status
             raise ValueError(msg)
         self.test_name = str(test_name)
         self.h5_address = h5_address
-        self.severity = severity
+        self.status = status
         self.comment = comment
     
     def __str__(self, *args, **kwargs):
-        s = self.severity
+        s = self.status
         s += ' ' + self.h5_address 
         s += ': ' + self.test_name
         s += ': ' + self.comment

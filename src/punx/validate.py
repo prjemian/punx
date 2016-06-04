@@ -225,6 +225,24 @@ class Data_File_Validator(object):
         p = CustomNxdlPattern(self, 'validItemName-strict', r'[a-z_][a-z0-9_]*')
         self.patterns[p.name] = p
     
+    def validate_default_plot(self):
+        '''
+        check that data file defines the default plottable data
+        
+        :see: http://download.nexusformat.org/doc/html/datarules.html#find-the-plottable-data
+        '''
+        def traverse_level(group):
+            for h5_child in sorted(group):
+                h5_obj = group.get(h5_child)
+                if h5_obj.attrs.get('NX_class', None) in ('NXdata',):
+                    nxdata_dict[h5_obj.name] = h5_obj
+        
+        # identify the NXdata groups to check, do not treat links differently
+        nxdata_dict = collections.OrderedDict()
+        traverse_level(self.h5)
+        print len(nxdata_dict)
+        # TODO: check the list of NXdata groups for compliance
+    
     def review_with_NXDL(self, group, nx_class):
         '''
         review *group* with the NXDL specification for *nx_class*
@@ -232,13 +250,13 @@ class Data_File_Validator(object):
         :param obj group: instance of h5py.Group or h5py.Dataset
         :param str nx_class: name of NeXus NXDL specification
         '''
-        self.new_finding('-'*10, group.name, finding.NOTE, 'review_with_NXDL start' + '-'*10)
+        self.new_finding('-'*10, group.name, finding.COMMENT, 'review_with_NXDL start' + '-'*10)
         if nx_class in self.nxdl_dict:
             self.new_finding('NXDL known', group.name, finding.OK, nx_class)
         else:
             msg = 'unknown NX_class: ' + nx_class
             self.new_finding('NXDL known', group.name, finding.OK, msg)
-            self.new_finding('-'*10, group.name, finding.NOTE, 'review_with_NXDL bailout' + '-'*10)
+            self.new_finding('-'*10, group.name, finding.COMMENT, 'review_with_NXDL bailout' + '-'*10)
             return
 
         if group.attrs.get('NX_class', '') in ('NXcollection',):
@@ -273,7 +291,7 @@ class Data_File_Validator(object):
                 msg = 'need to complete check with NXDL'
                 self.new_finding(nx_class + ' field', h5_obj.name, finding.TODO, msg)
 
-        self.new_finding('-'*10, group.name, finding.NOTE, 'review_with_NXDL end' + '-'*10)
+        self.new_finding('-'*10, group.name, finding.COMMENT, 'review_with_NXDL end' + '-'*10)
 
     def validate(self):
         '''
@@ -306,13 +324,15 @@ class Data_File_Validator(object):
                     counter += 1
         f = finding.TF_RESULT[counter > 0]
         self.new_finding('default plot test', '/', f, 'basic NeXus requirement')
-        self.new_finding('default plot test', '/', finding.NOTE, 'needs a more complete test')
+        self.new_finding('default plot test', '/', finding.COMMENT, 'needs a more complete test')
 
         # for review with the relevant NXDL specification: NXroot
         self.review_with_NXDL(self.h5, 'NXroot')
         # TODO: does the code below duplicate review_with_NXDL()?
+        
+        # self.validate_default_plot()
 
-        self.new_finding('-'*10, '/', finding.NOTE, 'NXroot checkup start' + '='*10)
+        self.new_finding('-'*10, '/', finding.COMMENT, 'NXroot checkup start' + '='*10)
         checkup_name = 'hdf5 file root object'
         for item in sorted(self.h5):
             obj = self.h5.get(item)
@@ -324,7 +344,7 @@ class Data_File_Validator(object):
                 self.validate_dataset(obj, self.h5)
             else:
                 self.new_finding(checkup_name, obj.name, finding.NOTE, 'not a NeXus item')
-        self.new_finding('-'*10, '/', finding.NOTE, 'NXroot checkup end' + '='*10)
+        self.new_finding('-'*10, '/', finding.COMMENT, 'NXroot checkup end' + '='*10)
 
     def validate_group(self, group, nxdl_classname):
         '''
@@ -377,11 +397,6 @@ class Data_File_Validator(object):
         nxdl_class_obj = self.nxdl_dict.get(nx_class, None)
         if nxdl_class_obj is None:
             self.new_finding('unknown NX_class', dataset.name, finding.ERROR, 'found: ' + nx_class)
-#         else:
-#             if ds_name in nxdl_class_obj.fields:
-#                 self.new_finding('defined', dataset.name, finding.TODO, finding.TODO.description)
-#             else:
-#                 self.new_finding('undefined', dataset.name, finding.NOTE, 'unspecified field')
 
         self.validate_attributes(dataset, nx_class)
 
@@ -409,9 +424,9 @@ class Data_File_Validator(object):
         :param str nxdl_class: NXDL class name
         '''
         if nxdl_class not in self.nxdl_dict:
-            severity = finding.ERROR
+            status = finding.ERROR
             msg = 'unknown: ' + nxdl_class
-            self.new_finding('NXDL NX_class', h5_obj, severity, msg)
+            self.new_finding('NXDL NX_class', h5_obj, status, msg)
             return
 
         if nxdl_class in ('NXcollection',):
@@ -434,7 +449,7 @@ class Data_File_Validator(object):
             data_type_checked = False
             if k in nxdl_class_obj.attrs:
                 msg = 'defined in ' + nxdl_class
-                severity = tf_result[k in h5_obj.attrs]
+                status = tf_result[k in h5_obj.attrs]
 
                 if k in h5_obj.attrs:                # check expected NXDL data type
                     data_type_checked = True
@@ -443,11 +458,11 @@ class Data_File_Validator(object):
                     nx_type = nxdl_attr.nx_type
                     data_type_ok = nx_type in NXDL_DATA_TYPES and type(obj_attr) in NXDL_DATA_TYPES[nx_type]
             else:
-                severity = finding.NOTE
+                status = finding.NOTE
                 msg = 'not defined in ' + nxdl_class
             # TODO: need to learn *minOccurs* from NXDL
             msg += ' (optional)'
-            self.new_finding(checkup_name, aname, severity, msg)
+            self.new_finding(checkup_name, aname, status, msg)
             if data_type_checked:
                 msg = str(type(obj_attr)) + ' : ' + nx_type
                 self.new_finding('NXDL NX_type', aname, finding.TF_RESULT[data_type_ok], msg)
@@ -527,12 +542,12 @@ class Data_File_Validator(object):
 
         self.new_finding(key, h5_addr, name_ok, adjective +' re: ' + p.regexp_pattern_str)
 
-    def new_finding(self, test_name, h5_address, severity, comment):
+    def new_finding(self, test_name, h5_address, status, comment):
         '''
         accumulate a list of findings
         '''
         addr = str(h5_address)
-        f = finding.Finding(test_name, addr, severity, comment)
+        f = finding.Finding(test_name, addr, status, comment)
         self.findings.append(f)
         if addr in self.addresses:
             self.addresses[addr].findings.append(f)
@@ -583,14 +598,14 @@ class Data_File_Validator(object):
             a = a[0]
         return a
     
-    def report_findings(self, severities=()):
+    def report_findings(self, statuses=()):
         '''
         make a table of the validation findings
         
-        :param severities: List (or tuple) of finding severities to be shown.
+        :param statuses: List (or tuple) of finding statuses to be shown.
             Several lists have been pre-defined for convenience:
 
-            :var:`finding.SHOW_ALL`        ``(OK, NOTE, WARN, ERROR, TODO, UNUSED)``
+            :var:`finding.SHOW_ALL`        ``(OK, NOTE, WARN, ERROR, TODO, UNUSED, COMMENT)``
             :var:`finding.SHOW_NOT_OK`     ``(ERROR, WARN)``
             :var:`finding.SHOW_ERRORS`     ``(WARN, ERROR, TODO, UNUSED)``
             
@@ -602,20 +617,21 @@ class Data_File_Validator(object):
         t = pyRestTable.Table()
         t.labels = 'address validation status comment(s)'.split()
         for f in self.findings:
-            if f.severity in severities:
-                t.rows.append((f.h5_address, f.test_name, f.severity, f.comment))
+            if f.status in statuses:
+                t.rows.append((f.h5_address, f.test_name, f.status, f.comment))
         return t.reST()
     
     def report_findings_summary(self):
         '''
-        make a summary table of the validation findings (count how many of each severity)
+        make a summary table of the validation findings (count how many of each status)
         '''
         import pyRestTable
+        # TODO: also show the description of each status int he table
 
         # count each category
-        summary = {str(k): 0 for k in finding.VALID_SEVERITY_LIST}
+        summary = {str(k): 0 for k in finding.VALID_STATUS_LIST}
         for f in self.findings:
-            k = str(f.severity)
+            k = str(f.status)
             summary[k] += 1
 
         t = pyRestTable.Table()

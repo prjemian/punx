@@ -32,14 +32,15 @@ class Severity(object):
         return self.key
 
 
-OK      = Severity('OK',     'green',     'meets NeXus specification')
-NOTE    = Severity('NOTE',   'palegreen', 'does not meet NeXus specification, but acceptable')
-WARN    = Severity('WARN',   'yellow',    'does not meet NeXus specification, not generally acceptable')
-ERROR   = Severity('ERROR',  'red',       'violates NeXus specification')
-TODO    = Severity('TODO',   'blue',      'validation not implemented yet')
-UNUSED  = Severity('UNUSED', 'grey',      'optional NeXus item not used in data file')
+OK      = Severity('OK',      'green',     'meets NeXus specification')
+NOTE    = Severity('NOTE',    'palegreen', 'does not meet NeXus specification, but acceptable')
+WARN    = Severity('WARN',    'yellow',    'does not meet NeXus specification, not generally acceptable')
+ERROR   = Severity('ERROR',   'red',       'violates NeXus specification')
+TODO    = Severity('TODO',    'blue',      'validation not implemented yet')
+UNUSED  = Severity('UNUSED',  'grey',      'optional NeXus item not used in data file')
+COMMENT = Severity('COMMENT', 'grey',      'comment from the punx source code')
 
-VALID_SEVERITY_LIST = (OK, NOTE, WARN, ERROR, TODO, UNUSED)
+VALID_SEVERITY_LIST = (OK, NOTE, WARN, ERROR, TODO, UNUSED, COMMENT)
 TF_RESULT = {True: OK, False: ERROR}
 
 SHOW_ALL = VALID_SEVERITY_LIST

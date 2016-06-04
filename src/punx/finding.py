@@ -85,7 +85,7 @@ class CheckupResults(object):
     def __init__(self, h5_address):
         self.h5_address = h5_address
         self.findings = []      # keep list of all findings for this address
-        self.classpath = None
+        self.classpath = ''
     
     def __str__(self, *args, **kwargs):
         return self.h5_address

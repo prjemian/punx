@@ -27,9 +27,9 @@ import finding
 PKG_DIR = os.path.abspath(os.path.dirname(__file__))
 TEST_DATA_DIR = os.path.join(PKG_DIR, 'data')
 TEST_DATA_FILE = os.path.join(TEST_DATA_DIR, 'writer_1_3.hdf5')
-TEST_DATA_FILE = os.path.join(TEST_DATA_DIR, 'writer_2_1.hdf5')
+# TEST_DATA_FILE = os.path.join(TEST_DATA_DIR, 'writer_2_1.hdf5')
 TEST_DATA_FILE = os.path.join(TEST_DATA_DIR, '02_03_setup.h5')
-TEST_DATA_FILE = os.path.join(TEST_DATA_DIR, 'chopper.nxs')
+# TEST_DATA_FILE = os.path.join(TEST_DATA_DIR, 'chopper.nxs')
 # TEST_DATA_FILE = os.path.join(TEST_DATA_DIR, 'scan101.nxs')
 # TEST_DATA_FILE = os.path.join(TEST_DATA_DIR, 'compression.h5')
 # TEST_DATA_FILE = os.path.join(TEST_DATA_DIR, 'Data_Q.h5')
@@ -47,8 +47,11 @@ validator.validate()
 #  finding.SHOW_ALL
 #  finding.SHOW_NOT_OK
 #  finding.SHOW_ERRORS
-print 'file: ' + os.path.basename(validator.fname)
-print validator.report_findings(finding.SHOW_ALL)
+show_these = finding.SHOW_ALL
+print 'Validation findings'
+print ':file: ' + os.path.basename(validator.fname)
+print ':validation results shown: ', ', '.join(sorted(map(str, show_these)))
+print validator.report_findings(show_these)
 
 print 'summary statistics'
 print validator.report_findings_summary()

@@ -518,8 +518,10 @@ class Data_File_Validator(object):
             # should fail due to "."
             # should fail due to "#"
             t = m is not None and m.string == short_name
-            # opinion: this is too harsh, NXroot defines attributes that produce such warnings
-            name_ok = {True: finding.WARN, False: finding.ERROR}[t]
+            # opinion: finding.WARN is too harsh
+            # NXroot defines attributes that produce such warnings
+            # capital letters in names are generally acceptable, only a few complain
+            name_ok = {True: finding.NOTE, False: finding.ERROR}[t]
             adjective = 'relaxed'
             key = key_relaxed
 

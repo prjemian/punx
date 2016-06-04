@@ -221,8 +221,7 @@ class Data_File_Validator(object):
 
         # strict match: [a-z_][a-z\d_]*
         # flexible match: [A-Za-z_][\w_]*  but gets finding.WARN per manual
-        #p = CustomNxdlPattern(self, 'validItemName', r'[A-Za-z_][A-Za-z0-9_]*')
-        #self.patterns[p.name] = p
+        # advisory changed to finding.NOTE
         p = CustomNxdlPattern(self, 'validItemName-strict', r'[a-z_][a-z0-9_]*')
         self.patterns[p.name] = p
     
@@ -242,7 +241,7 @@ class Data_File_Validator(object):
             self.new_finding('-'*10, group.name, finding.NOTE, 'review_with_NXDL bailout' + '-'*10)
             return
 
-        if group.attrs.get('NX_class', '') in ('NXcollection'):
+        if group.attrs.get('NX_class', '') in ('NXcollection',):
             msg = 'NXcollection content is not validated'
             self.new_finding('NXcollection', group.name, finding.OK, msg)
             return
@@ -290,19 +289,24 @@ class Data_File_Validator(object):
         # this may be useful for validating rule for default plot, for example
         # /NXentry/NXdata/<any>@signal
         # /NXentry/NXdata@signal
-        self.classpath_dict = {k: v.classpath for k, v in self.addresses.items()}
+        self.classpath_dict = collections.OrderedDict()
+        for k, v in self.addresses.items():
+            self.classpath_dict[k] = v
         counter = 0
         for k, v in sorted(self.classpath_dict.items()):
             # looks for NeXus rule identifying default plot
-            if v is not None and 'NXdata' in v and '@signal' in v:
+#             if v is not None and 'NXdata' in v:
+#                 self.new_finding('NXdata signal data test', '/', finding.NOTE, 'needs a more complete test')
+            if v is not None and 'NXdata' in str(v) and '@signal' in str(v):
                 f = finding.OK
                 self.new_finding('NXdata contains @signal', k, f, 'simple: ' + str(v))
-                if 'NXentry' in v:
+                if 'NXentry' in str(v):
                     # This test is too simplistic, need to check if value of @signal points
                     # to an actual field and that field has data of type = NX_NUMBER
                     counter += 1
         f = finding.TF_RESULT[counter > 0]
         self.new_finding('default plot test', '/', f, 'basic NeXus requirement')
+        self.new_finding('default plot test', '/', finding.NOTE, 'needs a more complete test')
 
         # for review with the relevant NXDL specification: NXroot
         self.review_with_NXDL(self.h5, 'NXroot')
@@ -410,7 +414,7 @@ class Data_File_Validator(object):
             self.new_finding('NXDL NX_class', h5_obj, severity, msg)
             return
 
-        if nxdl_class in ('NXcollection'):
+        if nxdl_class in ('NXcollection',):
             msg = 'NXcollection content is not validated'
             self.new_finding('NXcollection', h5_obj.name, finding.OK, msg)
             return
@@ -578,6 +582,37 @@ class Data_File_Validator(object):
             self.new_finding('attribute data type', gname, finding.NOTE, msg)
             a = a[0]
         return a
+    
+    def report_findings(self, severities=()):
+        '''
+        make a table of the validation findings
+        
+        :param severities: List (or tuple) of finding severities to be shown.
+            Several lists have been pre-defined for convenience:
+
+            :var:`finding.SHOW_ALL`        ``(OK, NOTE, WARN, ERROR, TODO, UNUSED)``
+            :var:`finding.SHOW_NOT_OK`     ``(ERROR, WARN)``
+            :var:`finding.SHOW_ERRORS`     ``(WARN, ERROR, TODO, UNUSED)``
+            
+            See :mod:`finding` for details.
+
+        '''
+        import pyRestTable
+
+        t = pyRestTable.Table()
+        t.labels = 'address validation status comment(s)'.split()
+        for f in self.findings:
+            if f.severity in severities:
+                t.rows.append((f.h5_address, f.test_name, f.severity, f.comment))
+        return t.reST()
+    
+    def report_classpath(self):
+        import pyRestTable
+        t = pyRestTable.Table()
+        t.labels = 'HDF5-address  NeXus-classpath'.split()
+        for k, v in self.classpath_dict.items():
+            t.rows.append((k, v))
+        return t.reST()
 
 
 def parse_command_line_arguments():

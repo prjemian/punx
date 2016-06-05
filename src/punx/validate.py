@@ -286,15 +286,16 @@ class Data_File_Validator(object):
                     f = finding.TF_RESULT[t]
                     self.new_finding('v3 @axes value exists', group.name, f, 'value: ' + a)
 
-                    # AXISNAME_indices
-                    axis_index = self.get_hdf5_attribute(group, a + '_indices')
-                    t = axis_index is not None
-                    f = {True: finding.OK, False: finding.NOTE}[t]
-                    m = 'v3 @AXISNAME_indices exists'
-                    gn = group.name + '@' + a + '_indices'
-                    self.new_finding(m, gn, f, 'value: ' + str(axis_index))
-                    m = 'v3 @AXISNAME_indices value(s)'
-                    self.new_finding(m, gn, finding.TODO, 'unchecked')
+                    if t:
+                        # AXISNAME_indices
+                        axis_index = self.get_hdf5_attribute(group, a + '_indices')
+                        t = axis_index is not None
+                        f = {True: finding.OK, False: finding.NOTE}[t]
+                        m = 'v3 @AXISNAME_indices exists'
+                        gn = group.name + '@' + a + '_indices'
+                        self.new_finding(m, gn, f, 'value: ' + str(axis_index))
+                        m = 'v3 @AXISNAME_indices value(s)'
+                        self.new_finding(m, gn, finding.TODO, 'unchecked')
 
             self.new_finding('v3 dimension scales', group.name, finding.TODO, 'unchecked')
 

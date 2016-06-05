@@ -285,8 +285,7 @@ class Data_File_Validator(object):
                     t = a in group and a != signal
                     f = finding.TF_RESULT[t]
                     self.new_finding('v3 @axes value exists', group.name, f, 'value: ' + a)
-                    if not t:
-                        return False
+
                     # AXISNAME_indices
                     axis_index = self.get_hdf5_attribute(group, a + '_indices')
                     t = axis_index is not None

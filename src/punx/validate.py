@@ -262,12 +262,12 @@ class Data_File_Validator(object):
             signal = self.get_hdf5_attribute(group, 'signal')
             t = signal is not None
             f = {True: finding.OK, False: finding.NOTE}[t]
-            self.new_finding('v3 @signal exists', group.name, f, 'attribute check')
+            self.new_finding('v3 @signal attribute exists', group.name, f, 'attribute check')
             if not t:
                 return False
 
             t = signal in group
-            f = {True: finding.OK, False: finding.ERROR}[t]
+            f = finding.TF_RESULT[t]
             self.new_finding('v3 @signal value exists', group.name, f, 'value: ' + signal)
             if not t:
                 return False
@@ -275,13 +275,29 @@ class Data_File_Validator(object):
             axes = self.get_hdf5_attribute(group, 'axes')
             t = axes is not None
             f = {True: finding.OK, False: finding.NOTE}[t]
-            self.new_finding('v3 @axes exists', group.name, f, 'attribute check')
-            self.new_finding('v3 @axes parsing', group.name, finding.TODO, 'value: ' + axes)
+            self.new_finding('v3 @axes attribute exists', group.name, f, 'attribute check')
+            if axes is not None:
+                for a in axes.split(','):
+                    t = a in group and a != signal
+                    f = finding.TF_RESULT[t]
+                    self.new_finding('v3 @axes value exists', group.name, f, 'value: ' + a)
+                    if not t:
+                        return False
+                    # AXISNAME_indices
+                    axis_index = self.get_hdf5_attribute(group, a + '_indices')
+                    t = axis_index is not None
+                    f = {True: finding.OK, False: finding.NOTE}[t]
+                    m = 'v3 @AXISNAME_indices exists'
+                    gn = group.name + '@' + a + '_indices'
+                    self.new_finding(m, gn, f, 'value: ' + str(axis_index))
+                    m = 'v3 @AXISNAME_indices value(s)'
+                    self.new_finding(m, gn, finding.TODO, 'unchecked')
+
+            self.new_finding('v3 dimension scales', group.name, finding.TODO, 'unchecked')
 
             return True
-           
         # - - - - - - - - - -
-        
+
         # identify the NXdata groups to check, do not treat links differently
         nxdata_dict = collections.OrderedDict()
         find_NXdata_in_group(self.h5)
@@ -304,6 +320,9 @@ class Data_File_Validator(object):
         # TODO: search each valid NXdata for a parent NXentry
         msg = 'must be at least one in this data file'
         self.new_finding('NXentry/NXdata', '/', finding.TODO, msg)
+        count = 0
+        for h5_addr, nxdata_group in valid_nxdata_dict.items():
+            pass
         
         # TODO: 
         msg = 'note if this is provided'

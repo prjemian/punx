@@ -27,7 +27,7 @@ import finding
 PKG_DIR = os.path.abspath(os.path.dirname(__file__))
 TEST_DATA_DIR = os.path.join(PKG_DIR, 'data')
 TEST_DATA_FILE = os.path.join(TEST_DATA_DIR, 'writer_1_3.hdf5')
-TEST_DATA_FILE = os.path.join(TEST_DATA_DIR, 'writer_2_1.hdf5')
+# TEST_DATA_FILE = os.path.join(TEST_DATA_DIR, 'writer_2_1.hdf5')
 # TEST_DATA_FILE = os.path.join(TEST_DATA_DIR, '02_03_setup.h5')
 # TEST_DATA_FILE = os.path.join(TEST_DATA_DIR, 'chopper.nxs')
 # TEST_DATA_FILE = os.path.join(TEST_DATA_DIR, 'scan101.nxs')

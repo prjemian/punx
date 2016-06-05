@@ -30,9 +30,13 @@ Checkboxes indicate which steps have been implemented in code below.
 #. [x] identify any objects at root level that are not in NXroot (which is OK)
 #. [x] verify classpath exists: /NXentry/NXdata & @signal
 #. [x] verify classpath exists: NXdata & @signal
-#. [ ] verify file has valid /NXentry/NXdata/signal_data
+#. [x] verify file has valid /NXentry/NXdata/signal_data
 #. [ ] verify every NXentry has NXdata/signal_data
 #. [ ] verify every NXdata has signal_data
+
+    #. [ ] version 1
+    #. [ ] version 2
+    #. [x] version 3
 
 .. rubric:: Groups
 
@@ -317,13 +321,18 @@ class Data_File_Validator(object):
             else:
                 self.new_finding(checkup_name, h5_addr, finding.ERROR, 'version 1')
 
-        # TODO: search each valid NXdata for a parent NXentry
-        msg = 'must be at least one in this data file'
-        self.new_finding('NXentry/NXdata', '/', finding.TODO, msg)
+        # search each valid NXdata for a parent NXentry
         count = 0
         for h5_addr, nxdata_group in valid_nxdata_dict.items():
-            pass
-        
+            parent_addr = '/'.join(h5_addr.split('/')[:-1])
+            if parent_addr in self.h5:
+                parent = self.h5[parent_addr]
+                if h5structure.isNeXusGroup(parent, 'NXentry'):
+                    count += 1
+                    self.new_finding('NXentry parent of NXdata exists', parent.name, finding.OK, '')
+        f = finding.TF_RESULT[count > 0]
+        self.new_finding('NXentry/NXdata exists', '/', f, 'basic NeXus requirement: default plot described')
+
         # TODO: 
         msg = 'note if this is provided'
         self.new_finding('/NXroot@default/NXentry@default/NXdata', '/', finding.TODO, msg)
@@ -335,20 +344,20 @@ class Data_File_Validator(object):
         :param obj group: instance of h5py.Group or h5py.Dataset
         :param str nx_class: name of NeXus NXDL specification
         '''
-        self.new_finding('-'*10, group.name, finding.COMMENT, 'review_with_NXDL start' + '-'*10)
+        #self.new_finding('-'*10, group.name, finding.COMMENT, 'review_with_NXDL start' + '-'*10)
         
         if not h5structure.isHdf5File(group):
             nxc = self.get_hdf5_attribute(group, 'NX_class', '<undefined>')
             f = finding.TF_RESULT[nxc in self.nxdl_dict]
             msg = nxc  + ' known?'
-            self.new_finding('NX_class known', group.name, f, 'review_with_NXDL start' + '-'*10)
+            self.new_finding('NX_class known', group.name, f, 'value: ' + nxc)
         
         if nx_class in self.nxdl_dict:
             self.new_finding('NXDL known', group.name, finding.OK, nx_class)
         else:
             msg = 'expected NX_class unknown: ' + nx_class
             self.new_finding('NXDL known', group.name, finding.OK, msg)
-            self.new_finding('-'*10, group.name, finding.COMMENT, 'review_with_NXDL bailout' + '-'*10)
+            #self.new_finding('-'*10, group.name, finding.COMMENT, 'review_with_NXDL bailout' + '-'*10)
             return
 
         if group.attrs.get('NX_class', '') in ('NXcollection',):
@@ -383,7 +392,7 @@ class Data_File_Validator(object):
                 msg = 'need to complete check with NXDL'
                 self.new_finding(nx_class + ' field', h5_obj.name, finding.TODO, msg)
 
-        self.new_finding('-'*10, group.name, finding.COMMENT, 'review_with_NXDL end' + '-'*10)
+        # self.new_finding('-'*10, group.name, finding.COMMENT, 'review_with_NXDL end' + '-'*10)
 
     def validate(self):
         '''
@@ -402,27 +411,14 @@ class Data_File_Validator(object):
         self.classpath_dict = collections.OrderedDict()
         for k, v in self.addresses.items():
             self.classpath_dict[k] = v
-        counter = 0
-        for k, v in sorted(self.classpath_dict.items()):
-            # looks for NeXus rule identifying default plot
-            if v is not None and v.classpath.find('/NXdata')>=0 and v.classpath.find('@signal')>=0:
-                f = finding.OK
-                self.new_finding('NXdata contains @signal', k, f, 'simple: ' + v.classpath)
-                if v.classpath.find('/NXentry')>=0:
-                    # This test is too simplistic, need to check if value of @signal points
-                    # to an actual field and that field has data of type = NX_NUMBER
-                    counter += 1
-        f = finding.TF_RESULT[counter > 0]
-        self.new_finding('default plot test', '/', f, 'basic NeXus requirement')
-        self.new_finding('default plot test', '/', finding.COMMENT, 'needs a more complete test')
-
+        
         # for review with the relevant NXDL specification: NXroot
         self.review_with_NXDL(self.h5, 'NXroot')
         # TODO: does the code below duplicate review_with_NXDL()?
         
         self.validate_default_plot()
 
-        self.new_finding('-'*10, '/', finding.COMMENT, 'NXroot checkup start' + '='*10)
+        # self.new_finding('-'*10, '/', finding.COMMENT, 'NXroot checkup start' + '='*10)
         checkup_name = 'hdf5 file root object'
         for item in sorted(self.h5):
             obj = self.h5.get(item)
@@ -434,7 +430,7 @@ class Data_File_Validator(object):
                 self.validate_dataset(obj, self.h5)
             else:
                 self.new_finding(checkup_name, obj.name, finding.NOTE, 'not a NeXus item')
-        self.new_finding('-'*10, '/', finding.COMMENT, 'NXroot checkup end' + '='*10)
+        # self.new_finding('-'*10, '/', finding.COMMENT, 'NXroot checkup end' + '='*10)
 
     def validate_group(self, group, nxdl_classname):
         '''

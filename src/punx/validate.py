@@ -250,9 +250,49 @@ class Data_File_Validator(object):
             :see: http://download.nexusformat.org/doc/html/datarules.html#design-findplottable-bydimnumber
             '''
             base_title = 'default plot v1'
-            self.new_finding(base_title, group.name, finding.TODO, 'not checked')
-            return False
-            return True
+            dimension_scales = []
+            signal_count = 0
+            for field_name in group:
+                field = group.get(field_name)
+                signal = self.get_hdf5_attribute(field, 'signal')
+                primary = self.get_hdf5_attribute(field, 'primary')
+                if signal is not None:
+                    title = base_title + ' @signal attribute exists'
+                    self.new_finding(title, field.name + '@signal', finding.OK, 'value: ' + str(signal))
+                    try:
+                        int_signal = int(signal)
+                        if int_signal == 1:
+                            signal_count += 1
+                            title = base_title + ' @signal value checked'
+                            self.new_finding(title, field.name + '@signal', finding.OK, 'default data')
+                    except ValueError:
+                        title = base_title + ' @signal value checked'
+                        m = '@signal="' + str(signal) + '" not interpreted as integer'
+                        self.new_finding(title, field.name + '@signal', finding.ERROR, m)
+                elif primary is not None:
+                    title = base_title + ' @primary attribute exists'
+                    self.new_finding(title, field.name + '@primary', finding.OK, 'value: ' + str(primary))
+                    try:
+                        int_primary = int(primary)
+                        if int_primary == 1:
+                            title = base_title + ' @primary value checked'
+                            m = 'possible dimension scale'
+                            self.new_finding(title, field.name + '@primary', finding.OK, m)
+                            # TODO: verify that shape is 1-D
+                            dimension_scales.append(field_name)
+                    except ValueError:
+                        title = base_title + ' @primary value checked'
+                        m = '@primary="' + str(signal) + '" not interpreted as integer'
+                        self.new_finding(title, field.name + '@primary', finding.ERROR, m)
+                self.new_finding(title, field.name + '@axis', finding.TODO, 'not checked')
+
+            if signal_count == 0:
+                m = 'no field marked with @signal="1"'
+                self.new_finding(base_title, field.name, finding.ERROR, m)
+            elif signal_count > 1:
+                m = 'too many fields marked with @signal="1"'
+                self.new_finding(base_title, field.name, finding.ERROR, m)
+            return signal_count == 1
         # - - - - - - - - - -
         def version2(group):
             '''plottable data version 2
@@ -260,7 +300,7 @@ class Data_File_Validator(object):
             :see: http://download.nexusformat.org/doc/html/datarules.html#design-findplottable-byname
             '''
             base_title = 'default plot v2'
-            count = 0
+            signal_count = 0
             for field_name in group:
                 field = group.get(field_name)
                 signal = self.get_hdf5_attribute(field, 'signal')
@@ -270,19 +310,19 @@ class Data_File_Validator(object):
                     try:
                         int_signal = int(signal)
                         if int_signal == 1:
-                            count += 1
+                            signal_count += 1
                             title = base_title + ' @signal value checked'
                             self.new_finding(title, field.name + '@signal', finding.OK, 'default data')
                     except ValueError:
                         title = base_title + ' @signal value checked'
                         m = '@signal="' + str(signal) + '" not interpreted as integer'
                         self.new_finding(title, field.name + '@signal', finding.ERROR, m)
-
-            title = base_title + ' @axes attribute'
-            # axes="axis1:xis2:xis3"
-            # delimiter could be either ":" or ","
-            self.new_finding(title, field.name + '@axes', finding.TODO, 'not checked')
-            return count == 1
+                title = base_title + ' @axes attribute'
+                # axes="axis1:xis2:xis3"
+                # delimiter could be either ":" or ","
+                self.new_finding(title, field.name + '@axes', finding.TODO, 'not checked')
+                
+            return signal_count == 1
         # - - - - - - - - - -
         def version3(group):
             '''plottable data version 3
@@ -332,6 +372,30 @@ class Data_File_Validator(object):
             self.new_finding('default plot v3 dimension scales', group.name, finding.TODO, 'unchecked')
             return True
         # - - - - - - - - - -
+        def niac2015_default_path(group, subgroup_class):
+            group_default = self.get_hdf5_attribute(group, 'default')
+            title = '@default attribute exists'
+            t = group_default is not None
+            f = {True: finding.OK, False: finding.NOTE}[t]
+            m = 'attribute' + {True: '', False: ' not'}[t] + ' found'
+            gn = group.name or '/'
+            self.new_finding(title, gn+'@default', f, m)
+
+            if t:
+                title = '@default value exists'
+                t = group_default in group
+                f = finding.TF_RESULT[t]
+                m = 'HDF5 item ' + {True: 'exists', False: 'does not exist'}[t]
+                self.new_finding(title, gn+'@default', f, m)
+                
+                if t:
+                    title = '@default value test'
+                    subgroup = group[group_default]
+                    t = h5structure.isNeXusGroup(subgroup, subgroup_class)
+                    m = 'HDF5 item is ' + subgroup_class
+                    self.new_finding(title, gn+'@default', f, m)
+            return group_default
+        # - - - - - - - - - -
 
         # identify the NXdata groups to check, do not treat links differently
         nxdata_dict = collections.OrderedDict()
@@ -368,9 +432,14 @@ class Data_File_Validator(object):
                 m = 'basic NeXus requirement: default plot described'
                 self.new_finding(title, nxentry.name, f, m)
 
-        # TODO: 
-        msg = 'note if this is provided'
-        self.new_finding('/NXroot@default/NXentry@default/NXdata', '/', finding.TODO, msg)
+        title = '/NXroot@default/NXentry@default/NXdata'
+        nxentry = niac2015_default_path(self.h5, 'NXentry')
+        if nxentry is not None:
+            nxdata = niac2015_default_path(self.h5[nxentry], 'NXdata')
+            if nxdata is not None:
+                m = 'absolute path to default plot'
+                self.new_finding(title, self.h5[nxentry][nxdata].name, finding.OK, m)
+        pass
     
     def review_with_NXDL(self, group, nx_class):
         '''

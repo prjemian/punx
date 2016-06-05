@@ -249,55 +249,63 @@ class Data_File_Validator(object):
             
             :see: http://download.nexusformat.org/doc/html/datarules.html#design-findplottable-bydimnumber
             '''
-            return True
+            self.new_finding('default plot v1', group.name, finding.TODO, 'not checked')
+            return False
         # - - - - - - - - - -
         def version2(group):
             '''plottable data version 2
             
             :see: http://download.nexusformat.org/doc/html/datarules.html#design-findplottable-byname
             '''
-            return True
+            self.new_finding('default plot v2', group.name, finding.TODO, 'not checked')
+            return False
         # - - - - - - - - - -
         def version3(group):
             '''plottable data version 3
             
             :see: http://download.nexusformat.org/doc/html/datarules.html#design-findplottable-niac2014
             '''
+            base_title = 'default plot v3'
+            
             signal = self.get_hdf5_attribute(group, 'signal')
             t = signal is not None
             f = {True: finding.OK, False: finding.NOTE}[t]
-            self.new_finding('v3 @signal attribute exists', group.name, f, 'attribute check')
+            title = base_title + ' @signal attribute exists'
+            self.new_finding(title, group.name, f, 'attribute check')
             if not t:
                 return False
 
             t = signal in group
             f = finding.TF_RESULT[t]
-            self.new_finding('v3 @signal value exists', group.name, f, 'value: ' + signal)
+            title = base_title + ' @signal value exists'
+            self.new_finding(title, group.name, f, 'value: ' + signal)
             if not t:
                 return False
 
             axes = self.get_hdf5_attribute(group, 'axes')
             t = axes is not None
             f = {True: finding.OK, False: finding.NOTE}[t]
-            self.new_finding('v3 @axes attribute exists', group.name, f, 'attribute check')
+            title = base_title + ' @axes attribute exists'
+            self.new_finding(title, group.name, f, 'attribute check')
             if axes is not None:
                 for a in axes.split(','):
                     t = a in group and a != signal
                     f = finding.TF_RESULT[t]
-                    self.new_finding('v3 @axes value exists', group.name, f, 'value: ' + a)
+                    title = base_title + ' @axes value exists'
+                    self.new_finding(title, group.name, f, 'value: ' + a)
 
                     if t:
                         # AXISNAME_indices
                         axis_index = self.get_hdf5_attribute(group, a + '_indices')
                         t = axis_index is not None
                         f = {True: finding.OK, False: finding.NOTE}[t]
-                        m = 'v3 @AXISNAME_indices exists'
                         gn = group.name + '@' + a + '_indices'
-                        self.new_finding(m, gn, f, 'value: ' + str(axis_index))
-                        m = 'v3 @AXISNAME_indices value(s)'
-                        self.new_finding(m, gn, finding.TODO, 'unchecked')
+                        title = base_title + ' @AXISNAME_indices exists'
+                        self.new_finding(title, gn, f, 'value: ' + str(axis_index))
+                        title = base_title + ' @AXISNAME_indices value(s)'
+                        self.new_finding(title, gn, finding.TODO, 'unchecked')
 
-            self.new_finding('v3 dimension scales', group.name, finding.TODO, 'unchecked')
+            self.new_finding('default plot v3 dimension scales', group.name, finding.TODO, 'unchecked')
 
             return True
         # - - - - - - - - - -
@@ -543,12 +551,13 @@ class Data_File_Validator(object):
                     nxdl_attr = nxdl_class_obj.attrs[k]
                     nx_type = nxdl_attr.nx_type
                     data_type_ok = nx_type in NXDL_DATA_TYPES and type(obj_attr) in NXDL_DATA_TYPES[nx_type]
-            else:
-                status = finding.NOTE
-                msg = 'not defined in ' + nxdl_class
-            # TODO: need to learn *minOccurs* from NXDL
-            msg += ' (optional)'
-            self.new_finding(checkup_name, aname, status, msg)
+                if status not in (finding.UNUSED,):
+                    self.new_finding(checkup_name, aname, status, msg)
+#             else:
+#                 status = finding.NOTE
+#                 msg = 'not defined in ' + nxdl_class
+#             # TODO: need to learn *minOccurs* from NXDL
+#             msg += ' (optional)'
             if data_type_checked:
                 msg = str(type(obj_attr)) + ' : ' + nx_type
                 self.new_finding('NXDL NX_type', aname, finding.TF_RESULT[data_type_ok], msg)

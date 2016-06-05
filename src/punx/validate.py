@@ -314,32 +314,36 @@ class Data_File_Validator(object):
         nxdata_dict = collections.OrderedDict()
         find_NXdata_in_group(self.h5)
 
-        checkup_name = 'NXdata default plottable data'
+        title = 'NXdata default plottable data'
         valid_nxdata_dict = collections.OrderedDict()
         for h5_addr, nxdata_group in nxdata_dict.items():
             if version3(nxdata_group):
-                self.new_finding(checkup_name, h5_addr, finding.OK, 'version 3')
+                self.new_finding(title, h5_addr, finding.OK, 'version 3')
                 valid_nxdata_dict[h5_addr] = nxdata_group
             elif version2(nxdata_group):
-                self.new_finding(checkup_name, h5_addr, finding.OK, 'version 2')
+                self.new_finding(title, h5_addr, finding.OK, 'version 2')
                 valid_nxdata_dict[h5_addr] = nxdata_group
             elif version1(nxdata_group):
-                self.new_finding(checkup_name, h5_addr, finding.OK, 'version 1')
+                self.new_finding(title, h5_addr, finding.OK, 'version 1')
                 valid_nxdata_dict[h5_addr] = nxdata_group
             else:
-                self.new_finding(checkup_name, h5_addr, finding.ERROR, 'version 1')
+                m = 'no default plottable data indicated'
+                self.new_finding(title, h5_addr, finding.ERROR, m)
 
-        # search each valid NXdata for a parent NXentry
-        count = 0
-        for h5_addr, nxdata_group in valid_nxdata_dict.items():
-            parent_addr = '/'.join(h5_addr.split('/')[:-1])
-            if parent_addr in self.h5:
-                parent = self.h5[parent_addr]
-                if h5structure.isNeXusGroup(parent, 'NXentry'):
-                    count += 1
-                    self.new_finding('NXentry parent of NXdata exists', parent.name, finding.OK, '')
-        f = finding.TF_RESULT[count > 0]
-        self.new_finding('NXentry/NXdata exists', '/', f, 'basic NeXus requirement: default plot described')
+        # search each NXentry for valid NXdata
+        for h5_addr in sorted(self.h5):
+            nxentry = self.h5.get(h5_addr)
+            if h5structure.isNeXusGroup(nxentry, 'NXentry'):
+                count = 0
+                for item in sorted(nxentry):
+                    nxdata = nxentry.get(item)
+                    if h5structure.isNeXusGroup(nxdata, 'NXdata'):
+                        if nxdata.name in valid_nxdata_dict.keys():
+                            count += 1
+                f = finding.TF_RESULT[count > 0]
+                title = '/NXentry/NXdata exists'
+                m = 'basic NeXus requirement: default plot described'
+                self.new_finding(title, nxentry.name, f, m)
 
         # TODO: 
         msg = 'note if this is provided'
@@ -427,7 +431,7 @@ class Data_File_Validator(object):
         self.validate_default_plot()
 
         # self.new_finding('-'*10, '/', finding.COMMENT, 'NXroot checkup start' + '='*10)
-        checkup_name = 'hdf5 file root object'
+        title = 'hdf5 file root object'
         for item in sorted(self.h5):
             obj = self.h5.get(item)
             if h5structure.isNeXusLink(obj):
@@ -437,7 +441,7 @@ class Data_File_Validator(object):
             elif h5structure.isHdf5Dataset(obj):
                 self.validate_dataset(obj, self.h5)
             else:
-                self.new_finding(checkup_name, obj.name, finding.NOTE, 'not a NeXus item')
+                self.new_finding(title, obj.name, finding.NOTE, 'not a NeXus item')
         # self.new_finding('-'*10, '/', finding.COMMENT, 'NXroot checkup end' + '='*10)
 
     def validate_group(self, group, nxdl_classname):
@@ -529,7 +533,7 @@ class Data_File_Validator(object):
             return
 
         nxdl_class_obj = self.nxdl_dict[nxdl_class]
-        checkup_name = nxdl_class + ' attribute'
+        title = nxdl_class + ' attribute'
         tf_result = {True: finding.OK, False: finding.UNUSED}
 
         # get list of all possible attributes from data file and NXDL spec
@@ -552,7 +556,7 @@ class Data_File_Validator(object):
                     nx_type = nxdl_attr.nx_type
                     data_type_ok = nx_type in NXDL_DATA_TYPES and type(obj_attr) in NXDL_DATA_TYPES[nx_type]
                 if status not in (finding.UNUSED,):
-                    self.new_finding(checkup_name, aname, status, msg)
+                    self.new_finding(title, aname, status, msg)
 #             else:
 #                 status = finding.NOTE
 #                 msg = 'not defined in ' + nxdl_class

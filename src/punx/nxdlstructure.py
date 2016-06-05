@@ -149,7 +149,7 @@ class NXDL_specification(NXDL_mixin):
         
     def parse_xml(self):
         def get_boolean(attribute, default):
-            t = root.get('ignoreExtraGroups', False)
+            t = root.get('ignoreExtraGroups', 'false')
             return t.lower() in ('true', '1', True)
         tree = lxml.etree.parse(self.nxdl_file_name)
     

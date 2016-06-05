@@ -130,6 +130,10 @@ class NXDL_specification(NXDL_mixin):
         self.title = None
         self.category = None
         self.ns = None
+
+        self.ignoreExtraGroups = False
+        self.ignoreExtraFields = False
+        self.ignoreExtraAttributes = False
         
         self.parse_xml()
     
@@ -144,12 +148,19 @@ class NXDL_specification(NXDL_mixin):
         return '\n'.join(t)
         
     def parse_xml(self):
+        def get_boolean(attribute, default):
+            t = root.get('ignoreExtraGroups', False)
+            return t.lower() in ('true', '1', True)
         tree = lxml.etree.parse(self.nxdl_file_name)
     
         self.ns = {'nx': NXDL_XML_NAMESPACE}
     
         root = tree.getroot()
         self.title = root.get('name')
+        
+        self.ignoreExtraGroups = get_boolean('ignoreExtraGroups', False)
+        self.ignoreExtraFields = get_boolean('ignoreExtraFields', False)
+        self.ignoreExtraAttributes = get_boolean('ignoreExtraAttributes', False)
         
         self.category = {
                      'base': 'base class',

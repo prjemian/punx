@@ -105,7 +105,6 @@ import collections
 import h5py
 import lxml.etree
 import numpy
-import os
 import re
 
 import cache
@@ -119,7 +118,7 @@ import nxdlstructure
 __url__ = 'http://punx.readthedocs.org/en/latest/validate.html'
 
 # for each NeXus data type, make a list of acceptable Python data types
-# TODO: is there a better way to define these?  Using nxdlTypes.xsd?
+# Is there a better way to define these?  Using nxdlTypes.xsd?
 NXDL_DATA_TYPES = {
     'NX_CHAR': (str, unicode, numpy.string_, numpy.ndarray),
     'NX_INT':  (int, numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64),
@@ -279,6 +278,8 @@ class Data_File_Validator(object):
                             m = 'possible dimension scale'
                             self.new_finding(title, field.name + '@primary', finding.OK, m)
                             # TODO: verify that shape is 1-D
+                            m = 'verify the shape is 1-D'
+                            self.new_finding(title, field.name + '@primary', finding.TODO, m)
                             dimension_scales.append(field_name)
                     except ValueError:
                         title = base_title + ' @primary value checked'
@@ -439,7 +440,6 @@ class Data_File_Validator(object):
             if nxdata is not None:
                 m = 'absolute path to default plot'
                 self.new_finding(title, self.h5[nxentry][nxdata].name, finding.OK, m)
-        pass
     
     def review_with_NXDL(self, group, nx_class):
         '''
@@ -817,20 +817,22 @@ class Data_File_Validator(object):
         make a summary table of the validation findings (count how many of each status)
         '''
         import pyRestTable
-        # TODO: also show the description of each status int he table
+        # TODO: also show the description of each status in the table
 
         # count each category
-        summary = {str(k): 0 for k in finding.VALID_STATUS_LIST}
+        summary = collections.OrderedDict()
+        for k in finding.VALID_STATUS_LIST:
+            summary[str(k.key)] = 0
+        xref = {str(k): k for k in finding.VALID_STATUS_LIST}
         for f in self.findings:
-            k = str(f.status)
-            summary[k] += 1
+            summary[str(f.status)] += 1
 
         t = pyRestTable.Table()
-        t.labels = 'status count'.split()
-        for k, v in sorted(summary.items()):
-                t.rows.append((k, v))
-        t.rows.append(('--', '--'))
-        t.rows.append(('TOTAL', len(self.findings)))
+        t.labels = 'status count description'.split()
+        for k, v in summary.items():
+                t.rows.append((k, v, xref[k].description))
+        t.rows.append(('--', '--', '--'))
+        t.rows.append(('TOTAL', len(self.findings), '--'))
         return t.reST()
     
     def report_classpath(self):

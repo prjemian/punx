@@ -249,16 +249,40 @@ class Data_File_Validator(object):
             
             :see: http://download.nexusformat.org/doc/html/datarules.html#design-findplottable-bydimnumber
             '''
-            self.new_finding('default plot v1', group.name, finding.TODO, 'not checked')
+            base_title = 'default plot v1'
+            self.new_finding(base_title, group.name, finding.TODO, 'not checked')
             return False
+            return True
         # - - - - - - - - - -
         def version2(group):
             '''plottable data version 2
             
             :see: http://download.nexusformat.org/doc/html/datarules.html#design-findplottable-byname
             '''
-            self.new_finding('default plot v2', group.name, finding.TODO, 'not checked')
-            return False
+            base_title = 'default plot v2'
+            count = 0
+            for field_name in group:
+                field = group.get(field_name)
+                signal = self.get_hdf5_attribute(field, 'signal')
+                if signal is not None:
+                    title = base_title + ' @signal attribute exists'
+                    self.new_finding(title, field.name + '@signal', finding.OK, 'value: ' + str(signal))
+                    try:
+                        int_signal = int(signal)
+                        if int_signal == 1:
+                            count += 1
+                            title = base_title + ' @signal value checked'
+                            self.new_finding(title, field.name + '@signal', finding.OK, 'default data')
+                    except ValueError:
+                        title = base_title + ' @signal value checked'
+                        m = '@signal="' + str(signal) + '" not interpreted as integer'
+                        self.new_finding(title, field.name + '@signal', finding.ERROR, m)
+
+            title = base_title + ' @axes attribute'
+            # axes="axis1:xis2:xis3"
+            # delimiter could be either ":" or ","
+            self.new_finding(title, field.name + '@axes', finding.TODO, 'not checked')
+            return count == 1
         # - - - - - - - - - -
         def version3(group):
             '''plottable data version 3
@@ -306,7 +330,6 @@ class Data_File_Validator(object):
                         self.new_finding(title, gn, finding.TODO, 'unchecked')
 
             self.new_finding('default plot v3 dimension scales', group.name, finding.TODO, 'unchecked')
-
             return True
         # - - - - - - - - - -
 

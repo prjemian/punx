@@ -492,7 +492,6 @@ class Data_File_Validator(object):
                     c = 'acceptable'
                 f = {True: finding.OK, False:finding.NOTE}[known_name]
                 self.new_finding(nx_class + ' defined field', h5_obj.name, f, c)
-                # TODO: if the data type is NX_NUMBER, is @units defined and has *some* value?
                 msg = 'need to complete check with NXDL'
                 self.new_finding(nx_class + ' field', h5_obj.name, finding.TODO, msg)
 
@@ -515,12 +514,6 @@ class Data_File_Validator(object):
         self.classpath_dict = collections.OrderedDict()
         for k, v in self.addresses.items():
             self.classpath_dict[k] = v
-        
-        # for review with the relevant NXDL specification: NXroot
-        self.review_with_NXDL(self.h5, 'NXroot')
-        # TODO: does the code below duplicate review_with_NXDL()?
-        
-        self.validate_default_plot()
 
         # self.new_finding('-'*10, '/', finding.COMMENT, 'NXroot checkup start' + '='*10)
         title = 'hdf5 file root object'
@@ -535,6 +528,11 @@ class Data_File_Validator(object):
             else:
                 self.new_finding(title, obj.name, finding.NOTE, 'not a NeXus item')
         # self.new_finding('-'*10, '/', finding.COMMENT, 'NXroot checkup end' + '='*10)
+        
+        # review file with the relevant NXDL specification: NXroot
+        # review of other classes as specified in the data file is called in validate_group()
+        self.review_with_NXDL(self.h5, 'NXroot')
+        self.validate_default_plot()
 
     def validate_group(self, group, nxdl_classname):
         '''
@@ -587,6 +585,9 @@ class Data_File_Validator(object):
         nxdl_class_obj = self.nxdl_dict.get(nx_class, None)
         if nxdl_class_obj is None:
             self.new_finding('unknown NX_class', dataset.name, finding.ERROR, 'found: ' + nx_class)
+        # TODO: if the data type is NX_NUMBER, is @units defined and has *some* value?
+        self.new_finding('field data type', dataset.name, finding.TODO, 'TBA')
+        self.new_finding('field units', dataset.name + '@units', finding.TODO, 'TBA')
 
         self.validate_attributes(dataset, nx_class)
 

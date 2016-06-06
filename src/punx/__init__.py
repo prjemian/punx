@@ -30,7 +30,9 @@ __keywords__     = ['NeXus', 'HDF5']
 __settings_organization__ = __package_name__
 __settings_package__ = __package_name__
 
-__install_requires__ = ['h5py', 'lxml', 'numpy', 'pyRestTable',]
+__install_requires__ = ['h5py', 'lxml', 'numpy', 
+                        'pyRestTable', 'PyQt4',
+                        ]
 __sphinx_mock_list__ = __install_requires__ + ['lxml.etree', ]
 __classifiers__ = [
      'Development Status :: 5 - Production/Stable',

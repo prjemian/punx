@@ -15,6 +15,7 @@ Contents
    finding
    h5structure
    install
+   nxdl_rules
    nxdlstructure
    settings
    validate

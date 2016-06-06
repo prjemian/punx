@@ -31,11 +31,11 @@ Checkboxes indicate which steps have been implemented in code below.
 #. [x] verify classpath exists: /NXentry/NXdata & @signal
 #. [x] verify classpath exists: NXdata & @signal
 #. [x] verify file has valid /NXentry/NXdata/signal_data
-#. [ ] verify every NXentry has NXdata/signal_data
-#. [ ] verify every NXdata has signal_data
+#. [x] verify every NXentry has NXdata/signal_data
+#. [x] verify every NXdata has signal_data
 
-    #. [ ] version 1
-    #. [ ] version 2
+    #. [x] version 1
+    #. [x] version 2
     #. [x] version 3
 
 .. rubric:: Groups
@@ -81,11 +81,12 @@ Checkboxes indicate which steps have been implemented in code below.
 #. [ ] is name flexible?
 #. [ ] observe attributes: minOccurs maxOccurs
 #. [ ] is deprecated?
-#. [ ] is units attribute defined?
+#. [x] is units attribute defined?
 #. [ ] check units are consistent against NXDL
 #. [ ] check data shape against NXDL
 #. [ ] check data type against NXDL
 #. [x] check for attributes defined by NXDL
+#. [x] check AXISNAME_indices are each within signal data rank
 
 .. rubric:: Attributes
 
@@ -256,8 +257,9 @@ class Data_File_Validator(object):
                 signal = self.get_hdf5_attribute(field, 'signal')
                 primary = self.get_hdf5_attribute(field, 'primary')
                 if signal is not None:
-                    title = base_title + ' @signal attribute exists'
-                    self.new_finding(title, field.name + '@signal', finding.OK, 'value: ' + str(signal))
+                    title = base_title + ' @signal attribute'
+                    msg = {True: 'value: ' + str(signal), False: 'does not exist'}
+                    self.new_finding(title, field.name + '@signal', finding.OK, msg)
                     try:
                         int_signal = int(signal)
                         if int_signal == 1:
@@ -269,8 +271,9 @@ class Data_File_Validator(object):
                         m = '@signal="' + str(signal) + '" not interpreted as integer'
                         self.new_finding(title, field.name + '@signal', finding.ERROR, m)
                 elif primary is not None:
-                    title = base_title + ' @primary attribute exists'
-                    self.new_finding(title, field.name + '@primary', finding.OK, 'value: ' + str(primary))
+                    title = base_title + ' @primary attribute'
+                    msg = {True: 'value: ' + str(primary), False: 'does not exist'}
+                    self.new_finding(title, field.name + '@primary', finding.OK, 'value: ' + msg)
                     try:
                         int_primary = int(primary)
                         if int_primary == 1:
@@ -306,8 +309,9 @@ class Data_File_Validator(object):
                 field = group.get(field_name)
                 signal = self.get_hdf5_attribute(field, 'signal')
                 if signal is not None:
-                    title = base_title + ' @signal attribute exists'
-                    self.new_finding(title, field.name + '@signal', finding.OK, 'value: ' + str(signal))
+                    title = base_title + ' @signal attribute'
+                    msg = {True: 'value: ' + str(signal), False: 'does not exist'}
+                    self.new_finding(title, field.name + '@signal', finding.OK, 'value: ' + msg)
                     try:
                         int_signal = int(signal)
                         if int_signal == 1:
@@ -335,28 +339,34 @@ class Data_File_Validator(object):
             signal = self.get_hdf5_attribute(group, 'signal')
             t = signal is not None
             f = {True: finding.OK, False: finding.NOTE}[t]
-            title = base_title + ' @signal attribute exists'
-            self.new_finding(title, group.name, f, 'attribute check')
+            title = base_title + ' @signal attribute'
+            msg = {True: 'exists', False: 'does not exist'}[t]
+            self.new_finding(title, group.name, f, msg)
             if not t:
                 return False
 
             t = signal in group
             f = finding.TF_RESULT[t]
-            title = base_title + ' @signal value exists'
-            self.new_finding(title, group.name, f, 'value: ' + signal)
+            title = base_title + ' @signal value'
+            msg = {True: 'value: ' + signal, False: 'does not exist'}[t]
+            self.new_finding(title, group.name, f, msg)
             if not t:
                 return False
+            signal_obj = group.get(signal)
+            signal_rank = len(signal_obj.shape)
 
             axes = self.get_hdf5_attribute(group, 'axes')
             t = axes is not None
             f = {True: finding.OK, False: finding.NOTE}[t]
-            title = base_title + ' @axes attribute exists'
-            self.new_finding(title, group.name, f, 'attribute check')
+            title = base_title + ' @axes attribute'
+            msg = {True: 'exists', False: 'does not exist'}[t]
+            self.new_finding(title, group.name, f, msg)
             if axes is not None:
                 for a in axes.split(','):
                     t = a in group and a != signal
                     f = finding.TF_RESULT[t]
-                    title = base_title + ' @axes value exists'
+                    title = base_title + ' @axes value'
+                    msg = {True: 'value: ' + a, False: 'does not exist'}[t]
                     self.new_finding(title, group.name, f, 'value: ' + a)
 
                     if t:
@@ -365,25 +375,32 @@ class Data_File_Validator(object):
                         t = axis_index is not None
                         f = {True: finding.OK, False: finding.NOTE}[t]
                         gn = group.name + '@' + a + '_indices'
-                        title = base_title + ' @AXISNAME_indices exists'
-                        self.new_finding(title, gn, f, 'value: ' + str(axis_index))
-                        title = base_title + ' @AXISNAME_indices value(s)'
-                        self.new_finding(title, gn, finding.TODO, 'unchecked')
+                        title = base_title + ' @AXISNAME_indices attribute'
+                        msg = {True: 'value: ' + str(axis_index), False: 'does not exist'}[t]
+                        self.new_finding(title, gn, f, msg)
+
+                        if t:
+                            # value of AXISNAME_indices is within the rank of the signal data
+                            title = base_title + ' @AXISNAME_indices value'
+                            t = 0 <= axis_index < signal_rank
+                            f = finding.TF_RESULT[t]
+                            msg = 'rank test: 0 <= ' + str(axis_index) + ' < ' + str(signal_rank)
+                            self.new_finding(title, gn, f, msg)
 
             self.new_finding('default plot v3 dimension scales', group.name, finding.TODO, 'unchecked')
             return True
         # - - - - - - - - - -
         def niac2015_default_path(group, subgroup_class):
             group_default = self.get_hdf5_attribute(group, 'default')
-            title = '@default attribute exists'
+            title = '@default attribute'
             t = group_default is not None
             f = {True: finding.OK, False: finding.NOTE}[t]
-            m = 'attribute' + {True: '', False: ' not'}[t] + ' found'
+            m = {True: 'exists', False: 'does not exist'}[t]
             gn = group.name or '/'
             self.new_finding(title, gn+'@default', f, m)
 
             if t:
-                title = '@default value exists'
+                title = '@default value'
                 t = group_default in group
                 f = finding.TF_RESULT[t]
                 m = 'HDF5 item ' + {True: 'exists', False: 'does not exist'}[t]
@@ -428,9 +445,11 @@ class Data_File_Validator(object):
                     if h5structure.isNeXusGroup(nxdata, 'NXdata'):
                         if nxdata.name in valid_nxdata_dict.keys():
                             count += 1
-                f = finding.TF_RESULT[count > 0]
-                title = '/NXentry/NXdata exists'
-                m = 'basic NeXus requirement: default plot described'
+                t = count > 0
+                f = finding.TF_RESULT[t]
+                title = '/NXentry/NXdata/signal_data'
+                m = 'basic NeXus requirement: default plot'
+                m += {True: '', False: ' not'}[t] + ' described'
                 self.new_finding(title, nxentry.name, f, m)
 
         title = '/NXroot@default/NXentry@default/NXdata'
@@ -501,6 +520,7 @@ class Data_File_Validator(object):
         '''
         start the validation process from the file root
         '''
+        self.new_finding('validate all names', '/', finding.COMMENT, '-'*10)
         self.collect_names(self.h5)
 
         # HDF5 group attributes
@@ -516,6 +536,7 @@ class Data_File_Validator(object):
             self.classpath_dict[k] = v
 
         # self.new_finding('-'*10, '/', finding.COMMENT, 'NXroot checkup start' + '='*10)
+        self.new_finding('validate all objects', '/', finding.COMMENT, '-'*10)
         title = 'hdf5 file root object'
         for item in sorted(self.h5):
             obj = self.h5.get(item)
@@ -531,7 +552,10 @@ class Data_File_Validator(object):
         
         # review file with the relevant NXDL specification: NXroot
         # review of other classes as specified in the data file is called in validate_group()
+        self.new_finding('review file root with NXroot', '/', finding.COMMENT, '-'*10)
         self.review_with_NXDL(self.h5, 'NXroot')
+
+        self.new_finding('check for default plot', '/', finding.COMMENT, '-'*10)
         self.validate_default_plot()
 
     def validate_group(self, group, nxdl_classname):
@@ -587,9 +611,23 @@ class Data_File_Validator(object):
         nxdl_class_obj = self.nxdl_dict.get(nx_class, None)
         if nxdl_class_obj is None:
             self.new_finding('unknown NX_class', dataset.name, finding.ERROR, 'found: ' + nx_class)
-        # TODO: if the data type is NX_NUMBER, is @units defined and has *some* value?
-        self.new_finding('field data type', dataset.name, finding.TODO, 'TBA')
-        self.new_finding('field units', dataset.name + '@units', finding.TODO, 'TBA')
+        # if the data type is NX_NUMBER, is @units defined and has *some* value?
+        if dataset.dtype in NXDL_DATA_TYPES['NX_NUMBER']:
+            title = 'field data type'
+            msg = 'data type: ' + str(dataset.dtype)
+            self.new_finding(title, dataset.name, finding.OK, msg)
+            
+            title = 'field units attribute'
+            units = self.get_hdf5_attribute(dataset, 'units')
+            t = units is not None
+            f = {True: finding.OK, False: finding.NOTE}[t]
+            msg = {True: 'exists', False: 'does not exist'}[t]
+            self.new_finding(title, dataset.name + '@units', f, msg)
+            if t:
+                t = len(units) > 0
+                f = {True: finding.OK, False: finding.NOTE}[t]
+                msg = {True: 'value: ' + units, False: 'has no value'}[t]
+                self.new_finding(title, dataset.name + '@units', f, msg)
 
         self.validate_attributes(dataset, nx_class)
 
@@ -603,8 +641,9 @@ class Data_File_Validator(object):
         target = link.attrs.get('target', None)
         if target is not None:
             target_exists = target in self.h5
-            target_exists = finding.TF_RESULT[target_exists]
-            self.new_finding('link target exists', link.name, target_exists, target)
+            f = finding.TF_RESULT[target_exists]
+            msg = {True: target, False: 'does not exist'}[target_exists]
+            self.new_finding('link target', link.name, f, msg)
             # not necessary: match target nexus classpath and match with NXDL
         else:
             self.new_finding('link', link.name, finding.ERROR, 'no target')
@@ -643,7 +682,7 @@ class Data_File_Validator(object):
             h5_attrs.remove('NX_class')
 
         attributes_reviewed_elsewhere = [
-            'NX_class AXISNAME_indices signal axes axis primary'.split()
+            'NX_class AXISNAME_indices signal axes axis primary units'.split()
         ]
         for k in sorted(h5_attrs):
             aname = h5_obj.name + '@' + k

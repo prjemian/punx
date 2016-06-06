@@ -27,10 +27,15 @@ PROGRAM_NAME = 'nxdl_rules'
 
 
 class NxdlRules(object):
+    ' '
     
     def __init__(self):
         self.qset = cache.qsettings()
         self.nxdl_xsd = cache.get_nxdl_xsd()
+        #context = self.nxdl_xsd.iterparse()
+        pass
+#         for item in self.nxdl_xsd:
+#             print item
 
 
 def main():

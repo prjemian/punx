@@ -29,6 +29,14 @@ when a network connection allows the code to contact the GitHub
 source code repository.  The update process will update content 
 from the repository.
 
+This code chooses which set of definitions to use, based on the
+presence of the *__use_source_cache__ file*.  This file is part
+of the source code repository and will be available to 
+developers using code from the source code repository.  This file
+will not be packaged with the source distribution, thus not present
+when users run from a copy of the *punx* package installed from PyPI
+(or other).
+
 .. rubric:: Public Interface
 
 :settings object:     :meth:`~punx.cache.qsettings`
@@ -59,6 +67,10 @@ appName = __init__.__settings_package__
 
 PKG_DIR = os.path.abspath(os.path.dirname(__file__))
 SOURCE_CACHE_ROOT = os.path.join(PKG_DIR, __init__.CACHE_SUBDIR)
+
+SOURCE_CACHE_KEY_FILE = '__use_source_cache__'
+USE_SOURCE_CACHE = os.path.exists(os.path.join(PKG_DIR, SOURCE_CACHE_KEY_FILE))
+
 NXDL_SCHEMA_FILE = 'nxdl.xsd'
 NXDL_TYPES_SCHEMA_FILE = 'nxdlTypes.xsd'
 
@@ -75,20 +87,7 @@ __singleton_xml_schema__ = None
 __singleton_nxdl_xsd__ = None
 
 
-def __is_developer_source_path_(path):
-    '''
-    check if path points at source cache
-    
-    path must have these strings: ``eclipse``, ``punx``, ``src``
-    '''
-    # TODO: improve this check
-    if 'eclipse' not in path:   # developer uses eclipse IDE
-        return False
-    if 'punx' not in path:      # project name
-        return False
-    if 'src' not in path:      # project name
-        return False
-    return 'jemian' in path.lower() or 'pete' in path.lower() or 'mintadmin' in path.lower()
+class NoCacheDirectory(Exception): pass
 
 
 def githubMasterInfo(org, repo):
@@ -152,6 +151,7 @@ def update_NXDL_Cache():
     update the cache of NeXus NXDL files
     '''
     # check with GitHub for any updates
+    # always do this first since there is no point continuing if not available
     info = githubMasterInfo(__init__.GITHUB_NXDL_ORGANIZATION, 
                             __init__.GITHUB_NXDL_REPOSITORY)
     if info is None:
@@ -200,13 +200,14 @@ def qsettings():
     '''
     global __singleton_settings__
     if __singleton_settings__ is None:
-        if __is_developer_source_path_(PKG_DIR):
+        # check if using from development source or installed source (user)
+        if USE_SOURCE_CACHE:
             qset = source_cache_settings()
         else:
             qset = user_cache_settings()
         __singleton_settings__ = qset
     if not os.path.exists(__singleton_settings__.cache_dir()):
-        raise IOError('no cache found, need to create it with an *update*')
+        raise NoCacheDirectory('no cache found, need to create it with an *update*')
     return __singleton_settings__
 
 
@@ -305,6 +306,12 @@ def get_XML_Schema():
 
 
 if __name__ == '__main__':
-    update_NXDL_Cache()
+    try:
+        update_NXDL_Cache()
+    except NoCacheDirectory:
+        # make the cache directory and try again
+        path = os.path.dirname(str(__singleton_settings__.fileName()))
+        os.mkdir(path)
+        update_NXDL_Cache()
     # print user_cache_settings().fileName()
     # print source_cache_settings().fileName()

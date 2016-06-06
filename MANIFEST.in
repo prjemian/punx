@@ -6,3 +6,7 @@ include src/punx/cache/*
 include src/punx/cache/*/*.xsd
 include src/punx/cache/*/*/*.xml
 include src/punx/cache/*/*/*.xsl
+
+# Do NOT package the file "__use_source_cache__" with the sdist created from setup.py.
+# do NOT include __use_source_cache__
+# Its presence is a boolean to update user or source cache.

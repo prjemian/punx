@@ -548,6 +548,8 @@ class Data_File_Validator(object):
         else:
             self.review_with_NXDL(group, nx_class)
         
+        self.validate_attributes(group, nx_class)
+        
         # get a list of the NXDL subgroups defined in this group
         nxdl_class_obj = self.nxdl_dict[nxdl_classname]
         defined_nxdl_list = nxdl_class_obj.getSubGroup_NX_class_list()
@@ -626,7 +628,12 @@ class Data_File_Validator(object):
             return
 
         nxdl_class_obj = self.nxdl_dict[nxdl_class]
-        title = nxdl_class + ' attribute'
+        if h5structure.isHdf5Group(h5_obj):
+            title = nxdl_class + ' attribute'
+        elif h5structure.isHdf5Dataset(h5_obj):
+            title = 'field attribute'
+        else:
+            raise ValueError('unknown object: ' + h5_obj.name)
         tf_result = {True: finding.OK, False: finding.UNUSED}
 
         # get list of all possible attributes from data file and NXDL spec
@@ -635,8 +642,15 @@ class Data_File_Validator(object):
         if 'NX_class' in h5_attrs:
             h5_attrs.remove('NX_class')
 
+        attributes_reviewed_elsewhere = [
+            'NX_class AXISNAME_indices signal axes axis primary'.split()
+        ]
         for k in sorted(h5_attrs):
             aname = h5_obj.name + '@' + k
+            if k in attributes_reviewed_elsewhere:
+                msg = 'reviewed elsewhere'
+                self.new_finding(title, aname, finding.COMMENT, msg)
+                continue
             data_type_checked = False
             if k in nxdl_class_obj.attrs:
                 msg = 'defined in ' + nxdl_class

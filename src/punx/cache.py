@@ -22,6 +22,10 @@ This code maintains two sets of the definitions.
 One is the set 
 provided with the package at installation.  This set is updated
 by the developer prior to packaging the source for distribution.
+Since the source cache is already installed with the package,
+it provides a version of the NeXus definitions available for 
+fallback use when network access to the GitHub
+repository is not available.
 
 The second set is updated into a directory that can be written by 
 the user.  This set is updated on demand by the user and only 
@@ -205,9 +209,14 @@ def qsettings():
             qset = source_cache_settings()
         else:
             qset = user_cache_settings()
+            if not os.path.exists(qset.cache_dir()):
+                # make the cache directory and try again
+                path = os.path.dirname(str(qset.fileName()))
+                os.mkdir(path)
+                qset = user_cache_settings()
         __singleton_settings__ = qset
     if not os.path.exists(__singleton_settings__.cache_dir()):
-        raise NoCacheDirectory('no cache found, need to create it with an *update*')
+        raise NoCacheDirectory('no cache found')
     return __singleton_settings__
 
 

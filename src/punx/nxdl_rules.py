@@ -17,7 +17,7 @@ Interpret the NXDL rules (nxdl.xsd) into useful Python components
 
 
 # import collections
-import lxml.etree
+# import lxml.etree
 # import os
 
 import cache
@@ -41,7 +41,6 @@ class NxdlRules(object):
     
     def __init__(self):
         self.ns = NAMESPACE_DICT
-        #qset = cache.qsettings()
         nxdl_xsd = cache.get_nxdl_xsd()
 
         node_list = nxdl_xsd.xpath('xs:element', namespaces=self.ns)
@@ -113,8 +112,7 @@ class Root(Mixin):
     def __init__(self, xml_parent, xml_obj, obj_name=None, ns_dict=None):
         Mixin.__init__(self, xml_parent, xml_obj, obj_name=None, ns_dict=None)
         self.attrs = {}
-        self.groups = {}
-        self.fields = {}
+        self.children = {}
 
     def parse(self):
         element_type = self.xml_obj.attrib.get('type')
@@ -141,7 +139,7 @@ class Root(Mixin):
         for node in seq_node:
             if node.tag.endswith('}element'):
                 obj = Field(self, node)
-                self.fields[obj.name] = obj
+                self.children[obj.name] = obj
             elif node.tag.endswith('}group'):
                 obj = Group(self, node)
                 if obj.name is None:
@@ -151,7 +149,7 @@ class Root(Mixin):
                     print 'FIXME: ', obj_name
                 else:
                     obj_name = obj.name
-                self.groups[obj_name] = obj
+                self.children[obj_name] = obj
     
     def parse_attributeGroup(self, ag_node):
         '''
@@ -218,8 +216,7 @@ class Group(Mixin):
     def __init__(self, xml_parent, xml_obj, obj_name=None, ns_dict=None):
         Mixin.__init__(self, xml_parent, xml_obj, obj_name=None, ns_dict=None)
         self.attrs = {}
-        self.groups = {}
-        self.fields = {}
+        self.children = {}
         self.links = {}
 
         self.minOccurs = xml_obj.attrib.get('minOccurs', '0')   # TODO: check default value
@@ -236,10 +233,10 @@ class Group(Mixin):
         for node in gg_node:
             if node.tag.endswith('}element'):
                 obj = Field(self, node)
-                self.fields[obj.name] = obj
+                self.children[obj.name] = obj
             elif node.tag.endswith('}group'):
                 obj = Group(self, node)
-                self.groups[obj.name] = obj
+                self.children[obj.name] = obj
             elif node.tag.endswith('}sequence'):
                 # TODO: parse
                 print ref, node.tag

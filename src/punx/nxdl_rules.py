@@ -216,7 +216,7 @@ class Group(Mixin):
         self.links = {}
 
         self.minOccurs = xml_obj.attrib.get('minOccurs', '0')   # TODO: check default value
-        self.maxOccurs = xml_obj.attrib.get('maxOccurs', '1')   # TODO: check default value
+        self.maxOccurs = xml_obj.attrib.get('maxOccurs', 'unbounded')   # TODO: check default value
         ref = xml_obj.attrib.get('ref')
         if ref is not None:
             self.parse_ref(ref)

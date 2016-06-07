@@ -17,7 +17,7 @@ Interpret the NXDL rules (nxdl.xsd) into useful Python components
 
 
 # import collections
-# import lxml.etree
+import lxml.etree
 # import os
 
 import cache
@@ -28,8 +28,7 @@ NXDL_XML_NAMESPACE = 'http://definition.nexusformat.org/nxdl/3.1'
 XMLSCHEMA_NAMESPACE = 'http://www.w3.org/2001/XMLSchema'
 NAMESPACE_DICT = {'nx': NXDL_XML_NAMESPACE, 
                   'xs': XMLSCHEMA_NAMESPACE}
-# xpath('nx:attribute', namespaces=ns)
-# self.ns = {'nx': NXDL_XML_NAMESPACE}
+
 
 class NxdlRules(object):
     '''
@@ -58,8 +57,8 @@ class Mixin(object):
     '''
     common code for NXDL Rules classes below
     
-    :param obj xml_parent: XML object that contains ``xml_obj``
-    :param obj xml_obj: XML object
+    :param lxml.etree.Element xml_parent: XML element that contains ``xml_obj``
+    :param lxml.etree.Element xml_obj: XML element
     :param str obj_name: optional, default taken from ``xml_obj``
     :param dict ns_dict: optional, default taken from :var:`NAMESPACE_DICT`
     '''
@@ -69,14 +68,44 @@ class Mixin(object):
         self.name = obj_name or xml_obj.attrib.get('name')
         self.xml_obj = xml_obj
         self.ns = ns_dict or NAMESPACE_DICT
+    
+    def get_root(self, node):
+        '''
+        return the XML root node
+        '''
+        if isinstance(node, Root):
+            tree = node.xml_parent
+            return tree.getroot()
+        return self.get_root(node.xml_parent)
+    
+    def get_root_named_node(self, tag, attribute, value):
+        '''
+        return a named node from the root level of the Schema
+        '''
+        root = self.get_root(self)
+        xpath_str = 'xs:' + tag
+        xpath_str += '[@' + attribute
+        xpath_str += '="' + value + '"]'
+        node_list = root.xpath(xpath_str, namespaces=self.ns)
+        if len(node_list) != 1:
+            msg = 'wrong number of ' + tag
+            msg += ' nodes found: ' + str(len(node_list))
+            raise ValueError(msg)
+        return node_list[0]
+    
+    def strip_ns(self, ref):
+        '''
+        strip the namespace prefix from ``ref``
+        '''
+        return ref.split(':')[-1]
 
 
 class Root(Mixin):
     '''
     root of the nxdl.xsd file
     
-    :param obj xml_parent: XML object that contains ``xml_obj``
-    :param obj xml_obj: XML object
+    :param lxml.etree.Element xml_parent: XML element that contains ``xml_obj``
+    :param lxml.etree.Element xml_obj: XML element
     :param str obj_name: optional, default taken from ``xml_obj``
     :param dict ns_dict: optional, default taken from :var:`NAMESPACE_DICT`
     '''
@@ -86,7 +115,6 @@ class Root(Mixin):
         self.attrs = {}
         self.groups = {}
         self.fields = {}
-        self.links = {}
 
     def parse(self):
         element_type = self.xml_obj.attrib.get('type')
@@ -95,31 +123,49 @@ class Root(Mixin):
             msg = 'no @type for element node: ' + str(element_name)
             raise ValueError(msg)
         
-        xpath_str = 'xs:complexType[@name="' + element_type.split(':')[-1] + '"]'
-        node_list = self.xml_parent.xpath(xpath_str, namespaces=self.ns)
-        if len(node_list) != 1:
-            msg = 'wrong number of ' + element_type
-            msg += ' nodes found: ' + str(len(node_list))
-            raise ValueError(msg)
-        type_node = node_list[0]
+        type_node = self.get_root_named_node('complexType', 'name', self.strip_ns(element_type))
         
-        # TODO: parse xs:attribute of node_list[0]
-        xpath_str = 'xs:attribute'
-        node_list = type_node.xpath(xpath_str, namespaces=self.ns)
-        for node in node_list:
-            obj = Attribute(self, node)
-            self.attrs[obj.name] = obj
-        pass
-
-        # TODO: parse xs:sequence of node_list[0]
+        for node in type_node:
+            if node.tag.endswith('}attribute'):
+                obj = Attribute(self, node)
+                self.attrs[obj.name] = obj
+            elif node.tag.endswith('}attributeGroup'):
+                self.parse_attributeGroup(node)
+            elif node.tag.endswith('}sequence'):
+                self.parse_sequence(node)
+    
+    def parse_sequence(self, seq_node):
+        '''
+        parse the sequence used in the root element
+        '''
+        for node in seq_node:
+            if node.tag.endswith('}element'):
+                obj = Field(self, node)
+                self.fields[obj.name] = obj
+            elif node.tag.endswith('}group'):
+                obj = Group(self, node)
+                self.groups[obj.name] = obj
+    
+    def parse_attributeGroup(self, ag_node):
+        '''
+        parse the attributeGroup used in the root element
+        '''
+        # this code is written for how nxdl.xsd exists now (2016-06-07)
+        # not robust or general
+        ag_name = self.strip_ns(ag_node.attrib['ref'])
+        ag_node = self.get_root_named_node('attributeGroup', 'name', ag_name)
+        for node in ag_node:
+            if node.tag.endswith('}attribute'):
+                obj = Attribute(self, node)
+                self.attrs[obj.name] = obj
 
 
 class Attribute(Mixin): 
     '''
-    root of the nxdl.xsd file
+    nx:attribute element
     
-    :param obj xml_parent: XML object that contains ``xml_obj``
-    :param obj xml_obj: XML object
+    :param lxml.etree.Element xml_parent: XML element that contains ``xml_obj``
+    :param lxml.etree.Element xml_obj: XML element
     :param str obj_name: optional, default taken from ``xml_obj``
     :param dict ns_dict: optional, default taken from :var:`NAMESPACE_DICT`
     '''
@@ -136,6 +182,7 @@ class Attribute(Mixin):
             self.default_value = defalt.lower() in ('true', 'y', 1)
         else:
             self.default_value = xml_obj.attrib.get('default')
+
         self.allowed_values = []
         xpath_str = 'xs:simpleType/xs:restriction/xs:enumeration'
         for node in xml_obj.xpath(xpath_str, namespaces=self.ns):
@@ -143,13 +190,20 @@ class Attribute(Mixin):
             if v is not None:
                 self.allowed_values.append(v)
 
+        self.patterns = []
+        xpath_str = 'xs:simpleType/xs:restriction/xs:pattern'
+        for node in xml_obj.xpath(xpath_str, namespaces=self.ns):
+            v = node.attrib.get('value')
+            if v is not None:
+                self.patterns.append(v)
+
 
 class Group(Mixin): 
     '''
-    root of the nxdl.xsd file
+    nx:group element
     
-    :param obj xml_parent: XML object that contains ``xml_obj``
-    :param obj xml_obj: XML object
+    :param lxml.etree.Element xml_parent: XML element that contains ``xml_obj``
+    :param lxml.etree.Element xml_obj: XML element
     :param str obj_name: optional, default taken from ``xml_obj``
     :param dict ns_dict: optional, default taken from :var:`NAMESPACE_DICT`
     '''
@@ -161,13 +215,32 @@ class Group(Mixin):
         self.fields = {}
         self.links = {}
 
+        self.minOccurs = xml_obj.attrib.get('minOccurs', '0')   # TODO: check default value
+        self.maxOccurs = xml_obj.attrib.get('maxOccurs', '1')   # TODO: check default value
+        ref = xml_obj.attrib.get('ref')
+        if ref is not None:
+            self.parse_ref(ref)
+    
+    def parse_ref(self, ref):
+        '''
+        parse the global group referenced from the parent element
+        '''
+        gg_node = self.get_root_named_node('group', 'name', self.strip_ns(ref))
+        for node in gg_node:
+            if node.tag.endswith('}element'):
+                obj = Field(self, node)
+                self.fields[obj.name] = obj
+            elif node.tag.endswith('}group'):
+                obj = Group(self, node)
+                self.groups[obj.name] = obj
+
 
 class Field(Mixin): 
     '''
-    a dataset
+    nx:field element
     
-    :param obj xml_parent: XML object that contains ``xml_obj``
-    :param obj xml_obj: XML object
+    :param lxml.etree.Element xml_parent: XML element that contains ``xml_obj``
+    :param lxml.etree.Element xml_obj: XML element
     :param str obj_name: optional, default taken from ``xml_obj``
     :param dict ns_dict: optional, default taken from :var:`NAMESPACE_DICT`
     '''
@@ -175,14 +248,18 @@ class Field(Mixin):
     def __init__(self, xml_parent, xml_obj, obj_name=None, ns_dict=None):
         Mixin.__init__(self, xml_parent, xml_obj, obj_name=None, ns_dict=None)
         self.attrs = {}
+        
+        self.type = xml_obj.attrib.get('type', 'str')
+        self.minOccurs = xml_obj.attrib.get('minOccurs', '0')   # TODO: check default value
+        self.maxOccurs = xml_obj.attrib.get('maxOccurs', '1')   # TODO: check default value
 
 
 class Link(Mixin): 
     '''
     a link to another object
     
-    :param obj xml_parent: XML object that contains ``xml_obj``
-    :param obj xml_obj: XML object
+    :param lxml.etree.Element xml_parent: XML element that contains ``xml_obj``
+    :param lxml.etree.Element xml_obj: XML element
     :param str obj_name: optional, default taken from ``xml_obj``
     :param dict ns_dict: optional, default taken from :var:`NAMESPACE_DICT`
     '''

@@ -101,8 +101,16 @@ class Root(Mixin):
             msg = 'wrong number of ' + element_type
             msg += ' nodes found: ' + str(len(node_list))
             raise ValueError(msg)
+        type_node = node_list[0]
         
         # TODO: parse xs:attribute of node_list[0]
+        xpath_str = 'xs:attribute'
+        node_list = type_node.xpath(xpath_str, namespaces=self.ns)
+        for node in node_list:
+            obj = Attribute(self, node)
+            self.attrs[obj.name] = obj
+        pass
+
         # TODO: parse xs:sequence of node_list[0]
 
 
@@ -118,6 +126,22 @@ class Attribute(Mixin):
     
     def __init__(self, xml_parent, xml_obj, obj_name=None, ns_dict=None):
         Mixin.__init__(self, xml_parent, xml_obj, obj_name=None, ns_dict=None)
+
+        use = xml_obj.attrib.get('use', 'optional')
+        self.required = use in ('required', )
+
+        self.type = xml_obj.attrib.get('type', 'str')
+        defalt = xml_obj.attrib.get('default')
+        if self.type in ('nx:NX_BOOLEAN',):
+            self.default_value = defalt.lower() in ('true', 'y', 1)
+        else:
+            self.default_value = xml_obj.attrib.get('default')
+        self.allowed_values = []
+        xpath_str = 'xs:simpleType/xs:restriction/xs:enumeration'
+        for node in xml_obj.xpath(xpath_str, namespaces=self.ns):
+            v = node.attrib.get('value')
+            if v is not None:
+                self.allowed_values.append(v)
 
 
 class Group(Mixin): 

@@ -144,7 +144,14 @@ class Root(Mixin):
                 self.fields[obj.name] = obj
             elif node.tag.endswith('}group'):
                 obj = Group(self, node)
-                self.groups[obj.name] = obj
+                if obj.name is None:
+                    i = 1
+                    # FIXME: groupGroup
+                    obj_name = 'groupGroup'
+                    print 'FIXME: ', obj_name
+                else:
+                    obj_name = obj.name
+                self.groups[obj_name] = obj
     
     def parse_attributeGroup(self, ag_node):
         '''
@@ -233,6 +240,9 @@ class Group(Mixin):
             elif node.tag.endswith('}group'):
                 obj = Group(self, node)
                 self.groups[obj.name] = obj
+            elif node.tag.endswith('}sequence'):
+                # TODO: parse
+                print ref, node.tag
 
 
 class Field(Mixin): 

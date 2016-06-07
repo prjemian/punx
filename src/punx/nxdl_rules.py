@@ -16,9 +16,9 @@ Interpret the NXDL rules (nxdl.xsd) into useful Python components
 '''
 
 
-import collections
-import lxml.etree
-import os
+# import collections
+# import lxml.etree
+# import os
 
 import cache
 
@@ -42,23 +42,27 @@ class NxdlRules(object):
     
     def __init__(self):
         self.ns = NAMESPACE_DICT
-        self.qset = cache.qsettings()
-        self.nxdl_xsd = cache.get_nxdl_xsd()
+        #qset = cache.qsettings()
+        nxdl_xsd = cache.get_nxdl_xsd()
 
-        node_list = self.nxdl_xsd.xpath('xs:element', namespaces=self.ns)
+        node_list = nxdl_xsd.xpath('xs:element', namespaces=self.ns)
         if len(node_list) != 1:
             msg = 'wrong number of xs:element nodes found: ' + str(len(node_list))
             raise ValueError(msg)
 
-        self.root = Root(self.nxdl_xsd, node_list[0])
+        self.root = Root(nxdl_xsd, node_list[0])
         self.root.parse()
-        pass
-        
-        # TODO: parse xs:attribute of node_list[0]
-        # TODO: parse xs:sequence of node_list[0]
 
 
 class Mixin(object):
+    '''
+    common code for NXDL Rules classes below
+    
+    :param obj xml_parent: XML object that contains ``xml_obj``
+    :param obj xml_obj: XML object
+    :param str obj_name: optional, default taken from ``xml_obj``
+    :param dict ns_dict: optional, default taken from :var:`NAMESPACE_DICT`
+    '''
     
     def __init__(self, xml_parent, xml_obj, obj_name=None, ns_dict=None):
         self.xml_parent = xml_parent
@@ -68,9 +72,21 @@ class Mixin(object):
 
 
 class Root(Mixin):
+    '''
+    root of the nxdl.xsd file
+    
+    :param obj xml_parent: XML object that contains ``xml_obj``
+    :param obj xml_obj: XML object
+    :param str obj_name: optional, default taken from ``xml_obj``
+    :param dict ns_dict: optional, default taken from :var:`NAMESPACE_DICT`
+    '''
     
     def __init__(self, xml_parent, xml_obj, obj_name=None, ns_dict=None):
         Mixin.__init__(self, xml_parent, xml_obj, obj_name=None, ns_dict=None)
+        self.attrs = {}
+        self.groups = {}
+        self.fields = {}
+        self.links = {}
 
     def parse(self):
         element_type = self.xml_obj.attrib.get('type')
@@ -85,12 +101,72 @@ class Root(Mixin):
             msg = 'wrong number of ' + element_type
             msg += ' nodes found: ' + str(len(node_list))
             raise ValueError(msg)
+        
+        # TODO: parse xs:attribute of node_list[0]
+        # TODO: parse xs:sequence of node_list[0]
 
 
-class Attribute(Mixin): pass
-class Group(Mixin): pass
-class Field(Mixin): pass
-class Link(Mixin): pass
+class Attribute(Mixin): 
+    '''
+    root of the nxdl.xsd file
+    
+    :param obj xml_parent: XML object that contains ``xml_obj``
+    :param obj xml_obj: XML object
+    :param str obj_name: optional, default taken from ``xml_obj``
+    :param dict ns_dict: optional, default taken from :var:`NAMESPACE_DICT`
+    '''
+    
+    def __init__(self, xml_parent, xml_obj, obj_name=None, ns_dict=None):
+        Mixin.__init__(self, xml_parent, xml_obj, obj_name=None, ns_dict=None)
+
+
+class Group(Mixin): 
+    '''
+    root of the nxdl.xsd file
+    
+    :param obj xml_parent: XML object that contains ``xml_obj``
+    :param obj xml_obj: XML object
+    :param str obj_name: optional, default taken from ``xml_obj``
+    :param dict ns_dict: optional, default taken from :var:`NAMESPACE_DICT`
+    '''
+    
+    def __init__(self, xml_parent, xml_obj, obj_name=None, ns_dict=None):
+        Mixin.__init__(self, xml_parent, xml_obj, obj_name=None, ns_dict=None)
+        self.attrs = {}
+        self.groups = {}
+        self.fields = {}
+        self.links = {}
+
+
+class Field(Mixin): 
+    '''
+    a dataset
+    
+    :param obj xml_parent: XML object that contains ``xml_obj``
+    :param obj xml_obj: XML object
+    :param str obj_name: optional, default taken from ``xml_obj``
+    :param dict ns_dict: optional, default taken from :var:`NAMESPACE_DICT`
+    '''
+    
+    def __init__(self, xml_parent, xml_obj, obj_name=None, ns_dict=None):
+        Mixin.__init__(self, xml_parent, xml_obj, obj_name=None, ns_dict=None)
+        self.attrs = {}
+
+
+class Link(Mixin): 
+    '''
+    a link to another object
+    
+    :param obj xml_parent: XML object that contains ``xml_obj``
+    :param obj xml_obj: XML object
+    :param str obj_name: optional, default taken from ``xml_obj``
+    :param dict ns_dict: optional, default taken from :var:`NAMESPACE_DICT`
+    '''
+    
+    def __init__(self, xml_parent, xml_obj, obj_name=None, ns_dict=None):
+        Mixin.__init__(self, xml_parent, xml_obj, obj_name=None, ns_dict=None)
+        self.attrs = {}
+
 
 def main():
     nr = NxdlRules()

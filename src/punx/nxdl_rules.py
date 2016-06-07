@@ -24,19 +24,73 @@ import cache
 
 
 PROGRAM_NAME = 'nxdl_rules'
-
+NXDL_XML_NAMESPACE = 'http://definition.nexusformat.org/nxdl/3.1'
+XMLSCHEMA_NAMESPACE = 'http://www.w3.org/2001/XMLSchema'
+NAMESPACE_DICT = {'nx': NXDL_XML_NAMESPACE, 
+                  'xs': XMLSCHEMA_NAMESPACE}
+# xpath('nx:attribute', namespaces=ns)
+# self.ns = {'nx': NXDL_XML_NAMESPACE}
 
 class NxdlRules(object):
-    ' '
+    '''
+    Interpret the rules for the NXDL files
+    
+    These contents will be used as the defaults for each of the
+    NXDL types (attribute, group, field, link) when parsing
+    each NXDL specification.
+    '''
     
     def __init__(self):
+        self.ns = NAMESPACE_DICT
         self.qset = cache.qsettings()
         self.nxdl_xsd = cache.get_nxdl_xsd()
-        #context = self.nxdl_xsd.iterparse()
-        pass
-#         for item in self.nxdl_xsd:
-#             print item
 
+        node_list = self.nxdl_xsd.xpath('xs:element', namespaces=self.ns)
+        if len(node_list) != 1:
+            msg = 'wrong number of xs:element nodes found: ' + str(len(node_list))
+            raise ValueError(msg)
+
+        self.root = Root(self.nxdl_xsd, node_list[0])
+        self.root.parse()
+        pass
+        
+        # TODO: parse xs:attribute of node_list[0]
+        # TODO: parse xs:sequence of node_list[0]
+
+
+class Mixin(object):
+    
+    def __init__(self, xml_parent, xml_obj, obj_name=None, ns_dict=None):
+        self.xml_parent = xml_parent
+        self.name = obj_name or xml_obj.attrib.get('name')
+        self.xml_obj = xml_obj
+        self.ns = ns_dict or NAMESPACE_DICT
+
+
+class Root(Mixin):
+    
+    def __init__(self, xml_parent, xml_obj, obj_name=None, ns_dict=None):
+        Mixin.__init__(self, xml_parent, xml_obj, obj_name=None, ns_dict=None)
+
+    def parse(self):
+        element_type = self.xml_obj.attrib.get('type')
+        if element_type is None:
+            element_name = self.xml_obj.attrib.get('name')
+            msg = 'no @type for element node: ' + str(element_name)
+            raise ValueError(msg)
+        
+        xpath_str = 'xs:complexType[@name="' + element_type.split(':')[-1] + '"]'
+        node_list = self.xml_parent.xpath(xpath_str, namespaces=self.ns)
+        if len(node_list) != 1:
+            msg = 'wrong number of ' + element_type
+            msg += ' nodes found: ' + str(len(node_list))
+            raise ValueError(msg)
+
+
+class Attribute(Mixin): pass
+class Group(Mixin): pass
+class Field(Mixin): pass
+class Link(Mixin): pass
 
 def main():
     nr = NxdlRules()

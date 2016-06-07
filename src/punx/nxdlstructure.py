@@ -42,13 +42,13 @@ import lxml.etree
 import os
 
 import cache
+import nxdl_rules
 import validate
 
 
 PROGRAM_NAME = 'nxdlstructure'
 INDENTATION_UNIT = '  '
 listing_category = None
-NXDL_XML_NAMESPACE = 'http://definition.nexusformat.org/nxdl/3.1'
 
 
 def validate_NXDL(nxdl_file_name):
@@ -61,7 +61,15 @@ def validate_NXDL(nxdl_file_name):
 class NXDL_mixin(object):
     '''
     common components available to all subclasses
+    
+    :param obj node: XML object
     '''
+    
+    def __init__(self, node):
+        node_name = node.get('name')
+        if node_name is not None:
+            self.name = node.get('name')
+        self.ns = nxdl_rules.NAMESPACE_DICT
     
     def get_NX_type(self, node):
         return node.get('type', 'NX_CHAR')
@@ -72,26 +80,26 @@ class NXDL_mixin(object):
     def __str__(self):
         return '-tba-'
     
-    def get_group_data(self, node, ns, category):
+    def get_group_data(self, node, category):
         self.attrs = {}
         self.fields = {}
         self.groups = {}
         self.links = {}
 
-        for subnode in node.xpath('nx:attribute', namespaces=ns):
-            obj = NX_attribute(subnode, ns)
+        for subnode in node.xpath('nx:attribute', namespaces=self.ns):
+            obj = NX_attribute(subnode)
             self.add_object(self.attrs, obj)
 
-        for subnode in node.xpath('nx:field', namespaces=ns):
-            obj = NX_field(subnode, ns, category)
+        for subnode in node.xpath('nx:field', namespaces=self.ns):
+            obj = NX_field(subnode, category)
             self.add_object(self.fields, obj)
 
-        for subnode in node.xpath('nx:group', namespaces=ns):
-            obj = NX_group(subnode, ns, category)
+        for subnode in node.xpath('nx:group', namespaces=self.ns):
+            obj = NX_group(subnode, category)
             self.add_object(self.groups, obj)
         
-        for subnode in node.xpath('nx:link', namespaces=ns):
-            obj = NX_link(subnode, ns, category)
+        for subnode in node.xpath('nx:link', namespaces=self.ns):
+            obj = NX_link(subnode, category)
             self.add_object(self.links, obj)
     
     def add_object(self, db, obj):
@@ -119,6 +127,8 @@ class NXDL_mixin(object):
 class NXDL_specification(NXDL_mixin):
     '''
     Contains the complete structure of the NXDL specification, without documentation
+    
+    :param str nxdl_file: name of file with NXDL specification (ends with ``.nxdl.xml``)
     '''
     
     def __init__(self, nxdl_file):
@@ -152,10 +162,9 @@ class NXDL_specification(NXDL_mixin):
             t = root.get('ignoreExtraGroups', 'false')
             return t.lower() in ('true', '1', True)
         tree = lxml.etree.parse(self.nxdl_file_name)
-    
-        self.ns = {'nx': NXDL_XML_NAMESPACE}
-    
+        
         root = tree.getroot()
+        NXDL_mixin.__init__(self, root)
         self.title = root.get('name')
         
         self.ignoreExtraGroups = get_boolean('ignoreExtraGroups', False)
@@ -168,7 +177,7 @@ class NXDL_specification(NXDL_mixin):
                      'contributed': 'contributed definition',
                      }[root.attrib["category"]]
 
-        self.get_group_data(root, self.ns, self.category)
+        self.get_group_data(root, self.category)
 
     def getSubGroup_NX_class_list(self):
         '''
@@ -182,14 +191,14 @@ class NX_attribute(NXDL_mixin):
     NXDL attribute
     '''
 
-    def __init__(self, node, ns):
-        self.name = node.get('name')
+    def __init__(self, node):
+        NXDL_mixin.__init__(self, node)
         if self.name in ('restricted deprecated minOccurs'.split()):
             pass
         self.nx_type = self.get_NX_type(node)
         self.units = self.get_NX_units(node)
         self.enum = []
-        for n in node.xpath('nx:enumeration/nx:item', namespaces=ns):
+        for n in node.xpath('nx:enumeration/nx:item', namespaces=self.ns):
             self.enum.append( n.attrib['value'] )
 
     def __str__(self):
@@ -206,8 +215,8 @@ class NX_field(NXDL_mixin):
     NXDL field
     '''
 
-    def __init__(self, node, ns, category):
-        self.name = node.get('name')
+    def __init__(self, node, category):
+        NXDL_mixin.__init__(self, node)
         self.flexible_name = False
         if category in ('base class',):
             self.minOccurs = node.get('minOccurs', 0)
@@ -215,18 +224,18 @@ class NX_field(NXDL_mixin):
             self.minOccurs = node.get('minOccurs', 1)
         self.optional = self.minOccurs in ('0', 0)
         
-        self.dims = self.field_dimensions(node, ns)
+        self.dims = self.field_dimensions(node)
 
         self.nx_type = self.get_NX_type(node)
         self.units = self.get_NX_units(node)
 
         self.enum = []
-        for n in node.xpath('nx:enumeration/nx:item', namespaces=ns):
+        for n in node.xpath('nx:enumeration/nx:item', namespaces=self.ns):
             self.enum.append( n.attrib['value'] )
 
         self.attrs = {}
-        for subnode in node.xpath('nx:attribute', namespaces=ns):
-            obj = NX_attribute(subnode, ns)
+        for subnode in node.xpath('nx:attribute', namespaces=self.ns):
+            obj = NX_attribute(subnode)
             self.attrs[obj.name] = obj
 
     def __str__(self):
@@ -238,13 +247,13 @@ class NX_field(NXDL_mixin):
             s += ' = ' + ' | '.join(self.enum)
         return s
     
-    def field_dimensions( self, parent, ns ):
-        node_list = parent.xpath('nx:dimensions', namespaces=ns)
+    def field_dimensions( self, parent):
+        node_list = parent.xpath('nx:dimensions', namespaces=self.ns)
         if len(node_list) != 1:
             return []
 
         dims = {}
-        for subnode in node_list[0].xpath('nx:dim', namespaces=ns):
+        for subnode in node_list[0].xpath('nx:dim', namespaces=self.ns):
             index = int(subnode.get('index'))
             value = subnode.get('value')
             if not value:
@@ -276,8 +285,8 @@ class NX_group(NXDL_mixin):
     NXDL group
     '''
 
-    def __init__(self, node, ns, category):
-        self.name = node.get('name', '')
+    def __init__(self, node, category):
+        NXDL_mixin.__init__(self, node)
         self.NX_class = node.get('type', None)
         if self.NX_class is None:
             msg = 'group has no type, this is an error, name = ' + self.name
@@ -288,7 +297,9 @@ class NX_group(NXDL_mixin):
         else:
             self.flexible_name = False
 
-        if len(self.name) == 0:
+        try:
+            len(self.name)
+        except AttributeError:
             self.flexible_name = True
             self.name = '{' + self.NX_class[2:] + '}'
 
@@ -298,7 +309,7 @@ class NX_group(NXDL_mixin):
             minOccurs = node.get('minOccurs', 1)
         self.optional = minOccurs in ('0', 0)
         
-        self.get_group_data(node, ns, category)
+        self.get_group_data(node, category)
 
     def __str__(self):
         s = self.name
@@ -311,8 +322,8 @@ class NX_link(NXDL_mixin):
     NXDL link
     '''
 
-    def __init__(self, node, ns, category):
-        self.name = node.get('name')
+    def __init__(self, node, category):
+        NXDL_mixin.__init__(self, node)
         self.target = node.get('target')
     
     def __str__(self):

@@ -13,6 +13,8 @@
 
 '''
 Interpret the NXDL rules (nxdl.xsd & nxdlTypes.xsd) into useful Python components
+
+:see: http://download.nexusformat.org/doc/html/nxdl.html
 '''
 
 

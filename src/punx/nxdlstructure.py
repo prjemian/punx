@@ -72,15 +72,23 @@ class NXDL_mixin(object):
         self.ns = nxdl_rules.NAMESPACE_DICT
     
     def get_NX_type(self, node):
+        '''
+        '''
         return node.get('type', 'NX_CHAR')
     
     def get_NX_units(self, node):
+        '''
+        '''
         return node.get('units', '')
 
     def __str__(self):
+        '''
+        '''
         return '-tba-'
     
     def get_group_data(self, node, category):
+        '''
+        '''
         self.attrs = {}
         self.fields = {}
         self.groups = {}
@@ -103,12 +111,16 @@ class NXDL_mixin(object):
             self.add_object(self.links, obj)
     
     def add_object(self, db, obj):
+        '''
+        '''
         name = obj.name
         if name in db:
             name += '_1'
         db[name] = obj
 
     def render_group(self, group):
+        '''
+        '''
         indentation = ' '*2
         t = []
         for _k, v in sorted(group.attrs.items()):
@@ -151,6 +163,8 @@ class NXDL_specification(NXDL_mixin):
         return self.title + ' : ' + self.category
     
     def render(self):
+        '''
+        '''
         indentation = ' '*2
         t = [self.title,]
         for line in self.render_group(self).splitlines():
@@ -158,6 +172,8 @@ class NXDL_specification(NXDL_mixin):
         return '\n'.join(t)
         
     def parse_xml(self):
+        '''
+        '''
         def get_boolean(attribute, default):
             t = root.get('ignoreExtraGroups', 'false')
             return t.lower() in ('true', '1', True)
@@ -248,6 +264,8 @@ class NX_field(NXDL_mixin):
         return s
     
     def field_dimensions( self, parent):
+        '''
+        '''
         node_list = parent.xpath('nx:dimensions', namespaces=self.ns)
         if len(node_list) != 1:
             return []

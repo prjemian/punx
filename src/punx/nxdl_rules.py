@@ -99,6 +99,9 @@ class Mixin(object):
     def strip_ns(self, ref):
         '''
         strip the namespace prefix from ``ref``
+        
+        :param str ref: one word, colon delimited string, such as *nx:groupGroup*
+        :returns str: the part to the right of the last colon
         '''
         return ref.split(':')[-1]
 
@@ -121,6 +124,9 @@ class NXDL_Root(Mixin):
         self.nxdl_types = {}
 
     def parse(self):
+        '''
+        read & analyze the XML content of the root element defined by the schema
+        '''
         element_type = self.xml_obj.attrib.get('type')
         if element_type is None:
             element_name = self.xml_obj.attrib.get('name')
@@ -234,6 +240,11 @@ class NXDL_Element(Mixin):
         self.maxOccurs = xml_obj.attrib.get('maxOccurs', '1')   # TODO: check default value
     
     def parse_type_specification(self, ref):
+        '''
+        read & analyze a *type* specification referenced by *ref*
+        
+        :param str ref: name of the XML type specification, such as *groupGroup* 
+        '''
         if ref is None:
             for node in self.xml_obj:
                 if node.tag.endswith('}complexType'):

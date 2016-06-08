@@ -56,14 +56,14 @@ class Mixin(object):
     '''
     common code for NXDL Rules classes below
     
-    :param lxml.etree.Element xml_parent: XML element that contains ``xml_obj``
+    :param obj parent: object that contains ``xml_obj``
     :param lxml.etree.Element xml_obj: XML element
     :param str obj_name: optional, default taken from ``xml_obj``
     :param dict ns_dict: optional, default taken from :var:`NAMESPACE_DICT`
     '''
     
-    def __init__(self, xml_parent, xml_obj, obj_name=None, ns_dict=None):
-        self.xml_parent = xml_parent
+    def __init__(self, parent, xml_obj, obj_name=None, ns_dict=None):
+        self.parent = parent
         self.name = obj_name or xml_obj.attrib.get('name')
         self.xml_obj = xml_obj
         self.ns = ns_dict or NAMESPACE_DICT
@@ -73,13 +73,17 @@ class Mixin(object):
         return the XML root node
         '''
         if isinstance(node, Root):
-            tree = node.xml_parent
+            tree = node.parent
             return tree.getroot()
-        return self.get_root(node.xml_parent)
+        return self.get_root(node.parent)
     
     def get_root_named_node(self, tag, attribute, value):
         '''
         return a named node from the root level of the Schema
+        
+        :param str tag: XML Schema tag (such as "complexType") to match
+        :param str attribute: attribute name to match
+        :param str value: attribute value to match
         '''
         root = self.get_root(self)
         xpath_str = 'xs:' + tag
@@ -103,22 +107,25 @@ class Root(Mixin):
     '''
     root of the nxdl.xsd file
     
-    :param lxml.etree.Element xml_parent: XML element that contains ``xml_obj``
+    :param obj parent: object that contains ``xml_obj``
     :param lxml.etree.Element xml_obj: XML element
     :param str obj_name: optional, default taken from ``xml_obj``
     :param dict ns_dict: optional, default taken from :var:`NAMESPACE_DICT`
     '''
     
-    def __init__(self, xml_parent, xml_obj, obj_name=None, ns_dict=None):
-        Mixin.__init__(self, xml_parent, xml_obj, obj_name=None, ns_dict=None)
+    def __init__(self, parent, xml_obj, obj_name=None, ns_dict=None):
+        Mixin.__init__(self, parent, xml_obj, obj_name=None, ns_dict=None)
         self.attrs = {}
         self.children = {}
+        self.nxdl_elements = {}
+        self.nxdl_types = {}
 
     def parse(self):
         element_type = self.xml_obj.attrib.get('type')
         if element_type is None:
             element_name = self.xml_obj.attrib.get('name')
-            msg = 'no @type for element node: ' + str(element_name)
+            msg = 'line ' + str(self.xml_obj.sourceline)
+            msg += ': no @type for element node: ' + str(element_name)
             raise ValueError(msg)
         
         type_node = self.get_root_named_node('complexType', 'name', self.strip_ns(element_type))
@@ -138,19 +145,19 @@ class Root(Mixin):
         '''
         for node in seq_node:
             if node.tag.endswith('}element'):
-                obj = Field(self, node)
-                self.children[obj.name] = obj
+                obj = NXDL_Element(self, node)
+                self.nxdl_elements[obj.name] = obj
             elif node.tag.endswith('}group'):
-                obj = Group(self, node)
-                if obj.name is None:
-                    i = 1
-                    # FIXME: groupGroup
-                    obj_name = 'groupGroup'
-                    print 'FIXME: ', obj_name
-                else:
-                    obj_name = obj.name
-                self.children[obj_name] = obj
-    
+                ref = node.attrib.get('ref')
+                if ref in ('nx:groupGroup',):
+                    groupGroup_ref = NXDL_Type(self, ref, 'group')
+                    for k, v in groupGroup_ref.children.items():
+                        self.nxdl_elements[k] = v
+            else:
+                msg = 'line ' + str(node.sourceline)
+                msg += ': unhandled tag in ``definitionType``: ' + node.tag
+                raise ValueError(msg)
+
     def parse_attributeGroup(self, ag_node):
         '''
         parse the attributeGroup used in the root element
@@ -169,14 +176,14 @@ class Attribute(Mixin):
     '''
     nx:attribute element
     
-    :param lxml.etree.Element xml_parent: XML element that contains ``xml_obj``
+    :param obj parent: object that contains ``xml_obj``
     :param lxml.etree.Element xml_obj: XML element
     :param str obj_name: optional, default taken from ``xml_obj``
     :param dict ns_dict: optional, default taken from :var:`NAMESPACE_DICT`
     '''
     
-    def __init__(self, xml_parent, xml_obj, obj_name=None, ns_dict=None):
-        Mixin.__init__(self, xml_parent, xml_obj, obj_name=None, ns_dict=None)
+    def __init__(self, parent, xml_obj, obj_name=None, ns_dict=None):
+        Mixin.__init__(self, parent, xml_obj, obj_name=None, ns_dict=None)
 
         use = xml_obj.attrib.get('use', 'optional')
         self.required = use in ('required', )
@@ -186,7 +193,7 @@ class Attribute(Mixin):
         if self.type in ('nx:NX_BOOLEAN',):
             self.default_value = defalt.lower() in ('true', 'y', 1)
         else:
-            self.default_value = xml_obj.attrib.get('default')
+            self.default_value = defalt
 
         self.allowed_values = []
         xpath_str = 'xs:simpleType/xs:restriction/xs:enumeration'
@@ -203,77 +210,81 @@ class Attribute(Mixin):
                 self.patterns.append(v)
 
 
-class Group(Mixin): 
+class NXDL_Element(Mixin): 
     '''
-    nx:group element
+    an element
     
-    :param lxml.etree.Element xml_parent: XML element that contains ``xml_obj``
+    :param obj parent: object that contains ``xml_obj``
     :param lxml.etree.Element xml_obj: XML element
     :param str obj_name: optional, default taken from ``xml_obj``
     :param dict ns_dict: optional, default taken from :var:`NAMESPACE_DICT`
+    
+    :see: http://download.nexusformat.org/doc/html/nxdl.html
+    :see: http://download.nexusformat.org/doc/html/nxdl_desc.html#nxdl-elements
     '''
     
-    def __init__(self, xml_parent, xml_obj, obj_name=None, ns_dict=None):
-        Mixin.__init__(self, xml_parent, xml_obj, obj_name=None, ns_dict=None)
-        self.attrs = {}
+    def __init__(self, parent, xml_obj, obj_name=None, ns_dict=None):
+        Mixin.__init__(self, parent, xml_obj, obj_name=None, ns_dict=None)
         self.children = {}
-        self.links = {}
 
-        self.minOccurs = xml_obj.attrib.get('minOccurs', '0')   # TODO: check default value
-        self.maxOccurs = xml_obj.attrib.get('maxOccurs', 'unbounded')   # TODO: check default value
-        ref = xml_obj.attrib.get('ref')
-        if ref is not None:
-            self.parse_ref(ref)
-    
-    def parse_ref(self, ref):
-        '''
-        parse the global group referenced from the parent element
-        '''
-        gg_node = self.get_root_named_node('group', 'name', self.strip_ns(ref))
-        for node in gg_node:
-            if node.tag.endswith('}element'):
-                obj = Field(self, node)
-                self.children[obj.name] = obj
-            elif node.tag.endswith('}group'):
-                obj = Group(self, node)
-                self.children[obj.name] = obj
-            elif node.tag.endswith('}sequence'):
-                # TODO: parse
-                print ref, node.tag
-
-
-class Field(Mixin): 
-    '''
-    nx:field element
-    
-    :param lxml.etree.Element xml_parent: XML element that contains ``xml_obj``
-    :param lxml.etree.Element xml_obj: XML element
-    :param str obj_name: optional, default taken from ``xml_obj``
-    :param dict ns_dict: optional, default taken from :var:`NAMESPACE_DICT`
-    '''
-    
-    def __init__(self, xml_parent, xml_obj, obj_name=None, ns_dict=None):
-        Mixin.__init__(self, xml_parent, xml_obj, obj_name=None, ns_dict=None)
-        self.attrs = {}
+        self.type = xml_obj.attrib.get('type')
+        self.parse_type_specification(self.type)
         
-        self.type = xml_obj.attrib.get('type', 'str')
         self.minOccurs = xml_obj.attrib.get('minOccurs', '0')   # TODO: check default value
         self.maxOccurs = xml_obj.attrib.get('maxOccurs', '1')   # TODO: check default value
-
-
-class Link(Mixin): 
-    '''
-    a link to another object
     
-    :param lxml.etree.Element xml_parent: XML element that contains ``xml_obj``
-    :param lxml.etree.Element xml_obj: XML element
+    def parse_type_specification(self, ref):
+        if ref is None:
+            for node in self.xml_obj:
+                if node.tag.endswith('}complexType'):
+                    a = Attribute(self, node.find('xs:attribute', self.ns))
+                    self.children[a.name] = a
+        else:
+            type_obj = NXDL_Type(self, ref)
+            for k, v in type_obj.children.items():
+                self.children[k] = v
+
+
+class NXDL_Type(Mixin): 
+    '''
+    an NXDL structure complexType type (such as groupGroup)
+    
+    :param obj parent: object that contains ``xml_obj``
+    :param str ref: name of NXDL structure type (such as ``groupGroup``)
     :param str obj_name: optional, default taken from ``xml_obj``
     :param dict ns_dict: optional, default taken from :var:`NAMESPACE_DICT`
+    
+    :see: http://download.nexusformat.org/doc/html/nxdl.html
+    :see: http://download.nexusformat.org/doc/html/nxdl_desc.html#nxdl-data-types-internal
     '''
     
-    def __init__(self, xml_parent, xml_obj, obj_name=None, ns_dict=None):
-        Mixin.__init__(self, xml_parent, xml_obj, obj_name=None, ns_dict=None)
-        self.attrs = {}
+    def __init__(self, parent, ref, tag = 'complexType'):
+        # Mixin.__init__(self, parent, self.xml_obj)
+        # do the Mixin.__init__ directly here
+        self.parent = parent
+        self.ns = NAMESPACE_DICT
+
+        self.xml_obj = self.get_root_named_node(tag, 'name', self.strip_ns(ref))
+        self.name = self.xml_obj.attrib.get('name')
+        
+        self.children = {}
+
+        for node in self.xml_obj:
+            if node.tag.endswith('}sequence'):
+                for subnode in node:
+                    if subnode.tag.endswith('}element'):
+                        obj = NXDL_Element(self, subnode)
+                        self.children[obj.name] = obj
+                    elif subnode.tag.endswith('}group'):
+                        obj = NXDL_Element(self, subnode)
+                        self.children[obj.name] = obj
+                    elif subnode.tag.endswith('}any'):
+                        # do not process this one, only used for documentation
+                        pass
+                    else:
+                        msg = 'line ' + str(subnode.sourceline)
+                        msg += ': unhandled tag: ' + subnode.tag
+                        raise ValueError(msg)
 
 
 def main():

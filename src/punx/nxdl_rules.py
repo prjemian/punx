@@ -59,7 +59,7 @@ class Mixin(object):
     :param obj parent: object that contains ``xml_obj``
     :param lxml.etree.Element xml_obj: XML element
     :param str obj_name: optional, default taken from ``xml_obj``
-    :param dict ns_dict: optional, default taken from :var:`NAMESPACE_DICT`
+    :param dict ns_dict: optional, default taken from :data:`NAMESPACE_DICT`
     '''
     
     def __init__(self, parent, xml_obj, obj_name=None, ns_dict=None):
@@ -110,7 +110,7 @@ class NXDL_Root(Mixin):
     :param obj parent: object that contains ``xml_obj``
     :param lxml.etree.Element xml_obj: XML element
     :param str obj_name: optional, default taken from ``xml_obj``
-    :param dict ns_dict: optional, default taken from :var:`NAMESPACE_DICT`
+    :param dict ns_dict: optional, default taken from :data:`NAMESPACE_DICT`
     '''
     
     def __init__(self, parent, xml_obj, obj_name=None, ns_dict=None):
@@ -179,7 +179,7 @@ class Attribute(Mixin):
     :param obj parent: object that contains ``xml_obj``
     :param lxml.etree.Element xml_obj: XML element
     :param str obj_name: optional, default taken from ``xml_obj``
-    :param dict ns_dict: optional, default taken from :var:`NAMESPACE_DICT`
+    :param dict ns_dict: optional, default taken from :data:`NAMESPACE_DICT`
     '''
     
     def __init__(self, parent, xml_obj, obj_name=None, ns_dict=None):
@@ -217,7 +217,7 @@ class NXDL_Element(Mixin):
     :param obj parent: object that contains ``xml_obj``
     :param lxml.etree.Element xml_obj: XML element
     :param str obj_name: optional, default taken from ``xml_obj``
-    :param dict ns_dict: optional, default taken from :var:`NAMESPACE_DICT`
+    :param dict ns_dict: optional, default taken from :data:`NAMESPACE_DICT`
     
     :see: http://download.nexusformat.org/doc/html/nxdl.html
     :see: http://download.nexusformat.org/doc/html/nxdl_desc.html#nxdl-elements
@@ -252,7 +252,7 @@ class NXDL_Type(Mixin):
     :param obj parent: object that contains ``xml_obj``
     :param str ref: name of NXDL structure type (such as ``groupGroup``)
     :param str obj_name: optional, default taken from ``xml_obj``
-    :param dict ns_dict: optional, default taken from :var:`NAMESPACE_DICT`
+    :param dict ns_dict: optional, default taken from :data:`NAMESPACE_DICT`
     
     :see: http://download.nexusformat.org/doc/html/nxdl.html
     :see: http://download.nexusformat.org/doc/html/nxdl_desc.html#nxdl-data-types-internal

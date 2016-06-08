@@ -850,9 +850,9 @@ class Data_File_Validator(object):
         :param statuses: List (or tuple) of finding statuses to be shown.
             Several lists have been pre-defined for convenience:
 
-            :var:`finding.SHOW_ALL`        ``(OK, NOTE, WARN, ERROR, TODO, UNUSED, COMMENT)``
-            :var:`finding.SHOW_NOT_OK`     ``(ERROR, WARN)``
-            :var:`finding.SHOW_ERRORS`     ``(WARN, ERROR, TODO, UNUSED)``
+            :data:`finding.SHOW_ALL`        ``(OK, NOTE, WARN, ERROR, TODO, UNUSED, COMMENT)``
+            :data:`finding.SHOW_NOT_OK`     ``(ERROR, WARN)``
+            :data:`finding.SHOW_ERRORS`     ``(WARN, ERROR, TODO, UNUSED)``
             
             See :mod:`finding` for details.
 

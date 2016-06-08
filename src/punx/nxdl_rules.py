@@ -14,7 +14,32 @@
 '''
 Interpret the NXDL rules (nxdl.xsd & nxdlTypes.xsd) into useful Python components
 
+.. index:: NXDL
+
+:definition: NXDL : NeXus Definition Language
 :see: http://download.nexusformat.org/doc/html/nxdl.html
+
+.. rubric:: Structure type coverage
+
+These NXDL structures are parsed now by the code below:
+
+* [x] attributeType
+* [ ] basicComponent
+* [ ] definitionType
+* [ ] definitionTypeAttr
+* [ ] dimensionsType
+* [x] docType
+* [x] enumerationType
+* [x] fieldType
+* [x] groupGroup
+* [x] groupType
+* [x] linkType
+* [ ] nonNegativeUnbounded
+* [x] symbolsType
+* [ ] validItemName
+* [ ] validNXClassName
+* [ ] validTargetName
+
 '''
 
 
@@ -43,13 +68,15 @@ class NxdlRules(object):
     
     def __init__(self):
         self.ns = NAMESPACE_DICT
-        nxdl_xsd = cache.get_nxdl_xsd()
+        nxdl_xsd = cache.get_nxdl_xsd()             # NXDL structures
+        nxdlTypes_xsd = cache.get_nxdlTypes_xsd()   # types of data and units
 
         node_list = nxdl_xsd.xpath('xs:element', namespaces=self.ns)
         if len(node_list) != 1:
             msg = 'wrong number of xs:element nodes found: ' + str(len(node_list))
             raise ValueError(msg)
 
+        # TODO: parse nxdlTypes_xsd first before NXDL_Root()
         self.root = NXDL_Root(nxdl_xsd, node_list[0])
         self.root.parse()
 
@@ -69,6 +96,7 @@ class Mixin(object):
         self.name = obj_name or xml_obj.attrib.get('name')
         self.xml_obj = xml_obj
         self.ns = ns_dict or NAMESPACE_DICT
+        #print self.name
     
     def get_root(self, node):
         '''
@@ -122,8 +150,8 @@ class NXDL_Root(Mixin):
         Mixin.__init__(self, parent, xml_obj, obj_name=None, ns_dict=None)
         self.attrs = {}
         self.children = {}
-        self.nxdl_elements = {}
-        self.nxdl_types = {}
+        #self.nxdl_elements = {}
+        #self.nxdl_types = {}
 
     def parse(self):
         '''
@@ -136,6 +164,7 @@ class NXDL_Root(Mixin):
             msg += ': no @type for element node: ' + str(element_name)
             raise ValueError(msg)
         
+        # TODO: can this be parsed with NXDL_Type()?
         type_node = self.get_root_named_node('complexType', 'name', self.strip_ns(element_type))
         
         for node in type_node:
@@ -154,13 +183,13 @@ class NXDL_Root(Mixin):
         for node in seq_node:
             if node.tag.endswith('}element'):
                 obj = NXDL_Element(self, node)
-                self.nxdl_elements[obj.name] = obj
+                self.children[obj.name] = obj
             elif node.tag.endswith('}group'):
                 ref = node.attrib.get('ref')
                 if ref in ('nx:groupGroup',):
                     groupGroup_ref = NXDL_Type(self, ref, 'group')
                     for k, v in groupGroup_ref.children.items():
-                        self.nxdl_elements[k] = v
+                        self.children[k] = v
             else:
                 msg = 'line ' + str(node.sourceline)
                 msg += ': unhandled tag in ``definitionType``: ' + node.tag
@@ -247,6 +276,7 @@ class NXDL_Element(Mixin):
         
         :param str ref: name of the XML type specification, such as *groupGroup* 
         '''
+        print ref
         if ref is None:
             for node in self.xml_obj:
                 if node.tag.endswith('}complexType'):
@@ -279,6 +309,7 @@ class NXDL_Type(Mixin):
 
         self.xml_obj = self.get_root_named_node(tag, 'name', self.strip_ns(ref))
         self.name = self.xml_obj.attrib.get('name')
+        #print self.name
         
         self.children = {}
 
@@ -298,6 +329,8 @@ class NXDL_Type(Mixin):
                         msg = 'line ' + str(subnode.sourceline)
                         msg += ': unhandled tag: ' + subnode.tag
                         raise ValueError(msg)
+            elif node.tag.endswith('}extension'):
+                pass
 
 
 def main():

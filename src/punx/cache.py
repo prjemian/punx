@@ -89,6 +89,7 @@ __singleton_cache_settings_user__ = None
 __singleton_settings__ = None
 __singleton_xml_schema__ = None
 __singleton_nxdl_xsd__ = None
+__singleton_nxdlTypes_xsd__ = None
 
 
 class NoCacheDirectory(Exception): pass
@@ -284,9 +285,25 @@ def abs_NXDL_filename(file_name):
     return absolute_name
 
 
+def get_XML_Schema():
+    '''
+    parse & cache the XML Schema file (nxdl.xsd) as an **XML Schema** only once
+    
+    Uses :class:`lxml.etree.XMLSchema` and :meth:`~get_nxdl_xsd`
+    '''
+    global __singleton_xml_schema__
+
+    if __singleton_xml_schema__ is None:
+        __singleton_xml_schema__ = lxml.etree.XMLSchema(get_nxdl_xsd())
+
+    return __singleton_xml_schema__
+
+
 def get_nxdl_xsd():
     '''
     parse and cache the XML Schema file (nxdl.xsd) as an XML document only once
+    
+    Uses :meth:`lxml.etree.parse`
     '''
     global __singleton_nxdl_xsd__
 
@@ -302,16 +319,22 @@ def get_nxdl_xsd():
     return __singleton_nxdl_xsd__
 
 
-def get_XML_Schema():
+def get_nxdlTypes_xsd():
     '''
-    parse & cache the XML Schema file (nxdl.xsd) as an XML Schema only once
+    parse and cache the XML Schema file (nxdlTypes.xsd) as an XML document only once
     '''
-    global __singleton_xml_schema__
+    global __singleton_nxdlTypes_xsd__
 
-    if __singleton_xml_schema__ is None:
-        __singleton_xml_schema__ = lxml.etree.XMLSchema(get_nxdl_xsd())
+    if __singleton_nxdlTypes_xsd__ is None:
+        xsd_file_name = abs_NXDL_filename(NXDL_TYPES_SCHEMA_FILE)
 
-    return __singleton_xml_schema__
+        if not os.path.exists(xsd_file_name):
+            msg = 'Could not find XML Schema file: ' + xsd_file_name
+            raise IOError(msg)
+    
+        __singleton_nxdlTypes_xsd__ = lxml.etree.parse(xsd_file_name)
+
+    return __singleton_nxdlTypes_xsd__
 
 
 if __name__ == '__main__':

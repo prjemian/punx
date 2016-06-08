@@ -48,7 +48,7 @@ class NxdlRules(object):
             msg = 'wrong number of xs:element nodes found: ' + str(len(node_list))
             raise ValueError(msg)
 
-        self.root = Root(nxdl_xsd, node_list[0])
+        self.root = NXDL_Root(nxdl_xsd, node_list[0])
         self.root.parse()
 
 
@@ -72,7 +72,7 @@ class Mixin(object):
         '''
         return the XML root node
         '''
-        if isinstance(node, Root):
+        if isinstance(node, NXDL_Root):
             tree = node.parent
             return tree.getroot()
         return self.get_root(node.parent)
@@ -103,7 +103,7 @@ class Mixin(object):
         return ref.split(':')[-1]
 
 
-class Root(Mixin):
+class NXDL_Root(Mixin):
     '''
     root of the nxdl.xsd file
     

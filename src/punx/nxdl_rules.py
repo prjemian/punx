@@ -12,7 +12,7 @@
 #-----------------------------------------------------------------------------
 
 '''
-Interpret the NXDL rules (nxdl.xsd) into useful Python components
+Interpret the NXDL rules (nxdl.xsd & nxdlTypes.xsd) into useful Python components
 '''
 
 

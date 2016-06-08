@@ -7,7 +7,8 @@ Validation
 The process of validation compares each item in an HDF5 data file 
 and compares it with standards to check that the item is valid
 within that standard.  Each test is assigned a result, a
-class:`~punx.finding.Severity` object, with these values and meanings:
+:class:`~punx.finding.Severity` object, with values and meanings
+as shown in the table below.
 
 =======  =========  ==========================================================
 value    color      meaning
@@ -18,6 +19,7 @@ WARN     yellow     does not meet NeXus specification, not generally acceptable
 ERROR    red        violates NeXus specification
 TODO     blue       validation not implemented yet
 UNUSED   grey       optional NeXus item not used in data file
+COMMENT  grey       comment from the *punx* source code
 =======  =========  ==========================================================
 
 Items marked with the WARN *severity* status are as noted in either the

@@ -263,6 +263,7 @@ class NXDL_Element(Mixin):
     def __init__(self, parent, xml_obj, obj_name=None, ns_dict=None):
         Mixin.__init__(self, parent, xml_obj, obj_name=None, ns_dict=None)
         self.children = {}
+        self.attrs = {}
 
         self.type = xml_obj.attrib.get('type')
         self.parse_type_specification(self.type)
@@ -281,9 +282,11 @@ class NXDL_Element(Mixin):
             for node in self.xml_obj:
                 if node.tag.endswith('}complexType'):
                     a = Attribute(self, node.find('xs:attribute', self.ns))
-                    self.children[a.name] = a
+                    self.attrs[a.name] = a
         else:
             type_obj = NXDL_Type(self, ref)
+            for k, v in type_obj.attrs.items():
+                self.attrs[k] = v
             for k, v in type_obj.children.items():
                 self.children[k] = v
 
@@ -332,10 +335,8 @@ class NXDL_Type(Mixin):
 
     def parse_attribute(self, node):
         ''' '''
-        print 'TODO: attribute', node
-        _nm = node.get('name')
-        print _nm
-        pass        # TODO:
+        obj = Attribute(self, node)
+        self.attrs[obj.name] = obj
 
     def parse_attributeGroup(self, node):
         ''' '''

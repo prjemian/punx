@@ -19,7 +19,7 @@ Developers: use this code to develop and test validate.py
 import os
 # disable HDF5 library/header mismatch warning for now
 # Headers are 1.8.15, library is 1.8.16
-os.environ['HDF5_DISABLE_VERSION_CHECK'] = '2'
+# os.environ['HDF5_DISABLE_VERSION_CHECK'] = '2'
 import validate
 import finding
 

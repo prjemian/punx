@@ -175,7 +175,7 @@ class NXDL_Root(Mixin):
                 self.parse_attributeGroup(node)
             elif node.tag.endswith('}sequence'):
                 self.parse_sequence(node)
-    
+
     def parse_sequence(self, seq_node):
         '''
         parse the sequence used in the root element
@@ -276,7 +276,7 @@ class NXDL_Element(Mixin):
         
         :param str ref: name of the XML type specification, such as *groupGroup* 
         '''
-        print ref
+        # print ref
         if ref is None:
             for node in self.xml_obj:
                 if node.tag.endswith('}complexType'):
@@ -311,27 +311,63 @@ class NXDL_Type(Mixin):
         self.name = self.xml_obj.attrib.get('name')
         #print self.name
         
+        self.attrs = {}
         self.children = {}
 
         for node in self.xml_obj:
-            if node.tag.endswith('}sequence'):
-                for subnode in node:
-                    if subnode.tag.endswith('}element'):
-                        obj = NXDL_Element(self, subnode)
-                        self.children[obj.name] = obj
-                    elif subnode.tag.endswith('}group'):
-                        obj = NXDL_Element(self, subnode)
-                        self.children[obj.name] = obj
-                    elif subnode.tag.endswith('}any'):
-                        # do not process this one, only used for documentation
-                        pass
-                    else:
-                        msg = 'line ' + str(subnode.sourceline)
-                        msg += ': unhandled tag: ' + subnode.tag
-                        raise ValueError(msg)
-            elif node.tag.endswith('}extension'):
+            if node.tag.endswith('}annotation'):
                 pass
+            elif node.tag.endswith('}attribute'):
+                self.parse_attribute(node)
+            elif node.tag.endswith('}attributeGroup'):
+                self.parse_attributeGroup(node)
+            elif node.tag.endswith('}complexContent'):
+                self.parse_complexContent(node)
+            elif node.tag.endswith('}group'):
+                self.parse_group(node)
+            elif node.tag.endswith('}sequence'):
+                self.parse_sequence(node)
+            else:
+                print '2', node.tag, ref
 
+    def parse_attribute(self, node):
+        ''' '''
+        print 'TODO: attribute', node
+        _nm = node.get('name')
+        print _nm
+        pass        # TODO:
+
+    def parse_attributeGroup(self, node):
+        ''' '''
+        #print 'TODO: attributeGroup', node
+        pass        # TODO:
+
+    def parse_complexContent(self, node):
+        ''' '''
+        #print 'TODO: complexContent', node
+        pass        # TODO:
+
+    def parse_group(self, node):
+        ''' '''
+        #print 'TODO: group', node
+        pass        # TODO:
+
+    def parse_sequence(self, node):
+        ''' '''
+        for subnode in node:
+            if subnode.tag.endswith('}element'):
+                obj = NXDL_Element(self, subnode)
+                self.children[obj.name] = obj
+            elif subnode.tag.endswith('}group'):
+                obj = NXDL_Element(self, subnode)
+                self.children[obj.name] = obj
+            elif subnode.tag.endswith('}any'):
+                # do not process this one, only used for documentation
+                pass
+            else:
+                msg = 'line ' + str(subnode.sourceline)
+                msg += ': unhandled tag: ' + subnode.tag
+                raise ValueError(msg)
 
 def main():
     nr = NxdlRules()

@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+from spyderlib.widgets.externalshell import namespacebrowser
 
 #-----------------------------------------------------------------------------
 # :author:    Pete R. Jemian
@@ -70,14 +71,62 @@ class NxdlRules(object):
     def __init__(self):
         self.ns = NAMESPACE_DICT
         nxdl_xsd = cache.get_nxdl_xsd()             # NXDL structures
-        nxdlTypes_xsd = cache.get_nxdlTypes_xsd()   # types of data and units
 
         node_list = nxdl_xsd.xpath('xs:element', namespaces=self.ns)
         if len(node_list) != 1:
             self.raise_error(nxdl_xsd, 'wrong number of xs:element nodes found: ', len(node_list))
 
-        # TODO: parse nxdlTypes_xsd first before NXDL_Root()
+        self.types = self.parse_nxdlTypes()
         self.root = NXDL_Root(node_list[0])
+    
+    def parse_nxdlTypes(self):
+        db = {}
+        nxdlTypes_xsd = cache.get_nxdlTypes_xsd()   # types of data and units
+        for node in nxdlTypes_xsd.getroot():
+            if isinstance(node, lxml.etree._Comment):
+                pass
+            elif node.tag.endswith('}annotation'):
+                pass
+            else:
+                obj = NXDL_nxdlType(node)
+                db[obj.name] = obj
+        return db
+
+
+class NXDL_nxdlType(object):
+    '''
+    one of the types defined in the file *nxdlTypes.xsd*
+    '''
+    
+    def __init__(self, xml_obj):
+        self.name = xml_obj.attrib.get('name')
+        self.restriction = None
+        self.union = None
+        self.values = None
+        
+        for node in xml_obj:
+            if isinstance(node, lxml.etree._Comment):
+                pass
+            elif node.tag.endswith('}annotation'):
+                pass
+            elif node.tag.endswith('}list'):
+                self.values = map(self.strip_ns, [node.attrib['itemType'],])
+            elif node.tag.endswith('}restriction'):
+                self.restriction = node.attrib['base']
+                # TODO: get the enumeration values
+            elif node.tag.endswith('}union'):
+                self.union = map(self.strip_ns, node.attrib['memberTypes'].split())
+            else:
+                print node.tag
+
+    def strip_ns(self, ref):
+        '''
+        strip the namespace prefix from ``ref``
+        
+        :param str ref: one word, colon delimited string, such as *nx:groupGroup*
+        :returns str: the part to the right of the last colon
+        '''
+        return ref.split(':')[-1]
 
 
 class Mixin(object):

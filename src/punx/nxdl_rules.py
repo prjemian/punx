@@ -188,9 +188,7 @@ class Mixin(object):
         self.attrs[obj.name] = obj
 
     def parse_attributeGroup(self, node):
-        '''
-        parse an attributeGroup 
-        '''
+        ''' '''
         obj = NXDL_Type(node.attrib.get('ref'))
         obj.copy_to(self)
 

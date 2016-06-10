@@ -44,7 +44,7 @@ These NXDL structures are parsed now by the code below:
 
 
 # import collections
-# import lxml.etree
+import lxml.etree
 # import os
 
 import cache
@@ -73,8 +73,7 @@ class NxdlRules(object):
 
         node_list = nxdl_xsd.xpath('xs:element', namespaces=self.ns)
         if len(node_list) != 1:
-            msg = 'wrong number of xs:element nodes found: ' + str(len(node_list))
-            raise ValueError(msg)
+            self.raise_error(nxdl_xsd, 'wrong number of xs:element nodes found: ', len(node_list))
 
         # TODO: parse nxdlTypes_xsd first before NXDL_Root()
         self.root = NXDL_Root(nxdl_xsd, node_list[0])
@@ -98,6 +97,11 @@ class Mixin(object):
         self.ns = ns_dict or NAMESPACE_DICT
         #print self.name
     
+    def raise_error(self, node, text, obj):
+        msg = 'line ' + str(node.sourceline)
+        msg += ': ' + text + str(obj)
+        raise ValueError(msg)
+
     def get_root(self, node):
         '''
         return the XML root node
@@ -160,12 +164,10 @@ class NXDL_Root(Mixin):
         element_type = self.xml_obj.attrib.get('type')
         if element_type is None:
             element_name = self.xml_obj.attrib.get('name')
-            msg = 'line ' + str(self.xml_obj.sourceline)
-            msg += ': no @type for element node: ' + str(element_name)
-            raise ValueError(msg)
+            self.raise_error(self.xml_obj, 'no @type for element node: ', element_name)
         
-        # TODO: can this be parsed with NXDL_Type()?
-        type_node = self.get_root_named_node('complexType', 'name', self.strip_ns(element_type))
+        ref = self.strip_ns(element_type)
+        type_node = self.get_root_named_node('complexType', 'name', ref)
         
         for node in type_node:
             if node.tag.endswith('}attribute'):
@@ -191,9 +193,7 @@ class NXDL_Root(Mixin):
                     for k, v in groupGroup_ref.children.items():
                         self.children[k] = v
             else:
-                msg = 'line ' + str(node.sourceline)
-                msg += ': unhandled tag in ``definitionType``: ' + node.tag
-                raise ValueError(msg)
+                self.raise_error(node, 'unhandled tag in ``definitionType``: ', node.tag)
 
     def parse_attributeGroup(self, ag_node):
         '''
@@ -265,19 +265,18 @@ class NXDL_Element(Mixin):
         self.children = {}
         self.attrs = {}
 
-        self.type = xml_obj.attrib.get('type')
-        self.parse_type_specification(self.type)
-        
-        self.minOccurs = xml_obj.attrib.get('minOccurs', '0')   # TODO: check default value
-        self.maxOccurs = xml_obj.attrib.get('maxOccurs', '1')   # TODO: check default value
-    
-    def parse_type_specification(self, ref):
-        '''
-        read & analyze a *type* specification referenced by *ref*
-        
-        :param str ref: name of the XML type specification, such as *groupGroup* 
-        '''
-        # print ref
+        ref = self.type = xml_obj.attrib.get('type')
+        # read & analyze a *type* specification referenced by *ref*
+
+#         self.parse_type_specification(self.type)
+#     
+#     def parse_type_specification(self, ref):
+#         '''
+#         read & analyze a *type* specification referenced by *ref*
+#         
+#         :param str ref: name of the XML type specification, such as *groupGroup* 
+#         '''
+#         # print ref
         if ref is None:
             for node in self.xml_obj:
                 if node.tag.endswith('}complexType'):
@@ -285,10 +284,7 @@ class NXDL_Element(Mixin):
                     self.attrs[a.name] = a
         else:
             type_obj = NXDL_Type(self, ref)
-            for k, v in type_obj.attrs.items():
-                self.attrs[k] = v
-            for k, v in type_obj.children.items():
-                self.children[k] = v
+            type_obj.copy_to_parent(self)
 
 
 class NXDL_Type(Mixin): 
@@ -318,7 +314,9 @@ class NXDL_Type(Mixin):
         self.children = {}
 
         for node in self.xml_obj:
-            if node.tag.endswith('}annotation'):
+            if isinstance(node, lxml.etree._Comment):
+                pass
+            elif node.tag.endswith('}annotation'):
                 pass
             elif node.tag.endswith('}attribute'):
                 self.parse_attribute(node)
@@ -331,7 +329,18 @@ class NXDL_Type(Mixin):
             elif node.tag.endswith('}sequence'):
                 self.parse_sequence(node)
             else:
-                print '2', node.tag, ref
+                self.raise_error(node, 'unexpected tag=', node.tag)
+    
+    def copy_to_parent(self, parent):
+        '''
+        copy results into parent object
+        
+        :param obj parent: instance of Mixin, such as NXDL_Element
+        '''
+        for k, v in self.attrs.items():
+            parent.attrs[k] = v
+        for k, v in self.children.items():
+            parent.children[k] = v
 
     def parse_attribute(self, node):
         ''' '''
@@ -345,6 +354,27 @@ class NXDL_Type(Mixin):
 
     def parse_complexContent(self, node):
         ''' '''
+        for subnode in node:
+            if subnode.tag.endswith('}extension'):
+                ref = subnode.attrib.get('base')
+                if ref not in ('nx:basicComponent'):
+                    self.raise_error(subnode, 'unexpected base=', ref)
+                obj = NXDL_Type(self, ref)
+                obj.copy_to_parent(self)
+
+                # parse children of extension node
+                for obj_node in subnode:
+                    if obj_node.tag.endswith('}annotation'):
+                        pass
+                    elif obj_node.tag.endswith('}attribute'):
+                        self.parse_attribute(obj_node)
+                    elif obj_node.tag.endswith('}sequence'):
+                        self.parse_sequence(obj_node)
+                    else:
+                        self.raise_error(obj_node, 'unexpected base=', obj_node.tag)
+
+            else:
+                self.raise_error(subnode, 'unexpected tag=', subnode.tag)
         #print 'TODO: complexContent', node
         pass        # TODO:
 
@@ -366,13 +396,11 @@ class NXDL_Type(Mixin):
                 # do not process this one, only used for documentation
                 pass
             else:
-                msg = 'line ' + str(subnode.sourceline)
-                msg += ': unhandled tag: ' + subnode.tag
-                raise ValueError(msg)
+                self.raise_error(subnode, 'unexpected tag=', subnode.tag)
 
 def main():
-    nr = NxdlRules()
-    print nr
+    rules = NxdlRules()
+    print rules
 
 
 if __name__ == '__main__':

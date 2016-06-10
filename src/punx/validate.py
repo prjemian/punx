@@ -871,7 +871,6 @@ class Data_File_Validator(object):
         make a summary table of the validation findings (count how many of each status)
         '''
         import pyRestTable
-        # TODO: also show the description of each status in the table
 
         # count each category
         summary = collections.OrderedDict()

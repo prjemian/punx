@@ -69,13 +69,12 @@ PICKLE_FILE                     = 'nxdl.p'
 NXDL_CACHE_SUBDIR = GITHUB_NXDL_REPOSITORY + '-' + GITHUB_NXDL_BRANCH
 
 
-if False:   # False while in development phase
-    import os
-    on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
-    from ._version import get_versions
-    __version__ = get_versions()['version']
-    del get_versions
-    if on_rtd:
-        # special handling for readthedocs.org, remove distracting info
-        __version__ = __version__.split('+')[0]
-    __release__   = __version__
+import os
+on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
+from ._version import get_versions
+__version__ = get_versions()['version']
+del get_versions
+if on_rtd:
+    # special handling for readthedocs.org, remove distracting info
+    __version__ = __version__.split('+')[0]
+__release__   = __version__

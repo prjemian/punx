@@ -17,6 +17,12 @@ manage the settings file for this application
 import datetime
 import os
 
+on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
+if on_rtd:
+    from mock_PyQt4 import QtCore
+else:
+    from PyQt4 import QtCore
+
 import __init__
 
 
@@ -71,7 +77,9 @@ class QSettingsMixin(object):
             group = __init__.GLOBAL_INI_GROUP
         key = group + '/' + k
         v = self.value(key)
-        return str(v)
+        if isinstance(v, QtCore.QVariant):
+            v = v.toPyObject()
+        return v
     
     def setKey(self, key, value):
         '''

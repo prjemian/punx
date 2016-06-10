@@ -289,18 +289,17 @@ class NXDL_Element(Mixin):
 
 class NXDL_Type(Mixin): 
     '''
-    an NXDL structure complexType type (such as groupGroup)
+    a named NXDL structure type (such as groupGroup)
     
     :param obj parent: object that contains ``xml_obj``
     :param str ref: name of NXDL structure type (such as ``groupGroup``)
-    :param str obj_name: optional, default taken from ``xml_obj``
-    :param dict ns_dict: optional, default taken from :data:`NAMESPACE_DICT`
+    :param str tag: XML Schema element tag, such as complexType (default=``*``)
     
     :see: http://download.nexusformat.org/doc/html/nxdl.html
     :see: http://download.nexusformat.org/doc/html/nxdl_desc.html#nxdl-data-types-internal
     '''
     
-    def __init__(self, parent, ref, tag = 'complexType'):
+    def __init__(self, parent, ref, tag = '*'):
         # Mixin.__init__(self, parent, self.xml_obj)
         # do the Mixin.__init__ directly here
         self.parent = parent
@@ -349,8 +348,9 @@ class NXDL_Type(Mixin):
 
     def parse_attributeGroup(self, node):
         ''' '''
-        #print 'TODO: attributeGroup', node
-        pass        # TODO:
+        ref = node.attrib.get('ref')
+        obj = NXDL_Type(self, ref)
+        obj.copy_to_parent(self)
 
     def parse_complexContent(self, node):
         ''' '''

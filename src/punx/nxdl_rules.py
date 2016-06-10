@@ -40,7 +40,6 @@ These NXDL structures are parsed now by the code below:
 * [x] validItemName
 * [x] validNXClassName
 * [x] validTargetName
-
 '''
 
 
@@ -86,8 +85,8 @@ class NxdlRules(object):
         if len(node_list) != 1:
             self.raise_error(nxdl_xsd, 'wrong number of xs:element nodes found: ', len(node_list))
 
-        self.types = self.parse_nxdlTypes()
-        self.root = NXDL_Root(node_list[0])
+        self.nxdlTypes = self.parse_nxdlTypes()
+        self.nxdl = NXDL_Root(node_list[0])
     
     def parse_nxdlTypes(self):
         db = {}
@@ -122,8 +121,13 @@ class NXDL_nxdlType(object):
             elif node.tag.endswith('}list'):
                 self.values = map(strip_ns, [node.attrib['itemType'],])
             elif node.tag.endswith('}restriction'):
-                self.restriction = node.attrib['base']
-                # TODO: get the enumeration values
+                self.restriction = strip_ns(node.attrib['base'])
+                self.values = []
+                for subnode in node:
+                    if isinstance(node, lxml.etree._Comment):
+                        pass
+                    elif subnode.tag.endswith('}enumeration'):
+                        self.values.append(subnode.attrib['value'])
             elif node.tag.endswith('}union'):
                 self.union = map(strip_ns, node.attrib['memberTypes'].split())
             else:

@@ -24,28 +24,26 @@ Interpret the NXDL rules (nxdl.xsd & nxdlTypes.xsd) into useful Python component
 These NXDL structures are parsed now by the code below:
 
 * [x] attributeType
-* [ ] basicComponent
-* [ ] definitionType
-* [ ] definitionTypeAttr
-* [ ] dimensionsType
+* [x] basicComponent
+* [x] definitionType
+* [x] definitionTypeAttr
+* [x] dimensionsType
 * [x] docType
 * [x] enumerationType
 * [x] fieldType
 * [x] groupGroup
 * [x] groupType
 * [x] linkType
-* [ ] nonNegativeUnbounded
+* [x] nonNegativeUnbounded
 * [x] symbolsType
-* [ ] validItemName
-* [ ] validNXClassName
-* [ ] validTargetName
+* [x] validItemName
+* [x] validNXClassName
+* [x] validTargetName
 
 '''
 
 
-# import collections
 import lxml.etree
-# import os
 
 import cache
 
@@ -55,6 +53,9 @@ NXDL_XML_NAMESPACE = 'http://definition.nexusformat.org/nxdl/3.1'
 XMLSCHEMA_NAMESPACE = 'http://www.w3.org/2001/XMLSchema'
 NAMESPACE_DICT = {'nx': NXDL_XML_NAMESPACE, 
                   'xs': XMLSCHEMA_NAMESPACE}
+
+
+__group_parsing_started__ = False   # avoid a known recursion of group in a group
 
 
 class NxdlRules(object):
@@ -137,7 +138,7 @@ class NXDL_Root(Mixin):
     '''
     
     def __init__(self, xml_obj, obj_name=None, ns_dict=None):
-        Mixin.__init__(self, xml_obj, obj_name=None, ns_dict=None)
+        Mixin.__init__(self, xml_obj, obj_name=obj_name, ns_dict=ns_dict)
         self.attrs = {}
         self.children = {}
 
@@ -196,7 +197,7 @@ class Attribute(Mixin):
     '''
     
     def __init__(self, xml_obj, obj_name=None, ns_dict=None):
-        Mixin.__init__(self, xml_obj, obj_name=None, ns_dict=None)
+        Mixin.__init__(self, xml_obj, obj_name=obj_name, ns_dict=ns_dict)
 
         use = xml_obj.attrib.get('use', 'optional')
         self.required = use in ('required', )
@@ -236,7 +237,8 @@ class NXDL_Element(Mixin):
     '''
     
     def __init__(self, xml_obj, obj_name=None, ns_dict=None):
-        Mixin.__init__(self, xml_obj, obj_name=None, ns_dict=None)
+        global __group_parsing_started__
+        Mixin.__init__(self, xml_obj, obj_name=obj_name, ns_dict=ns_dict)
         self.children = {}
         self.attrs = {}
 
@@ -248,8 +250,18 @@ class NXDL_Element(Mixin):
                     a = Attribute(node.find('xs:attribute', self.ns))
                     self.attrs[a.name] = a
         else:
-            type_obj = NXDL_Type(ref)
-            type_obj.copy_to(self)
+            # avoid known infinite recursion: group may contain group(s)
+            ok_to_parse = True
+            if xml_obj.attrib['name'] == 'group' and xml_obj.attrib['type'] == 'nx:groupType':
+                if __group_parsing_started__:
+                    ok_to_parse = False
+                    # needs a special code to apply this rule
+                    #     isinstance(obj, Recursion)
+                    self.children['group'] = Recursion('group')
+                __group_parsing_started__ = True
+            if ok_to_parse:
+                type_obj = NXDL_Type(ref)
+                type_obj.copy_to(self)
 
 
 class NXDL_Type(Mixin): 
@@ -339,9 +351,8 @@ class NXDL_Type(Mixin):
 
     def parse_group(self, node):
         ''' '''
-        pass        # TODO:
-        # obj = NXDL_Type(node.attrib.get('ref'))        # FIXME: infinite recursion
-        # obj.copy_to(self)
+        obj = NXDL_Type(node.attrib.get('ref'))
+        obj.copy_to(self)
 
     def parse_sequence(self, node):
         ''' '''
@@ -357,6 +368,18 @@ class NXDL_Type(Mixin):
                 pass
             else:
                 self.raise_error(subnode, 'unexpected tag=', subnode.tag)
+
+
+class Recursion(Mixin): 
+    '''
+    an element used in recursion, such as child group of group
+    
+    :param str obj_name: optional, default taken from ``xml_obj``
+    '''
+    
+    def __init__(self, obj_name):
+        Mixin.__init__(self, None, obj_name=obj_name, ns_dict=None)
+
 
 def main():
     rules = NxdlRules()

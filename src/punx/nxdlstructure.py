@@ -50,6 +50,20 @@ PROGRAM_NAME = 'nxdlstructure'
 INDENTATION_UNIT = '  '
 listing_category = None
 
+__singleton_nxdl_rules__ = None
+
+
+def get_nxdl_rules():
+    '''
+    parse and cache the XML Schema file (nxdlTypes.xsd) as an XML document only once
+    '''
+    global __singleton_nxdl_rules__
+
+    if __singleton_nxdl_rules__ is None:
+        __singleton_nxdl_rules__ = nxdl_rules.NxdlRules()
+
+    return __singleton_nxdl_rules__
+
 
 def validate_NXDL(nxdl_file_name):
     '''
@@ -354,18 +368,14 @@ def get_NXDL_specifications():
     '''
     qset = cache.qsettings()
 
-#     if not getting_nxdl:
-#         # infinite loop avoided
-#         getting_nxdl = True
-#         cache.update_NXDL_Cache()
-#     getting_nxdl = False
-
     pfile = qset.getKey('pickle_file')
     if pfile is not None and os.path.exists(pfile):
         # hope that we can read a cached version of nxdl_dict
         nxdl_dict = cache.read_pickle_file(pfile, qset.getKey('git_sha'))
         if nxdl_dict is not None:      # declare victory!
             return nxdl_dict
+    
+    rules = get_nxdl_rules()
     
     # build the nxdl_dict by parsing all the NXDL specifications
     basedir = qset.nxdl_dir()
@@ -387,6 +397,7 @@ def get_NXDL_specifications():
         # k = os.path.basename(nxdl_file_name)
         obj = NXDL_specification(nxdl_file_name)
         nxdl_dict[obj.title] = obj
+    nxdl_dict['rules'] = rules
 
     return nxdl_dict
 

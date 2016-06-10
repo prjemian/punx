@@ -78,7 +78,6 @@ USE_SOURCE_CACHE = os.path.exists(os.path.join(PKG_DIR, SOURCE_CACHE_KEY_FILE))
 NXDL_SCHEMA_FILE = 'nxdl.xsd'
 NXDL_TYPES_SCHEMA_FILE = 'nxdlTypes.xsd'
 
-# TODO: get these from nxdl.xsd?  they are well-known anyway
 NXDL_NAMESPACE = 'http://definition.nexusformat.org/nxdl/3.1'
 XSD_NAMESPACE = 'http://www.w3.org/2001/XMLSchema'
 NX_DICT = dict(xs=XSD_NAMESPACE, nx=NXDL_NAMESPACE)

@@ -77,7 +77,6 @@ class NxdlRules(object):
 
         # TODO: parse nxdlTypes_xsd first before NXDL_Root()
         self.root = NXDL_Root(node_list[0])
-        self.root.parse()
 
 
 class Mixin(object):
@@ -91,7 +90,6 @@ class Mixin(object):
     
     def __init__(self, xml_obj, obj_name=None, ns_dict=None):
         self.name = obj_name or xml_obj.attrib.get('name')
-        self.xml_obj = xml_obj
         self.ns = ns_dict or NAMESPACE_DICT
         #print self.name
     
@@ -100,9 +98,9 @@ class Mixin(object):
         msg += ': ' + text + str(obj)
         raise ValueError(msg)
     
-    def get_root_named_node(self, tag, attribute, value):
+    def get_named_node(self, tag, attribute, value):
         '''
-        return a named node from the root level of the Schema
+        return a named node from the XML Schema
         
         :param str tag: XML Schema tag (such as "complexType") to match
         :param str attribute: attribute name to match
@@ -142,20 +140,14 @@ class NXDL_Root(Mixin):
         Mixin.__init__(self, xml_obj, obj_name=None, ns_dict=None)
         self.attrs = {}
         self.children = {}
-        #self.nxdl_elements = {}
-        #self.nxdl_types = {}
 
-    def parse(self):
-        '''
-        read & analyze the XML content of the root element defined by the schema
-        '''
-        element_type = self.xml_obj.attrib.get('type')
+        element_type = xml_obj.attrib.get('type')
         if element_type is None:
-            element_name = self.xml_obj.attrib.get('name')
-            self.raise_error(self.xml_obj, 'no @type for element node: ', element_name)
+            element_name = xml_obj.attrib.get('name')
+            self.raise_error(xml_obj, 'no @type for element node: ', element_name)
         
         ref = self.strip_ns(element_type)
-        type_node = self.get_root_named_node('complexType', 'name', ref)
+        type_node = self.get_named_node('complexType', 'name', ref)
         
         for node in type_node:
             if node.tag.endswith('}attribute'):
@@ -187,7 +179,7 @@ class NXDL_Root(Mixin):
         # this code is written for how nxdl.xsd exists now (2016-06-07)
         # not robust or general
         ag_name = self.strip_ns(ag_node.attrib['ref'])
-        ag_node = self.get_root_named_node('attributeGroup', 'name', ag_name)
+        ag_node = self.get_named_node('attributeGroup', 'name', ag_name)
         for node in ag_node:
             if node.tag.endswith('}attribute'):
                 obj = Attribute(node)
@@ -251,7 +243,7 @@ class NXDL_Element(Mixin):
         # read & analyze theNXDL structural *type* referenced by *ref*
         ref = self.type = xml_obj.attrib.get('type')
         if ref is None:
-            for node in self.xml_obj:
+            for node in xml_obj:
                 if node.tag.endswith('}complexType'):
                     a = Attribute(node.find('xs:attribute', self.ns))
                     self.attrs[a.name] = a
@@ -272,17 +264,17 @@ class NXDL_Type(Mixin):
     '''
     
     def __init__(self, ref, tag = '*'):
-        # Mixin.__init__(self, self.xml_obj)
+        # Mixin.__init__(self, xml_obj)
         # do the Mixin.__init__ directly here
         self.ns = NAMESPACE_DICT
 
-        self.xml_obj = self.get_root_named_node(tag, 'name', self.strip_ns(ref))
-        self.name = self.xml_obj.attrib.get('name')
+        xml_obj = self.get_named_node(tag, 'name', self.strip_ns(ref))
+        self.name = xml_obj.attrib.get('name')
         
         self.attrs = {}
         self.children = {}
 
-        for node in self.xml_obj:
+        for node in xml_obj:
             if isinstance(node, lxml.etree._Comment):
                 pass
             elif node.tag.endswith('}annotation'):

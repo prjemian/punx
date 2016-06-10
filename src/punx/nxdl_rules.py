@@ -130,7 +130,7 @@ class NXDL_nxdlType(object):
             elif node.tag.endswith('}union'):
                 self.union = map(strip_ns, node.attrib['memberTypes'].split())
             else:
-                print node.tag
+                self.raise_error(node, 'unhandled tag=', node.tag)
 
 
 class Mixin(object):
@@ -145,9 +145,9 @@ class Mixin(object):
     def __init__(self, xml_obj, obj_name=None, ns_dict=None):
         self.name = obj_name or xml_obj.attrib.get('name')
         self.ns = ns_dict or NAMESPACE_DICT
-        #print self.name
     
     def raise_error(self, node, text, obj):
+        '''standard *ValueError* exception handling'''
         msg = 'line ' + str(node.sourceline)
         msg += ': ' + text + str(obj)
         raise ValueError(msg)
@@ -170,6 +170,58 @@ class Mixin(object):
             msg += ' nodes found: ' + str(len(node_list))
             raise ValueError(msg)
         return node_list[0]
+    
+    def copy_to(self, target):
+        '''
+        copy results into target object
+        
+        :param obj target: instance of Mixin, such as NXDL_Element
+        '''
+        for k, v in self.attrs.items():
+            target.attrs[k] = v
+        for k, v in self.children.items():
+            target.children[k] = v
+
+    def parse_attribute(self, node):
+        ''' '''
+        obj = Attribute(node)
+        self.attrs[obj.name] = obj
+
+    def parse_attributeGroup(self, node):
+        '''
+        parse an attributeGroup 
+        '''
+        obj = NXDL_Type(node.attrib.get('ref'))
+        obj.copy_to(self)
+
+    def parse_complexContent(self, node):
+        ''' '''
+        for subnode in node:
+            if subnode.tag.endswith('}extension'):
+                ref = subnode.attrib.get('base')
+                if ref not in ('nx:basicComponent'):
+                    self.raise_error(subnode, 'unexpected base=', ref)
+                obj = NXDL_Type(ref)
+                obj.copy_to(self)
+
+                # parse children of extension node
+                for obj_node in subnode:
+                    if obj_node.tag.endswith('}annotation'):
+                        pass
+                    elif obj_node.tag.endswith('}attribute'):
+                        self.parse_attribute(obj_node)
+                    elif obj_node.tag.endswith('}sequence'):
+                        self.parse_sequence(obj_node)
+                    else:
+                        self.raise_error(obj_node, 'unexpected base=', obj_node.tag)
+
+            else:
+                self.raise_error(subnode, 'unexpected tag=', subnode.tag)
+
+    def parse_group(self, node):
+        ''' '''
+        obj = NXDL_Type(node.attrib.get('ref'))
+        obj.copy_to(self)
 
 
 class NXDL_Root(Mixin):
@@ -202,6 +254,10 @@ class NXDL_Root(Mixin):
                 self.parse_attributeGroup(node)
             elif node.tag.endswith('}sequence'):
                 self.parse_sequence(node)
+            elif node.tag.endswith('}annotation'):
+                pass
+            else:
+                self.raise_error(node, 'unhandled tag=', node.tag)
 
     def parse_sequence(self, seq_node):
         '''
@@ -215,20 +271,8 @@ class NXDL_Root(Mixin):
                 obj = NXDL_Type(node.attrib.get('ref'))
                 obj.copy_to(self)
             else:
-                self.raise_error(node, 'unhandled tag in ``definitionType``: ', node.tag)
-
-    def parse_attributeGroup(self, ag_node):
-        '''
-        parse the attributeGroup used in the root element
-        '''
-        # this code is written for how nxdl.xsd exists now (2016-06-07)
-        # not robust or general
-        ag_name = strip_ns(ag_node.attrib['ref'])
-        ag_node = self.get_named_node('attributeGroup', 'name', ag_name)
-        for node in ag_node:
-            if node.tag.endswith('}attribute'):
-                obj = Attribute(node)
-                self.attrs[obj.name] = obj
+                msg = 'unhandled tag in ``definitionType``: '
+                self.raise_error(node, msg, node.tag)
 
 
 class Attribute(Mixin): 
@@ -293,6 +337,10 @@ class NXDL_Element(Mixin):
                 if node.tag.endswith('}complexType'):
                     a = Attribute(node.find('xs:attribute', self.ns))
                     self.attrs[a.name] = a
+                elif node.tag.endswith('}annotation'):
+                    pass
+                else:
+                    self.raise_error(node, 'unhandled tag=', node.tag)
         else:
             # avoid known infinite recursion: group may contain group(s)
             ok_to_parse = True
@@ -347,56 +395,6 @@ class NXDL_Type(Mixin):
                 self.parse_sequence(node)
             else:
                 self.raise_error(node, 'unexpected tag=', node.tag)
-    
-    def copy_to(self, target):
-        '''
-        copy results into target object
-        
-        :param obj target: instance of Mixin, such as NXDL_Element
-        '''
-        for k, v in self.attrs.items():
-            target.attrs[k] = v
-        for k, v in self.children.items():
-            target.children[k] = v
-
-    def parse_attribute(self, node):
-        ''' '''
-        obj = Attribute(node)
-        self.attrs[obj.name] = obj
-
-    def parse_attributeGroup(self, node):
-        ''' '''
-        obj = NXDL_Type(node.attrib.get('ref'))
-        obj.copy_to(self)
-
-    def parse_complexContent(self, node):
-        ''' '''
-        for subnode in node:
-            if subnode.tag.endswith('}extension'):
-                ref = subnode.attrib.get('base')
-                if ref not in ('nx:basicComponent'):
-                    self.raise_error(subnode, 'unexpected base=', ref)
-                obj = NXDL_Type(ref)
-                obj.copy_to(self)
-
-                # parse children of extension node
-                for obj_node in subnode:
-                    if obj_node.tag.endswith('}annotation'):
-                        pass
-                    elif obj_node.tag.endswith('}attribute'):
-                        self.parse_attribute(obj_node)
-                    elif obj_node.tag.endswith('}sequence'):
-                        self.parse_sequence(obj_node)
-                    else:
-                        self.raise_error(obj_node, 'unexpected base=', obj_node.tag)
-
-            else:
-                self.raise_error(subnode, 'unexpected tag=', subnode.tag)
-
-    def parse_group(self, node):
-        ''' '''
-        obj = NXDL_Type(node.attrib.get('ref'))
-        obj.copy_to(self)
 
     def parse_sequence(self, node):
         ''' '''

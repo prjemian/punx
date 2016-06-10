@@ -59,6 +59,16 @@ NAMESPACE_DICT = {'nx': NXDL_XML_NAMESPACE,
 __group_parsing_started__ = False   # avoid a known recursion of group in a group
 
 
+def strip_ns(ref):
+    '''
+    strip the namespace prefix from ``ref``
+    
+    :param str ref: one word, colon delimited string, such as *nx:groupGroup*
+    :returns str: the part to the right of the last colon
+    '''
+    return ref.split(':')[-1]
+
+
 class NxdlRules(object):
     '''
     Interpret the rules for the NXDL files
@@ -110,23 +120,14 @@ class NXDL_nxdlType(object):
             elif node.tag.endswith('}annotation'):
                 pass
             elif node.tag.endswith('}list'):
-                self.values = map(self.strip_ns, [node.attrib['itemType'],])
+                self.values = map(strip_ns, [node.attrib['itemType'],])
             elif node.tag.endswith('}restriction'):
                 self.restriction = node.attrib['base']
                 # TODO: get the enumeration values
             elif node.tag.endswith('}union'):
-                self.union = map(self.strip_ns, node.attrib['memberTypes'].split())
+                self.union = map(strip_ns, node.attrib['memberTypes'].split())
             else:
                 print node.tag
-
-    def strip_ns(self, ref):
-        '''
-        strip the namespace prefix from ``ref``
-        
-        :param str ref: one word, colon delimited string, such as *nx:groupGroup*
-        :returns str: the part to the right of the last colon
-        '''
-        return ref.split(':')[-1]
 
 
 class Mixin(object):
@@ -166,15 +167,6 @@ class Mixin(object):
             msg += ' nodes found: ' + str(len(node_list))
             raise ValueError(msg)
         return node_list[0]
-    
-    def strip_ns(self, ref):
-        '''
-        strip the namespace prefix from ``ref``
-        
-        :param str ref: one word, colon delimited string, such as *nx:groupGroup*
-        :returns str: the part to the right of the last colon
-        '''
-        return ref.split(':')[-1]
 
 
 class NXDL_Root(Mixin):
@@ -196,7 +188,7 @@ class NXDL_Root(Mixin):
             element_name = xml_obj.attrib.get('name')
             self.raise_error(xml_obj, 'no @type for element node: ', element_name)
         
-        ref = self.strip_ns(element_type)
+        ref = strip_ns(element_type)
         type_node = self.get_named_node('complexType', 'name', ref)
         
         for node in type_node:
@@ -228,7 +220,7 @@ class NXDL_Root(Mixin):
         '''
         # this code is written for how nxdl.xsd exists now (2016-06-07)
         # not robust or general
-        ag_name = self.strip_ns(ag_node.attrib['ref'])
+        ag_name = strip_ns(ag_node.attrib['ref'])
         ag_node = self.get_named_node('attributeGroup', 'name', ag_name)
         for node in ag_node:
             if node.tag.endswith('}attribute'):
@@ -329,7 +321,7 @@ class NXDL_Type(Mixin):
         # do the Mixin.__init__ directly here
         self.ns = NAMESPACE_DICT
 
-        xml_obj = self.get_named_node(tag, 'name', self.strip_ns(ref))
+        xml_obj = self.get_named_node(tag, 'name', strip_ns(ref))
         self.name = xml_obj.attrib.get('name')
         
         self.attrs = {}

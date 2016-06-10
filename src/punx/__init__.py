@@ -56,9 +56,6 @@ __classifiers__ = [
      'Topic :: Utilities',
    ]
 
-__version__ = '0.0.1'
-__release__ = __version__
-
 GITHUB_NXDL_ORGANIZATION        = 'nexusformat'
 GITHUB_NXDL_REPOSITORY          = 'definitions'
 GITHUB_NXDL_BRANCH              = 'master'

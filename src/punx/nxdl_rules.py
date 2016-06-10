@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from spyderlib.widgets.externalshell import namespacebrowser
 
 #-----------------------------------------------------------------------------
 # :author:    Pete R. Jemian

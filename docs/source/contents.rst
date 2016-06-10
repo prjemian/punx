@@ -14,11 +14,12 @@ Contents
    cache
    finding
    h5structure
-   install
+   main
    nxdl_rules
    nxdlstructure
    settings
    validate
+   install
    changes
    license
 

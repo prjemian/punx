@@ -22,7 +22,7 @@ __license__      = 'Creative Commons Attribution 4.0 International Public Licens
 __description__  = 'Python Utilities for NeXus'
 __author_name__  = __author__
 __author_email__ = __email__
-__url__          = u'http://punx.readthedocs.org'
+__url__          = u'http://punx.readthedocs.io'
 #__download_url__ = u'https://github.com/prjemian/spec2nexus/tarball/' + __version__
 __keywords__     = ['NeXus', 'HDF5']
 
@@ -68,7 +68,10 @@ NXDL_CACHE_SUBDIR = GITHUB_NXDL_REPOSITORY + '-' + GITHUB_NXDL_BRANCH
 
 import os
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
-from ._version import get_versions
+try:
+    from ._version import get_versions
+except ValueError:
+    from _version import get_versions
 __version__ = get_versions()['version']
 del get_versions
 if on_rtd:

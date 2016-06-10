@@ -70,7 +70,8 @@ class QSettingsMixin(object):
         if group is None:
             group = __init__.GLOBAL_INI_GROUP
         key = group + '/' + k
-        return self.value(key).toPyObject()
+        v = self.value(key)
+        return str(v)
     
     def setKey(self, key, value):
         '''

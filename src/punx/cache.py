@@ -94,6 +94,29 @@ __singleton_nxdlTypes_xsd__ = None
 class NoCacheDirectory(Exception): pass
 
 
+def write_pickle_file(info, path):
+    '''
+    write the parsed nxdl_dict and info to a Python pickle file
+    '''
+    info['pickle_file'] = os.path.join(path, __init__.PICKLE_FILE)
+    nxdl_dict = nxdlstructure.get_NXDL_specifications()
+    pickle_data = dict(nxdl_dict=nxdl_dict, info=info)
+    pickle.dump(pickle_data, open(info['pickle_file'], 'wb'))
+
+
+def read_pickle_file(pfile, sha):
+    '''
+    read the parsed nxdl_dict and info from a Python pickle file
+    '''
+    pickle_data = pickle.load(open(pfile, 'rb'))
+    if 'info' in pickle_data:
+        # any other tests to qualify this?
+        if sha == pickle_data['info']['git_sha']:   # declare victory!
+            # do not need to return ``info`` since it matches
+            return pickle_data['nxdl_dict']
+    return None
+
+
 def githubMasterInfo(org, repo):
     '''
     get information about the repository master branch
@@ -127,82 +150,57 @@ def githubMasterInfo(org, repo):
     return dict(git_sha=sha, git_time=iso8601, zip_url=zip_url)
 
 
-def write_pickle_file(info, path):
+def __get_github_info__():
     '''
-    write the parsed nxdl_dict and info to a Python pickle file
+    check with GitHub for any updates
     '''
-    info['pickle_file'] = os.path.join(path, __init__.PICKLE_FILE)
-    nxdl_dict = nxdlstructure.get_NXDL_specifications()
-    pickle_data = dict(nxdl_dict=nxdl_dict, info=info)
-    pickle.dump(pickle_data, open(info['pickle_file'], 'wb'))
+    return githubMasterInfo(__init__.GITHUB_NXDL_ORGANIZATION, 
+                            __init__.GITHUB_NXDL_REPOSITORY)
 
 
-def read_pickle_file(pfile, sha):
-    '''
-    read the parsed nxdl_dict and info from a Python pickle file
-    '''
-    pickle_data = pickle.load(open(pfile, 'rb'))
-    if 'info' in pickle_data:
-        # any other tests to qualify this?
-        if sha == pickle_data['info']['git_sha']:   # declare victory!
-            # do not need to return ``info`` since it matches
-            return pickle_data['nxdl_dict']
-    return None
-
-
-def update_NXDL_Cache():
+def update_NXDL_Cache(force_update=False):
     '''
     update the cache of NeXus NXDL files
-    '''
-    # check with GitHub for any updates
-    # always do this first since there is no point continuing if not available
-    info = githubMasterInfo(__init__.GITHUB_NXDL_ORGANIZATION, 
-                            __init__.GITHUB_NXDL_REPOSITORY)
-    if info is None:
-        return
-
-    qset = qsettings()
-    info['file'] = str(qset.fileName())
-    nxdl_subdir = qset.nxdl_dir()
-
-    different_sha = str(info['git_sha']) != str(qset.getKey('git_sha'))
-    different_git_time = str(info['git_time']) != str(qset.getKey('git_time'))
-    nxdl_subdir_exists = os.path.exists(nxdl_subdir)
-    ok_to_update = different_sha or different_git_time or not nxdl_subdir_exists
-    if ok_to_update:
-        __update_cache__(info)
-
-
-def __update_cache__(info):
-    '''
-    actually do the cache update work
-    '''
-    qset = qsettings()
-    path = qset.cache_dir()
-
-    # download the repository ZIP file 
-    url = info['zip_url']
-    u = urllib.urlopen(url)
-    content = u.read()
-    buf = StringIO.StringIO(content)
-    zip_content = zipfile.ZipFile(buf)
-    # How to save this zip_content to disk?
     
-    # extract the NXDL (XML, XSL, & XSD) files to the path
-    categories = 'base_classes applications contributed_definitions'.split()
-    for item in zip_content.namelist():
-        parts = item.rstrip('/').split('/')
-        if len(parts) == 2:             # get the XML Schema files
-            if os.path.splitext(parts[1])[-1] in ('.xsd',):
-                zip_content.extract(item, path)
-        elif len(parts) == 3:         # get the NXDL files
-            if parts[1] in categories:    # the NXDL categories
-                if os.path.splitext(parts[2])[-1] in ('.xml .xsl'.split()):
-                    zip_content.extract(item, path)
+    :param bool force_update: (optional, default: False) update if GitHub is available
+    '''
+    info = __get_github_info__()    # check with GitHub first
+    if info is not None:
+        # proceed only if GitHub info was available
+        qset = qsettings()
+        info['file'] = str(qset.fileName())
+        nxdl_subdir = qset.nxdl_dir()
     
-    # optimization: write the parsed NXDL specifications to a file
-    write_pickle_file(info, path)
-    qset.updateGroupKeys(info)
+        different_sha = str(info['git_sha']) != str(qset.getKey('git_sha'))
+        different_git_time = str(info['git_time']) != str(qset.getKey('git_time'))
+        nxdl_subdir_exists = os.path.exists(nxdl_subdir)
+        can_update = different_sha or different_git_time or not nxdl_subdir_exists
+        if can_update or force_update:
+            path = qset.cache_dir()
+        
+            # download the repository ZIP file 
+            url = info['zip_url']
+            u = urllib.urlopen(url)
+            content = u.read()
+            buf = StringIO.StringIO(content)
+            zip_content = zipfile.ZipFile(buf)
+            # How to save this zip_content to disk?
+            
+            # extract the NXDL (XML, XSL, & XSD) files to the path
+            NXDL_categories = 'base_classes applications contributed_definitions'
+            for item in zip_content.namelist():
+                parts = item.rstrip('/').split('/')
+                if len(parts) == 2:             # get the XML Schema files
+                    if os.path.splitext(parts[1])[-1] in ('.xsd',):
+                        zip_content.extract(item, path)
+                elif len(parts) == 3:         # get the NXDL files
+                    if parts[1] in NXDL_categories.split():
+                        if os.path.splitext(parts[2])[-1] in ('.xml .xsl'.split()):
+                            zip_content.extract(item, path)
+            
+            # optimization: write the parsed NXDL specifications to a file
+            write_pickle_file(info, path)
+            qset.updateGroupKeys(info)
 
 
 def qsettings():

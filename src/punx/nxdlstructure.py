@@ -159,6 +159,7 @@ class NXDL_specification(NXDL_mixin):
         self.ignoreExtraFields = False
         self.ignoreExtraAttributes = False
         
+        self.nxdl_rules = get_nxdl_rules()
         self.parse_xml()
     
     def __str__(self):
@@ -363,8 +364,6 @@ def get_NXDL_specifications():
         if nxdl_dict is not None:      # declare victory!
             return nxdl_dict
     
-    rules = get_nxdl_rules()
-    
     # build the nxdl_dict by parsing all the NXDL specifications
     basedir = qset.nxdl_dir()
     path_list = [
@@ -385,7 +384,6 @@ def get_NXDL_specifications():
         # k = os.path.basename(nxdl_file_name)
         obj = NXDL_specification(nxdl_file_name)
         nxdl_dict[obj.title] = obj
-    nxdl_dict['rules'] = rules
 
     return nxdl_dict
 

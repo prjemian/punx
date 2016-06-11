@@ -174,8 +174,9 @@ def update_NXDL_Cache(force_update=False):
         different_sha = str(info['git_sha']) != str(qset.getKey('git_sha'))
         different_git_time = str(info['git_time']) != str(qset.getKey('git_time'))
         nxdl_subdir_exists = os.path.exists(nxdl_subdir)
-        can_update = different_sha or different_git_time or not nxdl_subdir_exists
-        if can_update or force_update:
+
+        could_update = different_sha or different_git_time or not nxdl_subdir_exists
+        if could_update or force_update:
             path = qset.cache_dir()
         
             # download the repository ZIP file 
@@ -184,7 +185,7 @@ def update_NXDL_Cache(force_update=False):
             content = u.read()
             buf = StringIO.StringIO(content)
             zip_content = zipfile.ZipFile(buf)
-            # How to save this zip_content to disk?
+            # How to save this zip_content to disk? not needed when using pickle file
             
             # extract the NXDL (XML, XSL, & XSD) files to the path
             NXDL_categories = 'base_classes applications contributed_definitions'
@@ -343,11 +344,11 @@ def get_nxdlTypes_xsd():
 
 if __name__ == '__main__':
     try:
-        update_NXDL_Cache()
+        update_NXDL_Cache(True) # FIXME: True is not forcing a re-parse of the NXDL files
     except NoCacheDirectory:
         # make the cache directory and try again
         path = os.path.dirname(str(__singleton_settings__.fileName()))
         os.mkdir(path)
-        update_NXDL_Cache()
+        update_NXDL_Cache(True)
     # print user_cache_settings().fileName()
     # print source_cache_settings().fileName()

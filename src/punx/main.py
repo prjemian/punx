@@ -138,10 +138,10 @@ def parse_command_line_arguments():
 #     parser_hierarchy.set_defaults(func=func_hierarchy)
 #     parser_hierarchy.add_argument('something', type=bool, help='something help')
     
-    parser_show = subparsers.add_parser('show', 
-                                        help='show program information (about the cache)')
-    parser_show.set_defaults(func=func_show)
-    parser_show.add_argument('details', type=bool, help='details help')
+#     parser_show = subparsers.add_parser('show', 
+#                                         help='show program information (about the cache)')
+#     parser_show.set_defaults(func=func_show)
+#     parser_show.add_argument('details', type=bool, help='details help')
     
     parser_structure = subparsers.add_parser('structure', 
                                              help='show structure of HDF5 or NXDL file')

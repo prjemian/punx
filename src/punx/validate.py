@@ -897,28 +897,6 @@ class Data_File_Validator(object):
         return t.reST()
 
 
-def parse_command_line_arguments():
-    import __init__
-    import argparse
-    
-    doc = __doc__.strip().splitlines()[0]
-    doc += '\n  URL: ' + __url__
-    doc += '\n  v' + __init__.__version__
-    parser = argparse.ArgumentParser(prog='h5structure', description=doc)
-
-    parser.add_argument('infile', 
-                    action='store', 
-                    nargs='+', 
-                    help="HDF5 data or NXDL file name(s)")
-
-    parser.add_argument('-v', 
-                        '--version', 
-                        action='version', 
-                        version=__init__.__version__)
-
-    return parser.parse_args()
-
-
 def main():
     pass
 

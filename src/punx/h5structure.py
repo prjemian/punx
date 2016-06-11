@@ -447,57 +447,8 @@ def isHdf5ExternalLink(obj):
     return isinstance(obj, h5py.ExternalLink)
 
 
-def do_filelist(filelist, limit=5, show_attributes=True):
-    '''
-    interpret and print the structure of a list of HDF5 files
-    
-    :param [str] filelist: one or more file names to be interpreted
-    :param int limit: maximum number of array items to be shown (default = 5)
-    '''
-    for item in filelist:
-        mc = h5structure(item)
-        mc.array_items_shown = limit
-        print '\n'.join(mc.report(show_attributes) or '')
-
-
 def main():
-    '''standard command-line interface'''
-    import __init__
-    NUM_DISPLAYED_DEFAULT = 5
-    NUM_DISPLAYED_MIN = 3
-    import argparse
-    doc = __doc__.strip().splitlines()[0]
-    doc += '\n  URL: ' + __url__
-    doc += '\n  v' + __init__.__version__
-    parser = argparse.ArgumentParser(prog='h5structure', description=doc)
-    parser.add_argument('infile', 
-                        action='store', 
-                        nargs='+', 
-                        help="HDF5 data file name(s)")
-    msg =  "limit number of displayed array items to NUM_DISPLAYED"
-    msg += " (must be >=%d or 'None')" % NUM_DISPLAYED_MIN
-    msg += ", default = %s" % str(NUM_DISPLAYED_DEFAULT)
-    parser.add_argument('-n', 
-                        action='store', 
-                        dest='num_displayed', 
-                        help=msg, 
-                        default=str(NUM_DISPLAYED_DEFAULT))
-    parser.add_argument('-a', 
-                        action='store_false', 
-                        default=True,
-                        dest='show_attributes',
-                        help='Do not print attributes')
-    parser.add_argument('-v', 
-                        '--version', 
-                        action='version', 
-                        version=__init__.__version__)
-    cmd_args = parser.parse_args()
-
-    if cmd_args.num_displayed.lower() == "none":
-        limit = None
-    else:
-        limit = max(NUM_DISPLAYED_MIN, int(cmd_args.num_displayed))
-    do_filelist(cmd_args.infile, limit, cmd_args.show_attributes)
+    pass
 
 
 if __name__ == '__main__':

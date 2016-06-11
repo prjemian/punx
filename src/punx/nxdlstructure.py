@@ -14,15 +14,13 @@
 '''
 Load and/or document the structure of a NeXus NXDL class specification
 
-* :class:`NXDL_specification`: the structure
+* :class:`NXDL_definition`: the structure
 * define a text renderer method for that class
 '''
 
 __url__ = 'http://punx.readthedocs.org/en/latest/nxdlstructure.html'
 
 # testing:  see file dev_nxdl2rst.py
-
-# TODO: apply nxdl_rules.NxdlRules() as defaults when creating NXDL_mixin subcleasses below
 
 
 import collections
@@ -66,12 +64,16 @@ class NXDL_mixin(object):
     
     :param obj node: XML object
     '''
+    element = 'mixin - must override in subclass'
     
     def __init__(self, node):
         node_name = node.get('name')
         if node_name is not None:
             self.name = node.get('name')
         self.ns = nxdl_rules.NAMESPACE_DICT
+        
+        # TODO: apply nxdl_rules.NxdlRules() as defaults when creating NXDL_mixin subclasses below
+        self.nxdl_rules = get_nxdl_rules()
     
     def get_NX_type(self, node):
         '''
@@ -88,9 +90,13 @@ class NXDL_mixin(object):
         '''
         return '-tba-'
     
-    def get_group_data(self, node, category):
+    def get_element_data(self, node, category):
         '''
         '''
+        if self.element == 'definition':
+            rules = self.nxdl_rules.nxdl
+        else:
+            rules = self.nxdl_rules.nxdl.children[self.element]
         self.attrs = {}
         self.fields = {}
         self.groups = {}
@@ -111,6 +117,8 @@ class NXDL_mixin(object):
         for subnode in node.xpath('nx:link', namespaces=self.ns):
             obj = NX_link(subnode, category)
             self.add_object(self.links, obj)
+        
+        pass
     
     def add_object(self, db, obj):
         '''
@@ -138,12 +146,13 @@ class NXDL_mixin(object):
         return '\n'.join(t)
 
 
-class NXDL_specification(NXDL_mixin):
+class NXDL_definition(NXDL_mixin):
     '''
-    Contains the complete structure of the NXDL specification, without documentation
+    Contains the complete structure of a NXDL definition, without documentation
     
-    :param str nxdl_file: name of file with NXDL specification (ends with ``.nxdl.xml``)
+    :param str nxdl_file: name of file with NXDL definition (ends with ``.nxdl.xml``)
     '''
+    element = 'definition'
     
     def __init__(self, nxdl_file):
         self.nxdl_file_name = nxdl_file
@@ -159,8 +168,32 @@ class NXDL_specification(NXDL_mixin):
         self.ignoreExtraFields = False
         self.ignoreExtraAttributes = False
         
-        self.nxdl_rules = get_nxdl_rules()
-        self.parse_xml()        # TODO: apply the rules from this point on
+        # - - - - - - - - - - - - - - - - - - - -
+        def get_boolean(attribute, default):
+            t = root.get('ignoreExtraGroups', 'false')
+            return t.lower() in ('true', '1', True)
+        # - - - - - - - - - - - - - - - - - - - -
+        
+        # parse the XML content now
+
+        tree = lxml.etree.parse(self.nxdl_file_name)
+        root = tree.getroot()
+
+        NXDL_mixin.__init__(self, root)
+        self.title = root.get('name')
+        
+        self.ignoreExtraGroups = get_boolean('ignoreExtraGroups', False)
+        self.ignoreExtraFields = get_boolean('ignoreExtraFields', False)
+        self.ignoreExtraAttributes = get_boolean('ignoreExtraAttributes', False)
+        
+        # self.category = {
+        #              'base': 'base class',
+        #              'application': 'application definition',
+        #              'contributed': 'contributed definition',
+        #              }[root.attrib["category"]]
+        self.category = root.attrib["category"]
+
+        self.get_element_data(root, self.category)
     
     def __str__(self):
         return self.title + ' : ' + self.category
@@ -173,30 +206,6 @@ class NXDL_specification(NXDL_mixin):
         for line in self.render_group(self).splitlines():
             t.append(indentation + line)
         return '\n'.join(t)
-        
-    def parse_xml(self):
-        '''
-        '''
-        def get_boolean(attribute, default):
-            t = root.get('ignoreExtraGroups', 'false')
-            return t.lower() in ('true', '1', True)
-        tree = lxml.etree.parse(self.nxdl_file_name)
-        
-        root = tree.getroot()
-        NXDL_mixin.__init__(self, root)
-        self.title = root.get('name')
-        
-        self.ignoreExtraGroups = get_boolean('ignoreExtraGroups', False)
-        self.ignoreExtraFields = get_boolean('ignoreExtraFields', False)
-        self.ignoreExtraAttributes = get_boolean('ignoreExtraAttributes', False)
-        
-        self.category = {
-                     'base': 'base class',
-                     'application': 'application definition',
-                     'contributed': 'contributed definition',
-                     }[root.attrib["category"]]
-
-        self.get_group_data(root, self.category)
 
     def getSubGroup_NX_class_list(self):
         '''
@@ -209,6 +218,7 @@ class NX_attribute(NXDL_mixin):
     '''
     NXDL attribute
     '''
+    element = 'attribute'
 
     def __init__(self, node):
         NXDL_mixin.__init__(self, node)
@@ -233,6 +243,7 @@ class NX_field(NXDL_mixin):
     '''
     NXDL field
     '''
+    element = 'field'
 
     def __init__(self, node, category):
         NXDL_mixin.__init__(self, node)
@@ -305,6 +316,7 @@ class NX_group(NXDL_mixin):
     '''
     NXDL group
     '''
+    element = 'group'
 
     def __init__(self, node, category):
         NXDL_mixin.__init__(self, node)
@@ -330,7 +342,7 @@ class NX_group(NXDL_mixin):
             minOccurs = node.get('minOccurs', 1)
         self.optional = minOccurs in ('0', 0)
         
-        self.get_group_data(node, category)
+        self.get_element_data(node, category)
 
     def __str__(self):
         s = self.name
@@ -342,6 +354,7 @@ class NX_link(NXDL_mixin):
     '''
     NXDL link
     '''
+    element = 'link'
 
     def __init__(self, node, category):
         NXDL_mixin.__init__(self, node)
@@ -349,6 +362,13 @@ class NX_link(NXDL_mixin):
     
     def __str__(self):
         return self.name + ' --> ' + self.target
+
+
+class NX_symbols(NXDL_mixin):
+    '''
+    NXDL symbols table
+    '''
+    element = 'symbols'
 
 
 def get_NXDL_specifications():
@@ -382,7 +402,7 @@ def get_NXDL_specifications():
     nxdl_dict = collections.OrderedDict()
     for nxdl_file_name in nxdl_file_list:
         # k = os.path.basename(nxdl_file_name)
-        obj = NXDL_specification(nxdl_file_name)
+        obj = NXDL_definition(nxdl_file_name)
         nxdl_dict[obj.title] = obj
 
     return nxdl_dict
@@ -420,7 +440,7 @@ def main():
         print( 'Cannot find %s' % nxdl_file )
         exit()
 
-    nxdl = NXDL_specification(nxdl_file)
+    nxdl = NXDL_definition(nxdl_file)
     print nxdl.render()
 
 

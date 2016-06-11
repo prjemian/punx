@@ -46,11 +46,67 @@ import sys
 import argparse
 
 import __init__
-import cache
 
 
 # :see: https://docs.python.org/2/library/argparse.html#sub-commands
 # obvious 1st implementations are h5structure and update
+
+
+def func_hierarchy(args):
+    print 'still in development -- not implemented yet'
+    print args
+
+
+def func_show(args):
+    print 'still in development -- not implemented yet'
+    print args
+
+
+def func_structure(args):
+    if args.infile.endswith('.nxdl.xml'):
+        import nxdlstructure
+        nxdl = nxdlstructure.NXDL_definition(args.infile)
+        print nxdl.render()
+    else:
+        import h5structure
+        
+        #    :param int limit: maximum number of array items to be shown (default = 5)
+        limit=5
+        #    :param bool show_attributes: display attributes in output
+        show_attributes=True
+        
+        mc = h5structure.h5structure(os.path.abspath(args.infile))
+        mc.array_items_shown = limit
+        print '\n'.join(mc.report(show_attributes) or '')
+
+
+def func_update(args):
+    import cache
+    cache.update_NXDL_Cache(force_update=args.force)
+
+
+def func_validate(args):
+    if args.infile.endswith('.nxdl.xml'):
+        import nxdlstructure
+        nxdl = nxdlstructure.NXDL_definition(args.infile)
+        print nxdl.render()
+    else:
+        import finding
+        import validate
+        validator = validate.Data_File_Validator(args.infile)
+        validator.validate()
+
+        # report the findings from the validation
+        #  finding.SHOW_ALL        finding.SHOW_NOT_OK        finding.SHOW_ERRORS
+        show_these = finding.SHOW_ALL
+        print 'Validation findings'
+        print ':file: ' + os.path.basename(validator.fname)
+        print ':validation results shown: ', ', '.join(sorted(map(str, show_these)))
+        print validator.report_findings(show_these)
+        
+        print 'summary statistics'
+        print validator.report_findings_summary()
+
 
 
 def parse_command_line_arguments():
@@ -58,7 +114,9 @@ def parse_command_line_arguments():
     doc = __doc__.strip().splitlines()[0]
     doc += '\n  URL: ' + __init__.__url__
     doc += '\n  v' + __init__.__version__
-    parser = argparse.ArgumentParser(prog=__init__.__package_name__, description=doc)
+    parser = argparse.ArgumentParser(prog=__init__.__package_name__, 
+                                     description=doc,
+                                     epilog=__init__.__url__)
 
     parser.add_argument('-v', 
                         '--version', 
@@ -75,28 +133,39 @@ def parse_command_line_arguments():
     
     # TODO: stretch goal: permit the first two char (or more) of each subcommand to be accepted
 
-    # hierarchy
-    parser_hierarchy = subparsers.add_parser('hierarchy', help='show NeXus base class hierarchy')
+#     parser_hierarchy = subparsers.add_parser('hierarchy', 
+#                                              help='show NeXus base class hierarchy')
+#     parser_hierarchy.set_defaults(func=func_hierarchy)
+#     parser_hierarchy.add_argument('something', type=bool, help='something help')
     
-    # show
-    parser_show = subparsers.add_parser('show', help='show program information (about the cache)')
+    parser_show = subparsers.add_parser('show', 
+                                        help='show program information (about the cache)')
+    parser_show.set_defaults(func=func_show)
     parser_show.add_argument('details', type=bool, help='details help')
-    parser_show.add_argument('hierarchy', type=bool, help='details help')
     
-    # structure
-    parser_structure = subparsers.add_parser('structure', help='show structure of HDF5 file')
-    # TODO: decide how to show structure of BOTH HDF5 files and NXDL files, easily
-    parser_structure.add_argument('details', type=bool, help='details help')
+    parser_structure = subparsers.add_parser('structure', 
+                                             help='show structure of HDF5 or NXDL file')
+    parser_structure.set_defaults(func=func_structure)
+    parser_structure.add_argument('infile', help="HDF5 or NXDL file name")
+    parser_structure.add_argument('-a', 
+                        action='store_false', 
+                        default=True,
+                        dest='show_attributes',
+                        help='Do not print attributes of HDF5 file structure')
     
-    # update
-    parser_update = subparsers.add_parser('update', help='update the local cache of NeXus definitions')
-    parser_update.add_argument('force', type=bool, help='force help')
-    parser_update.set_defaults(func=cache.update_NXDL_Cache)
+    parser_update = subparsers.add_parser('update', 
+                                          help='update the local cache of NeXus definitions')
+    parser_update.set_defaults(func=func_update)
+    parser_update.add_argument('-f', '--force', 
+                               action='store_true', 
+                               default=False, 
+                               help='force update (if GitHub available)')
     
-    # validate
-    parser_validate = subparsers.add_parser('validate', help='validate a NeXus file')
-    # TODO: decide how to validate BOTH HDF5 files and NXDL files, easily
-    parser_validate.add_argument('some_option', type=bool, help='force help')
+    parser_validate = subparsers.add_parser('validate', 
+                                            help='validate a NeXus file')
+    parser_validate.add_argument('infile', help="HDF5 or NXDL file name")
+    parser_validate.set_defaults(func=func_validate)
+
     return parser.parse_args()
 
 
@@ -107,5 +176,7 @@ def main():
 
 
 if __name__ == '__main__':
-    sys.argv.append('-h')
+#     sys.argv.append('update')
+#     # sys.argv.append('data/writer_1_3.hdf5')
+#     sys.argv.append('cache/definitions-master/base_classes/NXdata.nxdl.xml')
     main()

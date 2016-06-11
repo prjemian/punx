@@ -32,9 +32,10 @@ main user interface file
     subcommands:
       valid subcommands
     
-      {hierarchy,show,structure,update,validate}
-        hierarchy           show NeXus base class hierarchy
-        show                show program information (about the cache)
+      {demo,structure,update,validate}
+        demo                update the cache from GitHub and validate writer_1_3.hdf5
+        hierarchy           TBA: show NeXus base class hierarchy
+        show                TBA: show program information (about the cache)
         structure           show structure of HDF5 file
         update              update the local cache of NeXus definitions
         validate            validate a NeXus file
@@ -42,7 +43,6 @@ main user interface file
 '''
 
 import os
-import sys
 import argparse
 
 import __init__
@@ -50,6 +50,17 @@ import __init__
 
 # :see: https://docs.python.org/2/library/argparse.html#sub-commands
 # obvious 1st implementations are h5structure and update
+
+
+def func_demo(args):
+#     print 'punx update '
+#     args.force = False
+#     func_update(args)
+
+    path = os.path.dirname(__file__)
+    args.infile = os.path.abspath(os.path.join(path, 'data', 'writer_1_3.hdf5'))
+    print 'punx validate ' + args.infile
+    func_validate(args)
 
 
 def func_hierarchy(args):
@@ -131,6 +142,10 @@ def parse_command_line_arguments():
     subparsers = parser.add_subparsers(title='subcommands',
                                        description='valid subcommands',)
     
+    parser_demo = subparsers.add_parser('demo',
+                                        help='demonstrate HDF5 file validation')
+    parser_demo.set_defaults(func=func_demo)
+    
     # TODO: stretch goal: permit the first two char (or more) of each subcommand to be accepted
 
 #     parser_hierarchy = subparsers.add_parser('hierarchy', 
@@ -176,7 +191,4 @@ def main():
 
 
 if __name__ == '__main__':
-#     sys.argv.append('update')
-#     # sys.argv.append('data/writer_1_3.hdf5')
-#     sys.argv.append('cache/definitions-master/base_classes/NXdata.nxdl.xml')
     main()

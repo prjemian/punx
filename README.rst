@@ -20,9 +20,9 @@ Project Goals
 * Validation of NeXus NXDL files
 * Validation of NeXus HDF5 data files
 * Display of NeXus HDF5 data file structure
-* Display of NeXus base class hierarchy (stretch goal)
+* Display of NeXus base class hierarchy (stretch goal, graphical output)
 
 Provides
 ########
 
-* **punx**      : command-line tool: -tba-
+* **punx**      : command-line tool with subcommands for validate, structure, ...

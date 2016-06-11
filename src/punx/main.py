@@ -53,6 +53,11 @@ import __init__
 
 
 def func_demo(args):
+    '''
+    show what **punx** can do
+    
+    .. index:: demo
+    '''
 #     print 'punx update '
 #     args.force = False
 #     func_update(args)

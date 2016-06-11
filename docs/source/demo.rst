@@ -1,7 +1,8 @@
 .. _demo:
+.. index:: demo
 
-User interface: Demonstration
-#############################
+User interface: subcommand: **demo**
+####################################
 
 
 Examples

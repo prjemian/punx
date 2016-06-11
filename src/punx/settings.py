@@ -98,7 +98,6 @@ class QSettingsMixin(object):
         self.endGroup()
         if key not in ('written', 'written_gmt'):
             self.updateTimeStamp()
-            self.updateTimeStamp(gmt=True)
  
     def resetDefaults(self):
         '''
@@ -108,17 +107,13 @@ class QSettingsMixin(object):
             self.remove(key)
         self.init_global_keys()
     
-    def updateTimeStamp(self, gmt=False):
+    def updateTimeStamp(self):
         '''date/time file was written'''
         key = 'written'
-        if gmt:
-            # current ISO8601 time in GMT, matches format from GitHub
-            key += '_gmt'
-            ts = gmt_github_style()
-        else:
-            # current ISO8601 time in local time
-            ts = timestamp()
-        self.setKey(key, ts)
+        # current ISO8601 time in local time
+        self.setKey(key, timestamp())
+        # current ISO8601 time in GMT, matches format from GitHub
+        self.setKey(key+'_gmt', gmt_github_style())
     
     def cache_dir(self):
         '''return the absolute path of the cache directory'''

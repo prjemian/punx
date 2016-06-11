@@ -52,7 +52,7 @@ import json
 import lxml
 import os
 import StringIO
-import urllib
+import urllib2
 import zipfile
 
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
@@ -94,11 +94,16 @@ __singleton_nxdlTypes_xsd__ = None
 class NoCacheDirectory(Exception): pass
 
 
+def get_pickle_file_name(path):
+    ''' '''
+    return os.path.join(path, __init__.PICKLE_FILE)
+
+
 def write_pickle_file(info, path):
     '''
     write the parsed nxdl_dict and info to a Python pickle file
     '''
-    info['pickle_file'] = os.path.join(path, __init__.PICKLE_FILE)
+    info['pickle_file'] = get_pickle_file_name(path)
     nxdl_dict = nxdlstructure.get_NXDL_specifications()
     pickle_data = dict(nxdl_dict=nxdl_dict, info=info)
     pickle.dump(pickle_data, open(info['pickle_file'], 'wb'))
@@ -135,7 +140,7 @@ def githubMasterInfo(org, repo):
     url = 'https://api.github.com/repos/%s/%s/commits' % (org, repo)
     
     try:
-        text = urllib.urlopen(url).read()
+        text = urllib2.urlopen(url).read()
     except IOError:
         # IOError: [Errno socket error] [Errno -2] Name or service not known -- (no network)
         return None
@@ -181,7 +186,7 @@ def update_NXDL_Cache(force_update=False):
         
             # download the repository ZIP file 
             url = info['zip_url']
-            u = urllib.urlopen(url)
+            u = urllib2.urlopen(url)
             content = u.read()
             buf = StringIO.StringIO(content)
             zip_content = zipfile.ZipFile(buf)
@@ -200,7 +205,19 @@ def update_NXDL_Cache(force_update=False):
                             zip_content.extract(item, path)
             
             # optimization: write the parsed NXDL specifications to a file
+            if force_update:
+                # force the pickle file to be re-written
+                pfile = get_pickle_file_name(path)
+                if os.path.exists(pfile):
+                    os.remove(pfile)
             write_pickle_file(info, path)
+
+            if force_update:
+                # force the .ini file to be re-written
+                key = 'pickle_file'
+                v =  qset.getKey(key)
+                qset.setKey(key, 'update forced')
+                qset.setKey(key, v)
             qset.updateGroupKeys(info)
 
 
@@ -344,7 +361,7 @@ def get_nxdlTypes_xsd():
 
 if __name__ == '__main__':
     try:
-        update_NXDL_Cache(True) # FIXME: True is not forcing a re-parse of the NXDL files
+        update_NXDL_Cache(True)
     except NoCacheDirectory:
         # make the cache directory and try again
         path = os.path.dirname(str(__singleton_settings__.fileName()))

@@ -160,7 +160,7 @@ class NXDL_specification(NXDL_mixin):
         self.ignoreExtraAttributes = False
         
         self.nxdl_rules = get_nxdl_rules()
-        self.parse_xml()
+        self.parse_xml()        # TODO: apply the rules from this point on
     
     def __str__(self):
         return self.title + ' : ' + self.category

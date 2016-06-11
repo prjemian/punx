@@ -163,15 +163,22 @@ def update_NXDL_Cache():
 
     qset = qsettings()
     info['file'] = str(qset.fileName())
-    path = qset.cache_dir()
     nxdl_subdir = qset.nxdl_dir()
 
-    same_sha = str(info['git_sha']) == str(qset.getKey('git_sha'))
-    same_git_time = str(info['git_time']) == str(qset.getKey('git_time'))
+    different_sha = str(info['git_sha']) != str(qset.getKey('git_sha'))
+    different_git_time = str(info['git_time']) != str(qset.getKey('git_time'))
     nxdl_subdir_exists = os.path.exists(nxdl_subdir)
-    do_not_update = same_sha and same_git_time and nxdl_subdir_exists
-    if do_not_update:
-        return
+    ok_to_update = different_sha or different_git_time or not nxdl_subdir_exists
+    if ok_to_update:
+        __update_cache__(info)
+
+
+def __update_cache__(info):
+    '''
+    actually do the cache update work
+    '''
+    qset = qsettings()
+    path = qset.cache_dir()
 
     # download the repository ZIP file 
     url = info['zip_url']

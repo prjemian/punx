@@ -7,4 +7,6 @@ Change History
 Production
 **********
 
-:2016.0510.0: create the project
+:0.0.2: 2016-06-11 -- basic UI established
+:0.0.1: 2016-06-10 -- basic functions
+:started: 2016-05-20 -- initial project creation

@@ -121,7 +121,11 @@ def func_validate(args):
     else:
         import finding
         import validate
-        validator = validate.Data_File_Validator(args.infile)
+        try:
+            validator = validate.Data_File_Validator(args.infile)
+        except IOError, _exc:
+            print 'File not found: ' + args.infile
+            exit(1)
         validator.validate()
 
         # report the findings from the validation

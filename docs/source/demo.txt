@@ -1,4 +1,4 @@
-punx validate d:\apps\anaconda\lib\site-packages\punx\data\writer_1_3.hdf5
+punx validate d:\apps\python\lib\site-packages\punx\data\writer_1_3.hdf5
 Validation findings
 :file: writer_1_3.hdf5
 :validation results shown:  COMMENT, ERROR, NOTE, OK, TODO, UNUSED, WARN
@@ -75,8 +75,8 @@ TOTAL   51    --
 
 
 
-punx structure d:\apps\anaconda\lib\site-packages\punx\data\writer_1_3.hdf5
-d:\apps\anaconda\lib\site-packages\punx\data\writer_1_3.hdf5 : NeXus data file
+punx structure d:\apps\python\lib\site-packages\punx\data\writer_1_3.hdf5
+d:\apps\python\lib\site-packages\punx\data\writer_1_3.hdf5 : NeXus data file
   Scan:NXentry
     @NX_class = NXentry
     data:NXdata

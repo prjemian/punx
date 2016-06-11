@@ -376,6 +376,7 @@ def get_NXDL_specifications():
     return a dictionary of NXDL structures, keyed by NX_class name
     '''
     qset = cache.qsettings()
+    workaround = False
 
     pfile = qset.getKey('pickle_file')
     if pfile is not None and os.path.exists(pfile):
@@ -383,9 +384,27 @@ def get_NXDL_specifications():
         nxdl_dict = cache.read_pickle_file(pfile, qset.getKey('git_sha'))
         if nxdl_dict is not None:      # declare victory!
             return nxdl_dict
+    elif not cache.USE_SOURCE_CACHE and pfile is None:
+        # try to get it from the source cache if running from installed package
+        pfile = cache.get_pickle_file_name(cache.SOURCE_CACHE_ROOT)
+        try:
+            nxdl_dict = cache.read_pickle_file(pfile, qset.getKey('git_sha'))
+            if nxdl_dict is not None:      # declare victory!
+                return nxdl_dict
+        except ImportError:
+            # workaround for this problem when using fallback to source cache
+            '''
+                pickle_data = pickle.load(open(pfile, 'rb'))
+            ImportError: No module named nxdlstructure
+            '''
+            workaround = True    # parse from source cache instead
     
     # build the nxdl_dict by parsing all the NXDL specifications
-    basedir = qset.nxdl_dir()
+    if workaround:
+        import __init__
+        basedir = os.path.join(cache.SOURCE_CACHE_ROOT, __init__.NXDL_CACHE_SUBDIR)
+    else:
+        basedir = qset.nxdl_dir()
     path_list = [
         os.path.join(basedir, 'base_classes'),
         os.path.join(basedir, 'applications'),

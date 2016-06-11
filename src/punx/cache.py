@@ -308,7 +308,7 @@ def abs_NXDL_filename(file_name):
                 raise IOError('no NXDL cache: need to *update* it')
             else:
                 # fallback to source cache
-                absolute_name = os.path.join(PKG_DIR, 'cache', __init__.NXDL_CACHE_SUBDIR, file_name)
+                absolute_name = os.path.join(SOURCE_CACHE_ROOT, __init__.NXDL_CACHE_SUBDIR, file_name)
                 if not os.path.exists(absolute_name):
                     raise IOError('no NXDL cache: need to *update* it')
     return absolute_name

@@ -80,8 +80,9 @@ def func_demo(args):
 
 
 def func_hierarchy(args):
-    print 'still in development -- not implemented yet'
-    print args
+    url = 'http://punx.readthedocs.io/en/latest/analyze.html'
+    print 'A chart of the NeXus is in the **punx** documentation.'
+    print 'see: ' + url
 
 
 def func_show(args):
@@ -164,10 +165,10 @@ def parse_command_line_arguments():
     
     # TODO: stretch goal: permit the first two char (or more) of each subcommand to be accepted
 
-#     parser_hierarchy = subparsers.add_parser('hierarchy', 
-#                                              help='show NeXus base class hierarchy')
-#     parser_hierarchy.set_defaults(func=func_hierarchy)
-#     parser_hierarchy.add_argument('something', type=bool, help='something help')
+    parser_hierarchy = subparsers.add_parser('hierarchy', 
+                                             help='show NeXus base class hierarchy')
+    parser_hierarchy.set_defaults(func=func_hierarchy)
+    parser_hierarchy.add_argument('something', type=bool, help='something help')
     
 #     parser_show = subparsers.add_parser('show', 
 #                                         help='show program information (about the cache)')

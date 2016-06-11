@@ -14,20 +14,21 @@ the NeXus base class hierarchy.
 
     .. _fig.base.class.hierarchy:
 
-    .. figure:: graphics/base_class_hierarchy.png
+    .. figure:: ../graphics/base_class_hierarchy.png
         :alt: fig.main_window
         :width: 50%
 
         NeXus base class hierarchy.  Red indicates
         required components.  All others are optional.
 
-Output from the :func:`punx.analyze.base_class_hierarchy` 
+Output [#]_ from the :func:`punx.analyze.base_class_hierarchy` 
 function is used as input
 to the ``dot`` program (from the ``graphviz`` package [#]_)
 to generate the image file::
 
     dot -Tpng base_class_hierarchy.dot -o base_class_hierarchy.png
 
+.. [#] :download:`base_class_hierarchy.dot <../graphics/base_class_hierarchy.dot>`
 .. [#] GraphViz:  URL here
 
 ----

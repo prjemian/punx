@@ -31,7 +31,9 @@ __settings_organization__ = __package_name__
 __settings_package__ = __package_name__
 
 __install_requires__ = ['h5py', 'lxml', 'numpy', 
-                        'pyRestTable', 'PyQt4',
+                        'pyRestTable', 
+                        # 'PyQt4',  
+    # see: http://stackoverflow.com/questions/4628519/is-it-possible-to-require-pyqt-from-setuptools-setup-py
                         ]
 __sphinx_mock_list__ = __install_requires__ + ['lxml.etree', ]
 __classifiers__ = [

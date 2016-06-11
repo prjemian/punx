@@ -48,6 +48,7 @@ setup (name =  punx.__package_name__,        # punx
                                      'cache/*/*.xsd',
                                      'cache/*/*/*.xml',
                                      'cache/*/*/*.xsl',
+                                     'data/writer_*.hdf5',
                                      ],
                          },
        classifiers      = punx.__classifiers__,

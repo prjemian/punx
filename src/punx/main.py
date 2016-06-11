@@ -33,7 +33,7 @@ main user interface file
       valid subcommands
     
       {demo,structure,update,validate}
-        demo                update the cache from GitHub and validate writer_1_3.hdf5
+        demo                validate NeXus  demo file: writer_1_3.hdf5
         hierarchy           TBA: show NeXus base class hierarchy
         show                TBA: show program information (about the cache)
         structure           show structure of HDF5 file
@@ -61,6 +61,17 @@ def func_demo(args):
     args.infile = os.path.abspath(os.path.join(path, 'data', 'writer_1_3.hdf5'))
     print 'punx validate ' + args.infile
     func_validate(args)
+
+    print '\n'
+    print 'punx structure ' + args.infile
+    import h5structure
+    
+    
+    mc = h5structure.h5structure(args.infile)
+    #    :param bool show_attributes: display attributes in output
+    show_attributes=True
+    mc.array_items_shown = 5
+    print '\n'.join(mc.report(show_attributes))
 
 
 def func_hierarchy(args):

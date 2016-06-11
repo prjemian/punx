@@ -54,7 +54,7 @@ setup (name =  punx.__package_name__,        # punx
        entry_points     = {
             # create & install scripts in <python>/bin
             'console_scripts': [
-                # 'punx=punx.nexus:main',
+                'punx=punx.main:main',
 			],
             #'gui_scripts': [],
        },

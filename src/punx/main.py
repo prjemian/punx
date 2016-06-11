@@ -15,6 +15,30 @@
 Python Utilities for NeXus HDF5 files
 
 main user interface file
+
+.. rubric:: Usage
+
+::
+
+    usage: punx [-h] [-v] {hierarchy,show,structure,update,validate} ...
+    
+    Python Utilities for NeXus HDF5 files URL: http://punx.readthedocs.io
+    v0.0.1+4.gff00892.dirty
+    
+    optional arguments:
+      -h, --help            show this help message and exit
+      -v, --version         show program's version number and exit
+    
+    subcommands:
+      valid subcommands
+    
+      {hierarchy,show,structure,update,validate}
+        hierarchy           show NeXus base class hierarchy
+        show                show program information (about the cache)
+        structure           show structure of HDF5 file
+        update              update the local cache of NeXus definitions
+        validate            validate a NeXus file
+
 '''
 
 import os
@@ -30,6 +54,7 @@ import cache
 
 
 def parse_command_line_arguments():
+    ''' '''
     doc = __doc__.strip().splitlines()[0]
     doc += '\n  URL: ' + __init__.__url__
     doc += '\n  v' + __init__.__version__
@@ -76,6 +101,7 @@ def parse_command_line_arguments():
 
 
 def main():
+    ''' '''
     args = parse_command_line_arguments()
     args.func(args)
 

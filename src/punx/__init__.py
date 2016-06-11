@@ -37,7 +37,9 @@ __install_requires__ = ['h5py', 'lxml', 'numpy',
                         ]
 __sphinx_mock_list__ = __install_requires__ + ['lxml.etree', ]
 __classifiers__ = [
-     'Development Status :: 5 - Production/Stable',
+     #'Development Status :: 5 - Production/Stable',
+     #'Development Status :: 4 - Beta',
+     'Development Status :: 3 - Alpha',
      'Environment :: Console',
      'Intended Audience :: Science/Research',
      'License :: Freely Distributable',

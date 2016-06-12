@@ -4,6 +4,20 @@
 User interface: subcommand: **demo**
 ####################################
 
+demonstrate HDF5 file validation
+
+.. rubric:: command line help
+
+.. code-block:: console
+
+   console> punx demo -h
+   punx demo -h
+   usage: punx demo [-h]
+   
+   optional arguments:
+     -h, --help  show this help message and exit
+
+
 
 Examples
 ++++++++
@@ -20,5 +34,5 @@ showing a validation of *writer_1_3.hdf5*, an example
 NeXus HDF5 data file from the NeXus documentation.
 
 .. literalinclude:: demo.txt
-   :language: shell
+   :language: console
    :linenos:

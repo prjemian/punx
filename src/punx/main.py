@@ -64,14 +64,12 @@ def func_demo(args):
 
     path = os.path.dirname(__file__)
     args.infile = os.path.abspath(os.path.join(path, 'data', 'writer_1_3.hdf5'))
-    print 'punx validate ' + args.infile
+
+    print 'console> punx validate ' + args.infile
     func_validate(args)
 
-    print '\n'
-    print 'punx structure ' + args.infile
+    print 'console> punx structure ' + args.infile
     import h5structure
-    
-    
     mc = h5structure.h5structure(args.infile)
     #    :param bool show_attributes: display attributes in output
     show_attributes=True

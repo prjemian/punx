@@ -23,7 +23,7 @@ __description__  = 'Python Utilities for NeXus'
 __author_name__  = __author__
 __author_email__ = __email__
 __url__          = u'http://punx.readthedocs.io'
-#__download_url__ = u'https://github.com/prjemian/spec2nexus/tarball/' + __version__
+__download_url__ = u'https://github.com/prjemian/punx/archive/master.zip'
 __keywords__     = ['NeXus', 'HDF5']
 
 # used by QSettings to store configuration and user cache

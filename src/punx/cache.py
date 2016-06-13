@@ -318,9 +318,16 @@ class UserCacheSettings(QtCore.QSettings, settings.QSettingsMixin):
 def abs_NXDL_filename(file_name):
     '''return absolute path to file_name, within NXDL directory'''
     absolute_name = os.path.abspath(os.path.join(get_nxdl_dir(), file_name))
-    if not os.path.exists(absolute_name):
-        raise FileNotFound('file does not exist: ' + absolute_name)
-    return absolute_name
+    msg = 'file does not exist: ' + absolute_name
+    if os.path.exists(absolute_name):
+        return absolute_name
+    if not USE_SOURCE_CACHE:
+        path = os.path.join(SOURCE_CACHE_ROOT, __init__.NXDL_CACHE_SUBDIR)
+        absolute_name = os.path.abspath(os.path.join(path, file_name))
+        if os.path.exists(absolute_name):
+            return absolute_name
+        msg += '\t AND not found in source cache either!  Report this problem to the developer.'
+    raise FileNotFound(msg)
 
 
 def get_XML_Schema():

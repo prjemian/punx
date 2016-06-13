@@ -380,7 +380,11 @@ def get_NXDL_specifications():
     pfile = cache.get_pickle_file_name(qset.cache_dir())
     if os.path.exists(pfile):
         sha = qset.getKey('git_sha')
-        nxdl_dict = cache.read_pickle_file(pfile, sha)
+        try:
+            nxdl_dict = cache.read_pickle_file(pfile, sha)
+        except ImportError:
+            # could not read the pickle file, suggest user update the cache
+            nxdl_dict = None
         if nxdl_dict is not None:
             return  nxdl_dict
 

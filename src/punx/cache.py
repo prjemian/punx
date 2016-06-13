@@ -95,16 +95,37 @@ class FileNotFound(Exception): pass
 class NoCacheDirectory(Exception): pass
 
 
-def get_pickle_file_name(path):
-    ''' '''
-    return os.path.join(path, __init__.PICKLE_FILE)
+def get_nxdl_dir():
+    '''
+    the path of the directory with the files containing NeXus definitions
+    
+    Note:  This directory, and the files it contains, are **only** used during
+    the process of updating the cache and then writing the pickle file.
+    '''
+    if USE_SOURCE_CACHE:
+        cache_dir = SOURCE_CACHE_ROOT
+    else:
+        cache_dir = qsettings().cache_dir()
+    path = os.path.abspath(os.path.join(cache_dir, __init__.NXDL_CACHE_SUBDIR))
+    return path
+
+
+def get_pickle_file_name(path, use_fallback=True):
+    '''
+    The pickle file holds all known NXDL classes, parsed into Python data structures
+    '''
+    pfile = os.path.join(path, __init__.PICKLE_FILE)
+    if use_fallback and not USE_SOURCE_CACHE and not os.path.exists(pfile):
+        # user cache has no pickle file, fall back to source cache
+        pfile = os.path.join(SOURCE_CACHE_ROOT, __init__.PICKLE_FILE)
+    return pfile
 
 
 def write_pickle_file(info, path):
     '''
     write the parsed nxdl_dict and info to a Python pickle file
     '''
-    info['pickle_file'] = get_pickle_file_name(path)
+    info['pickle_file'] = get_pickle_file_name(path, use_fallback=False)
     nxdl_dict = nxdlstructure.get_NXDL_specifications()
     pickle_data = dict(nxdl_dict=nxdl_dict, info=info)
     pickle.dump(pickle_data, open(info['pickle_file'], 'wb'))
@@ -175,11 +196,10 @@ def update_NXDL_Cache(force_update=False):
         # proceed only if GitHub info was available
         qset = qsettings()
         info['file'] = str(qset.fileName())
-        nxdl_subdir = qset.nxdl_dir()
     
         different_sha = str(info['git_sha']) != str(qset.getKey('git_sha'))
         different_git_time = str(info['git_time']) != str(qset.getKey('git_time'))
-        nxdl_subdir_exists = os.path.exists(nxdl_subdir)
+        nxdl_subdir_exists = os.path.exists(get_nxdl_dir())
 
         could_update = different_sha or different_git_time or not nxdl_subdir_exists
         if could_update or force_update:
@@ -208,7 +228,7 @@ def update_NXDL_Cache(force_update=False):
             # optimization: write the parsed NXDL specifications to a file
             if force_update:
                 # force the pickle file to be re-written
-                pfile = get_pickle_file_name(path)
+                pfile = get_pickle_file_name(path, use_fallback=False)
                 if os.path.exists(pfile):
                     os.remove(pfile)
             write_pickle_file(info, path)
@@ -228,16 +248,10 @@ def qsettings():
     '''
     global __singleton_settings__
     if __singleton_settings__ is None:
-        # check if using from development source or installed source (user)
         if USE_SOURCE_CACHE:
             qset = source_cache_settings()
         else:
             qset = user_cache_settings()
-            if not os.path.exists(qset.cache_dir()):
-                # make the cache directory and try again
-                path = os.path.dirname(str(qset.fileName()))
-                os.mkdir(path)
-                qset = user_cache_settings()
         __singleton_settings__ = qset
     if not os.path.exists(__singleton_settings__.cache_dir()):
         raise NoCacheDirectory('no cache found')
@@ -272,6 +286,8 @@ class SourceCacheSettings(QtCore.QSettings, settings.QSettingsMixin):
     '''
     
     def __init__(self):
+        if USE_SOURCE_CACHE and not os.path.exists(SOURCE_CACHE_ROOT):
+            os.mkdir(SOURCE_CACHE_ROOT)
         path = os.path.join(SOURCE_CACHE_ROOT, 
                             __init__.SOURCE_CACHE_SETTINGS_FILENAME)
         QtCore.QSettings.__init__(self, path, QtCore.QSettings.IniFormat)
@@ -293,24 +309,17 @@ class UserCacheSettings(QtCore.QSettings, settings.QSettingsMixin):
                                   QtCore.QSettings.UserScope, 
                                   orgName, 
                                   appName)
+        path = self.cache_dir()
+        if not USE_SOURCE_CACHE and not os.path.exists(path):
+            os.mkdir(path)
         self.init_global_keys()
 
 
 def abs_NXDL_filename(file_name):
     '''return absolute path to file_name, within NXDL directory'''
-    qset = qsettings()
-    absolute_name = os.path.join(qset.nxdl_dir(), file_name)
+    absolute_name = os.path.abspath(os.path.join(get_nxdl_dir(), file_name))
     if not os.path.exists(absolute_name):
-        if os.path.exists(qset.nxdl_dir()):
-            raise FileNotFound('file does not exist: ' + absolute_name)
-        else:
-            if USE_SOURCE_CACHE:
-                raise IOError('no NXDL cache: need to *update* it')
-            else:
-                # fallback to source cache
-                absolute_name = os.path.join(SOURCE_CACHE_ROOT, __init__.NXDL_CACHE_SUBDIR, file_name)
-                if not os.path.exists(absolute_name):
-                    raise IOError('no NXDL cache: need to *update* it')
+        raise FileNotFound('file does not exist: ' + absolute_name)
     return absolute_name
 
 
@@ -367,12 +376,6 @@ def get_nxdlTypes_xsd():
 
 
 if __name__ == '__main__':
-    try:
-        update_NXDL_Cache(True)
-    except NoCacheDirectory:
-        # make the cache directory and try again
-        path = os.path.dirname(str(__singleton_settings__.fileName()))
-        os.mkdir(path)
-        update_NXDL_Cache(True)
-    # print user_cache_settings().fileName()
-    # print source_cache_settings().fileName()
+    update_NXDL_Cache(True)
+#     # print user_cache_settings().fileName()
+#     # print source_cache_settings().fileName()

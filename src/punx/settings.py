@@ -118,10 +118,6 @@ class QSettingsMixin(object):
     def cache_dir(self):
         '''return the absolute path of the cache directory'''
         return os.path.dirname(str(self.fileName()))
-    
-    def nxdl_dir(self):
-        '''return the absolute path of the NXDL directory'''
-        return os.path.join(self.cache_dir(), __init__.NXDL_CACHE_SUBDIR)
 
 
 def gmt_github_style():

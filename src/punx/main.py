@@ -170,7 +170,7 @@ def parse_command_line_arguments():
     parser_hierarchy = subparsers.add_parser('hierarchy', 
                                              help='show NeXus base class hierarchy')
     parser_hierarchy.set_defaults(func=func_hierarchy)
-    parser_hierarchy.add_argument('something', type=bool, help='something help')
+    #parser_hierarchy.add_argument('something', type=bool, help='something help')
     
 #     parser_show = subparsers.add_parser('show', 
 #                                         help='show program information (about the cache)')

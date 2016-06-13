@@ -112,13 +112,13 @@ def func_update(args):
 
 
 def func_validate(args):
+    import validate
     if args.infile.endswith('.nxdl.xml'):
-        import nxdlstructure
-        nxdl = nxdlstructure.NXDL_definition(args.infile)
-        print nxdl.render()
+        result = validate.validate_xml(args.infile)
+        if result is None:
+            print args.infile, ' validates'
     else:
         import finding
-        import validate
         try:
             validator = validate.Data_File_Validator(args.infile)
         except IOError, _exc:

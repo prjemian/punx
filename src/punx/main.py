@@ -166,6 +166,7 @@ def parse_command_line_arguments():
     parser_demo.set_defaults(func=func_demo)
     
     # TODO: stretch goal: permit the first two char (or more) of each subcommand to be accepted
+    # ?? http://stackoverflow.com/questions/4114996/python-argparse-nargs-or-depending-on-prior-argument?rq=1
 
     parser_hierarchy = subparsers.add_parser('hierarchy', 
                                              help='show NeXus base class hierarchy')

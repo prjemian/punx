@@ -34,31 +34,30 @@ There are two distinct cache directories:
    This cache is only updated by the developer, in preparation
    of a source code release.  It is not stored in the GitHub repository,
    to avoid duplication of the NeXus definitions sources.
+   
+   .. turns out the pickle file in the source cache is not
+      available to the user due to an Import Error.  When reading the
+      pickle file, this exception is reported:
+      
+         ImportError: cannot import nxdlstructure
+
+      So, the code parses the NXDL and creates the dictionary each time
+      the code is called.  Once the user updates the user cache (the user
+      cannot update the source cache), a new pickle file is written in the
+      user cache.  This file does not create the same exception.
 
 .. index: user cache
 
 :user cache:
    The *user cache* is stored in a subdirectory within the user's home 
-   directory.  Periodically, when network access is available, the
-   code will check for newer versions of the NeXus definitions and update
-   the *user cache* as necessary.  The method
-   :meth:`punx.cache.update_NXDL_Cache` is called to update the cache.
-   
-   .. warning:: this feature is not yet implemented
-      
-      plan to use the QSettings class to manage
-      a user settings file and the location of the user cache.
+   directory.  The user may request to update the cache, when network 
+   access to GitHub is available, and the code will check for newer 
+   versions of the NeXus definitions and update the *user cache* as 
+   necessary using method :meth:`punx.cache.update_NXDL_Cache`.
    
    .. tip::  To determine if the cache should be updated,
-      the code checks the GitHub commit hash and date/time stamp
-      and compares it with that in the *user cache*.
-
-The :meth:`punx.cache.cache_path` method returns the directory of
-the cache that will be used.  This directory contains the settings file, 
-the pickle file, and the subdirectory with NeXus definitions.
-
-The :meth:`punx.cache.NXDL_path` method returns the directory with
-the NeXus definitions (a subdirectory of :meth:`punx.cache.cache_path`).
+      the code compares the current GitHub commit hash and 
+      date/time stamp with the *user cache*.
 
 .. [#] QtCore.QSettings: http://doc.qt.io/qt-4.8/qsettings.html
 .. [#] Python pickle file: https://docs.python.org/2/library/pickle.html

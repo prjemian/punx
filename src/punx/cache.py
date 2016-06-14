@@ -19,9 +19,9 @@ NXDL class files is a current set of the NXDL definitions.
 
 This code maintains two sets of the definitions.
 
-One is the set 
-provided with the package at installation.  This set is updated
-by the developer prior to packaging the source for distribution.
+One is the set provided with the package at installation.  
+This set is updated by the developer prior to packaging the 
+source for distribution.
 Since the source cache is already installed with the package,
 it provides a version of the NeXus definitions available for 
 fallback use when network access to the GitHub

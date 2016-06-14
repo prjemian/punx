@@ -312,6 +312,8 @@ class Data_File_Validator(object):
                     title = base_title + ' @signal attribute'
                     msg = {True: 'value: ' + str(signal), False: 'does not exist'}
                     self.new_finding(title, field.name + '@signal', finding.OK, 'value: ' + msg)
+                    # FIXME: TypeError: cannot concatenate 'str' and 'dict' objects
+                    # NeXus example data: simple3D.h5
                     try:
                         int_signal = int(signal)
                         if int_signal == 1:
@@ -497,10 +499,14 @@ class Data_File_Validator(object):
             if h5structure.isHdf5Group(h5_obj):
                 h5_sub_nx_class = h5_obj.attrs.get('NX_class', None)
                 s = h5_sub_nx_class in nxdl_subgroups
-                f = {True: finding.OK, False: finding.ERROR}[s]
+                f = {True: finding.OK, False: finding.NOTE}[s]
                 c = h5_sub_nx_class
-                if f == finding.ERROR:
-                    c += ': not known subgroup of ' + nx_class
+                if f == finding.NOTE:
+                    s = h5_sub_nx_class in self.nxdl_dict
+                    f = {True: finding.NOTE, False: finding.ERROR}[s]
+                    c += ': not known '
+                    c += {True: 'subgroup of ', False: 'NeXus class'}[s]
+                    c += ' ' + nx_class
                 self.new_finding(nx_class + ' subgroup', h5_obj.name, f, c)
             if h5structure.isHdf5Dataset(h5_obj):
                 known_name = h5_obj.name in nxdl_spec.fields

@@ -288,6 +288,7 @@ class Data_File_Validator(object):
                         title = base_title + ' @primary value checked'
                         m = '@primary="' + str(signal) + '" not interpreted as integer'
                         self.new_finding(title, field.name + '@primary', finding.ERROR, m)
+                title = 'field @axis attribute'
                 self.new_finding(title, field.name + '@axis', finding.TODO, 'not checked')
 
             if signal_count == 0:

@@ -308,12 +308,11 @@ class Data_File_Validator(object):
             for field_name in group:
                 field = group.get(field_name)
                 signal = self.get_hdf5_attribute(field, 'signal')
-                if signal is not None:
+                t = signal is not None
+                if t:
                     title = base_title + ' @signal attribute'
-                    msg = {True: 'value: ' + str(signal), False: 'does not exist'}
+                    msg = {True: 'value: ' + str(signal), False: 'does not exist'}[t]
                     self.new_finding(title, field.name + '@signal', finding.OK, 'value: ' + msg)
-                    # FIXME: TypeError: cannot concatenate 'str' and 'dict' objects
-                    # NeXus example data: simple3D.h5
                     try:
                         int_signal = int(signal)
                         if int_signal == 1:

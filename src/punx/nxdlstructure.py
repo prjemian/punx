@@ -432,20 +432,6 @@ def parse_command_line_arguments():
     return parser.parse_args()
 
 
-def main():
-    '''
-    standard command-line processing
-    '''
-    args = parse_command_line_arguments()
-    nxdl_file = args.infile
-
-    if not os.path.exists(nxdl_file):
-        print( 'Cannot find %s' % nxdl_file )
-        exit()
-
-    nxdl = NXDL_definition(nxdl_file)
-    print nxdl.render()
-
-
 if __name__ == '__main__':
-    main()
+    print "Start this module using:  python main.py structure ..."
+    exit(0)

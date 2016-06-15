@@ -426,5 +426,5 @@ def main():
     print rules
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # remove for production
     main()

@@ -903,9 +903,6 @@ class Data_File_Validator(object):
         return t.reST()
 
 
-def main():
-    pass
-
-
 if __name__ == '__main__':
-    main()
+    print "Start this module using:  python main.py validate ..."
+    exit(0)

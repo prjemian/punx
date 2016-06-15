@@ -447,9 +447,6 @@ def isHdf5ExternalLink(obj):
     return isinstance(obj, h5py.ExternalLink)
 
 
-def main():
-    pass
-
-
 if __name__ == '__main__':
-    main()
+    print "Start this module using:  python main.py structure ..."
+    exit(0)

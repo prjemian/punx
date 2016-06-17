@@ -42,8 +42,9 @@ main user interface file
 
 '''
 
-import os
 import argparse
+import os
+import sys
 
 import __init__
 
@@ -138,70 +139,116 @@ def func_validate(args):
         print validator.report_findings_summary()
 
 
+class MyArgumentParser(argparse.ArgumentParser):
+    '''
+    override standard ArgumentParser to enable shortcut feature
+    
+    stretch goal: permit the first two char (or more) of each subcommand to be accepted
+    # ?? http://stackoverflow.com/questions/4114996/python-argparse-nargs-or-depending-on-prior-argument?rq=1
+    '''
+    
+    def parse_args(self, args=None, namespace=None):
+        '''
+        permit the first two char (or more) of each subcommand to be accepted
+        '''
+        if args is None:
+            # args default to the system args
+            args = sys.argv[1:]
+        if len(args) > 0:
+            # make a list of the available subcommand names
+            choices = []
+            for g in self._subparsers._group_actions:
+                if isinstance(g, argparse._SubParsersAction):
+                    #choices = g._name_parser_map.keys()
+                    choices = g.choices.keys()
+                    break
+            if len(choices) > 0 and args[0] not in choices:
+                if len(args[0]) < 2:
+                    msg = 'subcommand too short, must match first 2 or more characters, given: %s'
+                    self.error(msg % ' '.join(args))
+                # look for any matches
+                matches = [c for c in choices if c.startswith(args[0])]
+                # validate the match is unique
+                if len(matches) == 0:
+                    msg = 'subcommand unrecognized, given: %s'
+                    self.error(msg % ' '.join(args))
+                elif len(matches) > 1:
+                    msg = 'subcommand ambiguous (matches: %s)' % ' | '.join(matches)
+                    msg += ', given: %s'
+                    self.error(msg % ' '.join(args))
+                else:
+                    args[0] = matches[0]
+        # make sure that args are mutable
+        args = list(args)
+        return argparse.ArgumentParser.parse_args(self, args, namespace)
+
 
 def parse_command_line_arguments():
-    ''' '''
+    '''process command line'''
     doc = __doc__.strip().splitlines()[0]
     doc += '\n  URL: ' + __init__.__url__
     doc += '\n  v' + __init__.__version__
-    parser = argparse.ArgumentParser(prog=__init__.__package_name__, 
+    p = MyArgumentParser(prog=__init__.__package_name__, 
                                      description=doc,
                                      epilog=__init__.__url__)
 
-    parser.add_argument('-v', 
+    p.add_argument('-v', 
                         '--version', 
                         action='version', 
                         version=__init__.__version__)
 
     # TODO: stretch goal: GUI for any of this
-    # parser.add_argument('-g', 
+    # p.add_argument('-g', 
     #                     '--gui', 
     #                     help='graphical user interface (TBA)')
 
-    subparsers = parser.add_subparsers(title='subcommands',
-                                       description='valid subcommands',)
+    sub_p = p.add_subparsers(title='sub_p', description='valid sub_p',)
     
-    parser_demo = subparsers.add_parser('demo',
-                                        help='demonstrate HDF5 file validation')
-    parser_demo.set_defaults(func=func_demo)
     
-    # TODO: stretch goal: permit the first two char (or more) of each subcommand to be accepted
-    # ?? http://stackoverflow.com/questions/4114996/python-argparse-nargs-or-depending-on-prior-argument?rq=1
+    ### subcommand: demo
+    p_demo = sub_p.add_parser('demo', help='demonstrate HDF5 file validation')
+    p_demo.set_defaults(func=func_demo)
 
-    parser_hierarchy = subparsers.add_parser('hierarchy', 
-                                             help='show NeXus base class hierarchy')
-    parser_hierarchy.set_defaults(func=func_hierarchy)
-    #parser_hierarchy.add_argument('something', type=bool, help='something help')
-    
-#     parser_show = subparsers.add_parser('show', 
-#                                         help='show program information (about the cache)')
-#     parser_show.set_defaults(func=func_show)
-#     parser_show.add_argument('details', type=bool, help='details help')
-    
-    parser_structure = subparsers.add_parser('structure', 
-                                             help='show structure of HDF5 or NXDL file')
-    parser_structure.set_defaults(func=func_structure)
-    parser_structure.add_argument('infile', help="HDF5 or NXDL file name")
-    parser_structure.add_argument('-a', 
+
+    ### subcommand: hierarchy
+    p_hierarchy = sub_p.add_parser('hierarchy',  help='show NeXus base class hierarchy')
+    p_hierarchy.set_defaults(func=func_hierarchy)
+    #p_hierarchy.add_argument('something', type=bool, help='something help')
+
+
+    ### subcommand: show
+#     p_show = sub_p.add_parser('show', help='show program information (about the cache)')
+#     p_show.set_defaults(func=func_show)
+#     # p_show.add_argument('details', type=bool, help='details help')
+
+
+    ### subcommand: structure
+    p_structure = sub_p.add_parser('structure',
+                                   help='show structure of HDF5 or NXDL file')
+    p_structure.set_defaults(func=func_structure)
+    p_structure.add_argument('infile', help="HDF5 or NXDL file name")
+    p_structure.add_argument('-a', 
                         action='store_false', 
                         default=True,
                         dest='show_attributes',
                         help='Do not print attributes of HDF5 file structure')
-    
-    parser_update = subparsers.add_parser('update', 
-                                          help='update the local cache of NeXus definitions')
-    parser_update.set_defaults(func=func_update)
-    parser_update.add_argument('-f', '--force', 
+
+
+    ### subcommand: update
+    p_update = sub_p.add_parser('update', help='update the local cache of NeXus definitions')
+    p_update.set_defaults(func=func_update)
+    p_update.add_argument('-f', '--force', 
                                action='store_true', 
                                default=False, 
                                help='force update (if GitHub available)')
-    
-    parser_validate = subparsers.add_parser('validate', 
-                                            help='validate a NeXus file')
-    parser_validate.add_argument('infile', help="HDF5 or NXDL file name")
-    parser_validate.set_defaults(func=func_validate)
 
-    return parser.parse_args()
+
+    ### subcommand: validate
+    p_validate = sub_p.add_parser('validate', help='validate a NeXus file')
+    p_validate.add_argument('infile', help="HDF5 or NXDL file name")
+    p_validate.set_defaults(func=func_validate)
+
+    return p.parse_args()
 
 
 def main():

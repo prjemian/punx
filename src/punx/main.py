@@ -47,6 +47,7 @@ import os
 import sys
 
 import __init__
+import logs
 
 
 # :see: https://docs.python.org/2/library/argparse.html#sub-commands
@@ -224,6 +225,10 @@ def parse_command_line_arguments():
                         action='version', 
                         version=__init__.__version__)
 
+    p.add_argument('-l', '--logfile',
+                        default='__console__',
+                        help='log output to file (default: no log file')
+
     # TODO: stretch goal: GUI for any of this
     # p.add_argument('-g', 
     #                     '--gui', 
@@ -280,6 +285,9 @@ def parse_command_line_arguments():
 
 def main():
     args = parse_command_line_arguments()
+    if args.logfile != '__console__':
+        # TODO: adjust the API to the needs of this package
+        log = logs.Logger()
     args.func(args)
 
 

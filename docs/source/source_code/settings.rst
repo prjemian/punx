@@ -1,5 +1,5 @@
-Settings
-########
+Settings : :mod:`settings`
+###############################
 
 
 source code settings

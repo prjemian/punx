@@ -1,5 +1,5 @@
-nxdlstructure: NXDL File Structure
-##################################
+NXDL File Structure : :mod:`nxdlstructure`
+###########################################################
 
 Print the structure of a NeXus NXDL definition language file
 

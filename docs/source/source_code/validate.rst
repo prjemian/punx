@@ -1,7 +1,7 @@
 .. _source.validate:
 
-Validation
-##########
+Validation : :mod:`validate`
+###################################
 
 .. index:: validation
 .. index:: severity

@@ -1,5 +1,5 @@
-Cache
-#####
+Cache : :mod:`cache`
+###########################
 
 .. index:: NeXus definitions
 

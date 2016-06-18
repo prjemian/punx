@@ -1,5 +1,5 @@
-User interface
-##############
+User interface : :mod:`main`
+######################################
 
 
 source code settings

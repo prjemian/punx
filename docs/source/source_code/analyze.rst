@@ -1,6 +1,6 @@
 
-Analysis
-########
+Analysis : :mod:`analyze`
+##################################
 
 First off, load ALL the NXDL classes,
 count the number of times each base class has

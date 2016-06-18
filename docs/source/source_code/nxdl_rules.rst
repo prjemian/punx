@@ -1,5 +1,5 @@
-NXDL Rules: The XML Schema files
-################################
+NXDL Rules: The XML Schema files : :mod:`nxdl_rules`
+#########################################################
 
 The NXDL is defined by a set of rules expressed in XML Schema.
 These rules defined the elements of the NXDL, such as fields and groups.

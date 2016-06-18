@@ -1,5 +1,5 @@
-Finding
-#######
+Findings : :mod:`finding`
+###############################
 
 source code documentation
 *************************

@@ -20,6 +20,8 @@ import sys      #@UnusedImport
 import h5py
 import numpy
 
+import __init__
+
 
 class h5structure(object):
     '''
@@ -42,6 +44,8 @@ class h5structure(object):
         if os.path.exists(filename):
             self.filename = filename
             self.isNeXus = isNeXusFile(filename)
+        else:
+            raise __init__.FileNotFound(filename)
 
     def report(self, show_attributes=True):
         '''
@@ -50,8 +54,13 @@ class h5structure(object):
         The work of parsing the datafile is done in this method.
         '''
         if self.filename is None: return None
+        if not os.path.exists(self.filename):
+            raise __init__.FileNotFound(self.filename)
         self.show_attributes = show_attributes
-        f = h5py.File(self.filename, 'r')
+        try:
+            f = h5py.File(self.filename, 'r')
+        except IOError:
+            raise __init__.HDF5_Open_Error(self.filename)
         txt = self.filename
         if self.isNeXus:
             txt += " : NeXus data file"

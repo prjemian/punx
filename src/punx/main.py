@@ -58,11 +58,26 @@ def func_demo(args):
     show what **punx** can do
     
     .. index:: demo
-    '''
-#     print 'punx update '
-#     args.force = False
-#     func_update(args)
 
+    Internally, runs these commands::
+
+        punx validate <source_directory>/data/writer_1_3.hdf5
+        punx structure <source_directory>/data/writer_1_3.hdf5
+
+    .. index:: cache update
+
+    If you get an error message that looks like this one (line breaks added here for clarity::
+
+        punx.cache.FileNotFound: file does not exist:
+        /Users/<username>/.config/punx/definitions-master/nxdl.xsd
+        AND not found in source cache either!  Report this problem to the developer.
+
+    then you will need to update your local cache of the NeXus definitions.
+    Use this command to update the local cache::
+
+        punx update
+
+    '''
     path = os.path.dirname(__file__)
     args.infile = os.path.abspath(os.path.join(path, 'data', 'writer_1_3.hdf5'))
 
@@ -80,7 +95,7 @@ def func_demo(args):
 
 def func_hierarchy(args):
     url = 'http://punx.readthedocs.io/en/latest/analyze.html'
-    print 'A chart of the NeXus is in the **punx** documentation.'
+    print 'A chart of the NeXus hierarchy is in the **punx** documentation.'
     print 'see: ' + url
 
 
@@ -101,10 +116,19 @@ def func_structure(args):
         limit=5
         #    :param bool show_attributes: display attributes in output
         show_attributes=True
-        
-        mc = h5structure.h5structure(os.path.abspath(args.infile))
+
+        try:
+            mc = h5structure.h5structure(os.path.abspath(args.infile))
+        except __init__.FileNotFound:
+            print 'File not found: ' + args.infile
+            exit(1)
         mc.array_items_shown = limit
-        print '\n'.join(mc.report(show_attributes) or '')
+        try:
+            report = mc.report(show_attributes)
+        except __init__.HDF5_Open_Error:
+            print 'Could not open as HDF5: ' + args.infile
+            exit(1)
+        print '\n'.join(report or '')
 
 
 def func_update(args):
@@ -122,8 +146,11 @@ def func_validate(args):
         import finding
         try:
             validator = validate.Data_File_Validator(args.infile)
-        except IOError, _exc:
+        except __init__.FileNotFound:
             print 'File not found: ' + args.infile
+            exit(1)
+        except __init__.HDF5_Open_Error:
+            print 'Could not open as HDF5: ' + args.infile
             exit(1)
         validator.validate()
 
@@ -252,7 +279,6 @@ def parse_command_line_arguments():
 
 
 def main():
-    ''' '''
     args = parse_command_line_arguments()
     args.func(args)
 

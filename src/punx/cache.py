@@ -91,7 +91,6 @@ __singleton_nxdl_xsd__ = None
 __singleton_nxdlTypes_xsd__ = None
 
 
-class FileNotFound(Exception): pass
 class NoCacheDirectory(Exception): pass
 
 
@@ -327,7 +326,7 @@ def abs_NXDL_filename(file_name):
         if os.path.exists(absolute_name):
             return absolute_name
         msg += '\t AND not found in source cache either!  Report this problem to the developer.'
-    raise FileNotFound(msg)
+    raise __init__.FileNotFound(msg)
 
 
 def get_XML_Schema():

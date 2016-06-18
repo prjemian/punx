@@ -70,6 +70,10 @@ PICKLE_FILE                     = 'nxdl.p'
 NXDL_CACHE_SUBDIR = GITHUB_NXDL_REPOSITORY + '-' + GITHUB_NXDL_BRANCH
 
 
+class FileNotFound(Exception): pass
+class HDF5_Open_Error(Exception): pass
+
+
 import os
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 try:

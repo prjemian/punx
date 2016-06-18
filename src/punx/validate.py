@@ -106,13 +106,14 @@ import collections
 import h5py
 import lxml.etree
 import numpy
+import os
 import re
 
+import __init__
 import cache
 import finding
 import h5structure
 import nxdlstructure
-
 
 # TODO: http://download.nexusformat.org/doc/html/search.html?q=warning&check_keywords=yes&area=default
 
@@ -198,7 +199,10 @@ class Data_File_Validator(object):
     '''
     
     def __init__(self, fname):
+        if not os.path.exists(fname):
+            raise __init__.FileNotFound(fname)
         self.fname = fname
+
         self.findings = []      # list of Finding() instances
         self.addresses = collections.OrderedDict()     # dictionary of all HDF5 address nodes in the data file
 
@@ -211,7 +215,10 @@ class Data_File_Validator(object):
         self.nxdlTypes_xsd = lxml.etree.parse(nxdlTypes_xsd_file)
 
         self.nxdl_dict = nxdlstructure.get_NXDL_specifications()
-        self.h5 = h5py.File(fname, 'r')
+        try:
+            self.h5 = h5py.File(fname, 'r')
+        except IOError:
+            raise __init__.HDF5_Open_Error(fname)
         self._init_patterns()
     
     def _init_patterns(self):

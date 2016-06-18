@@ -63,7 +63,7 @@ class Logger(object):
                 ymd = str(_now()).split()[0]
                 pid = os.getpid()
                 # current working directory?
-                log_file = __init__.__package_name__ + ymd + '-' + str(pid) + '.log'
+                log_file = '-'.join(__init__.__package_name__, ymd, str(pid) + '.log')
             self.log_file = os.path.abspath(log_file)
             logging.basicConfig(filename=log_file, level=level)
 

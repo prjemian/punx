@@ -59,6 +59,6 @@ setup (name =  punx.__package_name__,        # punx
 			],
             #'gui_scripts': [],
        },
-       #version          = versioneer.get_version(),
-       #cmdclass         = versioneer.get_cmdclass(),
+       version          = versioneer.get_version(),
+       cmdclass         = versioneer.get_cmdclass(),
       )

@@ -99,7 +99,7 @@ class h5structure(object):
                     s += self._renderLinkedObject(value, itemname, indentation+"  ")
                 elif isHdf5Group(value) or isHdf5File(value):
                     groups.append(value)
-                    # TODO: report external group links in the right place
+                    # TODO: issue #18: report external group links in the right place
                     # The problem is the link file and path need to be fed into the
                     # next call to _renderGroup().  No such design exists now for that. 
                 elif isHdf5Dataset(value):
@@ -290,7 +290,7 @@ def _get_group_niac2014(parent, attribute, nxclass_name):
         # Expect that some data files will not write these attributes.
         # Find *any* HDF5 group that has its @NX_class attribute set to ``nxclass_name``.
         for node0 in parent.values():
-            # TODO: verify
+            # TODO: issue #19: verify
             # Does this search ALL POSSIBLE {nxclass_name} groups for 
             # at least one compliance or just the first one it finds?
             if isNeXusGroup(node0, nxclass_name):
@@ -407,7 +407,7 @@ def isNeXusFile_ByAxisAttr(filename):
     
     NOTE: **Not implemented yet!**
     '''
-    return False    # TODO: implement this method
+    return False    # TODO: issue #20: implement this method
 
 
 def isNeXusGroup(obj, NXtype):

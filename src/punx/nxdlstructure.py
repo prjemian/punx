@@ -73,7 +73,7 @@ class NXDL_mixin(object):
             self.name = node.get('name')
         self.ns = nxdl_rules.NAMESPACE_DICT
         
-        # TODO: apply nxdl_rules.NxdlRules() as defaults when creating NXDL_mixin subclasses below
+        # TODO: issue #12: apply nxdl_rules.NxdlRules() as defaults when creating NXDL_mixin subclasses below
         self.nxdl_rules = get_nxdl_rules()
     
     def get_NX_type(self, node):
@@ -297,7 +297,7 @@ class NX_field(NXDL_mixin):
             dims[index] = value
         
         if len(dims) == 0:
-            # TODO: read the "rank" attribute and create array of that length with "0" values
+            # TODO: issue #13: read the "rank" attribute and create array of that length with "0" values
             rank = int(node_list[0].get('rank'))
             return ['*' for _ in range(rank)]
         if len(dims) == 1 and min(dims.keys()) == 0:

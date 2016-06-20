@@ -98,7 +98,7 @@ def func_hierarchy(args):
     url = 'http://punx.readthedocs.io/en/latest/analyze.html'
     print 'A chart of the NeXus hierarchy is in the **punx** documentation.'
     print 'see: ' + url
-    # TODO: show NeXus base class hierarchy from a given base class
+    # TODO: issue #1 & #10 show NeXus base class hierarchy from a given base class
 
 
 def func_show(args):

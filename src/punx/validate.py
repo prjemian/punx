@@ -115,7 +115,7 @@ import finding
 import h5structure
 import nxdlstructure
 
-# TODO: http://download.nexusformat.org/doc/html/search.html?q=warning&check_keywords=yes&area=default
+# TODO: issue #14: http://download.nexusformat.org/doc/html/search.html?q=warning&check_keywords=yes&area=default
 
 __url__ = 'http://punx.readthedocs.org/en/latest/validate.html'
 
@@ -125,8 +125,8 @@ NXDL_DATA_TYPES = {
     'NX_CHAR': (str, unicode, numpy.string_, numpy.ndarray),
     'NX_INT':  (int, numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64),
     'NX_FLOAT':  (float, ),
-    'NX_BINARY': (None, ),     # FIXME:
-    'NX_BOOLEAN': (None, ),     # FIXME:
+    'NX_BINARY': (None, ),     # #FIXME: issue #21
+    'NX_BOOLEAN': (None, ),     # FIXME: issue #21
 }
 NXDL_DATA_TYPES['NX_UINT']   = NXDL_DATA_TYPES['NX_INT']
 NXDL_DATA_TYPES['NX_POSINT'] = NXDL_DATA_TYPES['NX_INT']
@@ -287,7 +287,7 @@ class Data_File_Validator(object):
                             title = base_title + ' @primary value checked'
                             m = 'possible dimension scale'
                             self.new_finding(title, field.name + '@primary', finding.OK, m)
-                            # TODO: verify that shape is 1-D
+                            # TODO: issue #15: verify that shape is 1-D
                             m = 'verify the shape is 1-D'
                             self.new_finding(title, field.name + '@primary', finding.TODO, m)
                             dimension_scales.append(field_name)
@@ -519,7 +519,7 @@ class Data_File_Validator(object):
                 known_name = h5_obj.name in nxdl_spec.fields
                 c = 'strict comparison'
                 if not known_name:
-                    # TODO: check here if name is flexible : How to do this?
+                    # TODO: issue #16: check here if name is flexible : How to do this?
                     known_name = nx_class in ('NXdata', 'NXdetector')
                     c = 'acceptable'
                 f = {True: finding.OK, False:finding.NOTE}[known_name]
@@ -719,7 +719,7 @@ class Data_File_Validator(object):
 #             else:
 #                 status = finding.NOTE
 #                 msg = 'not defined in ' + nxdl_class
-#             # TODO: need to learn *minOccurs* from NXDL
+#             # TODO: issue #17, need to learn *minOccurs* from NXDL
 #             msg += ' (optional)'
             if data_type_checked:
                 msg = str(type(obj_attr)) + ' : ' + nx_type

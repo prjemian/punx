@@ -239,6 +239,13 @@ def parse_command_line_arguments():
                        default='__console__',
                        nargs='?',
                        help=help_text)
+        
+        help_text = 'logging interest level (1-50), default=20 (INFO)'
+        subp.add_argument('-i', '--interest',
+                       default=__init__.INFO,
+                       type=int,
+                       #choices=range(1,51),
+                       help=help_text)
 
     # TODO: stretch goal: GUI for any of this
     # p.add_argument('-g', 
@@ -303,8 +310,11 @@ def parse_command_line_arguments():
 def main():
     args = parse_command_line_arguments()
     if args.logfile != '__console__':
-        # TODO: adjust the API to the needs of this package
-        _log = logs.Logger()
+        lo = __init__.NOISY
+        hi = __init__.CRITICAL
+        args.interest = max(lo, min(hi, args.interest))
+        _log = logs.Logger(log_file=args.logfile, level=args.interest)
+    __init__.LOG_MESSAGE('args: ' + str(args), __init__.DEBUG)
     args.func(args)
 
 

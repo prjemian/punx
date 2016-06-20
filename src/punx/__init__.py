@@ -69,6 +69,20 @@ SOURCE_CACHE_SETTINGS_FILENAME  = 'punx.ini'
 PICKLE_FILE                     = 'nxdl.p'
 NXDL_CACHE_SUBDIR = GITHUB_NXDL_REPOSITORY + '-' + GITHUB_NXDL_BRANCH
 
+LOG_MESSAGE                     = None      # re-define as function to add text to program logs
+
+# logging levelk, from logging.__init__.py
+CRITICAL = 50
+FATAL = CRITICAL
+ERROR = 40
+WARNING = 30
+WARN = WARNING
+INFO = 20
+DEBUG = 10
+NOTSET = 0
+# unique to this code
+NOISY = 1
+CONSOLE_ONLY = -1
 
 class FileNotFound(Exception): pass
 class HDF5_Open_Error(Exception): pass

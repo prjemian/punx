@@ -23,39 +23,20 @@ import sys
 
 import __init__
 
-# from logging.__init__.py
-CRITICAL = 50
-FATAL = CRITICAL
-ERROR = 40
-WARNING = 30
-WARN = WARNING
-INFO = 20
-DEBUG = 10
-NOTSET = 0
-# unique to this code
-CONSOLE_ONLY = -1
-
-_singleton_addMessageToHistory_ = None
-MINOR_DETAILS = False
-
 
 class Logger(object):
     '''
     use Python logging package to record program history
 
     :param str log_file: name of file to store history
-    :param enum level: logging interest level (default=logging.INFO, no logs = -1)
-    :param bool minor_details: Include minor details in the logs?
+    :param enum level: logging interest level (default=__init__.INFO, no logs = -1)
     '''
 
-    def __init__(self, log_file=None, level=logging.INFO, minor_details=False):
-        global MINOR_DETAILS
-        global _singleton_addMessageToHistory_
-
-        MINOR_DETAILS = minor_details
-
+    def __init__(self, log_file=None, level=None):
+        if level is None:
+            level = __init__.INFO
         self.level = level
-        if level == CONSOLE_ONLY:
+        if level == __init__.CONSOLE_ONLY:
             # this means: only write ALL log messages to the console
             self.log_file = None
         else:
@@ -63,7 +44,7 @@ class Logger(object):
                 ymd = str(_now()).split()[0]
                 pid = os.getpid()
                 # current working directory?
-                log_file = '-'.join(__init__.__package_name__, ymd, str(pid) + '.log')
+                log_file = '-'.join((__init__.__package_name__, ymd, str(pid) + '.log'))
             self.log_file = os.path.abspath(log_file)
             logging.basicConfig(filename=log_file, level=level)
 
@@ -71,26 +52,28 @@ class Logger(object):
         self.filename = os.path.basename(sys.argv[0])
         self.pid = os.getpid()
 
-        _singleton_addMessageToHistory_ = self.add
+        __init__.LOG_MESSAGE = self.add
         self.first_logs()
 
-    def add(self, message, major_status=True):
+    def add(self, message, interest=None):
         '''
         log a message or report from the application
 
         :param str message: words to be logged
-        :param bool major_status: major (True) or minor (False) status of this message
+        :param int interest: interest level of this message (default: logging.INFO)
         '''
-        global MINOR_DETAILS
-
-        if not MINOR_DETAILS and not major_status:
+        if interest is None:
+            interest = __init__.INFO
+        if interest < self.level:
             return
 
         timestamp = _now()
         text = "(%d,%s,%s) %s" % (self.pid, self.filename, timestamp, message)
 
-        if self.level != CONSOLE_ONLY:
-            logging.info(text)
+        if self.level == __init__.CONSOLE_ONLY:
+            print text
+        else:
+            logging.log(interest, text)
 
         if len(self.history) != 0:
             self.history += '\n'
@@ -101,10 +84,11 @@ class Logger(object):
     def first_logs(self):
         ''' '''
         user = os.environ.get('LOGNAME', None) or os.environ.get('USERNAME', None)
-        if self.level == CONSOLE_ONLY:
+        if self.level == __init__.CONSOLE_ONLY:
             interest = 'no logging'
         else:
             interest = logging.getLevelName(self.level)
+
         self.add("startup")
         self.add("log_file         = " + str(self.log_file))
         self.add("interest level   = " + interest)
@@ -113,26 +97,6 @@ class Logger(object):
         self.add("program          = " + sys.argv[0])
         self.add("program filename = " + self.filename)
         self.add("PID              = " + str(self.pid))
-
-
-def addLog(message='', major=True):
-    '''
-    put this message in the logs, note whether if major (True)
-    '''
-    global _singleton_addMessageToHistory_
-    if _singleton_addMessageToHistory_ is not None:
-        for line in str(message).splitlines():
-            _singleton_addMessageToHistory_(line, major)
-    else:
-        print message
-
-
-def logMinorDetails(choice):
-    '''
-    choose to record (True) or not record (False) minor details in the logs
-    '''
-    global MINOR_DETAILS
-    MINOR_DETAILS = choice
 
 
 def _now():

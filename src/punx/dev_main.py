@@ -15,12 +15,12 @@
 developer: exercise various aspects of the main user interface file
 '''
 
-import os
 import sys
 import main
 
 if __name__ == '__main__':
-    #sys.argv.append('st')
-    sys.argv.append('-h')
-    #sys.argv.append('LICENSE.txt')
+    #sys.argv.append('up')
+    #sys.argv.append('-h')
+    sys.argv.append('-v')
+    # sys.argv.append('LICENSE.txt')
     main.main()

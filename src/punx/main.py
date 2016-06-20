@@ -181,6 +181,7 @@ class MyArgumentParser(argparse.ArgumentParser):
         permit the first two char (or more) of each subcommand to be accepted
         '''
         if args is None and len(sys.argv) > 1 and not sys.argv[1].startswith('-'):
+            # TODO: issue #8: make more robust for variations in optional commands
             sub_cmd = sys.argv[1]
             # make a list of the available subcommand names
             choices = []
@@ -228,40 +229,47 @@ def parse_command_line_arguments():
                         '--version', 
                         action='version', 
                         version=__init__.__version__)
+    
+    def add_logging_argument(subp):
+        '''
+        common code to add option for logging program output
+        '''
+        help_text = 'log output to file (default: no log file)'
+        subp.add_argument('-l', '--logfile',
+                       default='__console__',
+                       nargs='?',
+                       help=help_text)
 
     # TODO: stretch goal: GUI for any of this
     # p.add_argument('-g', 
     #                     '--gui', 
     #                     help='graphical user interface (TBA)')
 
-    sub_p = p.add_subparsers(title='sub_p', description='valid sub_p',)
+    subcommand = p.add_subparsers(title='subcommand', description='valid subcommands',)
     
     
     ### subcommand: demo
-    p_demo = sub_p.add_parser('demo', help='demonstrate HDF5 file validation')
-    p_demo.add_argument('-l', '--logfile',
-                   default='__console__',
-                   nargs='?',
-                   help='log output to file (default: no log file)')
+    p_demo = subcommand.add_parser('demo', help='demonstrate HDF5 file validation')
+    add_logging_argument(p_demo)
     p_demo.set_defaults(func=func_demo)
 
 
     ### subcommand: hierarchy
-    help = 'show NeXus base class hierarchy from a given base class'
-    p_hierarchy = sub_p.add_parser('hierarchy',  help=help)
+    help_text = 'show NeXus base class hierarchy from a given base class'
+    p_hierarchy = subcommand.add_parser('hierarchy',  help=help_text)
     p_hierarchy.set_defaults(func=func_hierarchy)
-    #p_hierarchy.add_argument('something', type=bool, help='something help')
+    #p_hierarchy.add_argument('something', type=bool, help='something help_text')
 
 
     ### subcommand: show
-#     p_show = sub_p.add_parser('show', help='show program information (about the cache)')
+#     p_show = subcommand.add_parser('show', help='show program information (about the cache)')
 #     p_show.set_defaults(func=func_show)
-#     # p_show.add_argument('details', type=bool, help='details help')
+#     # p_show.add_argument('details', type=bool, help='details help_text')
 
 
     ### subcommand: structure
-    help = 'show structure of HDF5 or NXDL file'
-    p_structure = sub_p.add_parser('structure', help=help)
+    help_text = 'show structure of HDF5 or NXDL file'
+    p_structure = subcommand.add_parser('structure', help=help_text)
     p_structure.set_defaults(func=func_structure)
     p_structure.add_argument('infile', help="HDF5 or NXDL file name")
     p_structure.add_argument('-a', 
@@ -269,34 +277,25 @@ def parse_command_line_arguments():
                         default=True,
                         dest='show_attributes',
                         help='Do not print attributes of HDF5 file structure')
-    p_structure.add_argument('-l', '--logfile',
-                   default='__console__',
-                   nargs='?',
-                   help='log output to file (default: no log file)')
+    add_logging_argument(p_structure)
 
 
     ### subcommand: update
-    help = 'update the local cache of NeXus definitions'
-    p_update = sub_p.add_parser('update', help=help)
+    help_text = 'update the local cache of NeXus definitions'
+    p_update = subcommand.add_parser('update', help=help_text)
     p_update.set_defaults(func=func_update)
     p_update.add_argument('-f', '--force', 
                                action='store_true', 
                                default=False, 
                                help='force update (if GitHub available)')
-    p_update.add_argument('-l', '--logfile',
-                   default='__console__',
-                   nargs='?',
-                   help='log output to file (default: no log file)')
+    add_logging_argument(p_update)
 
 
     ### subcommand: validate
-    p_validate = sub_p.add_parser('validate', help='validate a NeXus file')
+    p_validate = subcommand.add_parser('validate', help='validate a NeXus file')
     p_validate.add_argument('infile', help="HDF5 or NXDL file name")
     p_validate.set_defaults(func=func_validate)
-    p_validate.add_argument('-l', '--logfile',
-                   default='__console__',
-                   nargs='?',
-                   help='log output to file (default: no log file)')
+    add_logging_argument(p_validate)
 
     return p.parse_args()
 
@@ -305,7 +304,7 @@ def main():
     args = parse_command_line_arguments()
     if args.logfile != '__console__':
         # TODO: adjust the API to the needs of this package
-        log = logs.Logger()
+        _log = logs.Logger()
     args.func(args)
 
 

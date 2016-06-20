@@ -116,6 +116,7 @@ def get_pickle_file_name(path, use_fallback=True):
     pfile = os.path.join(path, __init__.PICKLE_FILE)
     if use_fallback and not USE_SOURCE_CACHE and not os.path.exists(pfile):
         # user cache has no pickle file, fall back to source cache
+        __init__.LOG_MESSAGE('using source cache pickle file', __init__.DEBUG)
         pfile = os.path.join(SOURCE_CACHE_ROOT, __init__.PICKLE_FILE)
     return pfile
 
@@ -124,6 +125,7 @@ def write_pickle_file(info, path):
     '''
     write the parsed nxdl_dict and info to a Python pickle file
     '''
+    __init__.LOG_MESSAGE('update pickle file', __init__.INFO)
     info['pickle_file'] = get_pickle_file_name(path, use_fallback=False)
     nxdl_dict = nxdlstructure.get_NXDL_specifications()
     pickle_data = dict(nxdl_dict=nxdl_dict, info=info)
@@ -134,12 +136,15 @@ def read_pickle_file(pfile, sha):
     '''
     read the parsed nxdl_dict and info from a Python pickle file
     '''
+    __init__.LOG_MESSAGE('read pickle file', __init__.DEBUG)
     pickle_data = pickle.load(open(pfile, 'rb'))
     if 'info' in pickle_data:
         # any other tests to qualify this?
         if sha == pickle_data['info']['git_sha']:   # declare victory!
             # do not need to return ``info`` since it matches
+            __init__.LOG_MESSAGE('matching SHA', __init__.DEBUG)
             return pickle_data['nxdl_dict']
+    __init__.LOG_MESSAGE('SHA does not match', __init__.DEBUG)
     return None
 
 
@@ -160,9 +165,11 @@ def githubMasterInfo(org, repo):
     # get repository information via GitHub API
     url = 'https://api.github.com/repos/%s/%s/commits' % (org, repo)
     
+    __init__.LOG_MESSAGE('get repo info: ' + str(url), __init__.INFO)
     try:
         text = urllib2.urlopen(url).read()
     except IOError:
+        __init__.LOG_MESSAGE('IOError from ' + str(url), __init__.ERROR)
         # IOError: [Errno socket error] [Errno -2] Name or service not known -- (no network)
         return None
 
@@ -172,6 +179,9 @@ def githubMasterInfo(org, repo):
     sha = latest['sha']
     iso8601 = latest['commit']['committer']['date']
     zip_url = 'https://github.com/%s/%s/archive/master.zip' % (org, repo)
+    
+    __init__.LOG_MESSAGE('git sha: ' + str(sha), __init__.INFO)
+    __init__.LOG_MESSAGE('git iso8601: ' + str(iso8601), __init__.INFO)
     
     return dict(git_sha=sha, git_time=iso8601, zip_url=zip_url)
 
@@ -190,55 +200,70 @@ def update_NXDL_Cache(force_update=False):
     
     :param bool force_update: (optional, default: False) update if GitHub is available
     '''
+    __init__.LOG_MESSAGE('update_NXDL_Cache(): force_update=' + str(force_update), 
+                         __init__.DEBUG)
     info = __get_github_info__()    # check with GitHub first
-    if info is not None:
-        # proceed only if GitHub info was available
-        qset = qsettings()
-        info['file'] = str(qset.fileName())
+    if info is None:
+        __init__.LOG_MESSAGE('GitHub not available', __init__.INFO)
+        return
+
+    # proceed only if GitHub info was available
+    qset = qsettings()
+    info['file'] = str(qset.fileName())
+
+    different_sha = str(info['git_sha']) != str(qset.getKey('git_sha'))
+    different_git_time = str(info['git_time']) != str(qset.getKey('git_time'))
+    nxdl_subdir_exists = os.path.exists(get_nxdl_dir())
+
+    could_update = different_sha or different_git_time or not nxdl_subdir_exists
+    updating = could_update or force_update
     
-        different_sha = str(info['git_sha']) != str(qset.getKey('git_sha'))
-        different_git_time = str(info['git_time']) != str(qset.getKey('git_time'))
-        nxdl_subdir_exists = os.path.exists(get_nxdl_dir())
+    if not updating:
+        __init__.LOG_MESSAGE('not updating NeXus definitions files', __init__.INFO)
+        return
 
-        could_update = different_sha or different_git_time or not nxdl_subdir_exists
-        if could_update or force_update:
-            path = qset.cache_dir()
-        
-            # download the repository ZIP file 
-            url = info['zip_url']
-            u = urllib2.urlopen(url)
-            content = u.read()
-            buf = StringIO.StringIO(content)
-            zip_content = zipfile.ZipFile(buf)
-            # How to save this zip_content to disk? not needed when using pickle file
-            
-            # extract the NXDL (XML, XSL, & XSD) files to the path
-            NXDL_categories = 'base_classes applications contributed_definitions'
-            for item in zip_content.namelist():
-                parts = item.rstrip('/').split('/')
-                if len(parts) == 2:             # get the XML Schema files
-                    if os.path.splitext(parts[1])[-1] in ('.xsd',):
-                        zip_content.extract(item, path)
-                elif len(parts) == 3:         # get the NXDL files
-                    if parts[1] in NXDL_categories.split():
-                        if os.path.splitext(parts[2])[-1] in ('.xml .xsl'.split()):
-                            zip_content.extract(item, path)
-            
-            # optimization: write the parsed NXDL specifications to a file
-            if force_update:
-                # force the pickle file to be re-written
-                pfile = get_pickle_file_name(path, use_fallback=False)
-                if os.path.exists(pfile):
-                    os.remove(pfile)
-            write_pickle_file(info, path)
+    __init__.LOG_MESSAGE('updating NeXus definitions files', __init__.INFO)
+    path = qset.cache_dir()
 
-            if force_update:
-                # force the .ini file to be re-written
-                key = 'pickle_file'
-                v =  qset.getKey(key)
-                qset.setKey(key, 'update forced')
-                qset.setKey(key, v)
-            qset.updateGroupKeys(info)
+    # download the repository ZIP file 
+    url = info['zip_url']
+    __init__.LOG_MESSAGE('download: ' + str(url), __init__.INFO)
+    u = urllib2.urlopen(url)
+    content = u.read()
+    buf = StringIO.StringIO(content)
+    zip_content = zipfile.ZipFile(buf)
+    # How to save this zip_content to disk? not needed when using pickle file
+    
+    # extract the NXDL (XML, XSL, & XSD) files to the path
+    __init__.LOG_MESSAGE('extract ZIP to: ' + path, __init__.INFO)
+    NXDL_categories = 'base_classes applications contributed_definitions'
+    for item in zip_content.namelist():
+        parts = item.rstrip('/').split('/')
+        if len(parts) == 2:             # get the XML Schema files
+            if os.path.splitext(parts[1])[-1] in ('.xsd',):
+                zip_content.extract(item, path)
+        elif len(parts) == 3:         # get the NXDL files
+            if parts[1] in NXDL_categories.split():
+                if os.path.splitext(parts[2])[-1] in ('.xml .xsl'.split()):
+                    zip_content.extract(item, path)
+    
+    # optimization: write the parsed NXDL specifications to a file
+    if force_update:
+        # force the pickle file to be re-written
+        __init__.LOG_MESSAGE('force pickle file update', __init__.DEBUG)
+        pfile = get_pickle_file_name(path, use_fallback=False)
+        if os.path.exists(pfile):
+            os.remove(pfile)
+    write_pickle_file(info, path)
+
+    if force_update:
+        # force the .ini file to be re-written
+        __init__.LOG_MESSAGE('force .ini file update', __init__.DEBUG)
+        key = 'pickle_file'
+        v =  qset.getKey(key)
+        qset.setKey(key, 'update forced')
+        qset.setKey(key, v)
+    qset.updateGroupKeys(info)
 
 
 def qsettings():
@@ -319,11 +344,14 @@ def abs_NXDL_filename(file_name):
     absolute_name = os.path.abspath(os.path.join(get_nxdl_dir(), file_name))
     msg = 'file does not exist: ' + absolute_name
     if os.path.exists(absolute_name):
+        __init__.LOG_MESSAGE('user cache: ' + absolute_name, __init__.DEBUG)
         return absolute_name
     if not USE_SOURCE_CACHE:
+        __init__.LOG_MESSAGE('try source cache for: ' + file_name, __init__.DEBUG)
         path = os.path.join(SOURCE_CACHE_ROOT, __init__.NXDL_CACHE_SUBDIR)
         absolute_name = os.path.abspath(os.path.join(path, file_name))
         if os.path.exists(absolute_name):
+            __init__.LOG_MESSAGE('source cache: ' + absolute_name, __init__.DEBUG)
             return absolute_name
         msg += '\t AND not found in source cache either!  Report this problem to the developer.'
     raise __init__.FileNotFound(msg)

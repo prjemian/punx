@@ -240,8 +240,10 @@ def parse_command_line_arguments():
                        help=help_text)
         
         level = __init__.DEFAULT_LOG_LEVEL
-        help_text = 'logging interest level (1-50), default=%d (%s)'
-        help_text = help_text % (__init__.DEFAULT_LOG_LEVEL,
+        help_text = 'logging interest level (%d - %d), default=%d (%s)'
+        help_text = help_text % (__init__.NOISY,
+                                 __init__.CRITICAL,
+                                 __init__.DEFAULT_LOG_LEVEL,
                                  logging.getLevelName(level)
                                  )
         subp.add_argument('-i', '--interest',
@@ -265,6 +267,7 @@ def parse_command_line_arguments():
 
 
 #     ### subcommand: hierarchy
+#     # TODO: issue #1 & #10
 #     help_text = 'show NeXus base class hierarchy from a given base class'
 #     p_hierarchy = subcommand.add_parser('hierarchy',  help=help_text)
 #     p_hierarchy.set_defaults(func=func_hierarchy)
@@ -272,6 +275,7 @@ def parse_command_line_arguments():
 
 
     ### subcommand: show
+#     # TODO: issue #11
 #     p_show = subcommand.add_parser('show', help='show program information (about the cache)')
 #     p_show.set_defaults(func=func_show)
 #     # p_show.add_argument('details', type=bool, help='details help_text')

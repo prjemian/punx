@@ -82,7 +82,9 @@ class Logger(object):
         return text
 
     def first_logs(self):
-        ''' '''
+        '''
+        first logging information after log file has been defined
+        '''
         user = os.environ.get('LOGNAME', None) or os.environ.get('USERNAME', None)
         if self.level == __init__.CONSOLE_ONLY:
             interest = 'no logging'
@@ -100,6 +102,9 @@ class Logger(object):
 
 
 def to_console(message, interest=None):
+    '''
+    used when *only* logging output to the console (not using the logging package)
+    '''
     if interest >= __init__.DEFAULT_LOG_LEVEL:
         status = logging.getLevelName(interest) + ':'
         print status, message

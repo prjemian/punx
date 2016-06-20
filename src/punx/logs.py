@@ -99,6 +99,12 @@ class Logger(object):
         self.add("PID              = " + str(self.pid))
 
 
+def to_console(message, interest=None):
+    if interest >= __init__.DEFAULT_LOG_LEVEL:
+        status = logging.getLevelName(interest) + ':'
+        print status, message
+
+
 def _now():
     ''' '''
     return datetime.datetime.now()

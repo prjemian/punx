@@ -19,10 +19,12 @@ import sys
 import main
 
 if __name__ == '__main__':
+    import __init__
+    __init__.DEFAULT_LOG_LEVEL = __init__.NOISY
     sys.argv.append('up')
     #sys.argv.append('-h')
-    sys.argv.append('--interest')
-    sys.argv.append('0')
-    sys.argv.append('--logfile')
-    sys.argv.append('_punx_.log')
+    # sys.argv.append('--interest')
+    # sys.argv.append('0')
+    # sys.argv.append('--logfile')
+    # sys.argv.append('_punx_.log')
     main.main()

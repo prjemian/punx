@@ -234,15 +234,20 @@ def parse_command_line_arguments():
         '''
         common code to add option for logging program output
         '''
+        import logging
         help_text = 'log output to file (default: no log file)'
         subp.add_argument('-l', '--logfile',
                        default='__console__',
                        nargs='?',
                        help=help_text)
         
-        help_text = 'logging interest level (1-50), default=20 (INFO)'
+        level = __init__.DEFAULT_LOG_LEVEL
+        help_text = 'logging interest level (1-50), default=%d (%s)'
+        help_text = help_text % (__init__.DEFAULT_LOG_LEVEL,
+                                 logging.getLevelName(level)
+                                 )
         subp.add_argument('-i', '--interest',
-                       default=__init__.INFO,
+                       default=level,
                        type=int,
                        #choices=range(1,51),
                        help=help_text)
@@ -309,11 +314,14 @@ def parse_command_line_arguments():
 
 def main():
     args = parse_command_line_arguments()
-    if args.logfile != '__console__':
+    if args.logfile == '__console__':
+        __init__.LOG_MESSAGE = logs.to_console
+    else:
         lo = __init__.NOISY
         hi = __init__.CRITICAL
         args.interest = max(lo, min(hi, args.interest))
         _log = logs.Logger(log_file=args.logfile, level=args.interest)
+    __init__.LOG_MESSAGE('sys.argv: ' + ' '.join(sys.argv), __init__.DEBUG)
     __init__.LOG_MESSAGE('args: ' + str(args), __init__.DEBUG)
     args.func(args)
 

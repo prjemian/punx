@@ -71,7 +71,7 @@ NXDL_CACHE_SUBDIR = GITHUB_NXDL_REPOSITORY + '-' + GITHUB_NXDL_BRANCH
 
 LOG_MESSAGE                     = None      # re-define as function to add text to program logs
 
-# logging levelk, from logging.__init__.py
+# logging level, from logging.__init__.py
 CRITICAL = 50
 FATAL = CRITICAL
 ERROR = 40
@@ -83,6 +83,7 @@ NOTSET = 0
 # unique to this code
 NOISY = 1
 CONSOLE_ONLY = -1
+DEFAULT_LOG_LEVEL = INFO
 
 class FileNotFound(Exception): pass
 class HDF5_Open_Error(Exception): pass

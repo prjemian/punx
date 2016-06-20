@@ -128,6 +128,8 @@ NXDL_DATA_TYPES = {
     'NX_BINARY': (None, ),     # #FIXME: issue #21
     'NX_BOOLEAN': (None, ),     # FIXME: issue #21
 }
+# definitions dependent on other definitions
+# (can add the lists together as needed)
 NXDL_DATA_TYPES['NX_UINT']   = NXDL_DATA_TYPES['NX_INT']
 NXDL_DATA_TYPES['NX_POSINT'] = NXDL_DATA_TYPES['NX_INT']
 NXDL_DATA_TYPES['NX_NUMBER'] = NXDL_DATA_TYPES['NX_INT'] + NXDL_DATA_TYPES['NX_FLOAT']

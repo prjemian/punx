@@ -69,7 +69,7 @@ SOURCE_CACHE_SETTINGS_FILENAME  = 'punx.ini'
 PICKLE_FILE                     = 'nxdl.p'
 NXDL_CACHE_SUBDIR = GITHUB_NXDL_REPOSITORY + '-' + GITHUB_NXDL_BRANCH
 
-LOG_MESSAGE                     = None      # re-define as function to add text to program logs
+LOG_MESSAGE                     = None      # a function object, re-define as function to add text to program logs
 
 # logging level, from logging.__init__.py
 CRITICAL = 50

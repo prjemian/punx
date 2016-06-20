@@ -50,6 +50,9 @@ import __init__
 import logs
 
 
+CONSOLE_LOGGING_DEFAULT_CHOICE = '__console__'
+
+
 # :see: https://docs.python.org/2/library/argparse.html#sub-commands
 # obvious 1st implementations are h5structure and update
 
@@ -235,7 +238,7 @@ def parse_command_line_arguments():
         import logging
         help_text = 'log output to file (default: no log file)'
         subp.add_argument('-l', '--logfile',
-                       default='__console__',
+                       default=CONSOLE_LOGGING_DEFAULT_CHOICE,
                        nargs='?',
                        help=help_text)
         
@@ -316,7 +319,10 @@ def parse_command_line_arguments():
 
 def main():
     args = parse_command_line_arguments()
-    if args.logfile == '__console__':
+    
+    # special handling for logging program output
+    if args.logfile == CONSOLE_LOGGING_DEFAULT_CHOICE:
+        __init__.DEFAULT_LOG_LEVEL = args.interest
         __init__.LOG_MESSAGE = logs.to_console
     else:
         lo = __init__.NOISY
@@ -325,6 +331,7 @@ def main():
         _log = logs.Logger(log_file=args.logfile, level=args.interest)
     __init__.LOG_MESSAGE('sys.argv: ' + ' '.join(sys.argv), __init__.DEBUG)
     __init__.LOG_MESSAGE('args: ' + str(args), __init__.DEBUG)
+
     args.func(args)
 
 

@@ -20,8 +20,7 @@ import sys
 import main
 
 if __name__ == '__main__':
-    sys.argv.append('st')
-    sys.argv.append('-l')
-    sys.argv.append('-')
-    sys.argv.append('LICENSE.txt')
+    #sys.argv.append('st')
+    sys.argv.append('-h')
+    #sys.argv.append('LICENSE.txt')
     main.main()

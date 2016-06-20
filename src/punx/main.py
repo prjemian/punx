@@ -180,12 +180,8 @@ class MyArgumentParser(argparse.ArgumentParser):
         '''
         permit the first two char (or more) of each subcommand to be accepted
         '''
-        # FIXME: something is not right with the default handling
-        # TODO: instead of args, make changes to sys.argv[1] only if args is None
-        if args is None:
-            # args default to the system args
-            args = sys.argv[1:]
-        if len(args) > 0:
+        if args is None and len(sys.argv) > 1 and not sys.argv[1].startswith('-'):
+            sub_cmd = sys.argv[1]
             # make a list of the available subcommand names
             choices = []
             for g in self._subparsers._group_actions:
@@ -193,24 +189,24 @@ class MyArgumentParser(argparse.ArgumentParser):
                     #choices = g._name_parser_map.keys()
                     choices = g.choices.keys()
                     break
-            if len(choices) > 0 and args[0] not in choices:
-                if len(args[0]) < 2:
+            if len(choices) > 0 and sub_cmd not in choices:
+                if len(sub_cmd) < 2:
                     msg = 'subcommand too short, must match first 2 or more characters, given: %s'
-                    self.error(msg % ' '.join(args))
+                    self.error(msg % ' '.join(sys.argv[1:]))
                 # look for any matches
-                matches = [c for c in choices if c.startswith(args[0])]
+                matches = [c for c in choices if c.startswith(sub_cmd)]
                 # validate the match is unique
                 if len(matches) == 0:
                     msg = 'subcommand unrecognized, given: %s'
-                    self.error(msg % ' '.join(args))
+                    self.error(msg % ' '.join(sys.argv[1:]))
                 elif len(matches) > 1:
                     msg = 'subcommand ambiguous (matches: %s)' % ' | '.join(matches)
                     msg += ', given: %s'
-                    self.error(msg % ' '.join(args))
+                    self.error(msg % ' '.join(sys.argv[1:]))
                 else:
-                    args[0] = matches[0]
-        # make sure that args are mutable
-        args = list(args)
+                    sub_cmd = matches[0]
+                # re-assign the subcommand
+                sys.argv[1] = sub_cmd
         return argparse.ArgumentParser.parse_args(self, args, namespace)
 
 
@@ -233,11 +229,6 @@ def parse_command_line_arguments():
                         action='version', 
                         version=__init__.__version__)
 
-    p.add_argument('-l', '--logfile',
-                   default='__console__',
-                   nargs='?',
-                   help='log output to file (default: no log file)')
-
     # TODO: stretch goal: GUI for any of this
     # p.add_argument('-g', 
     #                     '--gui', 
@@ -248,6 +239,10 @@ def parse_command_line_arguments():
     
     ### subcommand: demo
     p_demo = sub_p.add_parser('demo', help='demonstrate HDF5 file validation')
+    p_demo.add_argument('-l', '--logfile',
+                   default='__console__',
+                   nargs='?',
+                   help='log output to file (default: no log file)')
     p_demo.set_defaults(func=func_demo)
 
 
@@ -274,6 +269,10 @@ def parse_command_line_arguments():
                         default=True,
                         dest='show_attributes',
                         help='Do not print attributes of HDF5 file structure')
+    p_structure.add_argument('-l', '--logfile',
+                   default='__console__',
+                   nargs='?',
+                   help='log output to file (default: no log file)')
 
 
     ### subcommand: update
@@ -284,12 +283,20 @@ def parse_command_line_arguments():
                                action='store_true', 
                                default=False, 
                                help='force update (if GitHub available)')
+    p_update.add_argument('-l', '--logfile',
+                   default='__console__',
+                   nargs='?',
+                   help='log output to file (default: no log file)')
 
 
     ### subcommand: validate
     p_validate = sub_p.add_parser('validate', help='validate a NeXus file')
     p_validate.add_argument('infile', help="HDF5 or NXDL file name")
     p_validate.set_defaults(func=func_validate)
+    p_validate.add_argument('-l', '--logfile',
+                   default='__console__',
+                   nargs='?',
+                   help='log output to file (default: no log file)')
 
     return p.parse_args()
 

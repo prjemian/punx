@@ -252,7 +252,7 @@ def parse_command_line_arguments():
                        #choices=range(1,51),
                        help=help_text)
 
-    # TODO: stretch goal: GUI for any of this
+    # TODO: issue #9, stretch goal: GUI for any of this
     # p.add_argument('-g', 
     #                     '--gui', 
     #                     help='graphical user interface (TBA)')

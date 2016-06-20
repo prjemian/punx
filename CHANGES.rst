@@ -7,6 +7,7 @@ Change History
 Production
 **********
 
+:0.0.5: 2016-06-20 -- added subcommand shortcuts and logging
 :0.0.4: 2016-06-17 -- work-in-progress to test installation with remote user
 :0.0.3: 2016-06-11 -- basic UI established, **demo** command added
 :0.0.2: 2016-06-11 -- basic UI established

@@ -34,7 +34,7 @@ main user interface file
     
       {demo,structure,update,validate}
         demo                validate NeXus  demo file: writer_1_3.hdf5
-        hierarchy           TBA: show NeXus base class hierarchy
+        hierarchy           TBA: show NeXus base class hierarchy from a given base class
         show                TBA: show program information (about the cache)
         structure           show structure of HDF5 file
         update              update the local cache of NeXus definitions
@@ -98,6 +98,7 @@ def func_hierarchy(args):
     url = 'http://punx.readthedocs.io/en/latest/analyze.html'
     print 'A chart of the NeXus hierarchy is in the **punx** documentation.'
     print 'see: ' + url
+    # TODO: show NeXus base class hierarchy from a given base class
 
 
 def func_show(args):
@@ -179,6 +180,8 @@ class MyArgumentParser(argparse.ArgumentParser):
         '''
         permit the first two char (or more) of each subcommand to be accepted
         '''
+        # FIXME: something is not right with the default handling
+        # TODO: instead of args, make changes to sys.argv[1] only if args is None
         if args is None:
             # args default to the system args
             args = sys.argv[1:]
@@ -216,9 +219,14 @@ def parse_command_line_arguments():
     doc = __doc__.strip().splitlines()[0]
     doc += '\n  URL: ' + __init__.__url__
     doc += '\n  v' + __init__.__version__
+    epilog = 'Note: It is only necessary to use the first characters'
+    epilog += ' of the subcommand so that it is unique.  Such as: ``demo``'
+    epilog += ' can be abbreviated to ``de`` or even ``d``.'
+    epilog += '\n'*2
+    epilog += __init__.__url__
     p = MyArgumentParser(prog=__init__.__package_name__, 
                                      description=doc,
-                                     epilog=__init__.__url__)
+                                     epilog=epilog)
 
     p.add_argument('-v', 
                         '--version', 
@@ -226,8 +234,9 @@ def parse_command_line_arguments():
                         version=__init__.__version__)
 
     p.add_argument('-l', '--logfile',
-                        default='__console__',
-                        help='log output to file (default: no log file')
+                   default='__console__',
+                   nargs='?',
+                   help='log output to file (default: no log file)')
 
     # TODO: stretch goal: GUI for any of this
     # p.add_argument('-g', 
@@ -243,7 +252,8 @@ def parse_command_line_arguments():
 
 
     ### subcommand: hierarchy
-    p_hierarchy = sub_p.add_parser('hierarchy',  help='show NeXus base class hierarchy')
+    help = 'show NeXus base class hierarchy from a given base class'
+    p_hierarchy = sub_p.add_parser('hierarchy',  help=help)
     p_hierarchy.set_defaults(func=func_hierarchy)
     #p_hierarchy.add_argument('something', type=bool, help='something help')
 
@@ -255,8 +265,8 @@ def parse_command_line_arguments():
 
 
     ### subcommand: structure
-    p_structure = sub_p.add_parser('structure',
-                                   help='show structure of HDF5 or NXDL file')
+    help = 'show structure of HDF5 or NXDL file'
+    p_structure = sub_p.add_parser('structure', help=help)
     p_structure.set_defaults(func=func_structure)
     p_structure.add_argument('infile', help="HDF5 or NXDL file name")
     p_structure.add_argument('-a', 
@@ -267,7 +277,8 @@ def parse_command_line_arguments():
 
 
     ### subcommand: update
-    p_update = sub_p.add_parser('update', help='update the local cache of NeXus definitions')
+    help = 'update the local cache of NeXus definitions'
+    p_update = sub_p.add_parser('update', help=help)
     p_update.set_defaults(func=func_update)
     p_update.add_argument('-f', '--force', 
                                action='store_true', 

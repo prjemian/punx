@@ -216,11 +216,9 @@ def parse_command_line_arguments():
     doc = __doc__.strip().splitlines()[0]
     doc += '\n  URL: ' + __init__.__url__
     doc += '\n  v' + __init__.__version__
-    epilog = 'Note: It is only necessary to use the first characters'
-    epilog += ' of the subcommand so that it is unique.  Such as: ``demo``'
-    epilog += ' can be abbreviated to ``de`` or even ``d``.'
-    epilog += '\n'*2
-    epilog += __init__.__url__
+    epilog = 'Note: It is only necessary to use the first two or'
+    epilog += ' more characters of any subcommand so that it is unique. '
+    epilog += ' Such as: ``demo`` can be abbreviated to ``de``.'
     p = MyArgumentParser(prog=__init__.__package_name__, 
                                      description=doc,
                                      epilog=epilog)
@@ -266,11 +264,11 @@ def parse_command_line_arguments():
     p_demo.set_defaults(func=func_demo)
 
 
-    ### subcommand: hierarchy
-    help_text = 'show NeXus base class hierarchy from a given base class'
-    p_hierarchy = subcommand.add_parser('hierarchy',  help=help_text)
-    p_hierarchy.set_defaults(func=func_hierarchy)
-    #p_hierarchy.add_argument('something', type=bool, help='something help_text')
+#     ### subcommand: hierarchy
+#     help_text = 'show NeXus base class hierarchy from a given base class'
+#     p_hierarchy = subcommand.add_parser('hierarchy',  help=help_text)
+#     p_hierarchy.set_defaults(func=func_hierarchy)
+#     #p_hierarchy.add_argument('something', type=bool, help='something help_text')
 
 
     ### subcommand: show

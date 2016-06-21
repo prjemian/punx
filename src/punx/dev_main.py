@@ -27,5 +27,6 @@ if __name__ == '__main__':
     # sys.argv.append('0')
     # sys.argv.append('--logfile')
     # sys.argv.append('_punx_.log')
-    sys.argv.append('data/has_default_attribute_error/external_master.hdf5')
+    #sys.argv.append('data/has_default_attribute_error/external_master.hdf5')
+    sys.argv.append('data/has_default_attribute_error/external_angles.hdf5')
     main.main()

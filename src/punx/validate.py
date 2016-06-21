@@ -425,6 +425,9 @@ class Data_File_Validator(object):
                     self.new_finding(title, gn+'@default', f, m)
             return group_default
         # - - - - - - - - - -
+        def list_groups(parent, classname):
+            return [c for c in parent if h5structure.isNeXusGroup(c, classname)]
+        # - - - - - - - - - -
 
         # identify the NXdata groups to check, do not treat links differently
         nxdata_dict = collections.OrderedDict()
@@ -463,47 +466,56 @@ class Data_File_Validator(object):
                 m += {True: '', False: ' not'}[t] + ' described'
                 self.new_finding(title, nxentry.name, f, m)
 
-        title = '/NXroot@default/NXentry@default/NXdata'
+        title = '/@default/NXentry'
         nxentry = niac2015_default_path(self.h5, 'NXentry')
         if nxentry is None:
             # count number of NXentry groups
-            g = [c for c in self.h5 if h5structure.isNeXusGroup(c, 'NXentry')]
+            g = list_groups(self.h5, 'NXentry')
             if len(g) == 1:
                 nxentry = g[0]
-                m = 'no @default attribute but only one NXentry group: not ambiguous'
+                m = 'no @default attribute, one NXentry group: not ambiguous'
+                f = finding.OK
             elif len(g) > 1:
                 nxentry = g[0]
-                m = 'no @default attribute and multiple NXentry groups: ambiguous'
+                m = 'no @default attribute, multiple NXentry groups: ambiguous'
+                f = finding.NOTE
             else:
                 nxentry = None
-                m = 'no @default attribute and no NXentry groups: not a NeXus file'
-            self.new_finding(title, self.h5.name, finding.WARN, m)
+                m = 'no @default attribute, no NXentry groups: not a NeXus file'
+                f = finding.ERROR
+            self.new_finding(title, self.h5.name, f, m)
 
-        if nxentry in self.h5:
-            nxdata = niac2015_default_path(self.h5[nxentry], 'NXdata')
-            if nxdata is None:
-                # count number of NXentry groups
-                g = [c for c in self.h5 if h5structure.isNeXusGroup(c, 'NXdata')]
-                if len(g) == 1:
-                    nxdata = g[0]
-                    m = 'no @default attribute but only one NXdata group: not ambiguous'
-                elif len(g) > 1:
-                    nxdata = g[0]
-                    m = 'no @default attribute and multiple NXdata groups: ambiguous'
-                else:
-                    nxdata = None
-                    m = 'no @default attribute and no NXdata groups: not a NeXus file'
-                self.new_finding(title, self.h5[nxentry].name, finding.WARN, m)
-
-            if nxdata in self.h5[nxentry]:
-                m = 'absolute path to default plot'
-                self.new_finding(title, self.h5[nxentry][nxdata].name, finding.OK, m)
-            elif nxdata is not None:
-                m = 'NXentry group has no subgroup named: ' + nxdata
-                self.new_finding(title, self.h5[nxentry].name, finding.ERROR, m)
-        elif nxentry is not None:
-            m = 'file root has no subgroup named: ' + nxentry
-            self.new_finding(title, self.h5.name, finding.ERROR, m)
+        if nxentry is not None:
+            if nxentry in self.h5:
+                title = '/@default/NXentry@default/NXdata'
+                nxdata = niac2015_default_path(self.h5[nxentry], 'NXdata')
+                if nxdata is None:
+                    # count number of NXdata groups
+                    g = list_groups(self.h5[nxentry], 'NXdata')
+                    if len(g) == 1:
+                        nxdata = g[0]
+                        m = 'no @default attribute, one NXdata group: not ambiguous'
+                        f = finding.OK
+                    elif len(g) > 1:
+                        nxdata = g[0]
+                        m = 'no @default attribute, multiple NXdata groups: ambiguous'
+                        f = finding.NOTE
+                    else:
+                        nxdata = None
+                        m = 'no @default attribute, no NXdata groups: not a NeXus file'
+                        f = finding.ERROR
+                    self.new_finding(title, self.h5[nxentry].name, f, m)
+    
+                if nxdata is not None:
+                    if nxdata in self.h5[nxentry]:
+                        m = 'absolute path to default plot'
+                        self.new_finding(title, self.h5[nxentry][nxdata].name, finding.OK, m)
+                    else:
+                        m = 'NXentry group has no subgroup named: ' + nxdata
+                        self.new_finding(title, self.h5[nxentry].name, finding.ERROR, m)
+            else:
+                m = 'file root has no subgroup named: ' + nxentry
+                self.new_finding(title, self.h5.name, finding.ERROR, m)
     
     def review_with_NXDL(self, group, nx_class):
         '''

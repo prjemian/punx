@@ -271,10 +271,10 @@ def parse_command_line_arguments():
 
 #     ### subcommand: hierarchy
 #     # TODO: issue #1 & #10
-    help_text = 'show NeXus base class hierarchy from a given base class'
-    p_hierarchy = subcommand.add_parser('hierarchy',  help=help_text)
-    p_hierarchy.set_defaults(func=func_hierarchy)
-    #p_hierarchy.add_argument('something', type=bool, help='something help_text')
+#     help_text = 'show NeXus base class hierarchy from a given base class'
+#     p_hierarchy = subcommand.add_parser('hierarchy',  help=help_text)
+#     p_hierarchy.set_defaults(func=func_hierarchy)
+#     #p_hierarchy.add_argument('something', type=bool, help='something help_text')
 
 
     ### subcommand: show

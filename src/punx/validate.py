@@ -465,11 +465,45 @@ class Data_File_Validator(object):
 
         title = '/NXroot@default/NXentry@default/NXdata'
         nxentry = niac2015_default_path(self.h5, 'NXentry')
-        if nxentry is not None:
+        if nxentry is None:
+            # count number of NXentry groups
+            g = [c for c in self.h5 if h5structure.isNeXusGroup(c, 'NXentry')]
+            if len(g) == 1:
+                nxentry = g[0]
+                m = 'no @default attribute but only one NXentry group: not ambiguous'
+            elif len(g) > 1:
+                nxentry = g[0]
+                m = 'no @default attribute and multiple NXentry groups: ambiguous'
+            else:
+                nxentry = None
+                m = 'no @default attribute and no NXentry groups: not a NeXus file'
+            self.new_finding(title, self.h5.name, finding.WARN, m)
+
+        if nxentry in self.h5:
             nxdata = niac2015_default_path(self.h5[nxentry], 'NXdata')
-            if nxdata is not None:
+            if nxdata is None:
+                # count number of NXentry groups
+                g = [c for c in self.h5 if h5structure.isNeXusGroup(c, 'NXdata')]
+                if len(g) == 1:
+                    nxdata = g[0]
+                    m = 'no @default attribute but only one NXdata group: not ambiguous'
+                elif len(g) > 1:
+                    nxdata = g[0]
+                    m = 'no @default attribute and multiple NXdata groups: ambiguous'
+                else:
+                    nxdata = None
+                    m = 'no @default attribute and no NXdata groups: not a NeXus file'
+                self.new_finding(title, self.h5[nxentry].name, finding.WARN, m)
+
+            if nxdata in self.h5[nxentry]:
                 m = 'absolute path to default plot'
                 self.new_finding(title, self.h5[nxentry][nxdata].name, finding.OK, m)
+            elif nxdata is not None:
+                m = 'NXentry group has no subgroup named: ' + nxdata
+                self.new_finding(title, self.h5[nxentry].name, finding.ERROR, m)
+        elif nxentry is not None:
+            m = 'file root has no subgroup named: ' + nxentry
+            self.new_finding(title, self.h5.name, finding.ERROR, m)
     
     def review_with_NXDL(self, group, nx_class):
         '''

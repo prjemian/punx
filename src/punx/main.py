@@ -271,10 +271,10 @@ def parse_command_line_arguments():
 
 #     ### subcommand: hierarchy
 #     # TODO: issue #1 & #10
-#     help_text = 'show NeXus base class hierarchy from a given base class'
-#     p_hierarchy = subcommand.add_parser('hierarchy',  help=help_text)
-#     p_hierarchy.set_defaults(func=func_hierarchy)
-#     #p_hierarchy.add_argument('something', type=bool, help='something help_text')
+    help_text = 'show NeXus base class hierarchy from a given base class'
+    p_hierarchy = subcommand.add_parser('hierarchy',  help=help_text)
+    p_hierarchy.set_defaults(func=func_hierarchy)
+    #p_hierarchy.add_argument('something', type=bool, help='something help_text')
 
 
     ### subcommand: show
@@ -321,16 +321,17 @@ def main():
     args = parse_command_line_arguments()
     
     # special handling for logging program output
-    if args.logfile == CONSOLE_LOGGING_DEFAULT_CHOICE:
-        __init__.DEFAULT_LOG_LEVEL = args.interest
-        __init__.LOG_MESSAGE = logs.to_console
-    else:
-        lo = __init__.NOISY
-        hi = __init__.CRITICAL
-        args.interest = max(lo, min(hi, args.interest))
-        _log = logs.Logger(log_file=args.logfile, level=args.interest)
-    __init__.LOG_MESSAGE('sys.argv: ' + ' '.join(sys.argv), __init__.DEBUG)
-    __init__.LOG_MESSAGE('args: ' + str(args), __init__.DEBUG)
+    if 'logfile' in args:
+        if args.logfile == CONSOLE_LOGGING_DEFAULT_CHOICE:
+            __init__.DEFAULT_LOG_LEVEL = args.interest
+            __init__.LOG_MESSAGE = logs.to_console
+        else:
+            lo = __init__.NOISY
+            hi = __init__.CRITICAL
+            args.interest = max(lo, min(hi, args.interest))
+            _log = logs.Logger(log_file=args.logfile, level=args.interest)
+        __init__.LOG_MESSAGE('sys.argv: ' + ' '.join(sys.argv), __init__.DEBUG)
+        __init__.LOG_MESSAGE('args: ' + str(args), __init__.DEBUG)
 
     args.func(args)
 

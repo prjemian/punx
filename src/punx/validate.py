@@ -771,7 +771,15 @@ class Data_File_Validator(object):
 #             msg += ' (optional)'
             if data_type_checked:
                 msg = str(type(obj_attr)) + ' : ' + nx_type
-                self.new_finding('NXDL NX_type', aname, finding.TF_RESULT[data_type_ok], msg)
+                if data_type_ok:
+                    f = finding.OK
+                elif aname.split('@')[-1] == 'signal' and h5structure.isNeXusDataset(h5_obj):
+                    t = type(obj_attr) in NXDL_DATA_TYPES['NX_INT']
+                    f = finding.TF_RESULT[t]
+                else:
+                    f = finding.ERROR
+                self.new_finding('NXDL NX_type', aname, f, msg)
+                        
 
     def collect_names(self, h5_object):
         '''

@@ -13,6 +13,12 @@
 
 '''
 document program history events in a log file
+
+.. autosummary::
+   
+   ~Logger
+   ~to_console
+
 '''
 
 import datetime

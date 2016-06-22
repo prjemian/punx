@@ -14,6 +14,19 @@
 '''
 Load and/or document the structure of a NeXus NXDL class specification
 
+.. autosummary::
+   
+   ~get_nxdl_rules
+   ~validate_NXDL
+   ~NXDL_mixin
+   ~NXDL_definition
+   ~NX_attribute
+   ~NX_field
+   ~NX_group
+   ~NX_link
+   ~NX_symbols
+   ~get_NXDL_specifications
+
 * :class:`NXDL_definition`: the structure
 * define a text renderer method for that class
 '''
@@ -410,26 +423,6 @@ def get_NXDL_specifications():
         nxdl_dict[obj.title] = obj
 
     return nxdl_dict
-
-
-def parse_command_line_arguments():
-    import argparse
-    
-    doc = __doc__.strip().splitlines()[0]
-    doc += '\n  URL: ' + __url__
-    doc += '\n  v' + __init__.__version__
-    parser = argparse.ArgumentParser(prog=PROGRAM_NAME, description=doc)
-
-    parser.add_argument('infile', 
-                    action='store', 
-                    help="NXDL file name")
-
-    parser.add_argument('-v', 
-                        '--version', 
-                        action='version', 
-                        version=__init__.__version__)
-
-    return parser.parse_args()
 
 
 if __name__ == '__main__':

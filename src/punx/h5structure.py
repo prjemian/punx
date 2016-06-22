@@ -11,7 +11,27 @@
 # The full license is in the file LICENSE.txt, distributed with this software.
 #-----------------------------------------------------------------------------
 
-'''Command line tool to print the structure of an HDF5 file'''
+'''
+Command line tool to print the structure of an HDF5 file
+
+.. autosummary::
+    
+    ~h5structure
+    ~isHdf5File
+    ~isHdf5Group
+    ~isHdf5Dataset
+    ~isHdf5Link
+    ~isHdf5ExternalLink
+    ~isNeXusFile
+    ~isNeXusFile_ByNXdataAttrs
+    ~isNeXusFile_ByAxes
+    ~isNeXusFile_ByAxisAttr
+    ~isNeXusGroup
+    ~isNeXusDataset
+    ~isNeXusLink
+
+'''
+
 
 __url__ = 'http://punx.readthedocs.org/en/latest/h5structure.html'
 
@@ -25,12 +45,15 @@ import __init__
 
 class h5structure(object):
     '''
+    show structure of any HDF5 data file
+    
     Example usage showing default display::
     
         mc = h5structure(filename)
         mc.array_items_shown = 5
         show_attributes = False
         txt = mc.report(show_attributes)
+    
     '''
     requested_filename = None
     isNeXus = False

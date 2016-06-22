@@ -14,6 +14,18 @@
 '''
 Interpret the NXDL rules (nxdl.xsd & nxdlTypes.xsd) into useful Python components
 
+.. autosummary::
+   
+   ~strip_ns
+   ~NxdlRules
+   ~NXDL_nxdlType
+   ~Mixin
+   ~NXDL_Root
+   ~Attribute
+   ~NXDL_Element
+   ~NXDL_Type
+   ~Recursion
+
 .. index:: NXDL
 
 :definition: NXDL : NeXus Definition Language

@@ -1,7 +1,6 @@
 Logging : :mod:`logs`
 #####################
 
-----
 
 source code documentation
 *************************

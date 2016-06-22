@@ -1,6 +1,13 @@
 
 '''
 manage the settings file for this application
+
+.. autosummary::
+   
+   ~QSettingsMixin
+   ~gmt_github_style
+   ~timestamp
+
 '''
 
 #-----------------------------------------------------------------------------

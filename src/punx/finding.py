@@ -11,6 +11,13 @@
 
 '''
 document each item during validation
+
+.. autosummary::
+   
+   ~Finding
+   ~CheckupResults
+   ~VALID_STATUS_DICT
+
 '''
 
 
@@ -40,13 +47,15 @@ TODO    = ValidationResultStatus('TODO',    'blue',      'validation not impleme
 UNUSED  = ValidationResultStatus('UNUSED',  'grey',      'optional NeXus item not used in data file')
 COMMENT = ValidationResultStatus('COMMENT', 'grey',      'comment from the punx source code')
 
-VALID_STATUS_LIST = (OK, NOTE, WARN, ERROR, TODO, UNUSED, COMMENT)
+VALID_STATUS_LIST = (OK, NOTE, WARN, ERROR, TODO, UNUSED, COMMENT)    
 VALID_STATUS_DICT = {str(f): f for f in VALID_STATUS_LIST}
+'''dictionary (by names) of all available findings'''
+
 TF_RESULT = {True: OK, False: ERROR}
 
-SHOW_ALL = VALID_STATUS_LIST
-SHOW_ERRORS = (ERROR, WARN)
-SHOW_NOT_OK = (WARN, ERROR, TODO, UNUSED)
+# SHOW_ALL = VALID_STATUS_LIST
+# SHOW_ERRORS = (ERROR, WARN)
+# SHOW_NOT_OK = (WARN, ERROR, TODO, UNUSED)
 
 
 class Finding(object):

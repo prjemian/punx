@@ -14,6 +14,26 @@
 '''
 maintain the local cache of NeXus NXDL and XML Schema files
 
+.. autosummary::
+   
+   ~NoCacheDirectory
+   ~get_nxdl_dir
+   ~get_pickle_file_name
+   ~write_pickle_file
+   ~read_pickle_file
+   ~githubMasterInfo
+   ~update_NXDL_Cache
+   ~qsettings
+   ~user_cache_settings
+   ~source_cache_settings
+   ~SourceCacheSettings
+   ~UserCacheSettings
+   ~abs_NXDL_filename
+   ~get_XML_Schema
+   ~get_nxdl_xsd
+   ~get_nxdlTypes_xsd
+
+
 A key component necessary to validate both NeXus data files and 
 NXDL class files is a current set of the NXDL definitions.
 
@@ -91,7 +111,9 @@ __singleton_nxdl_xsd__ = None
 __singleton_nxdlTypes_xsd__ = None
 
 
-class NoCacheDirectory(Exception): pass
+class NoCacheDirectory(Exception): 
+    'custom exception: no cache directory was found'
+    pass
 
 
 def get_nxdl_dir():

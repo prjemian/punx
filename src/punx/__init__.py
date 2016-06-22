@@ -1,6 +1,15 @@
 # -*- coding: iso-8859-1 -*-
 
-'''Python Utilities for NeXus HDF5 files'''
+'''
+Python Utilities for NeXus HDF5 files
+
+.. autosummary::
+   
+   ~FileNotFound
+   ~HDF5_Open_Error
+
+
+'''
 
 #-----------------------------------------------------------------------------
 # :author:    Pete R. Jemian
@@ -85,8 +94,12 @@ NOISY = 1
 CONSOLE_ONLY = -1
 DEFAULT_LOG_LEVEL = INFO
 
-class FileNotFound(Exception): pass
-class HDF5_Open_Error(Exception): pass
+class FileNotFound(Exception): 
+    'custom exception '
+    pass
+class HDF5_Open_Error(Exception): 
+    'custom exception '
+    pass
 
 
 import os

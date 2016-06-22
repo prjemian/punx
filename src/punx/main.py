@@ -40,6 +40,19 @@ main user interface file
         update              update the local cache of NeXus definitions
         validate            validate a NeXus file
 
+.. autosummary::
+   
+   ~main
+   ~MyArgumentParser
+   ~parse_command_line_arguments
+   ~interceptor_logfile
+   ~func_demo
+   ~func_hierarchy
+   ~func_show
+   ~func_structure
+   ~func_update
+   ~func_validate
+
 '''
 
 import argparse

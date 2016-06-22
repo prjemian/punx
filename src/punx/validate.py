@@ -14,6 +14,13 @@
 '''
 validate NeXus NXDL and HDF5 data files
 
+.. autosummary::
+   
+   ~validate_xml
+   ~NxdlPattern
+   ~CustomNxdlPattern
+   ~Data_File_Validator
+
 These are considerata for the validation of NeXus HDF5 data files.
 Compare these validation steps with rules and documentation
 in the NeXus manual and the XML Schema files (``nxdl.xsd`` and ``nxdlTypes.xsd``).

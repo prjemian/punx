@@ -1,5 +1,5 @@
 .. _install:
-__ index:: install
+.. index:: install
 
 Installation
 ############
@@ -35,9 +35,9 @@ To install in an alternate location::
 Updating
 ********
 
-:pip:  ::
+:pip:  If you have installed previously with *pip*::
 
-   pip install -U --no-deps punx
+    $ pip install -U --no-deps punx
 
 :git:  assuming you have cloned as shown above::
 

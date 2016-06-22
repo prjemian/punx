@@ -9,7 +9,10 @@ Python Utilities for NeXus HDF5 files
 
 NOTE: project is under initial construction, not yet released for public use
 
-Use these three steps to :ref:`install <install>` and try the :ref:`demo <demo>`::
+Use these three steps to :ref:`install <install>` and try the :ref:`demo <demo>`:
+
+.. code-block:: console
+   :linenos:
 
     pip install punx
     punx update

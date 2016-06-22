@@ -15,6 +15,14 @@
 Perform various analyses on the NXDL files
 
 1. load ALL the NXDL classes and prepare directed graph of the base class inheritance.
+
+.. autosummary::
+   
+   ~ab_counter
+   ~ab_groups
+   ~base_class_hierarchy
+
+.. warning:: This module is under development, not certain to work properly
 '''
 
 

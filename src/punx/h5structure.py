@@ -249,7 +249,10 @@ class h5structure(object):
         
         def __render(obj, rank, key, indents):
             if rank == 1:
-                item = obj[key]
+                try:
+                    item = obj[key]
+                except Exception, _exc:
+                    item = str(_exc)
             else:
                 # this replaces a lot of code: if rank == ...
                 indices = ', '.join( [str(key)] + (':'*(rank-1)).split() )

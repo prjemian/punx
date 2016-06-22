@@ -147,7 +147,10 @@ class h5structure(object):
         s = []
         if self.show_attributes:
             for name in obj.attrs:
-                value = obj.attrs[name]
+                try:
+                    value = obj.attrs.get(name, '')
+                except IOError, _exc:
+                    value = 'IOError: ' +  str(_exc)
                 try:
                     s.append("%s  @%s = %s" % (indentation, name, str(value)))
                 except UnicodeDecodeError, _exc:

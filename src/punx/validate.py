@@ -824,7 +824,18 @@ class Data_File_Validator(object):
             ``/entry/data01/data@signal``    ``signal``
             =============================    ============
 
-        This method will separate out the last part of the name for validation.
+        This method will separate out the last part of the name for validation.  
+        Then, it is tested against the strict or relaxed regular expressions for 
+        a valid item name.  The finding for each name is classified by the
+        next table:
+        
+        =====  =======  =======  ================================================================
+        order  finding  match    description
+        =====  =======  =======  ================================================================
+        1      OK       strict   matches most stringent NeXus specification
+        2      NOTE     relaxed  matches NeXus specification that is most generally accepted
+        3      WARN     HDF5     acceptable to HDF5 but not NeXus
+        =====  =======  =======  ================================================================
         
         :see: http://download.nexusformat.org/doc/html/datarules.html?highlight=regular%20expression
         '''
@@ -847,10 +858,7 @@ class Data_File_Validator(object):
             p = self.patterns[key_relaxed]
             m = p.match(short_name)
             t = m is not None and m.string == short_name
-            # opinion: finding.WARN is too harsh
-            #     NXroot defines attributes that produce such warnings
-            #     capital letters in names are generally acceptable, only a few complain
-            name_ok = {True: finding.NOTE, False: finding.ERROR}[t]
+            name_ok = {True: finding.NOTE, False: finding.WARN}[t]
             adjective = 'relaxed'
             key = key_relaxed
 

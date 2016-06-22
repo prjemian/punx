@@ -21,8 +21,8 @@ import main
 if __name__ == '__main__':
     import __init__
     __init__.DEFAULT_LOG_LEVEL = __init__.NOISY
-    sys.argv.append('up')
-    sys.argv.append('-f')
+    sys.argv.append('va')
+    # sys.argv.append('-f')
 #     sys.argv.append('-h')
 
 #     sys.argv.append('--report')
@@ -33,7 +33,7 @@ if __name__ == '__main__':
 
 #     sys.argv.append('data/chopper.nxs')
 #     sys.argv.append('data/compression.h5')
-#     sys.argv.append('data/prj_test.nexus.hdf5')
+    sys.argv.append('data/prj_test.nexus.hdf5')
 #     sys.argv.append('data/scan101.nxs')
 #     sys.argv.append('data/has_default_attribute_error/external_master.hdf5')
 #     sys.argv.append('data/has_default_attribute_error/external_angles.hdf5')

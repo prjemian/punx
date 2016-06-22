@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from nose.suite import _def
 
 #-----------------------------------------------------------------------------
 # :author:    Pete R. Jemian
@@ -441,8 +440,9 @@ def get_NXDL_specifications():
 
     return nxdl_dict
 
+
 def _developer():
-    ' '
+    'working on issue #4'
     import logs
     __init__.LOG_MESSAGE = logs.to_console
     nxdl_dict = _get_specs_from_NXDL_files()
@@ -450,6 +450,7 @@ def _developer():
 
 
 if __name__ == '__main__':
+    # TODO: remove for production
     # print "Start this module using:  python main.py structure ..."
     # exit(0)
     _developer()

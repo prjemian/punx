@@ -22,15 +22,19 @@ if __name__ == '__main__':
     import __init__
     __init__.DEFAULT_LOG_LEVEL = __init__.NOISY
     sys.argv.append('va')
-    #sys.argv.append('-h')
-    # sys.argv.append('--interest')
-    # sys.argv.append('0')
+    sys.argv.append('-h')
+
+    # sys.argv.append('--report')
+    # sys.argv.append('ERROR,WARN')
+
     # sys.argv.append('--logfile')
     # sys.argv.append('_punx_.log')
+
 #     sys.argv.append('data/chopper.nxs')
 #     sys.argv.append('data/compression.h5')
 #     sys.argv.append('data/prj_test.nexus.hdf5')
     sys.argv.append('data/scan101.nxs')
 #     sys.argv.append('data/has_default_attribute_error/external_master.hdf5')
 #     sys.argv.append('data/has_default_attribute_error/external_angles.hdf5')
+
     main.main()

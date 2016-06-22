@@ -41,6 +41,7 @@ UNUSED  = ValidationResultStatus('UNUSED',  'grey',      'optional NeXus item no
 COMMENT = ValidationResultStatus('COMMENT', 'grey',      'comment from the punx source code')
 
 VALID_STATUS_LIST = (OK, NOTE, WARN, ERROR, TODO, UNUSED, COMMENT)
+VALID_STATUS_DICT = {str(f): f for f in VALID_STATUS_LIST}
 TF_RESULT = {True: OK, False: ERROR}
 
 SHOW_ALL = VALID_STATUS_LIST

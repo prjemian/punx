@@ -47,6 +47,7 @@ import os
 import sys
 
 import __init__
+import finding
 import logs
 
 
@@ -55,6 +56,22 @@ CONSOLE_LOGGING_DEFAULT_CHOICE = '__console__'
 
 # :see: https://docs.python.org/2/library/argparse.html#sub-commands
 # obvious 1st implementations are h5structure and update
+
+
+def exit_message(msg, status=None, exit_code=1):
+    '''
+    exit this code with a message and a status
+    
+    :param str msg: text to be reported
+    :param int status: 0 - 50 (default: __init__.ERROR = 40)
+    :param int exit_code: 0: no error, 1: error (default)
+    '''
+    if status is None:
+        status = __init__.ERROR
+    __init__.LOG_MESSAGE(msg, status)
+    if __init__.LOG_MESSAGE != logs.to_console:
+        print msg
+    exit(exit_code)
 
 
 def func_demo(args):
@@ -125,14 +142,12 @@ def func_structure(args):
         try:
             mc = h5structure.h5structure(os.path.abspath(args.infile))
         except __init__.FileNotFound:
-            print 'File not found: ' + args.infile
-            exit(1)
+            exit_message('File not found: ' + args.infile)
         mc.array_items_shown = limit
         try:
             report = mc.report(show_attributes)
         except __init__.HDF5_Open_Error:
-            print 'Could not open as HDF5: ' + args.infile
-            exit(1)
+            exit_message('Could not open as HDF5: ' + args.infile)
         print '\n'.join(report or '')
 
 
@@ -143,29 +158,42 @@ def func_update(args):
 
 def func_validate(args):
     import validate
+
     if args.infile.endswith('.nxdl.xml'):
         result = validate.validate_xml(args.infile)
         if result is None:
             print args.infile, ' validates'
     else:
-        import finding
         try:
             validator = validate.Data_File_Validator(args.infile)
         except __init__.FileNotFound:
-            print 'File not found: ' + args.infile
-            exit(1)
+            exit_message('File not found: ' + args.infile)
         except __init__.HDF5_Open_Error:
-            print 'Could not open as HDF5: ' + args.infile
-            exit(1)
+            exit_message('Could not open as HDF5: ' + args.infile)
+    
+        # determine which findings are to be reported
+        report_choices, trouble = [], []
+        for c in args.report.upper().split(','):
+            if c in finding.VALID_STATUS_DICT:
+                report_choices.append(finding.VALID_STATUS_DICT[c])
+            else:
+                trouble.append(c)
+        if len(trouble) > 0:
+            msg = 'invalid choice(s) for *--report* option: '
+            msg += ','.join(trouble)
+            msg += '\n'
+            msg += '\t' + 'available choices: '
+            msg += ','.join(sorted(finding.VALID_STATUS_DICT.keys()))
+            exit_message(msg)
+
+        # run the validation
         validator.validate()
 
         # report the findings from the validation
-        #  finding.SHOW_ALL        finding.SHOW_NOT_OK        finding.SHOW_ERRORS
-        show_these = finding.SHOW_ALL
         print 'Validation findings'
         print ':file: ' + os.path.basename(validator.fname)
-        print ':validation results shown: ', ', '.join(sorted(map(str, show_these)))
-        print validator.report_findings(show_these)
+        print ':validation results shown: ', ', '.join(sorted(map(str, report_choices)))
+        print validator.report_findings(report_choices)
         
         print 'summary statistics'
         print validator.report_findings_summary()
@@ -312,19 +340,24 @@ def parse_command_line_arguments():
     p_validate = subcommand.add_parser('validate', help='validate a NeXus file')
     p_validate.add_argument('infile', help="HDF5 or NXDL file name")
     p_validate.set_defaults(func=func_validate)
+    reporting_choices = ','.join(sorted(finding.VALID_STATUS_DICT.keys()))
+    help_text = 'select which validation findings to report, choices: '
+    help_text += reporting_choices
+    p_validate.add_argument('--report', default=reporting_choices, help=help_text)
     add_logging_argument(p_validate)
 
     return p.parse_args()
 
 
-def main():
-    args = parse_command_line_arguments()
-    
-    # special handling for logging program output
+def interceptor_logfile(args):
+    '''
+    special handling for subcommands with a *logfile* option
+    '''
     if 'logfile' in args:
         if args.logfile == CONSOLE_LOGGING_DEFAULT_CHOICE:
             __init__.DEFAULT_LOG_LEVEL = args.interest
             __init__.LOG_MESSAGE = logs.to_console
+            __init__.LOG_MESSAGE('logging output to console only', __init__.DEBUG)
         else:
             lo = __init__.NOISY
             hi = __init__.CRITICAL
@@ -332,6 +365,13 @@ def main():
             _log = logs.Logger(log_file=args.logfile, level=args.interest)
         __init__.LOG_MESSAGE('sys.argv: ' + ' '.join(sys.argv), __init__.DEBUG)
         __init__.LOG_MESSAGE('args: ' + str(args), __init__.DEBUG)
+
+
+def main():
+    args = parse_command_line_arguments()
+    
+    # special handling for logging program output
+    interceptor_logfile(args)
 
     args.func(args)
 

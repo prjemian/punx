@@ -1,7 +1,7 @@
 .. _source.validate:
 
 Validation : :mod:`validate`
-###################################
+############################
 
 .. index:: validation
 .. index:: severity
@@ -30,7 +30,6 @@ the NeXus Definition Language (NXDL) files [#]_.
 
 The *color* is a suggestion for use in a GUI.
 
-
 NeXus HDF5 Data Files
 ---------------------
 
@@ -56,6 +55,32 @@ See the GitHub repository [#]_ for this file.
 
 .. [#] NeXus GitHub Definitions repository:
    https://github.com/nexusformat/definitions
+
+USAGE
+-----
+
+.. code-block:: text
+    :linenos:
+
+   usage: punx validate [-h] [--report REPORT] [-l [LOGFILE]] [-i INTEREST]
+                        infile
+   
+   positional arguments:
+     infile                HDF5 or NXDL file name
+   
+   optional arguments:
+     -h, --help            show this help message and exit
+     --report REPORT       select which validation findings to report, choices:
+                           COMMENT,ERROR,NOTE,OK,TODO,UNUSED,WARN
+     -l [LOGFILE], --logfile [LOGFILE]
+                           log output to file (default: no log file)
+     -i INTEREST, --interest INTEREST
+                           logging interest level (1 - 50), default=1 (Level 1)
+
+The **REPORT** findings are as presented in the table above for each validation step.
+
+The logging **INTEREST** levels are for output from the program, 
+registered at different levels of interest appropriate to the output.
 
 ----
 

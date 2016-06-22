@@ -1,7 +1,7 @@
 .. _h5structure:
 
 HDF5 Data File Structure : :mod:`h5structure`
-##############################################################
+#############################################
 
 Command line tool to print the structure of an HDF5 file
 
@@ -28,19 +28,18 @@ the version number::
 the help message::
 
    [linux,512]$ h5structure -h
-   usage: h5structure [-h] [-n NUM_DISPLAYED] [-V] infile [infile ...]
-   
-   Print the structure of an HDF5 file
+   usage: punx structure [-h] [-a] [-l [LOGFILE]] [-i INTEREST] infile
    
    positional arguments:
-     infile            HDF5 data file name(s)
+     infile                HDF5 or NXDL file name
    
    optional arguments:
-     -h, --help        show this help message and exit
-     -n NUM_DISPLAYED  limit number of displayed array items to NUM_DISPLAYED
-                       (must be 3 or more or 'None'), default = None
-     -a                Do not print attributes
-     -v, --version     show program's version number and exit
+     -h, --help            show this help message and exit
+     -a                    Do not print attributes of HDF5 file structure
+     -l [LOGFILE], --logfile [LOGFILE]
+                           log output to file (default: no log file)
+     -i INTEREST, --interest INTEREST
+                           logging interest level (1 - 50), default=1 (Level 1)
 
 
 Example

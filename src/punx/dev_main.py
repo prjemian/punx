@@ -21,7 +21,7 @@ import main
 if __name__ == '__main__':
     import __init__
     __init__.DEFAULT_LOG_LEVEL = __init__.NOISY
-#     sys.argv.append('va')
+    sys.argv.append('st')
     sys.argv.append('-h')
 
     # sys.argv.append('--report')

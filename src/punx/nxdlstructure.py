@@ -34,6 +34,7 @@ Load and/or document the structure of a NeXus NXDL class specification
 __url__ = 'http://punx.readthedocs.org/en/latest/nxdlstructure.html'
 
 
+
 import collections
 import lxml.etree
 import os
@@ -63,6 +64,13 @@ def get_nxdl_rules():
     return __singleton_nxdl_rules__
 
 
+def get_ns_dict():
+    '''
+    get the dictionary of namespace substitutions
+    '''
+    return get_nxdl_rules().nxdl.ns
+
+
 def validate_NXDL(nxdl_file_name):
     '''
     Validate a NeXus NXDL file
@@ -82,7 +90,6 @@ class NXDL_mixin(object):
         node_name = node.get('name')
         if node_name is not None:
             self.name = node.get('name')
-        self.ns = get_nxdl_rules().nxdl.ns
     
     def get_NX_type(self, node):
         '''
@@ -176,7 +183,6 @@ class NXDL_definition(NXDL_mixin):
         
         defaults = get_nxdl_rules().nxdl
         default_attrs = {k: v for k, v in defaults.attrs.items()}
-        #self.ns = defaults.ns
         
         # parse the XML content now
         tree = lxml.etree.parse(self.nxdl_file_name)
@@ -224,7 +230,7 @@ class NX_attribute(NXDL_mixin):
         self.nx_type = self.get_NX_type(node)
         self.units = self.get_NX_units(node)
         self.enum = []
-        for n in node.xpath('nx:enumeration/nx:item', namespaces=self.ns):
+        for n in node.xpath('nx:enumeration/nx:item', namespaces=get_ns_dict()):
             self.enum.append( n.attrib['value'] )
 
     def __str__(self):
@@ -263,11 +269,11 @@ class NX_field(NXDL_mixin):
         self.units = self.get_NX_units(node)
 
         self.enum = []
-        for n in node.xpath('nx:enumeration/nx:item', namespaces=self.ns):
+        for n in node.xpath('nx:enumeration/nx:item', namespaces=get_ns_dict()):
             self.enum.append( n.attrib['value'] )
 
         self.attrs = {}
-        for subnode in node.xpath('nx:attribute', namespaces=self.ns):
+        for subnode in node.xpath('nx:attribute', namespaces=get_ns_dict()):
             obj = NX_attribute(subnode)
             self.attrs[obj.name] = obj
 
@@ -283,12 +289,12 @@ class NX_field(NXDL_mixin):
     def field_dimensions( self, parent):
         '''
         '''
-        node_list = parent.xpath('nx:dimensions', namespaces=self.ns)
+        node_list = parent.xpath('nx:dimensions', namespaces=get_ns_dict())
         if len(node_list) != 1:
             return []
 
         dims = {}
-        for subnode in node_list[0].xpath('nx:dim', namespaces=self.ns):
+        for subnode in node_list[0].xpath('nx:dim', namespaces=get_ns_dict()):
             index = int(subnode.get('index'))
             value = subnode.get('value')
             if not value:

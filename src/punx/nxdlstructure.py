@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+from nose.suite import _def
 
 #-----------------------------------------------------------------------------
 # :author:    Pete R. Jemian
@@ -32,8 +33,6 @@ Load and/or document the structure of a NeXus NXDL class specification
 '''
 
 __url__ = 'http://punx.readthedocs.org/en/latest/nxdlstructure.html'
-
-# testing:  see file dev_nxdl2rst.py
 
 
 import collections
@@ -84,10 +83,7 @@ class NXDL_mixin(object):
         node_name = node.get('name')
         if node_name is not None:
             self.name = node.get('name')
-        self.ns = nxdl_rules.NAMESPACE_DICT
-        
-        # TODO: issue #12: apply nxdl_rules.NxdlRules() as defaults when creating NXDL_mixin subclasses below
-        self.nxdl_rules = get_nxdl_rules()
+        self.ns = get_nxdl_rules().nxdl.ns
     
     def get_NX_type(self, node):
         '''
@@ -108,32 +104,32 @@ class NXDL_mixin(object):
         '''
         '''
         if self.element == 'definition':
-            rules = self.nxdl_rules.nxdl
+            defaults = get_nxdl_rules().nxdl
         else:
-            rules = self.nxdl_rules.nxdl.children[self.element]
+            defaults = get_nxdl_rules().nxdl.children[self.element]
+        self.default_attrs = {k: v for k, v in defaults.attrs.items()}
         self.attrs = {}
         self.fields = {}
         self.groups = {}
         self.links = {}
-
-        for subnode in node.xpath('nx:attribute', namespaces=self.ns):
-            obj = NX_attribute(subnode)
-            self.add_object(self.attrs, obj)
-
-        for subnode in node.xpath('nx:field', namespaces=self.ns):
-            obj = NX_field(subnode, category)
-            self.add_object(self.fields, obj)
-
-        for subnode in node.xpath('nx:group', namespaces=self.ns):
-            obj = NX_group(subnode, category)
-            self.add_object(self.groups, obj)
         
-        for subnode in node.xpath('nx:link', namespaces=self.ns):
-            obj = NX_link(subnode, category)
-            self.add_object(self.links, obj)
-        
-        pass
-    
+        for subnode in node:
+            try:
+                if subnode.tag.endswith('}attribute'):
+                    obj = NX_attribute(subnode)
+                    self.add_object(self.attrs, obj)
+                elif subnode.tag.endswith('}field'):
+                    obj = NX_field(subnode, category)
+                    self.add_object(self.fields, obj)
+                elif subnode.tag.endswith('}group'):
+                    obj = NX_group(subnode, category)
+                    self.add_object(self.groups, obj)
+                elif subnode.tag.endswith('}link'):
+                    obj = NX_link(subnode, category)
+                    self.add_object(self.links, obj)
+            except AttributeError, _exc:
+                pass
+
     def add_object(self, db, obj):
         '''
         '''
@@ -174,37 +170,16 @@ class NXDL_definition(NXDL_mixin):
             raise IOError('file does not exist: ' + nxdl_file)
         validate_NXDL(nxdl_file)
         
-        self.title = None
-        self.category = None
-        self.ns = None
-
-        self.ignoreExtraGroups = False
-        self.ignoreExtraFields = False
-        self.ignoreExtraAttributes = False
-        
-        # - - - - - - - - - - - - - - - - - - - -
-        def get_boolean(attribute, default):
-            t = root.get('ignoreExtraGroups', 'false')
-            return t.lower() in ('true', '1', True)
-        # - - - - - - - - - - - - - - - - - - - -
+        defaults = get_nxdl_rules().nxdl
+        self.default_attrs = {k: v for k, v in defaults.attrs.items()}
+        #self.ns = defaults.ns
         
         # parse the XML content now
-
         tree = lxml.etree.parse(self.nxdl_file_name)
         root = tree.getroot()
 
         NXDL_mixin.__init__(self, root)
         self.title = root.get('name')
-        
-        self.ignoreExtraGroups = get_boolean('ignoreExtraGroups', False)
-        self.ignoreExtraFields = get_boolean('ignoreExtraFields', False)
-        self.ignoreExtraAttributes = get_boolean('ignoreExtraAttributes', False)
-        
-        # self.category = {
-        #              'base': 'base class',
-        #              'application': 'application definition',
-        #              'contributed': 'contributed definition',
-        #              }[root.attrib["category"]]
         self.category = root.attrib["category"]
 
         self.get_element_data(root, self.category)
@@ -236,6 +211,10 @@ class NX_attribute(NXDL_mixin):
 
     def __init__(self, node):
         NXDL_mixin.__init__(self, node)
+        
+        defaults = get_nxdl_rules().nxdl.children[self.element]
+        self.default_attrs = {k: v for k, v in defaults.attrs.items()}
+        
         if self.name in ('restricted deprecated minOccurs'.split()):
             pass
         self.nx_type = self.get_NX_type(node)
@@ -261,9 +240,14 @@ class NX_field(NXDL_mixin):
 
     def __init__(self, node, category):
         NXDL_mixin.__init__(self, node)
-        self.flexible_name = False
+        
+        defaults = get_nxdl_rules().nxdl.children[self.element]
+        self.default_attrs = {k: v for k, v in defaults.attrs.items()}
+        
+        nt = node.get('nameType', self.default_attrs['nameType'].default_value)
+        self.flexible_name = nt == 'any'
         if category in ('base class',):
-            self.minOccurs = node.get('minOccurs', 0)
+            self.minOccurs = node.get('minOccurs', self.default_attrs['minOccurs'].default_value)
         else:
             self.minOccurs = node.get('minOccurs', 1)
         self.optional = self.minOccurs in ('0', 0)
@@ -334,15 +318,21 @@ class NX_group(NXDL_mixin):
 
     def __init__(self, node, category):
         NXDL_mixin.__init__(self, node)
+        
+        defaults = get_nxdl_rules().nxdl.children[self.element]
+        self.default_attrs = {k: v for k, v in defaults.attrs.items()}
+        
         self.NX_class = node.get('type', None)
         if self.NX_class is None:
             msg = 'group has no type, this is an error, name = ' + self.name
             raise ValueError(msg)
 
         if category in ('base class', ):
-            self.flexible_name = True
+            nt = node.get('nameType', 'any')
+            self.flexible_name = nt == 'any'
         else:
-            self.flexible_name = False
+            nt = node.get('nameType', 'specified')
+            self.flexible_name = nt == 'any'
 
         try:
             len(self.name)
@@ -372,6 +362,9 @@ class NX_link(NXDL_mixin):
 
     def __init__(self, node, category):
         NXDL_mixin.__init__(self, node)
+        
+        defaults = get_nxdl_rules().nxdl.children[self.element]
+        
         self.target = node.get('target')
     
     def __str__(self):
@@ -385,23 +378,36 @@ class NX_symbols(NXDL_mixin):
     element = 'symbols'
 
 
-def get_NXDL_specifications():
+def _get_specs_from_pickle_file():
     '''
-    return a dictionary of NXDL structures, keyed by NX_class name
+    try to get the NXDL dictionary from the pickle file
+    
+    :return: dict with definitions or None
     '''
     qset = cache.qsettings()
     pfile = cache.get_pickle_file_name(qset.cache_dir())
-    if os.path.exists(pfile):
-        sha = qset.getKey('git_sha')
-        try:
-            nxdl_dict = cache.read_pickle_file(pfile, sha)
-        except (AttributeError, ImportError):
-            # could not read the pickle file, suggest user update the cache
-            nxdl_dict = None
-        if nxdl_dict is not None:
-            return  nxdl_dict
+    if not os.path.exists(pfile):
+        return
 
-    basedir = os.path.abspath(os.path.join(os.path.dirname(pfile), __init__.NXDL_CACHE_SUBDIR))
+    sha = qset.getKey('git_sha')
+    try:
+        nxdl_dict = cache.read_pickle_file(pfile, sha)
+    except (AttributeError, ImportError):
+        # could not read the pickle file, suggest user update the cache
+        nxdl_dict = None
+    if nxdl_dict is None:
+        return
+
+    return  nxdl_dict
+
+
+def _get_specs_from_NXDL_files():
+    '''
+    get the NXDL dictionary from the NXDL files in the cache
+    
+    :return: dict with definitions or None
+    '''
+    basedir = cache.get_nxdl_dir()
 
     path_list = [
         os.path.join(basedir, 'base_classes'),
@@ -421,10 +427,29 @@ def get_NXDL_specifications():
         # k = os.path.basename(nxdl_file_name)
         obj = NXDL_definition(nxdl_file_name)
         nxdl_dict[obj.title] = obj
-
+    
     return nxdl_dict
 
 
+def get_NXDL_specifications():
+    '''
+    return a dictionary of NXDL structures, keyed by NX_class name
+    '''
+    nxdl_dict = _get_specs_from_pickle_file()
+    if nxdl_dict is None:
+        nxdl_dict = _get_specs_from_NXDL_files()
+
+    return nxdl_dict
+
+def _developer():
+    ' '
+    import logs
+    __init__.LOG_MESSAGE = logs.to_console
+    nxdl_dict = _get_specs_from_NXDL_files()
+    print sorted(nxdl_dict.keys())
+
+
 if __name__ == '__main__':
-    print "Start this module using:  python main.py structure ..."
-    exit(0)
+    # print "Start this module using:  python main.py structure ..."
+    # exit(0)
+    _developer()

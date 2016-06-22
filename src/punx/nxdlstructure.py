@@ -106,11 +106,13 @@ class NXDL_mixin(object):
             defaults = get_nxdl_rules().nxdl
         else:
             defaults = get_nxdl_rules().nxdl.children[self.element]
-        self.default_attrs = {k: v for k, v in defaults.attrs.items()}
+        default_attrs = {k: v for k, v in defaults.attrs.items()}
+
         self.attrs = {}
         self.fields = {}
         self.groups = {}
         self.links = {}
+        self.symbols = {}
         
         for subnode in node:
             try:
@@ -126,6 +128,9 @@ class NXDL_mixin(object):
                 elif subnode.tag.endswith('}link'):
                     obj = NX_link(subnode, category)
                     self.add_object(self.links, obj)
+                elif subnode.tag.endswith('}symbols'):
+                    obj = NX_symbols(subnode, category)
+                    self.add_object(self.symbols, obj)
             except AttributeError, _exc:
                 pass
 
@@ -170,7 +175,7 @@ class NXDL_definition(NXDL_mixin):
         validate_NXDL(nxdl_file)
         
         defaults = get_nxdl_rules().nxdl
-        self.default_attrs = {k: v for k, v in defaults.attrs.items()}
+        default_attrs = {k: v for k, v in defaults.attrs.items()}
         #self.ns = defaults.ns
         
         # parse the XML content now
@@ -212,7 +217,7 @@ class NX_attribute(NXDL_mixin):
         NXDL_mixin.__init__(self, node)
         
         defaults = get_nxdl_rules().nxdl.children[self.element]
-        self.default_attrs = {k: v for k, v in defaults.attrs.items()}
+        default_attrs = {k: v for k, v in defaults.attrs.items()}
         
         if self.name in ('restricted deprecated minOccurs'.split()):
             pass
@@ -241,12 +246,13 @@ class NX_field(NXDL_mixin):
         NXDL_mixin.__init__(self, node)
         
         defaults = get_nxdl_rules().nxdl.children[self.element]
-        self.default_attrs = {k: v for k, v in defaults.attrs.items()}
+        default_attrs = {k: v for k, v in defaults.attrs.items()}
+        default_children = {k: v for k, v in defaults.children.items()}
         
-        nt = node.get('nameType', self.default_attrs['nameType'].default_value)
+        nt = node.get('nameType', default_attrs['nameType'].default_value)
         self.flexible_name = nt == 'any'
         if category in ('base class',):
-            self.minOccurs = node.get('minOccurs', self.default_attrs['minOccurs'].default_value)
+            self.minOccurs = node.get('minOccurs', default_attrs['minOccurs'].default_value)
         else:
             self.minOccurs = node.get('minOccurs', 1)
         self.optional = self.minOccurs in ('0', 0)
@@ -319,7 +325,8 @@ class NX_group(NXDL_mixin):
         NXDL_mixin.__init__(self, node)
         
         defaults = get_nxdl_rules().nxdl.children[self.element]
-        self.default_attrs = {k: v for k, v in defaults.attrs.items()}
+        default_attrs = {k: v for k, v in defaults.attrs.items()}
+        default_children = {k: v for k, v in defaults.children.items()}
         
         self.NX_class = node.get('type', None)
         if self.NX_class is None:
@@ -363,6 +370,8 @@ class NX_link(NXDL_mixin):
         NXDL_mixin.__init__(self, node)
         
         defaults = get_nxdl_rules().nxdl.children[self.element]
+        default_attrs = {k: v for k, v in defaults.attrs.items()}
+        default_children = {k: v for k, v in defaults.children.items()}
         
         self.target = node.get('target')
     
@@ -374,7 +383,17 @@ class NX_symbols(NXDL_mixin):
     '''
     NXDL symbols table
     '''
+
     element = 'symbols'
+
+    def __init__(self, node, category):
+        NXDL_mixin.__init__(self, node)
+        
+        defaults = get_nxdl_rules().nxdl.children[self.element]
+        default_attrs = {k: v for k, v in defaults.attrs.items()}
+        default_children = {k: v for k, v in defaults.children.items()}
+
+        # TODO:
 
 
 def _get_specs_from_pickle_file():
@@ -404,7 +423,7 @@ def _get_specs_from_NXDL_files():
     '''
     get the NXDL dictionary from the NXDL files in the cache
     
-    :return: dict with definitions or None
+    :return: dict with definitions
     '''
     basedir = cache.get_nxdl_dir()
 
@@ -434,11 +453,7 @@ def get_NXDL_specifications():
     '''
     return a dictionary of NXDL structures, keyed by NX_class name
     '''
-    nxdl_dict = _get_specs_from_pickle_file()
-    if nxdl_dict is None:
-        nxdl_dict = _get_specs_from_NXDL_files()
-
-    return nxdl_dict
+    return _get_specs_from_pickle_file() or _get_specs_from_NXDL_files()
 
 
 def _developer():

@@ -1,7 +1,7 @@
 punx
 ####
 
-Python Utilities for NeXus HDF5 files
+Python Utilities for NeXus HDF5 files: validation, structure, hierarchy
 
 :author:    Pete R. Jemian
 :email:     prjemian@gmail.com
@@ -21,8 +21,3 @@ Project Goals
 * Validation of NeXus HDF5 data files
 * Display of NeXus HDF5 data file structure
 * Display of NeXus base class hierarchy (stretch goal, graphical output)
-
-Provides
-########
-
-* **punx**      : command-line tool with subcommands for validate, structure, ...

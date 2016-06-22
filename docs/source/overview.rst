@@ -1,9 +1,12 @@
 Project Overview
-================
+################
 
 The **punx** program package is easy to use and has several useful modules.
 The first module to try is :ref:`demo <demo>`, which validates 
 and prints the structure of a NeXus HDF5 data file from the NeXus documentation.
+
+Subcommands
+***********
 
 .. toctree::
    :hidden:
@@ -13,8 +16,6 @@ and prints the structure of a NeXus HDF5 data file from the NeXus documentation.
    structure
    update
    validate
-
-.. rubric:: Subcommands
 
 **punx** uses a subcommand structure to provide several different modules under one
 identifiable program.  These are invoked using commands of the form::
@@ -37,12 +38,14 @@ and the *<other parameters>* are desribed by the help for each subcommand::
 
     punx <subcommand> -h
 
-.. note:: Subcommands may be abbreviated.
+.. tip:: Subcommands may be abbreviated.
+
    It is only necessary to use the first two (or more characters) of any
    subcommand so that it is unique. Such as: ``demonstrate`` can be abbreviated to
    ``demo`` or even ``de``.
 
-.. rubric:: command line help
+command line help
+*****************
 
 .. code-block:: console
 
@@ -67,5 +70,8 @@ and the *<other parameters>* are desribed by the help for each subcommand::
        validate            validate a NeXus file
    
    http://punx.readthedocs.io
+
+README
+******
 
 .. include:: ../../README.rst

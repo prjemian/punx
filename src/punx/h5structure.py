@@ -321,6 +321,8 @@ def _get_group_niac2014(parent, attribute, nxclass_name):
                 break
         if group is None:
             return False
+    else:
+        group = parent[group]   # convert str to HDF5 object or a KeyError exception
     if not isNeXusGroup(group, nxclass_name):
         return False
     return group

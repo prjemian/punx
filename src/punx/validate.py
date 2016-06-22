@@ -841,7 +841,8 @@ class Data_File_Validator(object):
         =====  =======  =======  ================================================================
         1      OK       strict   matches most stringent NeXus specification
         2      NOTE     relaxed  matches NeXus specification that is most generally accepted
-        3      WARN     HDF5     acceptable to HDF5 but not NeXus
+        3      ERROR    UTF8     specific to strings with UnicodeDecodeError (see issue #37)
+        4      WARN     HDF5     acceptable to HDF5 but not NeXus
         =====  =======  =======  ================================================================
         
         :see: http://download.nexusformat.org/doc/html/datarules.html?highlight=regular%20expression
@@ -858,18 +859,27 @@ class Data_File_Validator(object):
         p = self.patterns[key_strict]
         m = p.match(short_name)
         if m is not None and m.string == short_name:
-            name_ok = finding.OK
-            adjective = 'strict'
+            f = finding.OK
             key = key_strict
+            msg =  'strict re: ' + p.regexp_pattern_str
         else:
             p = self.patterns[key_relaxed]
             m = p.match(short_name)
-            t = m is not None and m.string == short_name
-            name_ok = {True: finding.NOTE, False: finding.WARN}[t]
-            adjective = 'relaxed'
-            key = key_relaxed
+            if m is not None and m.string == short_name:
+                f = finding.NOTE
+                key = key_relaxed
+                msg =  'relaxed re: ' + p.regexp_pattern_str
+            else:
+                # test if string rendering raises UnicodeDecodeError
+                key = 'validItemName'
+                msg = 'valid HDF5 item name, not valid with NeXus'
+                try:    # to raise the exception
+                    _test = '%s' % str(m)
+                    f = finding.WARN
+                except UnicodeDecodeError, _exc:
+                    f = finding.ERROR
 
-        self.new_finding(key, h5_addr, name_ok, adjective +' re: ' + p.regexp_pattern_str)
+        self.new_finding(key, h5_addr, f, msg)
 
     def new_finding(self, test_name, h5_address, status, comment):
         '''

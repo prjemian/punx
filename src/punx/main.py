@@ -32,11 +32,9 @@ main user interface file
     subcommands:
       valid subcommands
     
-      {demo,structure,update,validate}
-        demo                validate NeXus  demo file: writer_1_3.hdf5
-        hierarchy           TBA: show NeXus base class hierarchy from a given base class
-        show                TBA: show program information (about the cache)
-        structure           show structure of HDF5 file
+      {demonstrate,structure,update,validate}
+        demonstrate         demonstrate HDF5 file validation
+        structure           show structure of HDF5 or NXDL file
         update              update the local cache of NeXus definitions
         validate            validate a NeXus file
 
@@ -305,7 +303,7 @@ def parse_command_line_arguments():
     
     
     ### subcommand: demo
-    p_demo = subcommand.add_parser('demo', help='demonstrate HDF5 file validation')
+    p_demo = subcommand.add_parser('demonstrate', help='demonstrate HDF5 file validation')
     add_logging_argument(p_demo)
     p_demo.set_defaults(func=func_demo)
 

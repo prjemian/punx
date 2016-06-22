@@ -12,7 +12,7 @@
 #-----------------------------------------------------------------------------
 
 '''
-Command line tool to print the structure of an HDF5 file
+print the structure of an HDF5 file
 
 .. autosummary::
     

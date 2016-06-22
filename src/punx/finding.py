@@ -60,7 +60,7 @@ TF_RESULT = {True: OK, False: ERROR}
 
 class Finding(object):
     '''
-    a single observation noticed while validating
+    a single reported observation while validating
     
     :param str test_name: one-word description of the test
     :param str h5_address: address of h5py item

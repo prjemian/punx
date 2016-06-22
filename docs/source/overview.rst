@@ -16,6 +16,12 @@ and prints the structure of a NeXus HDF5 data file from the NeXus documentation.
 
 .. rubric:: Subcommands
 
+**punx** uses a subcommand structure to provide several different modules under one
+identifiable program.  These are invoked using commands of the form::
+
+    punx <subcommand> <other parameters>
+    
+ where the *<subcommands>* are from this table:
 
 ============================  ====================================================
 subcommand                    brief description
@@ -26,6 +32,15 @@ subcommand                    brief description
 :ref:`update <update>`        update the local cache of NeXus definitions
 :ref:`validate <validate>`    validate a NeXus file
 ============================  ====================================================
+
+and the *<other parameters>* are desribed by the help for each subcommand::
+
+    punx <subcommand> -h
+
+.. note:: Subcommands may be abbreviated.
+   It is only necessary to use the first two (or more characters) of any
+   subcommand so that it is unique. Such as: ``demonstrate`` can be abbreviated to
+   ``demo`` or even ``de``.
 
 .. rubric:: command line help
 
@@ -45,9 +60,8 @@ subcommand                    brief description
    subcommands:
      valid subcommands
    
-     {demo,hierarchy,structure,update,validate}
-       demo                demonstrate HDF5 file validation
-       hierarchy           show NeXus base class hierarchy
+     {demonstrate,structure,update,validate}
+       demonstrate         demonstrate HDF5 file validation
        structure           show structure of HDF5 or NXDL file
        update              update the local cache of NeXus definitions
        validate            validate a NeXus file

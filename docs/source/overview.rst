@@ -65,9 +65,9 @@ and the *<other parameters>* are desribed by the help for each subcommand::
 
     punx <subcommand> -h
 
-such as::
+Example::
 
-   command> punx validate -h
+   console> punx validate -h
    punx validate -h
    usage: punx validate [-h] [--report REPORT] [-l [LOGFILE]] [-i INTEREST]
                         infile

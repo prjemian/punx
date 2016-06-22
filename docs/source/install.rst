@@ -1,3 +1,6 @@
+.. _install:
+__ index:: install
+
 Installation
 ############
 
@@ -11,11 +14,14 @@ If you have ``pip`` installed, then you can install::
 The latest development versions of punx can be downloaded from the
 GitHub repository listed above::
 
+    $ cd /some/directory
     $ git clone http://github.com/prjemian/punx.git
 
 To install in the standard Python location::
 
     $ cd punx
+    $ pip install .
+    # -or-
     $ python setup.py install
 
 To install in user's home directory::
@@ -26,14 +32,41 @@ To install in an alternate location::
 
     $ python setup.py install --prefix=/path/to/installation/dir
 
-Required Libraries
-##################
+Updating
+********
+
+:pip:  ::
+
+   pip install -U --no-deps punx
+
+:git:  assuming you have cloned as shown above::
+
+    $ cd /some/directory/punx
+    $ git pull
+    $ pip install -U --no-deps .
+
+
+Required Packages
+*****************
 
 ============  ===================================
-Library       URL
+Package       URL
 ============  ===================================
+PyQt4         https://riverbankcomputing.com/software/pyqt/intro
 h5py          http://www.h5py.org
 lxml          http://lxml.de
 numpy         http://numpy.scipy.org
+============  ===================================
+
+Optional Packages
+*****************
+
+============  ===================================
+Package       URL
+============  ===================================
 pyRestTable   http://pyresttable.readthedocs.io
 ============  ===================================
+
+The *pyRestTable* package is only used for various reports.
+   If using the package as a library and developing your own custom 
+   reporting, this package is not required.

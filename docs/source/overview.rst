@@ -22,7 +22,7 @@ identifiable program.  These are invoked using commands of the form::
 
     punx <subcommand> <other parameters>
     
- where the *<subcommands>* are from this table:
+where the *<subcommands>* are from this table:
 
 ============================  ====================================================
 subcommand                    brief description

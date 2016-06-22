@@ -146,8 +146,12 @@ class h5structure(object):
         '''return a [formatted_string] with any attributes'''
         s = []
         if self.show_attributes:
-            for name, value in obj.attrs.iteritems():
-                s.append("%s  @%s = %s" % (indentation, name, str(value)))
+            for name in obj.attrs:
+                value = obj.attrs[name]
+                try:
+                    s.append("%s  @%s = %s" % (indentation, name, str(value)))
+                except UnicodeDecodeError, _exc:
+                    s.append("%s  @%s = %s" % (indentation, name, 'UnicodeDecodeError: ' + str(_exc)))
         return s
 
     def _renderLinkedObject(self, obj, name, indentation = "  "):
@@ -172,7 +176,10 @@ class h5structure(object):
                 value = " = %s" % dset.value[0]
             else:
                 value = " = %s" % str(dset.value)
-            s += [ "%s%s:%s%s" % (indentation, name, txType, value) ]
+            try:
+                s += [ "%s%s:%s%s" % (indentation, name, txType, str(value)) ]
+            except UnicodeDecodeError, _exc:
+                s += [ "%s%s:%s%s" % (indentation, name, txType, 'UnicodeDecodeError: ' + str(_exc)) ]
             s += self._renderAttributes(dset, indentation)
             # dset.dtype.kind == 'S', nchar = dset.dtype.itemsize
         elif dset.dtype.kind == 'O':

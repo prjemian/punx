@@ -24,8 +24,8 @@ if __name__ == '__main__':
     sys.argv.append('va')
 #     sys.argv.append('-h')
 
-    # sys.argv.append('--report')
-    # sys.argv.append('ERROR,WARN')
+#     sys.argv.append('--report')
+#     sys.argv.append('ERROR,WARN')
 
     # sys.argv.append('--logfile')
     # sys.argv.append('_punx_.log')
@@ -38,6 +38,5 @@ if __name__ == '__main__':
 #     sys.argv.append('data/has_default_attribute_error/external_angles.hdf5')
 #     sys.argv.append('data/prj_test.nexus.hdf5')
 #     sys.argv.append('data/verysimple.nx5')
-    sys.argv.append('data/file_1.nxs')
 
     main.main()

@@ -268,9 +268,9 @@ def parse_command_line_arguments():
                                      epilog=epilog)
 
     p.add_argument('-v', 
-                        '--version', 
-                        action='version', 
-                        version=__init__.__version__)
+                    '--version', 
+                    action='version', 
+                    version=__init__.__version__)
     
     def add_logging_argument(subp):
         '''

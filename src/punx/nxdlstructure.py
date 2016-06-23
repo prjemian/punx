@@ -17,6 +17,7 @@ Load and/or document the structure of a NeXus NXDL class specification
 .. autosummary::
    
    ~get_nxdl_rules
+   ~get_ns_dict
    ~validate_NXDL
    ~NXDL_mixin
    ~NXDL_definition
@@ -66,7 +67,7 @@ def get_nxdl_rules():
 
 def get_ns_dict():
     '''
-    get the dictionary of namespace substitutions
+    get the dictionary of XML namespace substitutions
     '''
     return get_nxdl_rules().nxdl.ns
 
@@ -83,6 +84,15 @@ class NXDL_mixin(object):
     common components available to all subclasses
     
     :param obj node: XML object
+    
+    .. autosummary::
+    
+        ~get_NX_type
+        ~get_NX_units
+        ~get_element_data
+        ~add_object
+        ~render_group
+    
     '''
     element = 'mixin - must override in subclass'
     
@@ -90,24 +100,28 @@ class NXDL_mixin(object):
         node_name = node.get('name')
         if node_name is not None:
             self.name = node.get('name')
+
+#     def __str__(self):
+#         '''
+#         canonical string representation of this object
+#         '''
+#         return self.name
     
     def get_NX_type(self, node):
         '''
+        return the NeXus type of the XML node
         '''
         return node.get('type', 'NX_CHAR')
     
     def get_NX_units(self, node):
         '''
+        return the units attribute of the XML node
         '''
         return node.get('units', '')
-
-    def __str__(self):
-        '''
-        '''
-        return '-tba-'
     
     def get_element_data(self, node, category):
         '''
+        parse the elements defined within this XML node 
         '''
         if self.element == 'definition':
             defaults = get_nxdl_rules().nxdl
@@ -143,6 +157,7 @@ class NXDL_mixin(object):
 
     def add_object(self, db, obj):
         '''
+        add object ``obj`` to database ``db`` (dictionary)
         '''
         name = obj.name
         if name in db:
@@ -151,6 +166,7 @@ class NXDL_mixin(object):
 
     def render_group(self, group):
         '''
+        return a string with text representation of this ``group``
         '''
         indentation = ' '*2
         t = []
@@ -272,7 +288,18 @@ class NX_field(NXDL_mixin):
         for n in node.xpath('nx:enumeration/nx:item', namespaces=get_ns_dict()):
             self.enum.append( n.attrib['value'] )
 
+        # CAREFUL:
+        # there are two kinds of attributes
+        # 1. XML attributes of XML elements defining the NXDL structure
+        # 2. NXDL attribute ... make this clear ...
+        # FIXME: resolve this before continuing
+
+        # walk through the attributes for this field as declared in the nxdl.xsd rules
         self.attrs = {}
+        for k, v in defaults.attrs.items():
+            pass
+
+        # walk through all custom attributes (<attribute /> elements) declared in the NXDL
         for subnode in node.xpath('nx:attribute', namespaces=get_ns_dict()):
             obj = NX_attribute(subnode)
             self.attrs[obj.name] = obj

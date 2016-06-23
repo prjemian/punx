@@ -266,7 +266,10 @@ class h5structure(object):
             else:
                 # this replaces a lot of code: if rank == ...
                 indices = ', '.join( [str(key)] + (':'*(rank-1)).split() )
-                part = eval('obj[%s]' % indices)
+                try:
+                    part = eval('obj[%s]' % indices)
+                except IOError, _exc:
+                    return 'IOError: ' + str(_exc)
                 item = self._renderNdArray(part, indents + '  ')    # recursion
             return item
 

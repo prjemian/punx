@@ -258,9 +258,11 @@ def parse_command_line_arguments():
     doc = __doc__.strip().splitlines()[0]
     doc += '\n  URL: ' + __init__.__url__
     doc += '\n  v' + __init__.__version__
-    epilog = 'Note: It is only necessary to use the first two or'
-    epilog += ' more characters of any subcommand so that it is unique. '
-    epilog += ' Such as: ``demo`` can be abbreviated to ``de``.'
+    epilog = 'Note: It is only necessary to use the first two (or'
+    epilog += ' more) characters of any subcommand, enough that the'
+    epilog += ' abbreviation is unique. '
+    epilog += ' Such as: ``demonstrate`` can be abbreviated to'
+    epilog += ' ``demo`` or even ``de``.'
     p = MyArgumentParser(prog=__init__.__package_name__, 
                                      description=doc,
                                      epilog=epilog)

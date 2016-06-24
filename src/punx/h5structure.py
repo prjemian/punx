@@ -204,9 +204,11 @@ class h5structure(object):
                             indentation, name, txType, txShape, value) ]
                 else:
                     # show multi-D arrays different
-                    s += [ "%s%s:%s%s = __array" % (
+                    s += [ "%s%s:%s%s" % (
                             indentation, name, txType, txShape) ]
-                    s += [ "%s  %s = %s" % (indentation, "__array", value) ]
+                    #s += [ "%s%s:%s%s = __array" % (
+                    #        indentation, name, txType, txShape) ]
+                    # s += [ "%s  %s = %s" % (indentation, "__array", value) ]
             else:
                 s += [ "%s%s:%s%s = [ ... ]" % (
                         indentation, name, txType, txShape) ]

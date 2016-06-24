@@ -40,7 +40,7 @@ __settings_organization__ = __package_name__
 __settings_package__ = __package_name__
 
 __install_requires__ = ['h5py', 'lxml', 'numpy', 
-                        'pyRestTable', 
+                        'pyRestTable',
                         # 'PyQt4',  
     # see: http://stackoverflow.com/questions/4628519/is-it-possible-to-require-pyqt-from-setuptools-setup-py
                         ]

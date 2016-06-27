@@ -7,6 +7,12 @@ Change History
 Production
 **********
 
+--none--
+
+Development
+***********
+
+:0.0.7: 2016-06-27 -- add "report" arguments to "demo" subcommand
 :0.0.6: 2016-06-22 -- resolved some UnicodeDecodeError exceptions
 :0.0.5: 2016-06-20 -- added subcommand shortcuts and logging
 :0.0.4: 2016-06-17 -- work-in-progress to test installation with remote user

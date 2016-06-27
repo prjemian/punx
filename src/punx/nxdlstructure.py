@@ -30,6 +30,29 @@ Load and/or document the structure of a NeXus NXDL class specification
 
 * :class:`NXDL_definition`: the structure
 * define a text renderer method for that class
+
+.. rubric:: about attributes
+
+There are three types of attributes this code must handle:
+
+1. XML attributes
+   
+   These are metadata applied to various elements in an XML file.  Example::
+   
+       <xs:element minOccurs="0" ...
+   
+2. NXDL attributes
+   
+   These are attribute elements presented in an NXDL file.  Example::
+   
+       <nx:attribute ...
+
+3. HDF5 data file attributes
+   
+   These are metadata applied to various groups or fields in an HDF5 data file.  Example::
+   
+       /entry@default=...
+
 '''
 
 __url__ = 'http://punx.readthedocs.org/en/latest/nxdlstructure.html'

@@ -114,7 +114,9 @@ def func_demo(args):
     args.infile = os.path.abspath(os.path.join(path, 'data', 'writer_1_3.hdf5'))
 
     print 'console> punx validate ' + args.infile
+    args.report = ','.join(sorted(finding.VALID_STATUS_DICT.keys()))
     func_validate(args)
+    del args.report
 
     print 'console> punx structure ' + args.infile
     import h5structure

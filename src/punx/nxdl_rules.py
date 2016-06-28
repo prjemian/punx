@@ -284,7 +284,7 @@ class NXDL_Root(Mixin):
                 msg = 'unhandled tag in ``definitionType``: '
                 self.raise_error(node, msg, node.tag)
 
-
+# TODO: confirm whether this is nx:attribute or xs:attribute
 class NXDL_Attribute(Mixin): 
     '''
     nx:attribute element

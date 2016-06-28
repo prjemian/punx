@@ -326,11 +326,11 @@ class NX_field(NX_mixin):
         # FIXME: resolve this before continuing
 
         # walk through the attributes for this field as declared in the nxdl.xsd rules
-        self.attrs = {}
         for k, v in defaults.attrs.items():
             pass
 
         # walk through all custom attributes (<attribute /> elements) declared in the NXDL
+        self.attrs = {}
         for subnode in node.xpath('nx:attribute', namespaces=get_ns_dict()):
             obj = NX_attribute(subnode)
             self.attrs[obj.name] = obj

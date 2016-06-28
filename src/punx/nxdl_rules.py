@@ -21,7 +21,7 @@ Interpret the NXDL rules (nxdl.xsd & nxdlTypes.xsd) into useful Python component
    ~NXDL_nxdlType
    ~Mixin
    ~NXDL_Root
-   ~Attribute
+   ~NXDL_Attribute
    ~NXDL_Element
    ~NXDL_Type
    ~Recursion
@@ -196,7 +196,7 @@ class Mixin(object):
 
     def parse_attribute(self, node):
         ''' '''
-        obj = Attribute(node)
+        obj = NXDL_Attribute(node)
         self.attrs[obj.name] = obj
 
     def parse_attributeGroup(self, node):
@@ -258,7 +258,7 @@ class NXDL_Root(Mixin):
         
         for node in type_node:
             if node.tag.endswith('}attribute'):
-                obj = Attribute(node)
+                obj = NXDL_Attribute(node)
                 self.attrs[obj.name] = obj
             elif node.tag.endswith('}attributeGroup'):
                 self.parse_attributeGroup(node)
@@ -285,7 +285,7 @@ class NXDL_Root(Mixin):
                 self.raise_error(node, msg, node.tag)
 
 
-class Attribute(Mixin): 
+class NXDL_Attribute(Mixin): 
     '''
     nx:attribute element
     
@@ -345,7 +345,7 @@ class NXDL_Element(Mixin):
         if ref is None:
             for node in xml_obj:
                 if node.tag.endswith('}complexType'):
-                    a = Attribute(node.find('xs:attribute', self.ns))
+                    a = NXDL_Attribute(node.find('xs:attribute', self.ns))
                     self.attrs[a.name] = a
                 elif node.tag.endswith('}annotation'):
                     pass

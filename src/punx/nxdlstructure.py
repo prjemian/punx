@@ -20,7 +20,7 @@ Load and/or document the structure of a NeXus NXDL class specification
    ~get_ns_dict
    ~validate_NXDL
    ~NXDL_mixin
-   ~NXDL_definition
+   ~NX_definition
    ~NX_attribute
    ~NX_field
    ~NX_group
@@ -28,7 +28,7 @@ Load and/or document the structure of a NeXus NXDL class specification
    ~NX_symbols
    ~get_NXDL_specifications
 
-* :class:`NXDL_definition`: the structure
+* :class:`NX_definition`: the structure
 * define a text renderer method for that class
 
 .. rubric:: about attributes
@@ -40,18 +40,26 @@ There are three types of attributes this code must handle:
    These are metadata applied to various elements in an XML file.  Example::
    
        <xs:element minOccurs="0" ...
+    
+    XML attributes can be stored in a key:value dictionary where value is a string.
    
 2. NXDL attributes
    
    These are attribute elements presented in an NXDL file.  Example::
    
        <nx:attribute ...
+    
+    NXDL attributes can be stored in a key:object dictionary where object is an instance of NX_attribute.
+    Content of that object is a dictionary of XML attributes and various objects which define the
+    structure of the defined NXDL attribute.
 
 3. HDF5 data file attributes
    
    These are metadata applied to various groups or fields in an HDF5 data file.  Example::
    
        /entry@default=...
+    
+    HDF5 data file attributes can be stored in a key:value dictionary where value is a string.
 
 '''
 
@@ -206,7 +214,7 @@ class NXDL_mixin(object):
         return '\n'.join(t)
 
 
-class NXDL_definition(NXDL_mixin):
+class NX_definition(NXDL_mixin):
     '''
     Contains the complete structure of a NXDL definition, without documentation
     
@@ -499,7 +507,7 @@ def _get_specs_from_NXDL_files():
     nxdl_dict = collections.OrderedDict()
     for nxdl_file_name in nxdl_file_list:
         # k = os.path.basename(nxdl_file_name)
-        obj = NXDL_definition(nxdl_file_name)
+        obj = NX_definition(nxdl_file_name)
         nxdl_dict[obj.title] = obj
     
     return nxdl_dict

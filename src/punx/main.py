@@ -142,7 +142,7 @@ def func_show(args):
 def func_structure(args):
     if args.infile.endswith('.nxdl.xml'):
         import nxdlstructure
-        nxdl = nxdlstructure.NXDL_definition(args.infile)
+        nxdl = nxdlstructure.NX_definition(args.infile)
         print nxdl.render()
     else:
         import h5structure

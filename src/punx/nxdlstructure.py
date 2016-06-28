@@ -19,7 +19,7 @@ Load and/or document the structure of a NeXus NXDL class specification
    ~get_nxdl_rules
    ~get_ns_dict
    ~validate_NXDL
-   ~NXDL_mixin
+   ~NX_mixin
    ~NX_definition
    ~NX_attribute
    ~NX_field
@@ -110,7 +110,7 @@ def validate_NXDL(nxdl_file_name):
     validate.validate_xml(nxdl_file_name)
 
 
-class NXDL_mixin(object):
+class NX_mixin(object):
     '''
     common components available to all subclasses
     
@@ -214,7 +214,7 @@ class NXDL_mixin(object):
         return '\n'.join(t)
 
 
-class NX_definition(NXDL_mixin):
+class NX_definition(NX_mixin):
     '''
     Contains the complete structure of a NXDL definition, without documentation
     
@@ -235,7 +235,7 @@ class NX_definition(NXDL_mixin):
         tree = lxml.etree.parse(self.nxdl_file_name)
         root = tree.getroot()
 
-        NXDL_mixin.__init__(self, root)
+        NX_mixin.__init__(self, root)
         self.title = root.get('name')
         self.category = root.attrib["category"]
 
@@ -260,14 +260,14 @@ class NX_definition(NXDL_mixin):
         return sorted({v.NX_class: None for v in self.groups.values()}.keys())
 
 
-class NX_attribute(NXDL_mixin):
+class NX_attribute(NX_mixin):
     '''
     NXDL attribute
     '''
     element = 'attribute'
 
     def __init__(self, node):
-        NXDL_mixin.__init__(self, node)
+        NX_mixin.__init__(self, node)
         
         defaults = get_nxdl_rules().nxdl.children[self.element]
         default_attrs = {k: v for k, v in defaults.attrs.items()}
@@ -289,14 +289,14 @@ class NX_attribute(NXDL_mixin):
         return s
 
 
-class NX_field(NXDL_mixin):
+class NX_field(NX_mixin):
     '''
     NXDL field
     '''
     element = 'field'
 
     def __init__(self, node, category):
-        NXDL_mixin.__init__(self, node)
+        NX_mixin.__init__(self, node)
         
         defaults = get_nxdl_rules().nxdl.children[self.element]
         default_attrs = {k: v for k, v in defaults.attrs.items()}
@@ -379,14 +379,14 @@ class NX_field(NXDL_mixin):
         return [dims[k] for k in sorted(map(int, dims.keys()))]
 
 
-class NX_group(NXDL_mixin):
+class NX_group(NX_mixin):
     '''
     NXDL group
     '''
     element = 'group'
 
     def __init__(self, node, category):
-        NXDL_mixin.__init__(self, node)
+        NX_mixin.__init__(self, node)
         
         defaults = get_nxdl_rules().nxdl.children[self.element]
         default_attrs = {k: v for k, v in defaults.attrs.items()}
@@ -424,14 +424,14 @@ class NX_group(NXDL_mixin):
         return s
 
 
-class NX_link(NXDL_mixin):
+class NX_link(NX_mixin):
     '''
     NXDL link
     '''
     element = 'link'
 
     def __init__(self, node, category):
-        NXDL_mixin.__init__(self, node)
+        NX_mixin.__init__(self, node)
         
         defaults = get_nxdl_rules().nxdl.children[self.element]
         default_attrs = {k: v for k, v in defaults.attrs.items()}
@@ -443,7 +443,7 @@ class NX_link(NXDL_mixin):
         return self.name + ' --> ' + self.target
 
 
-class NX_symbols(NXDL_mixin):
+class NX_symbols(NX_mixin):
     '''
     NXDL symbols table
     '''
@@ -451,7 +451,7 @@ class NX_symbols(NXDL_mixin):
     element = 'symbols'
 
     def __init__(self, node, category):
-        NXDL_mixin.__init__(self, node)
+        NX_mixin.__init__(self, node)
         
         defaults = get_nxdl_rules().nxdl.children[self.element]
         default_attrs = {k: v for k, v in defaults.attrs.items()}

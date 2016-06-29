@@ -16,7 +16,6 @@ developer: exercise various aspects of the main user interface file
 '''
 
 import sys
-import main
 
 
 def demo_prep():
@@ -51,8 +50,9 @@ def validate_prep():
 def logfile_prep():
     # sys.argv.append('--logfile')
     # sys.argv.append('_punx_.log')
-    sys.argv.append('--interest')
-    sys.argv.append('1')
+    # sys.argv.append('--interest')
+    # sys.argv.append('1')
+    pass
 
 
 def datafile_prep():
@@ -71,6 +71,7 @@ def datafile_prep():
 
 if __name__ == '__main__':
     import __init__
+    import main
     __init__.DEFAULT_LOG_LEVEL = __init__.NOISY
     # sys.argv.append('-h')
     

@@ -12,6 +12,7 @@ Production
 Development
 ***********
 
+:0.0.9: 2016-06-30 -- retry failed https requests to GitHub 
 :0.0.8: 2016-06-29 -- refactor update procedure 
 :0.0.7: 2016-06-27 -- add "report" arguments to "demo" subcommand
 :0.0.6: 2016-06-22 -- resolved some UnicodeDecodeError exceptions

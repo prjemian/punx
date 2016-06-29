@@ -76,7 +76,8 @@ GLOBAL_INI_GROUP                = '___global___'
 CACHE_SUBDIR                    = 'cache'
 SOURCE_CACHE_SETTINGS_FILENAME  = 'punx.ini'
 PICKLE_FILE                     = 'nxdl.p'
-NXDL_CACHE_SUBDIR = GITHUB_NXDL_REPOSITORY + '-' + GITHUB_NXDL_BRANCH
+NXDL_CACHE_SUBDIR               = GITHUB_NXDL_REPOSITORY + '-' + GITHUB_NXDL_BRANCH
+GITHUB_RETRY_COUNT              = 3
 
 LOG_MESSAGE                     = None      # a function object, re-define as function to add text to program logs
 

@@ -68,11 +68,11 @@ when users run from a copy of the *punx* package installed from PyPI
 '''
 
 import cPickle as pickle
-import json
 import lxml
 import os
+import requests.packages.urllib3
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
 import StringIO
-import urllib2
 import zipfile
 
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
@@ -188,16 +188,15 @@ def githubMasterInfo(org, repo):
     url = 'https://api.github.com/repos/%s/%s/commits' % (org, repo)
     
     __init__.LOG_MESSAGE('get repo info: ' + str(url), __init__.INFO)
+    requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
     try:
-        text = urllib2.urlopen(url).read()
-    except IOError:
-        __init__.LOG_MESSAGE('IOError from ' + str(url), __init__.ERROR)
-        # IOError: [Errno socket error] [Errno -2] Name or service not known -- (no network)
+        r = requests.get(url, verify=False)
+    except requests.exceptions.ConnectionError, _exc:
+        # TODO: can get more content from _exc
+        __init__.LOG_MESSAGE('ConnectionError from ' + str(url), __init__.ERROR)
         return None
 
-    buf = json.loads(text)
-
-    latest = buf[0]
+    latest = r.json()[0]
     sha = latest['sha']
     iso8601 = latest['commit']['committer']['date']
     zip_url = 'https://github.com/%s/%s/archive/master.zip' % (org, repo)
@@ -250,8 +249,9 @@ def update_NXDL_Cache(force_update=False):
     # download the repository ZIP file 
     url = info['zip_url']
     __init__.LOG_MESSAGE('download: ' + str(url), __init__.INFO)
-    u = urllib2.urlopen(url)
-    content = u.read()
+    requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+    # TODO: try ... except?  as above
+    content = requests.get(url, verify=False).content
     buf = StringIO.StringIO(content)
     zip_content = zipfile.ZipFile(buf)
     # How to save this zip_content to disk? not needed when using pickle file

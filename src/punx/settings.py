@@ -43,7 +43,7 @@ class QSettingsMixin(object):
     '''
 
     def init_global_keys(self):
-        self.updateGroupKeys({'file': str(self.fileName())})
+        self.updateGroupKeys({'file': os.path.abspath(str(self.fileName()))})
         self.updateGroupKeys({'version': '1.0'})
     
     def updateGroupKeys(self, group_dict={}, group=__init__.GLOBAL_INI_GROUP):

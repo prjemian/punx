@@ -68,11 +68,11 @@ when users run from a copy of the *punx* package installed from PyPI
 '''
 
 import cPickle as pickle
-import json
 import lxml
 import os
+import requests.packages.urllib3
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
 import StringIO
-import urllib2
 import zipfile
 
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
@@ -140,15 +140,17 @@ def get_pickle_file_name(path, use_fallback=True):
         # user cache has no pickle file, fall back to source cache
         __init__.LOG_MESSAGE('using source cache pickle file', __init__.DEBUG)
         pfile = os.path.join(SOURCE_CACHE_ROOT, __init__.PICKLE_FILE)
-    return pfile
+    return os.path.abspath(pfile)
 
 
 def write_pickle_file(info, path):
     '''
     write the parsed nxdl_dict and info to a Python pickle file
     '''
-    __init__.LOG_MESSAGE('update pickle file', __init__.INFO)
     info['pickle_file'] = get_pickle_file_name(path, use_fallback=False)
+    msg = 'update pickle file: ' + os.path.abspath(info['pickle_file'])
+    __init__.LOG_MESSAGE(msg, __init__.INFO)
+
     nxdl_dict = nxdlstructure.get_NXDL_specifications()
     pickle_data = dict(nxdl_dict=nxdl_dict, info=info)
     pickle.dump(pickle_data, open(info['pickle_file'], 'wb'))
@@ -187,17 +189,23 @@ def githubMasterInfo(org, repo):
     # get repository information via GitHub API
     url = 'https://api.github.com/repos/%s/%s/commits' % (org, repo)
     
+    msg = 'disabling warnings about GitHub self-signed https certificates'
+    __init__.LOG_MESSAGE(msg, __init__.DEBUG)
+    requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
     __init__.LOG_MESSAGE('get repo info: ' + str(url), __init__.INFO)
-    try:
-        text = urllib2.urlopen(url).read()
-    except IOError:
-        __init__.LOG_MESSAGE('IOError from ' + str(url), __init__.ERROR)
-        # IOError: [Errno socket error] [Errno -2] Name or service not known -- (no network)
-        return None
+    for _retry in range(__init__.GITHUB_RETRY_COUNT):
+        try:
+            r = requests.get(url, verify=False)
+        except requests.exceptions.ConnectionError, _exc:
+            # see: http://docs.python-requests.org/en/master/user/quickstart/#errors-and-exceptions
+            # see: http://docs.python-requests.org/en/master/api/#id1
+            __init__.LOG_MESSAGE('ConnectionError from ' + str(url), __init__.ERROR)
+            return None
+        else:
+            break
+        __init__.LOG_MESSAGE('retry to get repo info: ' + str(url), __init__.WARN)
 
-    buf = json.loads(text)
-
-    latest = buf[0]
+    latest = r.json()[0]
     sha = latest['sha']
     iso8601 = latest['commit']['committer']['date']
     zip_url = 'https://github.com/%s/%s/archive/master.zip' % (org, repo)
@@ -222,8 +230,8 @@ def update_NXDL_Cache(force_update=False):
     
     :param bool force_update: (optional, default: False) update if GitHub is available
     '''
-    __init__.LOG_MESSAGE('update_NXDL_Cache(): force_update=' + str(force_update), 
-                         __init__.DEBUG)
+    msg = 'update_NXDL_Cache(): force_update=' + str(force_update)
+    __init__.LOG_MESSAGE(msg, __init__.DEBUG)
     info = __get_github_info__()    # check with GitHub first
     if info is None:
         __init__.LOG_MESSAGE('GitHub not available', __init__.INFO)
@@ -244,36 +252,58 @@ def update_NXDL_Cache(force_update=False):
         __init__.LOG_MESSAGE('not updating NeXus definitions files', __init__.INFO)
         return
 
-    __init__.LOG_MESSAGE('updating NeXus definitions files', __init__.INFO)
     path = qset.cache_dir()
+    msg = 'updating NeXus definitions files in directory: ' + os.path.abspath(path)
+    __init__.LOG_MESSAGE(msg, __init__.INFO)
 
     # download the repository ZIP file 
     url = info['zip_url']
+    msg = 'disabling warnings about GitHub self-signed https certificates'
+    __init__.LOG_MESSAGE(msg, __init__.DEBUG)
+    requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
     __init__.LOG_MESSAGE('download: ' + str(url), __init__.INFO)
-    u = urllib2.urlopen(url)
-    content = u.read()
+    for _retry in range(__init__.GITHUB_RETRY_COUNT):
+        try:
+            content = requests.get(url, verify=False).content
+        except requests.exceptions.ConnectionError, _exc:
+            msg = 'ConnectionError from ' + str(url)
+            msg += ', ' + str(_exc)
+            __init__.LOG_MESSAGE(msg, __init__.ERROR)
+            return None
+        else:
+            break
+        __init__.LOG_MESSAGE('retry download: ' + str(url), __init__.WARN)
+
     buf = StringIO.StringIO(content)
     zip_content = zipfile.ZipFile(buf)
-    # How to save this zip_content to disk? not needed when using pickle file
+    # TODO: How to save this ZIP to disk? not needed when using pickle file
+    #local_zip_file_name = os.path.join(path, url.split('/')[-1])
+    #open(local_zip_file_name, 'w').write(content)
     
     # extract the NXDL (XML, XSL, & XSD) files to the path
-    __init__.LOG_MESSAGE('extract ZIP to: ' + path, __init__.INFO)
+    msg = 'extract ZIP to directory: ' + os.path.abspath(path)
+    __init__.LOG_MESSAGE(msg, __init__.INFO)
     NXDL_categories = 'base_classes applications contributed_definitions'
     for item in zip_content.namelist():
         parts = item.rstrip('/').split('/')
         if len(parts) == 2:             # get the XML Schema files
             if os.path.splitext(parts[1])[-1] in ('.xsd',):
                 zip_content.extract(item, path)
+                msg = 'extracted: ' + os.path.abspath(item)
+                __init__.LOG_MESSAGE(msg, __init__.DEBUG)
         elif len(parts) == 3:         # get the NXDL files
             if parts[1] in NXDL_categories.split():
                 if os.path.splitext(parts[2])[-1] in ('.xml .xsl'.split()):
                     zip_content.extract(item, path)
+                    msg = 'extracted: ' + os.path.abspath(item)
+                    __init__.LOG_MESSAGE(msg, __init__.DEBUG)
     
     # optimization: write the parsed NXDL specifications to a file
     if force_update:
         # force the pickle file to be re-written
-        __init__.LOG_MESSAGE('force pickle file update', __init__.DEBUG)
         pfile = get_pickle_file_name(path, use_fallback=False)
+        msg = 'force pickle file update'
+        __init__.LOG_MESSAGE(msg, __init__.DEBUG)
         if os.path.exists(pfile):
             os.remove(pfile)
     write_pickle_file(info, path)

@@ -562,7 +562,10 @@ class Data_File_Validator(object):
                 h5_sub_nx_class = h5_obj.attrs.get('NX_class', None)
                 s = h5_sub_nx_class in nxdl_subgroups
                 f = {True: finding.OK, False: finding.NOTE}[s]
-                c = h5_sub_nx_class
+                if h5_sub_nx_class is None:
+                    c = 'subgroup NX_class undefined'
+                else:
+                    c = h5_sub_nx_class
                 if f == finding.NOTE:
                     s = h5_sub_nx_class in self.nxdl_dict
                     f = {True: finding.NOTE, False: finding.ERROR}[s]
@@ -678,7 +681,11 @@ class Data_File_Validator(object):
             nx_class = self.get_hdf5_attribute(group, 'NX_class')
         nxdl_class_obj = self.nxdl_dict.get(nx_class, None)
         if nxdl_class_obj is None:
-            self.new_finding('unknown NX_class', dataset.name, finding.ERROR, 'found: ' + nx_class)
+            if nx_class is None:
+                msg = 'NX_class is not defined'
+            else:
+                msg = 'NX_class=' + nx_class
+            self.new_finding('unknown NX_class', dataset.name, finding.ERROR, msg)
         # if the data type is NX_NUMBER, is @units defined and has *some* value?
         if dataset.dtype in NXDL_DATA_TYPES['NX_NUMBER']:
             title = 'field data type'
@@ -725,7 +732,10 @@ class Data_File_Validator(object):
         '''
         if nxdl_class not in self.nxdl_dict:
             status = finding.ERROR
-            msg = 'unknown: ' + nxdl_class
+            if nxdl_class is None:
+                msg = 'NX_class is not defined'
+            else:
+                msg = 'unknown: ' + nxdl_class
             self.new_finding('NXDL NX_class', h5_obj, status, msg)
             return
 

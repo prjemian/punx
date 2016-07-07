@@ -309,7 +309,7 @@ class Data_File_Validator(object):
 
             if signal_count == 0:
                 m = 'no field marked with @signal="1"'
-                self.new_finding(base_title, field.name, finding.ERROR, m)
+                self.new_finding(base_title, group.name, finding.ERROR, m)
             elif signal_count > 1:
                 m = 'too many fields marked with @signal="1"'
                 self.new_finding(base_title, field.name, finding.ERROR, m)

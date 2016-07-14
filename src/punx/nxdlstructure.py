@@ -167,11 +167,11 @@ class NX_mixin(object):
         '''
         parse the elements defined within this XML node 
         '''
-#         if self.element == 'definition':
-#             defaults = get_nxdl_rules().nxdl
-#         else:
-#             defaults = get_nxdl_rules().nxdl.children[self.element]
-#         default_attrs = {k: v for k, v in defaults.attributes['custom'].items()}
+        if self.element == 'definition':
+            defaults = get_nxdl_rules().nxdl
+        else:
+            defaults = get_nxdl_rules().nxdl.children[self.element]
+        self.attributes['nxdl'] = {k: v for k, v in defaults.attrs.items()}
 
         self.fields = {}
         self.groups = {}
@@ -237,9 +237,6 @@ class NX_definition(NX_mixin):
             raise IOError('file does not exist: ' + nxdl_file)
         validate_NXDL(nxdl_file)
         
-#         defaults = get_nxdl_rules().nxdl
-#         default_attrs = {k: v for k, v in defaults.attributes['custom'].items()}
-        
         # parse the XML content now
         tree = lxml.etree.parse(self.nxdl_file_name)
         root = tree.getroot()
@@ -277,9 +274,6 @@ class NX_attribute(NX_mixin):
 
     def __init__(self, node, category):
         NX_mixin.__init__(self, node)
-        
-#         defaults = get_nxdl_rules().nxdl.children[self.element]
-#         default_attrs = {k: v for k, v in defaults.attributes['custom'].items()}
         
         if self.name in ('restricted deprecated minOccurs'.split()):
             pass
@@ -399,10 +393,6 @@ class NX_group(NX_mixin):
     def __init__(self, node, category):
         NX_mixin.__init__(self, node)
         
-#         defaults = get_nxdl_rules().nxdl.children[self.element]
-#         default_attrs = {k: v for k, v in defaults.attributes['custom'].items()}
-#         default_children = {k: v for k, v in defaults.children.items()}
-        
         self.NX_class = node.get('type', None)
         if self.NX_class is None:
             msg = 'group has no type, this is an error, name = ' + self.name
@@ -444,10 +434,6 @@ class NX_link(NX_mixin):
     def __init__(self, node, category):
         NX_mixin.__init__(self, node)
         
-#         defaults = get_nxdl_rules().nxdl.children[self.element]
-#         default_attrs = {k: v for k, v in defaults.attributes['custom'].items()}
-#         default_children = {k: v for k, v in defaults.children.items()}
-        
         self.target = node.get('target')
     
     def __str__(self):
@@ -463,12 +449,8 @@ class NX_symbols(NX_mixin):
 
     def __init__(self, node, category):
         NX_mixin.__init__(self, node)
-        
-#         defaults = get_nxdl_rules().nxdl.children[self.element]
-#         default_attrs = {k: v for k, v in defaults.attributes['custom'].items()}
-#         default_children = {k: v for k, v in defaults.children.items()}
 
-        # TODO:
+        # TODO: finish this
 
 
 def _get_specs_from_pickle_file():

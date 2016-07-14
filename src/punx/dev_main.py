@@ -64,11 +64,6 @@ def datafile_prep():
     # sys.argv.append('data/has_default_attribute_error/external_angles.hdf5')
     # sys.argv.append('data/prj_test.nexus.hdf5')
     sys.argv.append('data/verysimple.nx5')
-    # 
-    # sys.argv.append('data/local/PB103A_2_98_data_000001.h5')
-    # sys.argv.append('data/local/PB103A_2_98_master.h5')
-    # sys.argv.append('data/local/33837rear_1D_1.75_16.5_NXcanSAS.h5')
-    # sys.argv.append('data/local/33837rear_2D_1.75_16.5_NXcanSAS.h5')
 
 
 if __name__ == '__main__':

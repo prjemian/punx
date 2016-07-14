@@ -166,33 +166,33 @@ class NX_mixin(object):
         self.links = {}
         self.symbols = {}
         
+        switch_block = dict(
+            attribute = [NX_attribute, self.attrs],
+            field = [NX_field, self.fields],
+            group = [NX_group, self.groups],
+            link = [NX_link, self.links],
+            symbols = [NX_symbols, self.symbols],
+        )
         for subnode in node:
-            try:
-                if subnode.tag.endswith('}attribute'):
-                    obj = NX_attribute(subnode)
-                    self.add_object(self.attrs, obj)
-                elif subnode.tag.endswith('}field'):
-                    obj = NX_field(subnode, category)
-                    self.add_object(self.fields, obj)
-                elif subnode.tag.endswith('}group'):
-                    obj = NX_group(subnode, category)
-                    self.add_object(self.groups, obj)
-                elif subnode.tag.endswith('}link'):
-                    obj = NX_link(subnode, category)
-                    self.add_object(self.links, obj)
-                elif subnode.tag.endswith('}symbols'):
-                    obj = NX_symbols(subnode, category)
-                    self.add_object(self.symbols, obj)
-            except AttributeError, _exc:
-                pass
+            if isinstance(subnode.tag, str):    # do not process XML Comments
+                tag = subnode.tag.split('}')[-1]
+                if tag in switch_block:         # only handle certain elements
+                    NX_handler, nx_dict = switch_block[tag]
+                    obj = NX_handler(subnode, category)
+                    self.add_object(nx_dict, obj)
 
     def add_object(self, db, obj):
         '''
         add object ``obj`` to database ``db`` (dictionary)
         '''
-        name = obj.name
+        try:
+            name = obj.name
+        except AttributeError, _exc:
+            name = 'symbol'    # FIXME: NX_symbols.name is not defined
         if name in db:
-            name += '_1'
+            for i in range(len(db)):
+                name += '_' + str(i)
+                if name not in db: break
         db[name] = obj
 
     def render_group(self, group):
@@ -201,12 +201,9 @@ class NX_mixin(object):
         '''
         indentation = ' '*2
         t = []
-        for _k, v in sorted(group.attrs.items()):
-            t.append(str(v))
-        for _k, v in sorted(group.fields.items()):
-            t.append(str(v))
-        for _k, v in sorted(group.links.items()):
-            t.append(str(v))
+        for nx_dict in (group.attrs, group.fields, group.links):
+            for _k, v in sorted(nx_dict.items()):
+                t.append(str(v))
         for _k, v in sorted(group.groups.items()):
             t.append(str(v))
             for line in group.render_group(v).splitlines():
@@ -266,7 +263,7 @@ class NX_attribute(NX_mixin):
     '''
     element = 'attribute'
 
-    def __init__(self, node):
+    def __init__(self, node, category=None):
         NX_mixin.__init__(self, node)
         
         defaults = get_nxdl_rules().nxdl.children[self.element]
@@ -506,7 +503,6 @@ def _get_specs_from_NXDL_files():
     
     nxdl_dict = collections.OrderedDict()
     for nxdl_file_name in nxdl_file_list:
-        # k = os.path.basename(nxdl_file_name)
         obj = NX_definition(nxdl_file_name)
         nxdl_dict[obj.title] = obj
     

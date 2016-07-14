@@ -132,6 +132,19 @@ class NX_mixin(object):
         if node_name is not None:
             self.name = node.get('name')
 
+        # CAREFUL:
+        # there are two kinds of attributes
+        # 1. XML attributes of XML elements defining the NXDL structure
+        # 2. NXDL attribute ... make this clear ...  THESE are in self.attributes['custom']
+        # 3. XML Schema attributes
+        # FIXME: resolve this before continuing
+
+
+        self.attributes = {}
+        self.attributes['custom'] = {}      # attributes defined in NXDL files
+        self.attributes['nxdl'] = {}        # attributes defined in nxdl.xsd XML Schema
+        self.attributes['defaults'] = {}    # TODO: needed?
+
 #     def __str__(self):
 #         '''
 #         canonical string representation of this object
@@ -154,20 +167,19 @@ class NX_mixin(object):
         '''
         parse the elements defined within this XML node 
         '''
-        if self.element == 'definition':
-            defaults = get_nxdl_rules().nxdl
-        else:
-            defaults = get_nxdl_rules().nxdl.children[self.element]
-        default_attrs = {k: v for k, v in defaults.attrs.items()}
+#         if self.element == 'definition':
+#             defaults = get_nxdl_rules().nxdl
+#         else:
+#             defaults = get_nxdl_rules().nxdl.children[self.element]
+#         default_attrs = {k: v for k, v in defaults.attributes['custom'].items()}
 
-        self.attrs = {}
         self.fields = {}
         self.groups = {}
         self.links = {}
         self.symbols = {}
         
         switch_block = dict(
-            attribute = [NX_attribute, self.attrs],
+            attribute = [NX_attribute, self.attributes['custom']],
             field = [NX_field, self.fields],
             group = [NX_group, self.groups],
             link = [NX_link, self.links],
@@ -201,7 +213,7 @@ class NX_mixin(object):
         '''
         indentation = ' '*2
         t = []
-        for nx_dict in (group.attrs, group.fields, group.links):
+        for nx_dict in (group.attributes['custom'], group.fields, group.links):
             for _k, v in sorted(nx_dict.items()):
                 t.append(str(v))
         for _k, v in sorted(group.groups.items()):
@@ -225,8 +237,8 @@ class NX_definition(NX_mixin):
             raise IOError('file does not exist: ' + nxdl_file)
         validate_NXDL(nxdl_file)
         
-        defaults = get_nxdl_rules().nxdl
-        default_attrs = {k: v for k, v in defaults.attrs.items()}
+#         defaults = get_nxdl_rules().nxdl
+#         default_attrs = {k: v for k, v in defaults.attributes['custom'].items()}
         
         # parse the XML content now
         tree = lxml.etree.parse(self.nxdl_file_name)
@@ -263,11 +275,11 @@ class NX_attribute(NX_mixin):
     '''
     element = 'attribute'
 
-    def __init__(self, node, category=None):
+    def __init__(self, node, category):
         NX_mixin.__init__(self, node)
         
-        defaults = get_nxdl_rules().nxdl.children[self.element]
-        default_attrs = {k: v for k, v in defaults.attrs.items()}
+#         defaults = get_nxdl_rules().nxdl.children[self.element]
+#         default_attrs = {k: v for k, v in defaults.attributes['custom'].items()}
         
         if self.name in ('restricted deprecated minOccurs'.split()):
             pass
@@ -295,17 +307,17 @@ class NX_field(NX_mixin):
     def __init__(self, node, category):
         NX_mixin.__init__(self, node)
         
-        defaults = get_nxdl_rules().nxdl.children[self.element]
-        default_attrs = {k: v for k, v in defaults.attrs.items()}
-        default_children = {k: v for k, v in defaults.children.items()}
-        
-        nt = node.get('nameType', default_attrs['nameType'].default_value)
-        self.flexible_name = nt == 'any'
-        if category in ('base class',):
-            self.minOccurs = node.get('minOccurs', default_attrs['minOccurs'].default_value)
-        else:
-            self.minOccurs = node.get('minOccurs', 1)
-        self.optional = self.minOccurs in ('0', 0)
+#         defaults = get_nxdl_rules().nxdl.children[self.element]
+#         default_attrs = {k: v for k, v in defaults.attributes['custom'].items()}
+#         default_children = {k: v for k, v in defaults.children.items()}
+#         
+#         nt = node.get('nameType', default_attrs['nameType'].default_value)
+#         self.flexible_name = nt == 'any'
+#         if category in ('base class',):
+#             self.minOccurs = node.get('minOccurs', default_attrs['minOccurs'].default_value)
+#         else:
+#             self.minOccurs = node.get('minOccurs', 1)
+#         self.optional = self.minOccurs in ('0', 0)
         
         self.dims = self.field_dimensions(node)
 
@@ -316,21 +328,23 @@ class NX_field(NX_mixin):
         for n in node.xpath('nx:enumeration/nx:item', namespaces=get_ns_dict()):
             self.enum.append( n.attrib['value'] )
 
-        # CAREFUL:
-        # there are two kinds of attributes
-        # 1. XML attributes of XML elements defining the NXDL structure
-        # 2. NXDL attribute ... make this clear ...
-        # FIXME: resolve this before continuing
-
-        # walk through the attributes for this field as declared in the nxdl.xsd rules
-        for k, v in defaults.attrs.items():
-            pass
-
         # walk through all custom attributes (<attribute /> elements) declared in the NXDL
-        self.attrs = {}
-        for subnode in node.xpath('nx:attribute', namespaces=get_ns_dict()):
-            obj = NX_attribute(subnode)
-            self.attrs[obj.name] = obj
+        # use same code as above
+        switch_block = dict(
+            attribute = [NX_attribute, self.attributes['custom']],
+            #field = [NX_field, self.fields],
+            #group = [NX_group, self.groups],
+            #link = [NX_link, self.links],
+            #symbols = [NX_symbols, self.symbols],
+            #dimensions = ?
+        )
+        for subnode in node:
+            if isinstance(subnode.tag, str):    # do not process XML Comments
+                tag = subnode.tag.split('}')[-1]
+                if tag in switch_block:         # only handle certain elements
+                    NX_handler, nx_dict = switch_block[tag]
+                    obj = NX_handler(subnode, category)
+                    self.add_object(nx_dict, obj)
 
     def __str__(self):
         s = self.name
@@ -385,9 +399,9 @@ class NX_group(NX_mixin):
     def __init__(self, node, category):
         NX_mixin.__init__(self, node)
         
-        defaults = get_nxdl_rules().nxdl.children[self.element]
-        default_attrs = {k: v for k, v in defaults.attrs.items()}
-        default_children = {k: v for k, v in defaults.children.items()}
+#         defaults = get_nxdl_rules().nxdl.children[self.element]
+#         default_attrs = {k: v for k, v in defaults.attributes['custom'].items()}
+#         default_children = {k: v for k, v in defaults.children.items()}
         
         self.NX_class = node.get('type', None)
         if self.NX_class is None:
@@ -430,9 +444,9 @@ class NX_link(NX_mixin):
     def __init__(self, node, category):
         NX_mixin.__init__(self, node)
         
-        defaults = get_nxdl_rules().nxdl.children[self.element]
-        default_attrs = {k: v for k, v in defaults.attrs.items()}
-        default_children = {k: v for k, v in defaults.children.items()}
+#         defaults = get_nxdl_rules().nxdl.children[self.element]
+#         default_attrs = {k: v for k, v in defaults.attributes['custom'].items()}
+#         default_children = {k: v for k, v in defaults.children.items()}
         
         self.target = node.get('target')
     
@@ -450,9 +464,9 @@ class NX_symbols(NX_mixin):
     def __init__(self, node, category):
         NX_mixin.__init__(self, node)
         
-        defaults = get_nxdl_rules().nxdl.children[self.element]
-        default_attrs = {k: v for k, v in defaults.attrs.items()}
-        default_children = {k: v for k, v in defaults.children.items()}
+#         defaults = get_nxdl_rules().nxdl.children[self.element]
+#         default_attrs = {k: v for k, v in defaults.attributes['custom'].items()}
+#         default_children = {k: v for k, v in defaults.children.items()}
 
         # TODO:
 

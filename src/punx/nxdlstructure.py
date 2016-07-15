@@ -133,23 +133,33 @@ class NX_mixin(object):
             self.name = node.get('name')
 
         # CAREFUL:
-        # there are two kinds of attributes
+        # there are several kinds of attributes
         # 1. XML attributes of XML elements defining the NXDL structure
-        # 2. NXDL attribute ... make this clear ...  THESE are in self.attributes['custom']
-        # 3. XML Schema attributes
-        # FIXME: resolve this before continuing
+        # 2. NXDL attribute ... make this clear ...  THESE are in self.attributes['NXDL.xml']
+        # 3. custom XML Schema attributes
+        # The default attribute values are set from the list above, in that order
 
 
         self.attributes = {}
-        self.attributes['custom'] = {}      # attributes defined in NXDL files
-        self.attributes['nxdl'] = {}        # attributes defined in nxdl.xsd XML Schema
-        self.attributes['defaults'] = {}    # TODO: needed?
+        self.attributes['nxdl.xsd'] = {}    # attributes defined in nxdl.xsd XML Schema
+        self.attributes['NXDL.xml'] = {}    # attributes defined in NXDL.xml files
+        self.attributes['defined'] = {}     # XML attributes defined in this instance of the element
+        self.attributes['defaults'] = {}    # combination of the above
 
-#     def __str__(self):
-#         '''
-#         canonical string representation of this object
-#         '''
-#         return self.name
+        if self.element == 'definition':
+            defaults = get_nxdl_rules().nxdl
+        else:
+            defaults = get_nxdl_rules().nxdl.children[self.element]
+        self.attributes['nxdl.xsd'] = {k: v for k, v in defaults.attrs.items()}
+
+    def __str__(self, *args, **kwargs):
+        '''
+        canonical string representation of this object
+        '''
+        try:
+            return self.name
+        except:
+            return object.__str__(self, *args, **kwargs)
     
     def get_NX_type(self, node):
         '''
@@ -167,19 +177,13 @@ class NX_mixin(object):
         '''
         parse the elements defined within this XML node 
         '''
-        if self.element == 'definition':
-            defaults = get_nxdl_rules().nxdl
-        else:
-            defaults = get_nxdl_rules().nxdl.children[self.element]
-        self.attributes['nxdl'] = {k: v for k, v in defaults.attrs.items()}
-
         self.fields = {}
         self.groups = {}
         self.links = {}
         self.symbols = {}
         
         switch_block = dict(
-            attribute = [NX_attribute, self.attributes['custom']],
+            attribute = [NX_attribute, self.attributes['NXDL.xml']],
             field = [NX_field, self.fields],
             group = [NX_group, self.groups],
             link = [NX_link, self.links],
@@ -213,7 +217,7 @@ class NX_mixin(object):
         '''
         indentation = ' '*2
         t = []
-        for nx_dict in (group.attributes['custom'], group.fields, group.links):
+        for nx_dict in (group.attributes['NXDL.xml'], group.fields, group.links):
             for _k, v in sorted(nx_dict.items()):
                 t.append(str(v))
         for _k, v in sorted(group.groups.items()):
@@ -274,22 +278,34 @@ class NX_attribute(NX_mixin):
 
     def __init__(self, node, category):
         NX_mixin.__init__(self, node)
+
+        # get the attributes specified in THIS field element
+        for k, v in node.attrib.items():
+            if k not in ('name',):
+                self.attributes['defined'][k] = v
         
-        if self.name in ('restricted deprecated minOccurs'.split()):
-            pass
-        self.nx_type = self.get_NX_type(node)
-        self.units = self.get_NX_units(node)
+        default_attributes = self.attributes['defaults']
+        for k, v in self.attributes['nxdl.xsd'].items():
+            default_attributes[k] = v.default_value
+        for k, v in self.attributes['NXDL.xml'].items():
+            default_attributes[k] = None        # means: undefined
+        for k, v in self.attributes['defined'].items():
+            default_attributes[k] = v
+
         self.enum = []
         for n in node.xpath('nx:enumeration/nx:item', namespaces=get_ns_dict()):
             self.enum.append( n.attrib['value'] )
 
-    def __str__(self):
-        s = '@' + self.name
-        s += ' : ' + self.nx_type
-        if len(self.enum):
-            s += ' = '
-            s += ' | '.join(self.enum)
-        return s
+    def __str__(self, *args, **kwargs):
+        try:
+            s = '@' + self.name
+            s += ' : ' + self.attributes['defaults']['type']
+            if len(self.enum):
+                s += ' = '
+                s += ' | '.join(self.enum)
+            return s
+        except:
+            return NX_mixin.__str__(self, *args, **kwargs)
 
 
 class NX_field(NX_mixin):
@@ -301,37 +317,23 @@ class NX_field(NX_mixin):
     def __init__(self, node, category):
         NX_mixin.__init__(self, node)
         
-#         defaults = get_nxdl_rules().nxdl.children[self.element]
-#         default_attrs = {k: v for k, v in defaults.attributes['custom'].items()}
-#         default_children = {k: v for k, v in defaults.children.items()}
-#         
-#         nt = node.get('nameType', default_attrs['nameType'].default_value)
-#         self.flexible_name = nt == 'any'
-#         if category in ('base class',):
-#             self.minOccurs = node.get('minOccurs', default_attrs['minOccurs'].default_value)
-#         else:
-#             self.minOccurs = node.get('minOccurs', 1)
-#         self.optional = self.minOccurs in ('0', 0)
-        
         self.dims = self.field_dimensions(node)
-
-        self.nx_type = self.get_NX_type(node)
-        self.units = self.get_NX_units(node)
 
         self.enum = []
         for n in node.xpath('nx:enumeration/nx:item', namespaces=get_ns_dict()):
             self.enum.append( n.attrib['value'] )
 
-        # walk through all custom attributes (<attribute /> elements) declared in the NXDL
+        # walk through all <attribute /> elements declared in the NXDL
         # use same code as above
         switch_block = dict(
-            attribute = [NX_attribute, self.attributes['custom']],
+            attribute = [NX_attribute, self.attributes['NXDL.xml']],
             #field = [NX_field, self.fields],
             #group = [NX_group, self.groups],
             #link = [NX_link, self.links],
             #symbols = [NX_symbols, self.symbols],
             #dimensions = ?
         )
+
         for subnode in node:
             if isinstance(subnode.tag, str):    # do not process XML Comments
                 tag = subnode.tag.split('}')[-1]
@@ -340,9 +342,28 @@ class NX_field(NX_mixin):
                     obj = NX_handler(subnode, category)
                     self.add_object(nx_dict, obj)
 
+        # get the attributes specified in THIS field element
+        for k, v in node.attrib.items():
+            if k not in ('name',):
+                self.attributes['defined'][k] = v
+
+        default_attributes = self.attributes['defaults']
+        for k, v in self.attributes['nxdl.xsd'].items():
+            default_attributes[k] = v.default_value
+        if category in ('application',):
+            # this rule is not in the XML Schema: issue #266
+            # fields are required in application definitions
+            default_attributes['minOccurs'] = 1
+        for k, v in self.attributes['NXDL.xml'].items():
+            default_attributes[k] = None        # means: undefined
+        for k, v in self.attributes['defined'].items():
+            default_attributes[k] = v
+        
+        pass
+
     def __str__(self):
         s = self.name
-        s += ' : ' + self.nx_type
+        s += ' : ' + self.attributes['defined']['type']
         if len(self.dims):
             s += '[' + ', '.join(map(str, self.dims)) + ']'
         if len(self.enum):
@@ -398,25 +419,6 @@ class NX_group(NX_mixin):
             msg = 'group has no type, this is an error, name = ' + self.name
             raise ValueError(msg)
 
-        if category in ('base class', ):
-            nt = node.get('nameType', 'any')
-            self.flexible_name = nt == 'any'
-        else:
-            nt = node.get('nameType', 'specified')
-            self.flexible_name = nt == 'any'
-
-        try:
-            len(self.name)
-        except AttributeError:
-            self.flexible_name = True
-            self.name = '{' + self.NX_class[2:] + '}'
-
-        if category in ('base class',):
-            minOccurs = node.get('minOccurs', 0)
-        else:
-            minOccurs = node.get('minOccurs', 1)
-        self.optional = minOccurs in ('0', 0)
-        
         self.get_element_data(node, category)
 
     def __str__(self):

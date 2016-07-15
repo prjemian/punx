@@ -307,12 +307,12 @@ class NXDL_Attribute(Mixin):
         else:
             self.default_value = defalt
 
-        self.allowed_values = []
+        self.enum = []
         xpath_str = 'xs:simpleType/xs:restriction/xs:enumeration'
         for node in xml_obj.xpath(xpath_str, namespaces=self.ns):
             v = node.attrib.get('value')
             if v is not None:
-                self.allowed_values.append(v)
+                self.enum.append(v)
 
         self.patterns = []
         xpath_str = 'xs:simpleType/xs:restriction/xs:pattern'
@@ -325,9 +325,9 @@ class NXDL_Attribute(Mixin):
         try:
             s = '@' + self.name
             s += ' : ' + self.type
-            if len(self.allowed_values):
+            if len(self.enum):
                 s += ' = '
-                s += ' | '.join(self.allowed_values)
+                s += ' | '.join(self.enum)
             return s
         except:
             return Mixin.__str__(self, *args, **kwargs)

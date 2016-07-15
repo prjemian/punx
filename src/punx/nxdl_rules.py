@@ -320,6 +320,17 @@ class NXDL_Attribute(Mixin):
             v = node.attrib.get('value')
             if v is not None:
                 self.patterns.append(v)
+    
+    def __str__(self, *args, **kwargs):
+        try:
+            s = '@' + self.name
+            s += ' : ' + self.type
+            if len(self.allowed_values):
+                s += ' = '
+                s += ' | '.join(self.allowed_values)
+            return s
+        except:
+            return Mixin.__str__(self, *args, **kwargs)
 
 
 class NXDL_Element(Mixin): 

@@ -128,9 +128,11 @@ class NX_mixin(object):
     element = 'mixin - must override in subclass'
     
     def __init__(self, node):
-        node_name = node.get('name')
+        node_name = node.get('name') or node.get('type')
         if node_name is not None:
-            self.name = node.get('name')
+            if node_name.startswith('NX'):
+                node_name = node_name[2:]
+            self.name = node_name
 
         # CAREFUL:
         # there are several kinds of attributes
@@ -206,9 +208,11 @@ class NX_mixin(object):
         except AttributeError, _exc:
             name = 'symbol'    # FIXME: NX_symbols.name is not defined
         if name in db:
-            for i in range(len(db)):
-                name += '_' + str(i)
-                if name not in db: break
+            for i in range(1, 1+len(db)):
+                nm = name + '_' + str(i)
+                if nm not in db: 
+                    name = nm
+                    break
         db[name] = obj
 
     def render_group(self, group):
@@ -248,6 +252,19 @@ class NX_definition(NX_mixin):
         NX_mixin.__init__(self, root)
         self.title = root.get('name')
         self.category = root.attrib["category"]
+
+        # get the attributes specified in THIS group element
+        for k, v in root.attrib.items():
+            if k not in ('name',):
+                self.attributes['defined'][k] = v
+
+        default_attributes = self.attributes['defaults']
+        for k, v in self.attributes['nxdl.xsd'].items():
+            default_attributes[k] = v.default_value
+        for k, v in self.attributes['NXDL.xml'].items():
+            default_attributes[k] = None        # means: undefined
+        for k, v in self.attributes['defined'].items():
+            default_attributes[k] = v
 
         self.get_element_data(root, self.category)
     
@@ -358,8 +375,6 @@ class NX_field(NX_mixin):
             default_attributes[k] = None        # means: undefined
         for k, v in self.attributes['defined'].items():
             default_attributes[k] = v
-        
-        pass
 
     def __str__(self):
         s = self.name
@@ -418,6 +433,23 @@ class NX_group(NX_mixin):
         if self.NX_class is None:
             msg = 'group has no type, this is an error, name = ' + self.name
             raise ValueError(msg)
+
+        # get the attributes specified in THIS group element
+        for k, v in node.attrib.items():
+            if k not in ('name',):
+                self.attributes['defined'][k] = v
+
+        default_attributes = self.attributes['defaults']
+        for k, v in self.attributes['nxdl.xsd'].items():
+            default_attributes[k] = v.default_value
+        if category in ('application',):
+            # this rule is not in the XML Schema: issue #266
+            # fields are required in application definitions
+            default_attributes['minOccurs'] = 1
+        for k, v in self.attributes['NXDL.xml'].items():
+            default_attributes[k] = None        # means: undefined
+        for k, v in self.attributes['defined'].items():
+            default_attributes[k] = v
 
         self.get_element_data(node, category)
 

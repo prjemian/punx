@@ -743,59 +743,86 @@ class Data_File_Validator(object):
             msg = 'NXcollection content is not validated'
             self.new_finding('NXcollection', h5_obj.name, finding.OK, msg)
             return
-
-        nxdl_class_obj = self.nxdl_dict[nxdl_class]
-        if h5structure.isHdf5Group(h5_obj):
-            title = nxdl_class + ' attribute'
-        elif h5structure.isHdf5Dataset(h5_obj):
-            title = 'field attribute'
-        else:
-            raise ValueError('unknown object: ' + h5_obj.name)
-        tf_result = {True: finding.OK, False: finding.UNUSED}
-
-        # get list of all possible attributes from data file and NXDL spec
-        h5_attrs = h5_obj.attrs.keys() + nxdl_class_obj.attrs.keys()
-        h5_attrs = map(str, {k:None for k in h5_attrs}.keys())      # remove extras
-        if 'NX_class' in h5_attrs:
-            h5_attrs.remove('NX_class')
-
-        attributes_reviewed_elsewhere = [
-            'NX_class AXISNAME_indices signal axes axis primary units'.split()
-        ]
-        for k in sorted(h5_attrs):
+        
+        for k, v in h5_obj.attrs.items():
             aname = h5_obj.name + '@' + k
-            if k in attributes_reviewed_elsewhere:
-                msg = 'reviewed elsewhere'
-                self.new_finding(title, aname, finding.COMMENT, msg)
-                continue
-            data_type_checked = False
-            if k in nxdl_class_obj.attrs:
-                msg = 'defined in ' + nxdl_class
-                status = tf_result[k in h5_obj.attrs]
+            if k == 'NX_class': # designates this as a NeXus group
+                # check that h5_obj IS a NeXus group instance
+                title = h5_obj.name + ' is an HDF5 group?'
+                t = isinstance(h5_obj, h5py.Group)
+                f = {True: finding.OK, False: finding.NOTE}[t]
+                msg = h5_obj.name + ' is '
+                msg += {True: '', False: 'not '}[t]
+                msg += 'HDF5 group'
+                self.new_finding(title, aname, f, msg)
 
-                if k in h5_obj.attrs:                # check expected NXDL data type
-                    data_type_checked = True
-                    obj_attr = h5_obj.attrs[k]
-                    nxdl_attr = nxdl_class_obj.attrs[k]
-                    nx_type = nxdl_attr.nx_type
-                    data_type_ok = nx_type in NXDL_DATA_TYPES and type(obj_attr) in NXDL_DATA_TYPES[nx_type]
-                if status not in (finding.UNUSED,):
-                    self.new_finding(title, aname, status, msg)
-#             else:
-#                 status = finding.NOTE
-#                 msg = 'not defined in ' + nxdl_class
-#             # TODO: issue #17, need to learn *minOccurs* from NXDL
-#             msg += ' (optional)'
-            if data_type_checked:
-                msg = str(type(obj_attr)) + ' : ' + nx_type
-                if data_type_ok:
-                    f = finding.OK
-                elif aname.split('@')[-1] == 'signal' and h5structure.isNeXusDataset(h5_obj):
-                    t = type(obj_attr) in NXDL_DATA_TYPES['NX_INT']
-                    f = finding.TF_RESULT[t]
-                else:
-                    f = finding.ERROR
-                self.new_finding('NXDL NX_type', aname, f, msg)
+                # check that v is in the list of known NeXus group names
+                title = k + ' is known?'
+                t = v in self.nxdl_dict
+                f = finding.TF_RESULT[t]
+                msg = v + ' is '
+                msg += {True: '', False: 'not '}[t]
+                msg += 'recognized'
+                self.new_finding(title, aname, f, msg)
+            else:
+                pass
+
+        # TODO: re-write the attribute validation code below
+        # review all attributes provided in HDF5 file
+        # verify all attributes required by NXDL or Schema are provided
+        
+#         nxdl_class_obj = self.nxdl_dict[nxdl_class]
+#         if h5structure.isHdf5Group(h5_obj):
+#             title = nxdl_class + ' attribute'
+#         elif h5structure.isHdf5Dataset(h5_obj):
+#             title = 'field attribute'
+#         else:
+#             raise ValueError('unknown object: ' + h5_obj.name)
+#         tf_result = {True: finding.OK, False: finding.UNUSED}
+#
+#         # get list of all possible attributes from data file and NXDL spec
+#         h5_attrs = h5_obj.attrs.keys() + nxdl_class_obj.attrs.keys()
+#         h5_attrs = map(str, {k:None for k in h5_attrs}.keys())      # remove extras
+#         if 'NX_class' in h5_attrs:
+#             h5_attrs.remove('NX_class')
+# 
+#         attributes_reviewed_elsewhere = [
+#             'NX_class AXISNAME_indices signal axes axis primary units'.split()
+#         ]
+#         for k in sorted(h5_attrs):
+#             aname = h5_obj.name + '@' + k
+#             if k in attributes_reviewed_elsewhere:
+#                 msg = 'reviewed elsewhere'
+#                 self.new_finding(title, aname, finding.COMMENT, msg)
+#                 continue
+#             data_type_checked = False
+#             if k in nxdl_class_obj.attrs:
+#                 msg = 'defined in ' + nxdl_class
+#                 status = tf_result[k in h5_obj.attrs]
+# 
+#                 if k in h5_obj.attrs:                # check expected NXDL data type
+#                     data_type_checked = True
+#                     obj_attr = h5_obj.attrs[k]
+#                     nxdl_attr = nxdl_class_obj.attrs[k]
+#                     nx_type = nxdl_attr.nx_type
+#                     data_type_ok = nx_type in NXDL_DATA_TYPES and type(obj_attr) in NXDL_DATA_TYPES[nx_type]
+#                 if status not in (finding.UNUSED,):
+#                     self.new_finding(title, aname, status, msg)
+# #             else:
+# #                 status = finding.NOTE
+# #                 msg = 'not defined in ' + nxdl_class
+# #             # TODO: issue #17, need to learn *minOccurs* from NXDL
+# #             msg += ' (optional)'
+#             if data_type_checked:
+#                 msg = str(type(obj_attr)) + ' : ' + nx_type
+#                 if data_type_ok:
+#                     f = finding.OK
+#                 elif aname.split('@')[-1] == 'signal' and h5structure.isNeXusDataset(h5_obj):
+#                     t = type(obj_attr) in NXDL_DATA_TYPES['NX_INT']
+#                     f = finding.TF_RESULT[t]
+#                 else:
+#                     f = finding.ERROR
+#                 self.new_finding('NXDL NX_type', aname, f, msg)
                         
 
     def collect_names(self, h5_object):

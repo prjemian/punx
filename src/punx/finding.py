@@ -78,11 +78,14 @@ class Finding(object):
         self.comment = comment
     
     def __str__(self, *args, **kwargs):
-        s = self.status
-        s += ' ' + self.h5_address 
-        s += ': ' + self.test_name
-        s += ': ' + self.comment
-        return s
+        try:
+            s = self.status
+            s += ' ' + self.h5_address 
+            s += ': ' + self.test_name
+            s += ': ' + self.comment
+            return s
+        except:
+            return object.__str__(self, *args, **kwargs)
 
 
 class CheckupResults(object):

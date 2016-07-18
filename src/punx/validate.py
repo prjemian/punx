@@ -586,8 +586,42 @@ class Data_File_Validator(object):
                 self.new_finding(nx_class + ' field', h5_obj.name, finding.TODO, msg)
 
         # self.new_finding('-'*10, group.name, finding.COMMENT, 'review_with_NXDL end' + '-'*10)
-
+        
     def validate(self):
+        '''
+        start the validation process from the file root
+        '''
+        self.review_group(self.h5)
+        
+    def review_group(self, h5_obj):
+        '''
+        review the HDF5 group: group_obj
+        '''
+        nx_class_name = h5_obj.attrs.get('NX_class')
+        if nx_class_name is None:
+            if isinstance(h5_obj, h5py.File):
+                nx_class_name = 'NXroot'
+            else:
+                self.new_finding('no @NX_class attribute', h5_obj.name, finding.NOTE, 'not a NeXus group')
+                return  # evaluate any further?
+        else:
+            self.validate_item_name(h5_obj.name)
+        
+        nx_class_object = self.nxdl_dict.get(nx_class_name)
+        t = nx_class_name in self.nxdl_dict
+        f = finding.TF_RESULT[t]
+        msg = nx_class_name + {True: ' is ', False: ' is not '}[t] + 'known'
+        self.new_finding('known NX_class', h5_obj.name, f, msg)
+        
+        # TODO: review the group's attributes
+        for k, v in h5_obj.attrs.items():
+            aname = h5_obj.name + '@' + k
+            self.validate_item_name(aname)
+        # TODO: review the group's children
+        for child in h5_obj:
+            pass
+
+    def validate_v1(self):
         '''
         start the validation process from the file root
         '''

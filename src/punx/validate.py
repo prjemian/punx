@@ -748,18 +748,22 @@ class Data_File_Validator(object):
             aname = h5_obj.name + '@' + k
             if k == 'NX_class': # designates this as a NeXus group
                 pass    # reviewed elsewhere
+            elif k.endswith('_indices'):
+                # special handling
+                pass
             else:
                 # check if attribute is known
                 # if known, check that type is expected
                 # if known, check that value is acceptable
-                nexus_class_name = h5_obj.attrs.get('NX_class', None)
-                if nexus_class_name is not None:
-                    nexus_class = self.nxdl_dict[nexus_class_name]
-                    t1 = k in nexus_class.attributes['defaults']
-                    t2 = k in nexus_class.attributes['NXDL.xml']
-                    t3 = k in nexus_class.attributes['nxdl.xsd']
-                    t = t1 or t2 or t3
-                    f = {True: finding.OK, False: finding.NOTE}[t]
+                nexus_class = self.nxdl_dict[nxdl_class]
+                t0 = k in nexus_class.attributes['defaults']
+                t1 = k in nexus_class.attributes['defined']
+                t2 = k in nexus_class.attributes['NXDL.xml']
+                t3 = k in nexus_class.attributes['nxdl.xsd']
+                tf = {True: finding.OK, False: finding.NOTE}
+                msg = {True: 'in ', False: 'not in '}[t2]
+                msg += 'attributes[defined]'
+                self.new_finding('attribute defined?', aname, tf[t2], msg)
                 pass
 
         # TODO: re-write the attribute validation code below

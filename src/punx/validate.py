@@ -537,13 +537,13 @@ class Data_File_Validator(object):
             nxc = self.get_hdf5_attribute(group, 'NX_class', '<undefined>')
             f = finding.TF_RESULT[nxc in self.nxdl_dict]
             msg = nxc  + ' known?'
-            self.new_finding('NX_class known', group.name, f, 'value: ' + nxc)
+            self.new_finding('NX_class known?', group.name, f, 'value: ' + nxc)
         
         if nx_class in self.nxdl_dict:
             self.new_finding('NXDL known', group.name, finding.OK, nx_class)
         else:
             msg = 'expected NX_class unknown: ' + nx_class
-            self.new_finding('NXDL known', group.name, finding.OK, msg)
+            self.new_finding('NXDL known?', group.name, finding.OK, msg)
             #self.new_finding('-'*10, group.name, finding.COMMENT, 'review_with_NXDL bailout' + '-'*10)
             return
 
@@ -747,24 +747,19 @@ class Data_File_Validator(object):
         for k, v in h5_obj.attrs.items():
             aname = h5_obj.name + '@' + k
             if k == 'NX_class': # designates this as a NeXus group
-                # check that h5_obj IS a NeXus group instance
-                title = h5_obj.name + ' is an HDF5 group?'
-                t = isinstance(h5_obj, h5py.Group)
-                f = {True: finding.OK, False: finding.NOTE}[t]
-                msg = h5_obj.name + ' is '
-                msg += {True: '', False: 'not '}[t]
-                msg += 'HDF5 group'
-                self.new_finding(title, aname, f, msg)
-
-                # check that v is in the list of known NeXus group names
-                title = k + ' is known?'
-                t = v in self.nxdl_dict
-                f = finding.TF_RESULT[t]
-                msg = v + ' is '
-                msg += {True: '', False: 'not '}[t]
-                msg += 'recognized'
-                self.new_finding(title, aname, f, msg)
+                pass    # reviewed elsewhere
             else:
+                # check if attribute is known
+                # if known, check that type is expected
+                # if known, check that value is acceptable
+                nexus_class_name = h5_obj.attrs.get('NX_class', None)
+                if nexus_class_name is not None:
+                    nexus_class = self.nxdl_dict[nexus_class_name]
+                    t1 = k in nexus_class.attributes['defaults']
+                    t2 = k in nexus_class.attributes['NXDL.xml']
+                    t3 = k in nexus_class.attributes['nxdl.xsd']
+                    t = t1 or t2 or t3
+                    f = {True: finding.OK, False: finding.NOTE}[t]
                 pass
 
         # TODO: re-write the attribute validation code below
@@ -889,6 +884,13 @@ class Data_File_Validator(object):
 
         # h5_addr = obj.name
         short_name = h5_addr.split('/')[-1].split('@')[-1]
+        if short_name == 'NX_class':
+            # special case
+            self.new_finding('NeXus internal attribute', 
+                             h5_addr, 
+                             finding.OK, 
+                             'marks this HDF5 group as NeXus group')
+            return
         
         # strict match: [a-z_][a-z\d_]*
         # flexible match: [A-Za-z_][\w_]*  but gets finding.WARN per manual

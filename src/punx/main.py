@@ -210,6 +210,9 @@ def func_validate(args):
         
         print 'summary statistics'
         print validator.report_findings_summary()
+        
+        # print 'classpath'
+        # print validator.report_classpath()
 
 
 class MyArgumentParser(argparse.ArgumentParser):

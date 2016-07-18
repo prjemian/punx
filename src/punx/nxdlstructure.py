@@ -252,6 +252,13 @@ class NX_definition(NX_mixin):
         NX_mixin.__init__(self, root)
         self.title = root.get('name')
         self.category = root.attrib["category"]
+        
+        for subnode in root:
+            if isinstance(subnode.tag, str):    # do not process XML Comments
+                tag = subnode.tag.split('}')[-1]
+                if tag == 'attribute':
+                    obj = NX_attribute(subnode, self.category)
+                    self.add_object(self.attributes['NXDL.xml'], obj)
 
         # get the attributes specified in THIS group element
         for k, v in root.attrib.items():

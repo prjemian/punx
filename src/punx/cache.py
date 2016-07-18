@@ -148,6 +148,9 @@ def write_pickle_file(info, path):
     write the parsed nxdl_dict and info to a Python pickle file
     '''
     info['pickle_file'] = get_pickle_file_name(path, use_fallback=False)
+    for k, v in info.items():
+        msg = 'info[%s] = %s' % (k, str(v))
+        __init__.LOG_MESSAGE(msg, __init__.DEBUG)
     msg = 'update pickle file: ' + os.path.abspath(info['pickle_file'])
     __init__.LOG_MESSAGE(msg, __init__.INFO)
 
@@ -315,6 +318,9 @@ def update_NXDL_Cache(force_update=False):
         v =  qset.getKey(key)
         qset.setKey(key, 'update forced')
         qset.setKey(key, v)
+        for k in ('git_sha', 'git_time'):
+            qset.setKey('___global___/'+k, info[k])
+    __init__.LOG_MESSAGE('update .ini file: ' + qset.fileName(), __init__.INFO)
     qset.updateGroupKeys(info)
 
 

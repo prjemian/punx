@@ -320,30 +320,30 @@ def isNeXusFile(filename):
 
 def _get_group_niac2014(parent, attribute, nxclass_name):
     '''
-    supports the NIAC2014method:
+    supports the NIAC2014 method:
+    
+    :param obj parent: instance of h5py.Group or h5py.File
+    :param str attribute: this value: ``default``
+    :param str nxclass_name: either ``NXentry`` or ``NXdata``
+    :return [obj]: list of instances of h5py.Group
     
     Search parent for the group named by the attribute
-    (with fallback if the attribute is not defined to picking *any*
-    group that has the same nxclass_name).
+    or if attribute is not defined, then identify any and all
+    groups with the same *nxclass_name*.
     '''
-    group = parent.attrs.get(attribute, None)
+    matches = []
+    group = parent.attrs.get(attribute)
     if group is None:
         # Expect that some data files will not write these attributes.
         # Find *any* HDF5 group that has its @NX_class attribute set to ``nxclass_name``.
-        for node0 in parent.values():
-            # TODO: issue #19: verify
-            # Does this search ALL POSSIBLE {nxclass_name} groups for 
-            # at least one compliance or just the first one it finds?
-            if isNeXusGroup(node0, nxclass_name):
-                group = node0
-                break
-        if group is None:
-            return False
+        for node in parent.values():
+            if isNeXusGroup(node, nxclass_name):
+                matches.append(node)
     else:
-        group = parent[group]   # convert str to HDF5 object or a KeyError exception
-    if not isNeXusGroup(group, nxclass_name):
-        return False
-    return group
+        group = parent.get(group)   # convert str to HDF5 object or a KeyError exception
+        if group is not None and isNeXusGroup(group, nxclass_name):
+            matches.append(group)
+    return matches
 
 def isNeXusFile_ByNXdataAttrs(filename):
     '''
@@ -372,13 +372,15 @@ def isNeXusFile_ByNXdataAttrs(filename):
         
         # find the NXentry group
         nxentry = _get_group_niac2014(f, 'default', 'NXentry')
-        if nxentry is None:
+        if len(nxentry) == 0:
             return False
+        nxentry = nxentry[0]
         
         # find the NXdata group
         nxdata = _get_group_niac2014(nxentry, 'default', 'NXdata')
-        if nxdata is None:
+        if len(nxdata) == 0:
             return False        # no compliant NXdata group identified
+        nxdata = nxdata[0]
         
         # find the signal dataset
         signal = nxdata.attrs.get('signal', None)

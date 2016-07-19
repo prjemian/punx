@@ -412,7 +412,7 @@ def isNeXusFile_ByAxes(filename):
     
     In short, verify this NeXus classpath exists::
     
-        /NXentry/NXdata/dataset/@signal=1
+        /NXentry/NXdata/dataset@signal=1
     
     Tests for the existence of any NXentry group 
     containing any NXdata group containing a single dataset 
@@ -450,9 +450,9 @@ def isNeXusFile_ByAxisAttr(filename):
     
     This is the oldest method in NeXus to define the default plot.
     
-    NOTE: **Not implemented yet!**
+    NOTE: **Not implemented yet!** - calls *isNeXusFile_ByAxes()*
     '''
-    return False    # TODO: issue #20: implement this method
+    return isNeXusFile_ByAxes(filename)    # TODO: issue #20: implement this method
 
 
 def isNeXusGroup(obj, NXtype):

@@ -417,6 +417,73 @@ class Data_File_Validator(object):
         
         :see: http://download.nexusformat.org/doc/html/datarules.html#find-the-plottable-data
         '''
+        # prepare a dictionary of candidates for the default plot
+        v1 = collections.OrderedDict()
+        v2 = collections.OrderedDict()
+        v3 = collections.OrderedDict()
+        for node_name in self.h5:
+            node = self.h5[node_name]
+            if not h5structure.isNeXusGroup(node, 'NXentry'):
+                continue
+            for subnode_name in node:
+                subnode = node[subnode_name]
+                if not h5structure.isNeXusGroup(subnode, 'NXdata'):
+                    continue
+                if subnode.attrs.get('signal') is not None:
+                    k = subnode.name + '@signal'
+                    v3[k] = '/NXentry/NXdata@signal'
+                for ss_node_name in subnode:
+                    ss_node = subnode[ss_node_name]
+                    if not h5structure.isNeXusDataset(ss_node):
+                        continue
+                    if ss_node.attrs.get('signal') is not None:
+                        k = ss_node.name + '@signal'
+                        v2[k] = '/NXentry/NXdata/field@signal'
+                    if ss_node.attrs.get('primary') is not None:
+                        k = subnode.name + '@primary'
+                        v1[k] = '/NXentry/NXdata/field@primary'
+
+        for h5_addr, nx_classpath in v3.items():
+            title = 'NeXus default plot v3'
+            nxdata = self.h5[h5_addr.split('@')[0]]
+            signal_name = self.get_hdf5_attribute(nxdata, 'signal')
+            if signal_name not in nxdata:
+                m = 'signal field not found: ' + signal_name
+                self.new_finding(title, nx_classpath, finding.ERROR, m)
+                continue
+            # TODO: is this unique?
+            # TODO: NIAC2014 terms
+            m = 'signal data: ' + signal_name
+            self.new_finding(title, nxdata.name + '/' + signal_name, finding.OK, nx_classpath)
+            return
+
+        for h5_addr, nx_classpath in v2.items():
+            title = 'NeXus default plot v2'
+            field = self.h5[h5_addr.split('@')[0]]
+            signal = self.get_hdf5_attribute(field, 'signal')
+            if signal in (1, '1'):
+                m = nx_classpath + ' = 1'
+                self.new_finding(title, field.name, finding.ERROR, m)
+                # TODO: is this unique?
+                # TODO: NIAC2014 terms
+                return
+            else:
+                m = 'expected @signal=1, found: ' + signal
+                self.new_finding(title, h5_addr, finding.ERROR, m)
+                continue
+
+        for h5_addr, nx_classpath in v1.items():
+            pass
+        
+        m = 'no default plot: not a NeXus file'
+        self.new_finding('NeXus default plot', '/NXentry/NXentry', finding.ERROR, m)
+    
+    def validate_default_plot_v1(self):
+        '''
+        check that data file defines the default plottable data
+        
+        :see: http://download.nexusformat.org/doc/html/datarules.html#find-the-plottable-data
+        '''
         # - - - - - - - - - -
         def find_NXdata_in_group(group):
             if h5structure.isNeXusGroup(group, 'NXdata'):

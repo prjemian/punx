@@ -37,3 +37,4 @@ nosetests.xml
 .mr.developer.cfg
 /.settings
 /.idea
+/src/punx/data/local

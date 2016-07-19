@@ -21,7 +21,7 @@ Interpret the NXDL rules (nxdl.xsd & nxdlTypes.xsd) into useful Python component
    ~NXDL_nxdlType
    ~Mixin
    ~NXDL_Root
-   ~Attribute
+   ~NXDL_Attribute
    ~NXDL_Element
    ~NXDL_Type
    ~Recursion
@@ -196,7 +196,7 @@ class Mixin(object):
 
     def parse_attribute(self, node):
         ''' '''
-        obj = Attribute(node)
+        obj = NXDL_Attribute(node)
         self.attrs[obj.name] = obj
 
     def parse_attributeGroup(self, node):
@@ -258,7 +258,7 @@ class NXDL_Root(Mixin):
         
         for node in type_node:
             if node.tag.endswith('}attribute'):
-                obj = Attribute(node)
+                obj = NXDL_Attribute(node)
                 self.attrs[obj.name] = obj
             elif node.tag.endswith('}attributeGroup'):
                 self.parse_attributeGroup(node)
@@ -284,8 +284,8 @@ class NXDL_Root(Mixin):
                 msg = 'unhandled tag in ``definitionType``: '
                 self.raise_error(node, msg, node.tag)
 
-
-class Attribute(Mixin): 
+# TODO: confirm whether this is nx:attribute or xs:attribute
+class NXDL_Attribute(Mixin): 
     '''
     nx:attribute element
     
@@ -307,12 +307,12 @@ class Attribute(Mixin):
         else:
             self.default_value = defalt
 
-        self.allowed_values = []
+        self.enum = []
         xpath_str = 'xs:simpleType/xs:restriction/xs:enumeration'
         for node in xml_obj.xpath(xpath_str, namespaces=self.ns):
             v = node.attrib.get('value')
             if v is not None:
-                self.allowed_values.append(v)
+                self.enum.append(v)
 
         self.patterns = []
         xpath_str = 'xs:simpleType/xs:restriction/xs:pattern'
@@ -320,6 +320,17 @@ class Attribute(Mixin):
             v = node.attrib.get('value')
             if v is not None:
                 self.patterns.append(v)
+    
+    def __str__(self, *args, **kwargs):
+        try:
+            s = '@' + self.name
+            s += ' : ' + self.type
+            if len(self.enum):
+                s += ' = '
+                s += ' | '.join(self.enum)
+            return s
+        except:
+            return Mixin.__str__(self, *args, **kwargs)
 
 
 class NXDL_Element(Mixin): 
@@ -345,7 +356,7 @@ class NXDL_Element(Mixin):
         if ref is None:
             for node in xml_obj:
                 if node.tag.endswith('}complexType'):
-                    a = Attribute(node.find('xs:attribute', self.ns))
+                    a = NXDL_Attribute(node.find('xs:attribute', self.ns))
                     self.attrs[a.name] = a
                 elif node.tag.endswith('}annotation'):
                     pass

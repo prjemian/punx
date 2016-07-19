@@ -19,8 +19,8 @@ Load and/or document the structure of a NeXus NXDL class specification
    ~get_nxdl_rules
    ~get_ns_dict
    ~validate_NXDL
-   ~NXDL_mixin
-   ~NXDL_definition
+   ~NX_mixin
+   ~NX_definition
    ~NX_attribute
    ~NX_field
    ~NX_group
@@ -28,8 +28,39 @@ Load and/or document the structure of a NeXus NXDL class specification
    ~NX_symbols
    ~get_NXDL_specifications
 
-* :class:`NXDL_definition`: the structure
+* :class:`NX_definition`: the structure
 * define a text renderer method for that class
+
+.. rubric:: about attributes
+
+There are three types of attributes this code must handle:
+
+1. XML attributes
+   
+   These are metadata applied to various elements in an XML file.  Example::
+   
+       <xs:element minOccurs="0" ...
+    
+    XML attributes can be stored in a key:value dictionary where value is a string.
+   
+2. NXDL attributes
+   
+   These are attribute elements presented in an NXDL file.  Example::
+   
+       <nx:attribute ...
+    
+    NXDL attributes can be stored in a key:object dictionary where object is an instance of NX_attribute.
+    Content of that object is a dictionary of XML attributes and various objects which define the
+    structure of the defined NXDL attribute.
+
+3. HDF5 data file attributes
+   
+   These are metadata applied to various groups or fields in an HDF5 data file.  Example::
+   
+       /entry@default=...
+    
+    HDF5 data file attributes can be stored in a key:value dictionary where value is a string.
+
 '''
 
 __url__ = 'http://punx.readthedocs.org/en/latest/nxdlstructure.html'
@@ -79,7 +110,7 @@ def validate_NXDL(nxdl_file_name):
     validate.validate_xml(nxdl_file_name)
 
 
-class NXDL_mixin(object):
+class NX_mixin(object):
     '''
     common components available to all subclasses
     
@@ -97,15 +128,40 @@ class NXDL_mixin(object):
     element = 'mixin - must override in subclass'
     
     def __init__(self, node):
-        node_name = node.get('name')
+        node_name = node.get('name') or node.get('type')
         if node_name is not None:
-            self.name = node.get('name')
+            if node_name.startswith('NX'):
+                node_name = node_name[2:]
+            self.name = node_name
 
-#     def __str__(self):
-#         '''
-#         canonical string representation of this object
-#         '''
-#         return self.name
+        # CAREFUL:
+        # there are several kinds of attributes
+        # 1. XML attributes of XML elements defining the NXDL structure
+        # 2. NXDL attribute ... make this clear ...  THESE are in self.attributes['NXDL.xml']
+        # 3. custom XML Schema attributes
+        # The default attribute values are set from the list above, in that order
+
+
+        self.attributes = {}
+        self.attributes['nxdl.xsd'] = {}    # attributes defined in nxdl.xsd XML Schema
+        self.attributes['NXDL.xml'] = {}    # attributes defined in NXDL.xml files
+        self.attributes['defined'] = {}     # XML attributes defined in this instance of the element
+        self.attributes['defaults'] = {}    # combination of the above
+
+        if self.element == 'definition':
+            defaults = get_nxdl_rules().nxdl
+        else:
+            defaults = get_nxdl_rules().nxdl.children[self.element]
+        self.attributes['nxdl.xsd'] = {k: v for k, v in defaults.attrs.items()}
+
+    def __str__(self, *args, **kwargs):
+        '''
+        canonical string representation of this object
+        '''
+        try:
+            return self.name
+        except:
+            return object.__str__(self, *args, **kwargs)
     
     def get_NX_type(self, node):
         '''
@@ -123,45 +179,40 @@ class NXDL_mixin(object):
         '''
         parse the elements defined within this XML node 
         '''
-        if self.element == 'definition':
-            defaults = get_nxdl_rules().nxdl
-        else:
-            defaults = get_nxdl_rules().nxdl.children[self.element]
-        default_attrs = {k: v for k, v in defaults.attrs.items()}
-
-        self.attrs = {}
         self.fields = {}
         self.groups = {}
         self.links = {}
         self.symbols = {}
         
+        switch_block = dict(
+            attribute = [NX_attribute, self.attributes['NXDL.xml']],
+            field = [NX_field, self.fields],
+            group = [NX_group, self.groups],
+            link = [NX_link, self.links],
+            symbols = [NX_symbols, self.symbols],
+        )
         for subnode in node:
-            try:
-                if subnode.tag.endswith('}attribute'):
-                    obj = NX_attribute(subnode)
-                    self.add_object(self.attrs, obj)
-                elif subnode.tag.endswith('}field'):
-                    obj = NX_field(subnode, category)
-                    self.add_object(self.fields, obj)
-                elif subnode.tag.endswith('}group'):
-                    obj = NX_group(subnode, category)
-                    self.add_object(self.groups, obj)
-                elif subnode.tag.endswith('}link'):
-                    obj = NX_link(subnode, category)
-                    self.add_object(self.links, obj)
-                elif subnode.tag.endswith('}symbols'):
-                    obj = NX_symbols(subnode, category)
-                    self.add_object(self.symbols, obj)
-            except AttributeError, _exc:
-                pass
+            if isinstance(subnode.tag, str):    # do not process XML Comments
+                tag = subnode.tag.split('}')[-1]
+                if tag in switch_block:         # only handle certain elements
+                    NX_handler, nx_dict = switch_block[tag]
+                    obj = NX_handler(subnode, category)
+                    self.add_object(nx_dict, obj)
 
     def add_object(self, db, obj):
         '''
         add object ``obj`` to database ``db`` (dictionary)
         '''
-        name = obj.name
+        try:
+            name = obj.name
+        except AttributeError, _exc:
+            name = 'symbol'    # FIXME: NX_symbols.name is not defined
         if name in db:
-            name += '_1'
+            for i in range(1, 1+len(db)):
+                nm = name + '_' + str(i)
+                if nm not in db: 
+                    name = nm
+                    break
         db[name] = obj
 
     def render_group(self, group):
@@ -170,12 +221,9 @@ class NXDL_mixin(object):
         '''
         indentation = ' '*2
         t = []
-        for _k, v in sorted(group.attrs.items()):
-            t.append(str(v))
-        for _k, v in sorted(group.fields.items()):
-            t.append(str(v))
-        for _k, v in sorted(group.links.items()):
-            t.append(str(v))
+        for nx_dict in (group.attributes['NXDL.xml'], group.fields, group.links):
+            for _k, v in sorted(nx_dict.items()):
+                t.append(str(v))
         for _k, v in sorted(group.groups.items()):
             t.append(str(v))
             for line in group.render_group(v).splitlines():
@@ -183,7 +231,7 @@ class NXDL_mixin(object):
         return '\n'.join(t)
 
 
-class NXDL_definition(NXDL_mixin):
+class NX_definition(NX_mixin):
     '''
     Contains the complete structure of a NXDL definition, without documentation
     
@@ -197,16 +245,33 @@ class NXDL_definition(NXDL_mixin):
             raise IOError('file does not exist: ' + nxdl_file)
         validate_NXDL(nxdl_file)
         
-        defaults = get_nxdl_rules().nxdl
-        default_attrs = {k: v for k, v in defaults.attrs.items()}
-        
         # parse the XML content now
         tree = lxml.etree.parse(self.nxdl_file_name)
         root = tree.getroot()
 
-        NXDL_mixin.__init__(self, root)
+        NX_mixin.__init__(self, root)
         self.title = root.get('name')
         self.category = root.attrib["category"]
+        
+        for subnode in root:
+            if isinstance(subnode.tag, str):    # do not process XML Comments
+                tag = subnode.tag.split('}')[-1]
+                if tag == 'attribute':
+                    obj = NX_attribute(subnode, self.category)
+                    self.add_object(self.attributes['NXDL.xml'], obj)
+
+        # get the attributes specified in THIS group element
+        for k, v in root.attrib.items():
+            if k not in ('name',):
+                self.attributes['defined'][k] = v
+
+        default_attributes = self.attributes['defaults']
+        for k, v in self.attributes['nxdl.xsd'].items():
+            default_attributes[k] = v.default_value
+        for k, v in self.attributes['NXDL.xml'].items():
+            default_attributes[k] = None        # means: undefined
+        for k, v in self.attributes['defined'].items():
+            default_attributes[k] = v
 
         self.get_element_data(root, self.category)
     
@@ -229,84 +294,98 @@ class NXDL_definition(NXDL_mixin):
         return sorted({v.NX_class: None for v in self.groups.values()}.keys())
 
 
-class NX_attribute(NXDL_mixin):
+class NX_attribute(NX_mixin):
     '''
     NXDL attribute
     '''
     element = 'attribute'
 
-    def __init__(self, node):
-        NXDL_mixin.__init__(self, node)
+    def __init__(self, node, category):
+        NX_mixin.__init__(self, node)
+
+        # get the attributes specified in THIS field element
+        for k, v in node.attrib.items():
+            if k not in ('name',):
+                self.attributes['defined'][k] = v
         
-        defaults = get_nxdl_rules().nxdl.children[self.element]
-        default_attrs = {k: v for k, v in defaults.attrs.items()}
-        
-        if self.name in ('restricted deprecated minOccurs'.split()):
-            pass
-        self.nx_type = self.get_NX_type(node)
-        self.units = self.get_NX_units(node)
+        default_attributes = self.attributes['defaults']
+        for k, v in self.attributes['nxdl.xsd'].items():
+            default_attributes[k] = v.default_value
+        for k, v in self.attributes['NXDL.xml'].items():
+            default_attributes[k] = None        # means: undefined
+        for k, v in self.attributes['defined'].items():
+            default_attributes[k] = v
+
         self.enum = []
         for n in node.xpath('nx:enumeration/nx:item', namespaces=get_ns_dict()):
             self.enum.append( n.attrib['value'] )
 
-    def __str__(self):
-        s = '@' + self.name
-        s += ' : ' + self.nx_type
-        if len(self.enum):
-            s += ' = '
-            s += ' | '.join(self.enum)
-        return s
+    def __str__(self, *args, **kwargs):
+        try:
+            s = '@' + self.name
+            s += ' : ' + self.attributes['defaults']['type']
+            if len(self.enum):
+                s += ' = '
+                s += ' | '.join(self.enum)
+            return s
+        except:
+            return NX_mixin.__str__(self, *args, **kwargs)
 
 
-class NX_field(NXDL_mixin):
+class NX_field(NX_mixin):
     '''
     NXDL field
     '''
     element = 'field'
 
     def __init__(self, node, category):
-        NXDL_mixin.__init__(self, node)
-        
-        defaults = get_nxdl_rules().nxdl.children[self.element]
-        default_attrs = {k: v for k, v in defaults.attrs.items()}
-        default_children = {k: v for k, v in defaults.children.items()}
-        
-        nt = node.get('nameType', default_attrs['nameType'].default_value)
-        self.flexible_name = nt == 'any'
-        if category in ('base class',):
-            self.minOccurs = node.get('minOccurs', default_attrs['minOccurs'].default_value)
-        else:
-            self.minOccurs = node.get('minOccurs', 1)
-        self.optional = self.minOccurs in ('0', 0)
+        NX_mixin.__init__(self, node)
         
         self.dims = self.field_dimensions(node)
-
-        self.nx_type = self.get_NX_type(node)
-        self.units = self.get_NX_units(node)
 
         self.enum = []
         for n in node.xpath('nx:enumeration/nx:item', namespaces=get_ns_dict()):
             self.enum.append( n.attrib['value'] )
 
-        # CAREFUL:
-        # there are two kinds of attributes
-        # 1. XML attributes of XML elements defining the NXDL structure
-        # 2. NXDL attribute ... make this clear ...
-        # FIXME: resolve this before continuing
+        # walk through all <attribute /> elements declared in the NXDL
+        # use same code as above
+        switch_block = dict(
+            attribute = [NX_attribute, self.attributes['NXDL.xml']],
+            #field = [NX_field, self.fields],
+            #group = [NX_group, self.groups],
+            #link = [NX_link, self.links],
+            #symbols = [NX_symbols, self.symbols],
+            #dimensions = ?
+        )
 
-        # walk through the attributes for this field as declared in the nxdl.xsd rules
-        self.attrs = {}
-        for k, v in defaults.attrs.items():
-            pass
+        for subnode in node:
+            if isinstance(subnode.tag, str):    # do not process XML Comments
+                tag = subnode.tag.split('}')[-1]
+                if tag in switch_block:         # only handle certain elements
+                    NX_handler, nx_dict = switch_block[tag]
+                    obj = NX_handler(subnode, category)
+                    self.add_object(nx_dict, obj)
 
-        # walk through all custom attributes (<attribute /> elements) declared in the NXDL
-        for subnode in node.xpath('nx:attribute', namespaces=get_ns_dict()):
-            obj = NX_attribute(subnode)
-            self.attrs[obj.name] = obj
+        # get the attributes specified in THIS field element
+        for k, v in node.attrib.items():
+            if k not in ('name',):
+                self.attributes['defined'][k] = v
+
+        default_attributes = self.attributes['defaults']
+        for k, v in self.attributes['nxdl.xsd'].items():
+            default_attributes[k] = v.default_value
+        if category in ('application',):
+            # this rule is not in the XML Schema: issue #266
+            # fields are required in application definitions
+            default_attributes['minOccurs'] = 1
+        for k, v in self.attributes['NXDL.xml'].items():
+            default_attributes[k] = None        # means: undefined
+        for k, v in self.attributes['defined'].items():
+            default_attributes[k] = v
 
     def __str__(self):
         s = self.name
-        s += ' : ' + self.nx_type
+        s += ' : ' + self.attributes['defined']['type']
         if len(self.dims):
             s += '[' + ', '.join(map(str, self.dims)) + ']'
         if len(self.enum):
@@ -348,43 +427,37 @@ class NX_field(NXDL_mixin):
         return [dims[k] for k in sorted(map(int, dims.keys()))]
 
 
-class NX_group(NXDL_mixin):
+class NX_group(NX_mixin):
     '''
     NXDL group
     '''
     element = 'group'
 
     def __init__(self, node, category):
-        NXDL_mixin.__init__(self, node)
-        
-        defaults = get_nxdl_rules().nxdl.children[self.element]
-        default_attrs = {k: v for k, v in defaults.attrs.items()}
-        default_children = {k: v for k, v in defaults.children.items()}
+        NX_mixin.__init__(self, node)
         
         self.NX_class = node.get('type', None)
         if self.NX_class is None:
             msg = 'group has no type, this is an error, name = ' + self.name
             raise ValueError(msg)
 
-        if category in ('base class', ):
-            nt = node.get('nameType', 'any')
-            self.flexible_name = nt == 'any'
-        else:
-            nt = node.get('nameType', 'specified')
-            self.flexible_name = nt == 'any'
+        # get the attributes specified in THIS group element
+        for k, v in node.attrib.items():
+            if k not in ('name',):
+                self.attributes['defined'][k] = v
 
-        try:
-            len(self.name)
-        except AttributeError:
-            self.flexible_name = True
-            self.name = '{' + self.NX_class[2:] + '}'
+        default_attributes = self.attributes['defaults']
+        for k, v in self.attributes['nxdl.xsd'].items():
+            default_attributes[k] = v.default_value
+        if category in ('application',):
+            # this rule is not in the XML Schema: issue #266
+            # fields are required in application definitions
+            default_attributes['minOccurs'] = 1
+        for k, v in self.attributes['NXDL.xml'].items():
+            default_attributes[k] = None        # means: undefined
+        for k, v in self.attributes['defined'].items():
+            default_attributes[k] = v
 
-        if category in ('base class',):
-            minOccurs = node.get('minOccurs', 0)
-        else:
-            minOccurs = node.get('minOccurs', 1)
-        self.optional = minOccurs in ('0', 0)
-        
         self.get_element_data(node, category)
 
     def __str__(self):
@@ -393,18 +466,14 @@ class NX_group(NXDL_mixin):
         return s
 
 
-class NX_link(NXDL_mixin):
+class NX_link(NX_mixin):
     '''
     NXDL link
     '''
     element = 'link'
 
     def __init__(self, node, category):
-        NXDL_mixin.__init__(self, node)
-        
-        defaults = get_nxdl_rules().nxdl.children[self.element]
-        default_attrs = {k: v for k, v in defaults.attrs.items()}
-        default_children = {k: v for k, v in defaults.children.items()}
+        NX_mixin.__init__(self, node)
         
         self.target = node.get('target')
     
@@ -412,7 +481,7 @@ class NX_link(NXDL_mixin):
         return self.name + ' --> ' + self.target
 
 
-class NX_symbols(NXDL_mixin):
+class NX_symbols(NX_mixin):
     '''
     NXDL symbols table
     '''
@@ -420,13 +489,9 @@ class NX_symbols(NXDL_mixin):
     element = 'symbols'
 
     def __init__(self, node, category):
-        NXDL_mixin.__init__(self, node)
-        
-        defaults = get_nxdl_rules().nxdl.children[self.element]
-        default_attrs = {k: v for k, v in defaults.attrs.items()}
-        default_children = {k: v for k, v in defaults.children.items()}
+        NX_mixin.__init__(self, node)
 
-        # TODO:
+        # TODO: finish this
 
 
 def _get_specs_from_pickle_file():
@@ -475,8 +540,7 @@ def _get_specs_from_NXDL_files():
     
     nxdl_dict = collections.OrderedDict()
     for nxdl_file_name in nxdl_file_list:
-        # k = os.path.basename(nxdl_file_name)
-        obj = NXDL_definition(nxdl_file_name)
+        obj = NX_definition(nxdl_file_name)
         nxdl_dict[obj.title] = obj
     
     return nxdl_dict

@@ -19,12 +19,14 @@ import sys
 
 
 def demo_prep():
+    ''' '''
     sys.argv.append('de')
     # sys.argv.append('-h')
     logfile_prep()
 
 
 def update_prep():
+    ''' '''
     sys.argv.append('up')
     # sys.argv.append('-h')
     sys.argv.append('-f')
@@ -32,6 +34,7 @@ def update_prep():
 
 
 def structure_prep():
+    ''' '''
     sys.argv.append('st')
     # sys.argv.append('-h')
     logfile_prep()
@@ -39,6 +42,7 @@ def structure_prep():
 
 
 def validate_prep():
+    ''' '''
     sys.argv.append('va')
     # sys.argv.append('-h')
     logfile_prep()
@@ -48,22 +52,26 @@ def validate_prep():
 
 
 def logfile_prep():
+    ''' '''
     # sys.argv.append('--logfile')
     # sys.argv.append('_punx_.log')
     # sys.argv.append('--interest')
     # sys.argv.append('1')
-    pass
 
 
 def datafile_prep():
+    ''' '''
+    # sys.argv.append('data/writer_1_3.hdf5')
+    # sys.argv.append('data/writer_2_1.hdf5')
     # sys.argv.append('data/chopper.nxs')
     # sys.argv.append('data/compression.h5')
     # sys.argv.append('data/prj_test.nexus.hdf5')
     # sys.argv.append('data/scan101.nxs')
     # sys.argv.append('data/has_default_attribute_error/external_master.hdf5')
     # sys.argv.append('data/has_default_attribute_error/external_angles.hdf5')
-    # sys.argv.append('data/prj_test.nexus.hdf5')
-    sys.argv.append('data/verysimple.nx5')
+    # sys.argv.append('data/verysimple.nx5')
+    sys.argv.append('data/1998spheres.h5')
+    # sys.argv.append('data/cs_af1410.h5')
 
 
 if __name__ == '__main__':

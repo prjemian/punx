@@ -34,16 +34,13 @@ Checkboxes indicate which steps have been implemented in code below.
 
 #. [x] verify attributes
 #. [x] verify file level as group using NX_class = NXroot
-#. [x] identify any objects at root level that are not in NXroot (which is OK)
-#. [x] verify classpath exists: /NXentry/NXdata & @signal
-#. [x] verify classpath exists: NXdata & @signal
-#. [x] verify file has valid /NXentry/NXdata/signal_data
-#. [x] verify every NXentry has NXdata/signal_data
-#. [x] verify every NXdata has signal_data
+#. [ ] identify any objects at root level that are not in NXroot (which is OK)
+#. [x] verify default plot identified
 
     #. [x] version 1
     #. [x] version 2
     #. [x] version 3
+    #. [x] version 3+niac2014
 
 .. rubric:: Groups
 
@@ -58,12 +55,12 @@ Checkboxes indicate which steps have been implemented in code below.
 
     #. [ ] NXentry
     #. [ ] NXsubentry
-    #. [~] NXdata
+    #. [ ] NXdata
     #. [x] NXcollection
 
-#. [x] check for items defined by NX_class
+#. [ ] check for items defined by NX_class
 #. [ ] check for items required by NX_class
-#. [x] check for items not defined by NX_class
+#. [ ] check for items not defined by NX_class
 #. [ ] observe NXDL setting: ignoreExtraGroups
 #. [ ] observe NXDL setting: ignoreExtraFields
 #. [ ] observe NXDL setting: ignoreExtraAttributes
@@ -76,10 +73,9 @@ Checkboxes indicate which steps have been implemented in code below.
 #. [x] compare name with pattern *validItemName*
 #. [ ] is name flexible?
 #. [x] is target attribute defined?
-#. [ ] verify target attribute with pattern *validTargetName*
 #. [x] is target address absolute?
 #. [x] does target address exist?
-#. [x] construct NX classpath from target
+#. [ ] construct NX classpath from target
 #. [ ] compare NX classpath with NXDL specification
 
 .. rubric:: Fields
@@ -88,18 +84,18 @@ Checkboxes indicate which steps have been implemented in code below.
 #. [ ] is name flexible?
 #. [ ] observe attributes: minOccurs maxOccurs
 #. [ ] is deprecated?
-#. [x] is units attribute defined?
+#. [ ] is units attribute defined?
 #. [ ] check units are consistent against NXDL
 #. [ ] check data shape against NXDL
 #. [ ] check data type against NXDL
-#. [x] check for attributes defined by NXDL
-#. [x] check AXISNAME_indices are each within signal data rank
+#. [ ] check for attributes defined by NXDL
+#. [ ] check AXISNAME_indices are each within signal data rank
 
 .. rubric:: Attributes
 
 #. [x] compare name with pattern
 #. [ ] is deprecated?
-#. [x] check data type against NXDL
+#. [ ] check data type against NXDL
 #. [ ] check nxdl.xsd for how to handle these attributes regarding finding.WARN
 
     #. [ ] restricts
@@ -215,9 +211,6 @@ class Data_File_Validator(object):
         self.findings = []      # list of Finding() instances
         self.addresses = collections.OrderedDict()     # dictionary of all HDF5 address nodes in the data file
 
-        # open the NXDL rules files
-        #cache.update_NXDL_Cache()        # let the user control when to update
-
         self.ns = cache.NX_DICT
         self.nxdl_xsd = cache.get_nxdl_xsd()
         nxdlTypes_xsd_file = cache.abs_NXDL_filename(cache.NXDL_TYPES_SCHEMA_FILE)
@@ -244,585 +237,102 @@ class Data_File_Validator(object):
         # advisory changed to finding.NOTE
         p = CustomNxdlPattern(self, 'validItemName-strict', r'[a-z_][a-z0-9_]*')
         self.patterns[p.name] = p
-    
-    def validate_default_plot(self):
-        '''
-        check that data file defines the default plottable data
         
-        :see: http://download.nexusformat.org/doc/html/datarules.html#find-the-plottable-data
-        '''
-        # - - - - - - - - - -
-        def find_NXdata_in_group(group):
-            if h5structure.isNeXusGroup(group, 'NXdata'):
-                nxdata_dict[group.name] = group
-            for h5_child in sorted(group):
-                h5_obj = group.get(h5_child)
-                if h5structure.isHdf5Group(h5_obj):
-                    find_NXdata_in_group(h5_obj)
-        # - - - - - - - - - -
-        def version1(group):
-            '''plottable data version 1
-            
-            :see: http://download.nexusformat.org/doc/html/datarules.html#design-findplottable-bydimnumber
-            '''
-            base_title = 'default plot v1'
-            dimension_scales = []
-            signal_count = 0
-            for field_name in group:
-                field = group.get(field_name)
-                signal = self.get_hdf5_attribute(field, 'signal')
-                primary = self.get_hdf5_attribute(field, 'primary')
-                if signal is not None:
-                    title = base_title + ' @signal attribute'
-                    msg = {True: 'value: ' + str(signal), False: 'does not exist'}
-                    self.new_finding(title, field.name + '@signal', finding.OK, msg)
-                    try:
-                        int_signal = int(signal)
-                        if int_signal == 1:
-                            signal_count += 1
-                            title = base_title + ' @signal value checked'
-                            self.new_finding(title, field.name + '@signal', finding.OK, 'default data')
-                    except ValueError:
-                        title = base_title + ' @signal value checked'
-                        m = '@signal="' + str(signal) + '" not interpreted as integer'
-                        self.new_finding(title, field.name + '@signal', finding.ERROR, m)
-                elif primary is not None:
-                    title = base_title + ' @primary attribute'
-                    msg = {True: 'value: ' + str(primary), False: 'does not exist'}
-                    self.new_finding(title, field.name + '@primary', finding.OK, 'value: ' + msg)
-                    try:
-                        int_primary = int(primary)
-                        if int_primary == 1:
-                            title = base_title + ' @primary value checked'
-                            m = 'possible dimension scale'
-                            self.new_finding(title, field.name + '@primary', finding.OK, m)
-                            # TODO: issue #15: verify that shape is 1-D
-                            m = 'verify the shape is 1-D'
-                            self.new_finding(title, field.name + '@primary', finding.TODO, m)
-                            dimension_scales.append(field_name)
-                    except ValueError:
-                        title = base_title + ' @primary value checked'
-                        m = '@primary="' + str(signal) + '" not interpreted as integer'
-                        self.new_finding(title, field.name + '@primary', finding.ERROR, m)
-                title = 'field @axis attribute'
-                self.new_finding(title, field.name + '@axis', finding.TODO, 'not checked')
-
-            if signal_count == 0:
-                m = 'no field marked with @signal="1"'
-                self.new_finding(base_title, group.name, finding.ERROR, m)
-            elif signal_count > 1:
-                m = 'too many fields marked with @signal="1"'
-                self.new_finding(base_title, field.name, finding.ERROR, m)
-            return signal_count == 1
-        # - - - - - - - - - -
-        def version2(group):
-            '''plottable data version 2
-            
-            :see: http://download.nexusformat.org/doc/html/datarules.html#design-findplottable-byname
-            '''
-            base_title = 'default plot v2'
-            signal_count = 0
-            for field_name in group:
-                field = group.get(field_name)
-                signal = self.get_hdf5_attribute(field, 'signal')
-                t = signal is not None
-                if t:
-                    title = base_title + ' @signal attribute'
-                    msg = {True: 'value: ' + str(signal), False: 'does not exist'}[t]
-                    self.new_finding(title, field.name + '@signal', finding.OK, 'value: ' + msg)
-                    try:
-                        int_signal = int(signal)
-                        if int_signal == 1:
-                            signal_count += 1
-                            title = base_title + ' @signal value checked'
-                            self.new_finding(title, field.name + '@signal', finding.OK, 'default data')
-                    except ValueError:
-                        title = base_title + ' @signal value checked'
-                        m = '@signal="' + str(signal) + '" not interpreted as integer'
-                        self.new_finding(title, field.name + '@signal', finding.ERROR, m)
-                title = base_title + ' @axes attribute'
-                # axes="axis1:xis2:xis3"
-                # delimiter could be either ":" or ","
-                self.new_finding(title, field.name + '@axes', finding.TODO, 'not checked')
-                
-            return signal_count == 1
-        # - - - - - - - - - -
-        def version3(group):
-            '''plottable data version 3
-            
-            :see: http://download.nexusformat.org/doc/html/datarules.html#design-findplottable-niac2014
-            '''
-            base_title = 'default plot v3'
-            
-            signal = self.get_hdf5_attribute(group, 'signal')
-            t = signal is not None
-            f = {True: finding.OK, False: finding.NOTE}[t]
-            title = base_title + ' @signal attribute'
-            msg = {True: 'exists', False: 'does not exist'}[t]
-            self.new_finding(title, group.name, f, msg)
-            if not t:
-                return False
-
-            t = signal in group
-            f = finding.TF_RESULT[t]
-            title = base_title + ' @signal value'
-            msg = {True: 'value: ' + signal, False: 'does not exist'}[t]
-            self.new_finding(title, group.name, f, msg)
-            if not t:
-                return False
-            signal_obj = group.get(signal)
-            signal_rank = len(signal_obj.shape)
-
-            axes = self.get_hdf5_attribute(group, 'axes')
-            t = axes is not None
-            f = {True: finding.OK, False: finding.NOTE}[t]
-            title = base_title + ' @axes attribute'
-            msg = {True: 'exists', False: 'does not exist'}[t]
-            self.new_finding(title, group.name, f, msg)
-            if axes is not None:
-                for a in axes.split(','):
-                    t = a in group and a != signal
-                    f = finding.TF_RESULT[t]
-                    title = base_title + ' @axes value'
-                    msg = {True: 'value: ' + a, False: 'does not exist'}[t]
-                    self.new_finding(title, group.name, f, 'value: ' + a)
-
-                    if t:
-                        # AXISNAME_indices
-                        axis_index = self.get_hdf5_attribute(group, a + '_indices')
-                        t = axis_index is not None
-                        f = {True: finding.OK, False: finding.NOTE}[t]
-                        gn = group.name + '@' + a + '_indices'
-                        title = base_title + ' @AXISNAME_indices attribute'
-                        msg = {True: 'value: ' + str(axis_index), False: 'does not exist'}[t]
-                        self.new_finding(title, gn, f, msg)
-
-                        if t:
-                            # value of AXISNAME_indices is within the rank of the signal data
-                            title = base_title + ' @AXISNAME_indices value'
-                            t = 0 <= axis_index < signal_rank
-                            f = finding.TF_RESULT[t]
-                            msg = 'rank test: 0 <= ' + str(axis_index) + ' < ' + str(signal_rank)
-                            self.new_finding(title, gn, f, msg)
-
-            self.new_finding('default plot v3 dimension scales', group.name, finding.TODO, 'unchecked')
-            return True
-        # - - - - - - - - - -
-        def niac2015_default_path(group, subgroup_class):
-            group_default = self.get_hdf5_attribute(group, 'default')
-            title = '@default attribute'
-            t = group_default is not None
-            f = {True: finding.OK, False: finding.NOTE}[t]
-            m = {True: 'exists', False: 'does not exist'}[t]
-            gn = group.name or '/'
-            self.new_finding(title, gn+'@default', f, m)
-
-            if t:
-                title = '@default value'
-                t = group_default in group
-                f = finding.TF_RESULT[t]
-                m = 'HDF5 item ' + {True: 'exists', False: 'does not exist'}[t]
-                self.new_finding(title, gn+'@default', f, m)
-                
-                if t:
-                    title = '@default value test'
-                    subgroup = group[group_default]
-                    t = h5structure.isNeXusGroup(subgroup, subgroup_class)
-                    m = 'HDF5 item is ' + subgroup_class
-                    self.new_finding(title, gn+'@default', f, m)
-            return group_default
-        # - - - - - - - - - -
-        def list_groups(parent, classname):
-            return [c for c in parent if h5structure.isNeXusGroup(c, classname)]
-        # - - - - - - - - - -
-
-        # identify the NXdata groups to check, do not treat links differently
-        nxdata_dict = collections.OrderedDict()
-        find_NXdata_in_group(self.h5)
-
-        title = 'NXdata default plottable data'
-        valid_nxdata_dict = collections.OrderedDict()
-        for h5_addr, nxdata_group in nxdata_dict.items():
-            if version3(nxdata_group):
-                self.new_finding(title, h5_addr, finding.OK, 'version 3')
-                valid_nxdata_dict[h5_addr] = nxdata_group
-            elif version2(nxdata_group):
-                self.new_finding(title, h5_addr, finding.OK, 'version 2')
-                valid_nxdata_dict[h5_addr] = nxdata_group
-            elif version1(nxdata_group):
-                self.new_finding(title, h5_addr, finding.OK, 'version 1')
-                valid_nxdata_dict[h5_addr] = nxdata_group
-            else:
-                m = 'no default plottable data indicated'
-                self.new_finding(title, h5_addr, finding.ERROR, m)
-
-        # search each NXentry for valid NXdata
-        for h5_addr in sorted(self.h5):
-            nxentry = self.h5.get(h5_addr)
-            if h5structure.isNeXusGroup(nxentry, 'NXentry'):
-                count = 0
-                for item in sorted(nxentry):
-                    nxdata = nxentry.get(item)
-                    if h5structure.isNeXusGroup(nxdata, 'NXdata'):
-                        if nxdata.name in valid_nxdata_dict.keys():
-                            count += 1
-                t = count > 0
-                f = finding.TF_RESULT[t]
-                title = '/NXentry/NXdata/signal_data'
-                m = 'basic NeXus requirement: default plot'
-                m += {True: '', False: ' not'}[t] + ' described'
-                self.new_finding(title, nxentry.name, f, m)
-
-        title = '/@default/NXentry'
-        nxentry = niac2015_default_path(self.h5, 'NXentry')
-        if nxentry is None:
-            # count number of NXentry groups
-            g = list_groups(self.h5, 'NXentry')
-            if len(g) == 1:
-                nxentry = g[0]
-                m = 'no @default attribute, one NXentry group: not ambiguous'
-                f = finding.OK
-            elif len(g) > 1:
-                nxentry = g[0]
-                m = 'no @default attribute, multiple NXentry groups: ambiguous'
-                f = finding.NOTE
-            else:
-                nxentry = None
-                m = 'no @default attribute, no NXentry groups: not a NeXus file'
-                f = finding.ERROR
-            self.new_finding(title, self.h5.name, f, m)
-
-        if nxentry is not None:
-            if nxentry in self.h5:
-                title = '/@default/NXentry@default/NXdata'
-                nxdata = niac2015_default_path(self.h5[nxentry], 'NXdata')
-                if nxdata is None:
-                    # count number of NXdata groups
-                    g = list_groups(self.h5[nxentry], 'NXdata')
-                    if len(g) == 1:
-                        nxdata = g[0]
-                        m = 'no @default attribute, one NXdata group: not ambiguous'
-                        f = finding.OK
-                    elif len(g) > 1:
-                        nxdata = g[0]
-                        m = 'no @default attribute, multiple NXdata groups: ambiguous'
-                        f = finding.NOTE
-                    else:
-                        nxdata = None
-                        m = 'no @default attribute, no NXdata groups: not a NeXus file'
-                        f = finding.ERROR
-                    self.new_finding(title, self.h5[nxentry].name, f, m)
-    
-                if nxdata is not None:
-                    if nxdata in self.h5[nxentry]:
-                        m = 'absolute path to default plot'
-                        self.new_finding(title, self.h5[nxentry][nxdata].name, finding.OK, m)
-                    else:
-                        m = 'NXentry group has no subgroup named: ' + nxdata
-                        self.new_finding(title, self.h5[nxentry].name, finding.ERROR, m)
-            else:
-                m = 'file root has no subgroup named: ' + nxentry
-                self.new_finding(title, self.h5.name, finding.ERROR, m)
-    
-    def review_with_NXDL(self, group, nx_class):
-        '''
-        review *group* with the NXDL specification for *nx_class*
-        
-        :param obj group: instance of h5py.Group or h5py.Dataset
-        :param str nx_class: name of NeXus NXDL specification
-        '''
-        #self.new_finding('-'*10, group.name, finding.COMMENT, 'review_with_NXDL start' + '-'*10)
-        
-        if not h5structure.isHdf5File(group):
-            nxc = self.get_hdf5_attribute(group, 'NX_class', '<undefined>')
-            f = finding.TF_RESULT[nxc in self.nxdl_dict]
-            msg = nxc  + ' known?'
-            self.new_finding('NX_class known', group.name, f, 'value: ' + nxc)
-        
-        if nx_class in self.nxdl_dict:
-            self.new_finding('NXDL known', group.name, finding.OK, nx_class)
-        else:
-            msg = 'expected NX_class unknown: ' + nx_class
-            self.new_finding('NXDL known', group.name, finding.OK, msg)
-            #self.new_finding('-'*10, group.name, finding.COMMENT, 'review_with_NXDL bailout' + '-'*10)
-            return
-
-        if group.attrs.get('NX_class', '') in ('NXcollection',):
-            msg = 'NXcollection content is not validated'
-            self.new_finding('NXcollection', group.name, finding.OK, msg)
-            return
-
-        self.validate_attributes(group, nx_class)
-        
-        nxdl_spec = self.nxdl_dict[nx_class]
-        nxdl_subgroups = nxdl_spec.getSubGroup_NX_class_list()
-        for h5_child in sorted(group):
-            h5_obj = group.get(h5_child)
-            if h5structure.isHdf5Group(h5_obj):
-                h5_sub_nx_class = h5_obj.attrs.get('NX_class', None)
-                s = h5_sub_nx_class in nxdl_subgroups
-                f = {True: finding.OK, False: finding.NOTE}[s]
-                if h5_sub_nx_class is None:
-                    c = 'subgroup NX_class undefined'
-                else:
-                    c = h5_sub_nx_class
-                if f == finding.NOTE:
-                    s = h5_sub_nx_class in self.nxdl_dict
-                    f = {True: finding.NOTE, False: finding.ERROR}[s]
-                    c += ': not known '
-                    c += {True: 'subgroup of ', False: 'NeXus class'}[s]
-                    c += ' ' + nx_class
-                self.new_finding(nx_class + ' subgroup', h5_obj.name, f, c)
-            if h5structure.isHdf5Dataset(h5_obj):
-                known_name = h5_obj.name in nxdl_spec.fields
-                c = 'strict comparison'
-                if not known_name:
-                    # TODO: issue #16: check here if name is flexible : How to do this?
-                    known_name = nx_class in ('NXdata', 'NXdetector')
-                    c = 'acceptable'
-                f = {True: finding.OK, False:finding.NOTE}[known_name]
-                self.new_finding(nx_class + ' defined field', h5_obj.name, f, c)
-                msg = 'need to complete check with NXDL'
-                self.new_finding(nx_class + ' field', h5_obj.name, finding.TODO, msg)
-
-        # self.new_finding('-'*10, group.name, finding.COMMENT, 'review_with_NXDL end' + '-'*10)
-
     def validate(self):
         '''
         start the validation process from the file root
         '''
-        self.new_finding('validate all names', '/', finding.COMMENT, '-'*10)
-        self.collect_names(self.h5)
-
-        # HDF5 group attributes
-        for item in sorted(self.h5.attrs.keys()):
-            aname = self.h5.name + '@' + item
-            self.new_address(aname)
-        
-        # this may be useful for validating rule for default plot, for example
-        # /NXentry/NXdata/<any>@signal
-        # /NXentry/NXdata@signal
-        self.classpath_dict = collections.OrderedDict()
-        for k, v in self.addresses.items():
-            self.classpath_dict[k] = v
-
-        # self.new_finding('-'*10, '/', finding.COMMENT, 'NXroot checkup start' + '='*10)
-        self.new_finding('validate all objects', '/', finding.COMMENT, '-'*10)
-        title = 'hdf5 file root object'
-        for item in sorted(self.h5):
-            obj = self.h5.get(item)
-            if h5structure.isNeXusLink(obj):
-                self.validate_link(obj, self.h5)
-            elif h5structure.isHdf5Group(obj):
-                self.validate_group(obj, 'NXentry')
-            elif h5structure.isHdf5Dataset(obj):
-                self.validate_dataset(obj, self.h5)
-            else:
-                self.new_finding(title, obj.name, finding.NOTE, 'not a NeXus item')
-        # self.new_finding('-'*10, '/', finding.COMMENT, 'NXroot checkup end' + '='*10)
-        
-        # review file with the relevant NXDL specification: NXroot
-        # review of other classes as specified in the data file is called in validate_group()
-        self.new_finding('review file root with NXroot', '/', finding.COMMENT, '-'*10)
-        self.review_with_NXDL(self.h5, 'NXroot')
-
-        self.new_finding('check for default plot', '/', finding.COMMENT, '-'*10)
+        self.validate_HDF5_group(self.h5)
         self.validate_default_plot()
+        
+    def validate_HDF5_group(self, group):
+        '''
+        review the HDF5 group: group
 
-    def validate_group(self, group, nxdl_classname):
+        :param obj group: instance of h5py.File of h5py.Group
         '''
-        check group against the specification of nxdl_classname
-        
-        :param obj group: instance of h5py.Group
-        :param str nxdl_classname: name of NXDL class this group should match
-        '''
-        nx_class = self.get_hdf5_attribute(group, 'NX_class')
-        if nx_class is None:
-            comment = 'hdf5 group has no `NX_class` attribute'
-            self.new_finding('HDF5 group', group.name, finding.NOTE, comment)
-        else:
-            self.review_with_NXDL(group, nx_class)
-        
-        self.validate_attributes(group, nx_class)
-        
-        # get a list of the NXDL subgroups defined in this group
-        nxdl_class_obj = self.nxdl_dict[nxdl_classname]
-        defined_nxdl_list = nxdl_class_obj.getSubGroup_NX_class_list()
-        
-        # HDF5 group children
-        for item in sorted(group):
-            obj = group.get(item)
-            if h5structure.isNeXusLink(obj):
-                # pull these out BEFORE groups & fields
-                self.validate_link(obj, group)
-            elif h5structure.isHdf5Group(obj):
-                obj_nx_class = self.get_hdf5_attribute(obj, 'NX_class')
-                if obj_nx_class in defined_nxdl_list:
-                    self.validate_group(obj, obj_nx_class)
-                else:
-                    self.new_finding('defined', obj.name, finding.NOTE, 'not defined in ' + nxdl_classname)
-            elif h5structure.isHdf5Dataset(obj):
-                self.validate_dataset(obj, group)
+        nx_class_name = self.get_hdf5_attribute(group, 'NX_class')
+        if nx_class_name is None:
+            if isinstance(group, h5py.File):
+                nx_class_name = 'NXroot'
+                msg = 'assuming file root is NeXus base class: NXroot'
+                self.new_finding('@NX_class exists', group.name, finding.OK, msg)
             else:
-                self.new_finding('dataset', obj.name, finding.TODO, finding.TODO.description)
+                self.validate_item_name(group.name)
+                msg = 'no @NX_class attribute, not a NeXus group'
+                self.new_finding('@NX_class exists', group.name, finding.NOTE, msg)
+                return  # evaluate any further?
+        else:
+            self.validate_item_name(group.name)
 
-    
-    def validate_dataset(self, dataset, group):
-        '''
-        check dataset against the specification of group NXDL specification
+            aname = group.name + '@NX_class'
+            t = nx_class_name in self.nxdl_dict
+            f = finding.TF_RESULT[t]
+            msg = nx_class_name + {True: ' is ', False: ' is not '}[t] + 'known'
+            self.new_finding('@NX_class known', aname, f, msg)
         
+        # NeXus special case
+        if nx_class_name == 'NXcollection':
+            msg = 'NXcollection content will not be validated'
+            self.new_finding('NXcollection group', group.name, finding.OK, msg)
+            return
+        
+        for k, v in group.attrs.items():   # review the group's attributes
+            if k not in ('NX_class',):
+                aname = group.name + '@' + k
+                self.validate_item_name(aname)
+
+        for child_name in group:           # review the group's children
+            child = group[child_name]
+            if h5structure.isNeXusLink(child):
+                self.validate_NeXus_link(child, group)
+            elif h5structure.isHdf5Group(child):
+                self.validate_HDF5_group(child)
+            elif h5structure.isHdf5Dataset(child):
+                self.validate_HDF5_dataset(child, group)
+            else:
+                msg = 'unexpected: ' + child.name
+                raise ValueError(msg)
+        
+        # TODO: review with NXDL specification: nx_class_object
+        nx_class_object = self.nxdl_dict.get(nx_class_name)
+        if nx_class_object is not None:
+            msg = 'validate with ' + nx_class_name + ' specification'
+            self.new_finding('NXDL review', group.name, finding.TODO, msg)
+        
+    def validate_HDF5_dataset(self, dataset, group):
+        '''
+        review the HDF5 dataset: dataset
+
         :param obj dataset: instance of h5py.Dataset
-        :param obj group: instance of h5py.Group
+        :param obj group: instance of h5py.Group, needed to check against NXDL
         '''
-#         ds_name = dataset.name.split('/')[-1]
-        if h5structure.isHdf5File(group):
-            nx_class = 'NXroot'
-        else:
-            nx_class = self.get_hdf5_attribute(group, 'NX_class')
-        nxdl_class_obj = self.nxdl_dict.get(nx_class, None)
-        if nxdl_class_obj is None:
-            if nx_class is None:
-                msg = 'NX_class is not defined'
-            else:
-                msg = 'NX_class=' + nx_class
-            self.new_finding('unknown NX_class', dataset.name, finding.ERROR, msg)
-        # if the data type is NX_NUMBER, is @units defined and has *some* value?
-        if dataset.dtype in NXDL_DATA_TYPES['NX_NUMBER']:
-            title = 'field data type'
-            msg = 'data type: ' + str(dataset.dtype)
-            self.new_finding(title, dataset.name, finding.OK, msg)
-            
-            title = 'field units attribute'
-            units = self.get_hdf5_attribute(dataset, 'units')
-            t = units is not None
-            f = {True: finding.OK, False: finding.NOTE}[t]
-            msg = {True: 'exists', False: 'does not exist'}[t]
-            self.new_finding(title, dataset.name + '@units', f, msg)
-            if t:
-                t = len(units) > 0
-                f = {True: finding.OK, False: finding.NOTE}[t]
-                msg = {True: 'value: ' + units, False: 'has no value'}[t]
-                self.new_finding(title, dataset.name + '@units', f, msg)
+        self.validate_item_name(dataset.name)
 
-        self.validate_attributes(dataset, nx_class)
-
-    def validate_link(self, link, group):
+        for k, v in dataset.attrs.items():   # review the dataset's attributes
+            aname = dataset.name + '@' + k
+            self.validate_item_name(aname)
+        
+        # TODO: review the dataset's content
+        
+    def validate_NeXus_link(self, link, group):
         '''
-        check link against the specification of nxdl_classname
+        review the NeXus link: link
         
         :param obj link: instance of h5py.Group or h5py.Dataset
         :param obj group: instance of h5py.Group, needed to check against NXDL
         '''
-        target = link.attrs.get('target', None)
+        self.validate_item_name(link.name)
+
+        target = self.get_hdf5_attribute(link, 'target')
         if target is not None:
+            aname = link.name + '@target'
             target_exists = target in self.h5
             f = finding.TF_RESULT[target_exists]
             msg = {True: target, False: 'does not exist'}[target_exists]
-            self.new_finding('link target', link.name, f, msg)
-            # not necessary: match target nexus classpath and match with NXDL
+            self.new_finding('link target exists', aname, f, msg)
         else:
             self.new_finding('link', link.name, finding.ERROR, 'no target')
-
-    def validate_attributes(self, h5_obj, nxdl_class):
-        '''
-        check attributes of obj against the specification of nxdl_classname
-        
-        :param obj obj: instance of h5py object with attributes
-        :param str nxdl_class: NXDL class name
-        '''
-        if nxdl_class not in self.nxdl_dict:
-            status = finding.ERROR
-            if nxdl_class is None:
-                msg = 'NX_class is not defined'
-            else:
-                msg = 'unknown: ' + nxdl_class
-            self.new_finding('NXDL NX_class', h5_obj, status, msg)
-            return
-
-        if nxdl_class in ('NXcollection',):
-            msg = 'NXcollection content is not validated'
-            self.new_finding('NXcollection', h5_obj.name, finding.OK, msg)
-            return
-
-        nxdl_class_obj = self.nxdl_dict[nxdl_class]
-        if h5structure.isHdf5Group(h5_obj):
-            title = nxdl_class + ' attribute'
-        elif h5structure.isHdf5Dataset(h5_obj):
-            title = 'field attribute'
-        else:
-            raise ValueError('unknown object: ' + h5_obj.name)
-        tf_result = {True: finding.OK, False: finding.UNUSED}
-
-        # get list of all possible attributes from data file and NXDL spec
-        h5_attrs = h5_obj.attrs.keys() + nxdl_class_obj.attrs.keys()
-        h5_attrs = map(str, {k:None for k in h5_attrs}.keys())      # remove extras
-        if 'NX_class' in h5_attrs:
-            h5_attrs.remove('NX_class')
-
-        attributes_reviewed_elsewhere = [
-            'NX_class AXISNAME_indices signal axes axis primary units'.split()
-        ]
-        for k in sorted(h5_attrs):
-            aname = h5_obj.name + '@' + k
-            if k in attributes_reviewed_elsewhere:
-                msg = 'reviewed elsewhere'
-                self.new_finding(title, aname, finding.COMMENT, msg)
-                continue
-            data_type_checked = False
-            if k in nxdl_class_obj.attrs:
-                msg = 'defined in ' + nxdl_class
-                status = tf_result[k in h5_obj.attrs]
-
-                if k in h5_obj.attrs:                # check expected NXDL data type
-                    data_type_checked = True
-                    obj_attr = h5_obj.attrs[k]
-                    nxdl_attr = nxdl_class_obj.attrs[k]
-                    nx_type = nxdl_attr.nx_type
-                    data_type_ok = nx_type in NXDL_DATA_TYPES and type(obj_attr) in NXDL_DATA_TYPES[nx_type]
-                if status not in (finding.UNUSED,):
-                    self.new_finding(title, aname, status, msg)
-#             else:
-#                 status = finding.NOTE
-#                 msg = 'not defined in ' + nxdl_class
-#             # TODO: issue #17, need to learn *minOccurs* from NXDL
-#             msg += ' (optional)'
-            if data_type_checked:
-                msg = str(type(obj_attr)) + ' : ' + nx_type
-                if data_type_ok:
-                    f = finding.OK
-                elif aname.split('@')[-1] == 'signal' and h5structure.isNeXusDataset(h5_obj):
-                    t = type(obj_attr) in NXDL_DATA_TYPES['NX_INT']
-                    f = finding.TF_RESULT[t]
-                else:
-                    f = finding.ERROR
-                self.new_finding('NXDL NX_type', aname, f, msg)
-                        
-
-    def collect_names(self, h5_object):
-        '''
-        get the fullname of this object and any of its children
-        
-        also, check this name with the NeXus 
-        *validItemName* regular expression
-        '''
-        self.new_address(h5_object.name)
-        if not h5structure.isHdf5File(h5_object):
-            self.validate_item_name(h5_object.name)
-        for item in sorted(h5_object.attrs.keys()):
-            aname = h5_object.name + '@' + item
-            self.new_address(aname)
-            self.validate_item_name(aname)
-        
-        if h5structure.isHdf5Group(h5_object):
-            for item in sorted(h5_object):
-                obj = h5_object.get(item)
-                if h5structure.isNeXusLink(obj):
-                    # pull these out BEFORE groups & fields
-                    self.new_address(obj.name)
-                    self.validate_item_name(obj.name)
-                else:
-                    # anything else
-                    self.collect_names(obj)
 
     def validate_item_name(self, h5_addr):
         '''
@@ -862,6 +372,13 @@ class Data_File_Validator(object):
 
         # h5_addr = obj.name
         short_name = h5_addr.split('/')[-1].split('@')[-1]
+        if short_name == 'NX_class':
+            # special case
+            self.new_finding('NeXus internal attribute', 
+                             h5_addr, 
+                             finding.OK, 
+                             'marks this HDF5 group as NeXus group')
+            return
         
         # strict match: [a-z_][a-z\d_]*
         # flexible match: [A-Za-z_][\w_]*  but gets finding.WARN per manual
@@ -890,50 +407,505 @@ class Data_File_Validator(object):
                     f = finding.ERROR
 
         self.new_finding(key, h5_addr, f, msg)
-
-    def new_finding(self, test_name, h5_address, status, comment):
+    
+    def validate_default_plot(self):
         '''
-        accumulate a list of findings
-        '''
-        addr = str(h5_address)
-        f = finding.Finding(test_name, addr, status, comment)
-        self.findings.append(f)
-        if addr in self.addresses:
-            self.addresses[addr].findings.append(f)
-
-    def new_address(self, h5_address, *args, **kwargs):
-        '''
-        accumulate a dictionary of HDF5 object addresses
-        '''
-        self.addresses[h5_address] = finding.CheckupResults(h5_address)
-        self.reconstruct_classpath(h5_address)
-
-    def reconstruct_classpath(self, h5_address, *args, **kwargs):
-        '''
-        build the classpath from the h5_address
-        '''
-        path = h5_address.lstrip('/').split('@')[0]
-        if len(path) == 0:
-            return
-
-        # reconstruct the NeXus classpath
-        cp = ''     # classpath to be built
-        hp = ''     # HDF5 address to be built
-        for item in path.split('/'):
-            hp += '/' + item
-            if hp in self.h5:
-                if h5structure.isHdf5Dataset(self.h5[hp]):
-                    cp += '/' + item
-                else:
-                    obj = self.h5[hp]
-                    nx_class = self.get_hdf5_attribute(self.h5[hp], 'NX_class', '-')
-                    cp += '/' + nx_class
-        if '@' in h5_address:
-            cp += '@' + h5_address.split('@')[-1]
+        check that data file defines the default plottable data
         
-        if h5_address in self.addresses:
-            self.addresses[h5_address].classpath = cp
+        :see: http://download.nexusformat.org/doc/html/datarules.html#find-the-plottable-data
+        '''
+        candidates = self.identify_default_plot_candidates()
+        if self.default_plot_addr_v3(candidates['v3']) is not None:
+            return
+        elif self.default_plot_addr_v2(candidates['v2']) is not None:
+            return
+        elif self.default_plot_addr_v1(candidates['v1']) is not None:
+            return
+        
+        m = 'no default plot: not a NeXus file'
+        self.new_finding('NeXus default plot', '/NXentry/NXdata/field', finding.ERROR, m)
+    
+    def identify_default_plot_candidates(self):
+        '''
+        find the HDF5 addresses that might provide the default plottable data
+        
+        :see: http://download.nexusformat.org/doc/html/datarules.html#find-the-plottable-data
+        :see: http://download.nexusformat.org/doc/html/preface.html?highlight=class%20path#class-path-specification
+        
+        There are different methods to identify the default data to be plotted.
+        These can be distinguished by differences in the NeXus class path
+        (the sequence of NeXus classes and other elements that describe an object in
+        a NeXus HDF5 data file).  As used here, the text ``field`` is used
+        instead of the name of the field (as shown in the NeXus manual) but the name of the
+        attribute is given.
+        
+        ===========   =======================================
+        version       NeXus classpath signature
+        ===========   =======================================
+        v3            /NXentry/NXdata@signal
+        v3+niac2014   /@default/NXentry@default/NXdata@signal
+        v2            /NXentry/NXdata/field@signal
+        v1            /NXentry/NXdata/field@signal
+        ===========   =======================================
+        
+        Versions *v1* and *v2* differ in their use of other attributes
+        such as *axes* (v2) versus *axis* (v1) and *primary* (v1).
+        with other attributes such as */NXentry/NXdata/field2@primary*.
+        Since these other attributes are not always present, or
+        might be used to indicate alternatives, a test for *v1*
+        can fail due to both false negatives and false positives.
+        '''
+        # prepare dictionaries of candidates for the default plot
+        candidates = dict(v1 = {}, v2 = {}, v3 = {})
+        for node_name in self.h5:
+            node = self.h5[node_name]
+            if h5structure.isNeXusGroup(node, 'NXentry'):
+                for subnode_name in node:
+                    subnode = node[subnode_name]
+                    if h5structure.isNeXusGroup(subnode, 'NXdata'):
+                        if subnode.attrs.get('signal') is not None:
+                            k = subnode.name + '@signal'
+                            candidates['v3'][k] = '/NXentry/NXdata@signal'
+                        for ss_node_name in subnode:
+                            ss_node = subnode[ss_node_name]
+                            if not h5structure.isNeXusDataset(ss_node):
+                                continue
+                            if ss_node.attrs.get('signal') is not None:
+                                k = ss_node.name + '@signal'
+                                candidates['v2'][k] = '/NXentry/NXdata/field@signal'
+                                candidates['v1'][k] = '/NXentry/NXdata/field@signal'
+        return candidates
 
+    def default_plot_addr_v1(self, group_dict):
+        '''
+        return the HDF5 address of the v1 default plottable data or None
+        
+        :see: http://download.nexusformat.org/doc/html/datarules.html#version-1
+        '''
+        default_plot_addr = []
+        for primary_field_addr, nx_classpath in group_dict.items():
+            title = 'NXdata group default plot v1'
+            # need the NXdata group of this field
+            primary = self.h5[primary_field_addr.split('@')[0]]
+            nxdata_addr = '/'.join(primary.name.split('/')[:-1])
+            nxdata = self.h5[nxdata_addr]
+            signal_field_list = []
+            for field_name in nxdata:
+                field = nxdata[field_name]
+                if h5structure.isNeXusDataset(field):
+                    signal = self.get_hdf5_attribute(field, 'signal')
+                    if signal in (1, '1'):
+                        signal_field_list.append(field)
+                    else:
+                        m = 'expected @signal=1, found: ' + signal
+                        addr = field.name + '@signal'
+                        self.new_finding(title, addr, finding.ERROR, m)
+                        continue
+                # TODO: @axis, @primary, and dimension scales
+                # TODO: signal and dimension scales data shape
+
+            if len(signal_field_list) == 1:
+                m = 'NXdata group default plot using v1'
+                self.new_finding(title, signal_field_list[0], finding.OK, m)
+                default_plot_addr.append(signal_field_list[0])
+            elif len(signal_field_list) == 0:
+                m = 'NXdata group does not define a default plot using v1'
+                self.new_finding(title, nxdata_addr, finding.WARN, m)
+            else:
+                m = 'NXdata group defines more than one default plot using v1'
+                self.new_finding(title, nxdata_addr, finding.NOTE, m)
+        
+        cp = '/NXentry/NXdata/field@signal'
+        title = 'NeXus default plot v1'
+        if len(default_plot_addr) == 1:
+            m = 'NeXus data file default plot defined'
+            self.new_finding(title, default_plot_addr[0], finding.OK, m)
+            return default_plot_addr[0]
+        elif len(default_plot_addr) == 0:
+            m = 'NeXus data file does not define a default plot using v1'
+            self.new_finding(title, cp, finding.WARN, m)
+        else:
+            m = 'NeXus data file defines more than one default plot using v1'
+            self.new_finding(title, cp, finding.WARN, m)
+            return default_plot_addr
+    
+    def default_plot_addr_v2(self, group_dict):
+        '''
+        return the HDF5 address of the v2 default plottable data or None
+        
+        :see: http://download.nexusformat.org/doc/html/datarules.html#version-2
+        '''
+        default_plot_addr = []
+        for h5_addr, nx_classpath in group_dict.items():
+            title = 'NeXus default plot v2'
+            field = self.h5[h5_addr.split('@')[0]]
+            signal = self.get_hdf5_attribute(field, 'signal')
+            if signal in (1, '1'):
+                m = nx_classpath + ' = 1'
+                self.new_finding(title, field.name, finding.OK, m)
+                default_plot_addr.append(field.name)
+            else:
+                m = 'expected @signal=1, found: ' + signal
+                self.new_finding(title, h5_addr, finding.ERROR, m)
+            # TODO: @axes, @AXISNAME_indices, and dimension scales
+            # TODO: signal and dimension scales data shape
+
+        cp = '/NXentry/NXdata/field@signal'
+        title = 'NeXus default plot v2'
+        if len(default_plot_addr) == 1:
+            m = 'NeXus data file default plot defined using v2'
+            self.new_finding(title, default_plot_addr[0], finding.OK, m)
+            return default_plot_addr[0]
+        elif len(default_plot_addr) == 0:
+            m = 'NeXus data file does not define a default plot using v2'
+            self.new_finding(title, cp, finding.WARN, m)
+        else:
+            m = 'NeXus data file defines more than one default plot using v2'
+            self.new_finding(title, cp, finding.NOTE, m)
+            return default_plot_addr
+    
+    def default_plot_addr_v3(self, group_dict):
+        '''
+        return the HDF5 address of the v3 default plottable data or None
+        
+        :see: http://download.nexusformat.org/doc/html/datarules.html#version-3
+        '''
+        default_plot_addr = []
+        for h5_addr, nx_classpath in group_dict.items():
+            title = 'NXdata group default plot v3'
+            nxdata = self.h5[h5_addr.split('@')[0]]
+            signal_name = self.get_hdf5_attribute(nxdata, 'signal')
+            if signal_name not in nxdata:
+                m = 'signal field not found: ' + signal_name
+                self.new_finding(title, nx_classpath, finding.ERROR, m)
+                continue
+            m = 'signal data: ' + signal_name
+            addr = nxdata.name + '/' + signal_name
+            self.new_finding(title, addr, finding.OK, nx_classpath)
+            default_plot_addr.append(addr)
+            # TODO: @axes and dimension scales
+            # TODO: signal and dimension scales data shape
+
+        cp = '/NXentry/NXdata@signal'
+        title = 'NeXus default plot v3'
+        if len(default_plot_addr) == 1:
+            m = 'NeXus data file default plot defined using v3'
+            self.new_finding(title, default_plot_addr[0], finding.OK, m)
+            return default_plot_addr[0]
+        elif len(default_plot_addr) == 0:
+            m = 'NeXus data file does not define a default plot using v3'
+            self.new_finding(title, cp, finding.WARN, m)
+        else:
+            # use NIAC2014 terms to find unique address
+            unique_list = self.default_plot_addr_v3_niac2014(default_plot_addr)
+            if len(unique_list) == 1:
+                m = 'NeXus data file default plot defined using v3+niac2014'
+                self.new_finding(title, unique_list[0], finding.OK, m)
+                return unique_list[0]
+            else:
+                m = 'NeXus data file defines more than one default plot'
+                self.new_finding(title, cp, finding.NOTE, m)
+                return default_plot_addr
+    
+    def default_plot_addr_v3_niac2014(self, address_list):
+        '''
+        return a list of default plottable data as directed by @default attributes
+        '''
+        unique_list = []
+        for k in address_list:
+            nxentry_name = k.split('/')[1]
+            root_default = self.get_hdf5_attribute(self.h5, 'default', nxentry_name)
+            if root_default == nxentry_name:
+                nxentry = self.h5[nxentry_name]
+                nxdata_name = k.split('/')[2]
+                nxentry_default = self.get_hdf5_attribute(nxentry, 'default', nxdata_name)
+                if nxentry_default == nxdata_name:
+                    unique_list.append(k)
+        return unique_list
+    
+#     def validate_default_plot_v1(self):
+#         '''
+#         check that data file defines the default plottable data
+#         
+#         :see: http://download.nexusformat.org/doc/html/datarules.html#find-the-plottable-data
+#         '''
+#         # - - - - - - - - - -
+#         def find_NXdata_in_group(group):
+#             if h5structure.isNeXusGroup(group, 'NXdata'):
+#                 nxdata_dict[group.name] = group
+#             for h5_child in sorted(group):
+#                 h5_obj = group.get(h5_child)
+#                 if h5structure.isHdf5Group(h5_obj):
+#                     find_NXdata_in_group(h5_obj)
+#         # - - - - - - - - - -
+#         def version1(group):
+#             '''plottable data version 1
+#             
+#             :see: http://download.nexusformat.org/doc/html/datarules.html#design-findplottable-bydimnumber
+#             '''
+#             base_title = 'default plot v1'
+#             dimension_scales = []
+#             signal_count = 0
+#             for field_name in group:
+#                 field = group.get(field_name)
+#                 signal = self.get_hdf5_attribute(field, 'signal')
+#                 primary = self.get_hdf5_attribute(field, 'primary')
+#                 if signal is not None:
+#                     title = base_title + ' @signal attribute'
+#                     msg = {True: 'value: ' + str(signal), False: 'does not exist'}
+#                     self.new_finding(title, field.name + '@signal', finding.OK, msg)
+#                     try:
+#                         int_signal = int(signal)
+#                         if int_signal == 1:
+#                             signal_count += 1
+#                             title = base_title + ' @signal value checked'
+#                             self.new_finding(title, field.name + '@signal', finding.OK, 'default data')
+#                     except ValueError:
+#                         title = base_title + ' @signal value checked'
+#                         m = '@signal="' + str(signal) + '" not interpreted as integer'
+#                         self.new_finding(title, field.name + '@signal', finding.ERROR, m)
+#                 elif primary is not None:
+#                     title = base_title + ' @primary attribute'
+#                     msg = {True: 'value: ' + str(primary), False: 'does not exist'}
+#                     self.new_finding(title, field.name + '@primary', finding.OK, 'value: ' + msg)
+#                     try:
+#                         int_primary = int(primary)
+#                         if int_primary == 1:
+#                             title = base_title + ' @primary value checked'
+#                             m = 'possible dimension scale'
+#                             self.new_finding(title, field.name + '@primary', finding.OK, m)
+#                             # TODO: issue #15: verify that shape is 1-D
+#                             m = 'verify the shape is 1-D'
+#                             self.new_finding(title, field.name + '@primary', finding.TODO, m)
+#                             dimension_scales.append(field_name)
+#                     except ValueError:
+#                         title = base_title + ' @primary value checked'
+#                         m = '@primary="' + str(signal) + '" not interpreted as integer'
+#                         self.new_finding(title, field.name + '@primary', finding.ERROR, m)
+#                 title = 'field @axis attribute'
+#                 self.new_finding(title, field.name + '@axis', finding.TODO, 'not checked')
+# 
+#             if signal_count == 0:
+#                 m = 'no field marked with @signal="1"'
+#                 self.new_finding(base_title, group.name, finding.ERROR, m)
+#             elif signal_count > 1:
+#                 m = 'too many fields marked with @signal="1"'
+#                 self.new_finding(base_title, field.name, finding.ERROR, m)
+#             return signal_count == 1
+#         # - - - - - - - - - -
+#         def version2(group):
+#             '''plottable data version 2
+#             
+#             :see: http://download.nexusformat.org/doc/html/datarules.html#design-findplottable-byname
+#             '''
+#             base_title = 'default plot v2'
+#             signal_count = 0
+#             for field_name in group:
+#                 field = group.get(field_name)
+#                 signal = self.get_hdf5_attribute(field, 'signal')
+#                 t = signal is not None
+#                 if t:
+#                     title = base_title + ' @signal attribute'
+#                     msg = {True: 'value: ' + str(signal), False: 'does not exist'}[t]
+#                     self.new_finding(title, field.name + '@signal', finding.OK, 'value: ' + msg)
+#                     try:
+#                         int_signal = int(signal)
+#                         if int_signal == 1:
+#                             signal_count += 1
+#                             title = base_title + ' @signal value checked'
+#                             self.new_finding(title, field.name + '@signal', finding.OK, 'default data')
+#                     except ValueError:
+#                         title = base_title + ' @signal value checked'
+#                         m = '@signal="' + str(signal) + '" not interpreted as integer'
+#                         self.new_finding(title, field.name + '@signal', finding.ERROR, m)
+#                 title = base_title + ' @axes attribute'
+#                 # axes="axis1:xis2:xis3"
+#                 # delimiter could be either ":" or ","
+#                 self.new_finding(title, field.name + '@axes', finding.TODO, 'not checked')
+#                 
+#             return signal_count == 1
+#         # - - - - - - - - - -
+#         def version3(group):
+#             '''plottable data version 3
+#             
+#             :see: http://download.nexusformat.org/doc/html/datarules.html#design-findplottable-niac2014
+#             '''
+#             base_title = 'default plot v3'
+#             
+#             signal = self.get_hdf5_attribute(group, 'signal')
+#             t = signal is not None
+#             f = {True: finding.OK, False: finding.NOTE}[t]
+#             title = base_title + ' @signal attribute'
+#             msg = {True: 'exists', False: 'does not exist'}[t]
+#             self.new_finding(title, group.name, f, msg)
+#             if not t:
+#                 return False
+# 
+#             t = signal in group
+#             f = finding.TF_RESULT[t]
+#             title = base_title + ' @signal value'
+#             msg = {True: 'value: ' + signal, False: 'does not exist'}[t]
+#             self.new_finding(title, group.name, f, msg)
+#             if not t:
+#                 return False
+#             signal_obj = group.get(signal)
+#             signal_rank = len(signal_obj.shape)
+# 
+#             axes = self.get_hdf5_attribute(group, 'axes')
+#             t = axes is not None
+#             f = {True: finding.OK, False: finding.NOTE}[t]
+#             title = base_title + ' @axes attribute'
+#             msg = {True: 'exists', False: 'does not exist'}[t]
+#             self.new_finding(title, group.name, f, msg)
+#             if axes is not None:
+#                 for a in axes.split(','):
+#                     t = a in group and a != signal
+#                     f = finding.TF_RESULT[t]
+#                     title = base_title + ' @axes value'
+#                     msg = {True: 'value: ' + a, False: 'does not exist'}[t]
+#                     self.new_finding(title, group.name, f, 'value: ' + a)
+# 
+#                     if t:
+#                         # AXISNAME_indices
+#                         axis_index = self.get_hdf5_attribute(group, a + '_indices')
+#                         t = axis_index is not None
+#                         f = {True: finding.OK, False: finding.NOTE}[t]
+#                         gn = group.name + '@' + a + '_indices'
+#                         title = base_title + ' @AXISNAME_indices attribute'
+#                         msg = {True: 'value: ' + str(axis_index), False: 'does not exist'}[t]
+#                         self.new_finding(title, gn, f, msg)
+# 
+#                         if t:
+#                             # value of AXISNAME_indices is within the rank of the signal data
+#                             title = base_title + ' @AXISNAME_indices value'
+#                             t = 0 <= axis_index < signal_rank
+#                             f = finding.TF_RESULT[t]
+#                             msg = 'rank test: 0 <= ' + str(axis_index) + ' < ' + str(signal_rank)
+#                             self.new_finding(title, gn, f, msg)
+# 
+#             self.new_finding('default plot v3 dimension scales', group.name, finding.TODO, 'unchecked')
+#             return True
+#         # - - - - - - - - - -
+#         def niac2015_default_path(group, subgroup_class):
+#             group_default = self.get_hdf5_attribute(group, 'default')
+#             title = '@default attribute'
+#             t = group_default is not None
+#             f = {True: finding.OK, False: finding.NOTE}[t]
+#             m = {True: 'exists', False: 'does not exist'}[t]
+#             gn = group.name or '/'
+#             self.new_finding(title, gn+'@default', f, m)
+# 
+#             if t:
+#                 title = '@default value'
+#                 t = group_default in group
+#                 f = finding.TF_RESULT[t]
+#                 m = 'HDF5 item ' + {True: 'exists', False: 'does not exist'}[t]
+#                 self.new_finding(title, gn+'@default', f, m)
+#                 
+#                 if t:
+#                     title = '@default value test'
+#                     subgroup = group[group_default]
+#                     t = h5structure.isNeXusGroup(subgroup, subgroup_class)
+#                     m = 'HDF5 item is ' + subgroup_class
+#                     self.new_finding(title, gn+'@default', f, m)
+#             return group_default
+#         # - - - - - - - - - -
+#         def list_groups(parent, classname):
+#             return [c for c in parent if h5structure.isNeXusGroup(parent[c], classname)]
+#         # - - - - - - - - - -
+# 
+#         # identify the NXdata groups to check, do not treat links differently
+#         nxdata_dict = collections.OrderedDict()
+#         find_NXdata_in_group(self.h5)
+# 
+#         title = 'NXdata default plottable data'
+#         valid_nxdata_dict = collections.OrderedDict()
+#         for h5_addr, nxdata_group in nxdata_dict.items():
+#             if version3(nxdata_group):
+#                 self.new_finding(title, h5_addr, finding.OK, 'version 3')
+#                 valid_nxdata_dict[h5_addr] = nxdata_group
+#             elif version2(nxdata_group):
+#                 self.new_finding(title, h5_addr, finding.OK, 'version 2')
+#                 valid_nxdata_dict[h5_addr] = nxdata_group
+#             elif version1(nxdata_group):
+#                 self.new_finding(title, h5_addr, finding.OK, 'version 1')
+#                 valid_nxdata_dict[h5_addr] = nxdata_group
+#             else:
+#                 m = 'no default plottable data indicated'
+#                 self.new_finding(title, h5_addr, finding.ERROR, m)
+# 
+#         # search each NXentry for valid NXdata
+#         for h5_addr in sorted(self.h5):
+#             nxentry = self.h5.get(h5_addr)
+#             if h5structure.isNeXusGroup(nxentry, 'NXentry'):
+#                 count = 0
+#                 for item in sorted(nxentry):
+#                     nxdata = nxentry.get(item)
+#                     if h5structure.isNeXusGroup(nxdata, 'NXdata'):
+#                         if nxdata.name in valid_nxdata_dict.keys():
+#                             count += 1
+#                 t = count > 0
+#                 f = finding.TF_RESULT[t]
+#                 title = '/NXentry/NXdata/signal_data'
+#                 m = 'basic NeXus requirement: default plot'
+#                 m += {True: '', False: ' not'}[t] + ' described'
+#                 self.new_finding(title, nxentry.name, f, m)
+# 
+#         title = '/@default/NXentry'
+#         nxentry = niac2015_default_path(self.h5, 'NXentry')
+#         if nxentry is None:
+#             # count number of NXentry groups
+#             g = list_groups(self.h5, 'NXentry')
+#             if len(g) == 1:
+#                 nxentry = g[0]
+#                 title = '/NXentry'
+#                 m = 'no @default attribute, one NXentry group: not ambiguous'
+#                 f = finding.OK
+#             elif len(g) > 1:
+#                 nxentry = g[0]
+#                 title = '/NXentry[?]'
+#                 m = 'no @default attribute, multiple NXentry groups: ambiguous'
+#                 f = finding.NOTE
+#             else:
+#                 nxentry = None
+#                 title = '/?NeXus?'
+#                 m = 'no @default attribute, no NXentry groups: not a NeXus file'
+#                 f = finding.ERROR
+#             self.new_finding(title, self.h5.name, f, m)
+# 
+#         if nxentry is not None:
+#             if nxentry in self.h5:
+#                 #title += '/@default/NXentry@default/NXdata'
+#                 nxdata = niac2015_default_path(self.h5[nxentry], 'NXdata')
+#                 if nxdata is None:
+#                     # count number of NXdata groups
+#                     g = list_groups(self.h5[nxentry], 'NXdata')
+#                     if len(g) == 1:
+#                         nxdata = g[0]
+#                         title = title + '/NXdata'
+#                         m = 'no @default attribute, one NXdata group: not ambiguous'
+#                         f = finding.OK
+#                     elif len(g) > 1:
+#                         nxdata = g[0]
+#                         title = title + '/NXdata[?]'
+#                         m = 'no @default attribute, multiple NXdata groups: ambiguous'
+#                         f = finding.NOTE
+#                     else:
+#                         nxdata = None
+#                         m = 'no @default attribute, no NXdata groups: not a NeXus file'
+#                         f = finding.ERROR
+#                     self.new_finding(title, self.h5[nxentry].name, f, m)
+#     
+#                 if nxdata is not None:
+#                     if nxdata in self.h5[nxentry]:
+#                         m = 'absolute path to default plot'
+#                         self.new_finding(title, self.h5[nxentry][nxdata].name, finding.OK, m)
+#                     else:
+#                         m = 'NXentry group has no subgroup named: ' + nxdata
+#                         self.new_finding(title, self.h5[nxentry].name, finding.ERROR, m)
+#             else:
+#                 m = 'file root has no subgroup named: ' + nxentry
+#                 self.new_finding(title, self.h5.name, finding.ERROR, m)
 
     def get_hdf5_attribute(self, obj, attribute, default=None):
         '''
@@ -946,6 +918,44 @@ class Data_File_Validator(object):
             self.new_finding('attribute data type', gname, finding.NOTE, msg)
             a = a[0]
         return a
+
+    def reconstruct_classpath(self, h5_address, *args, **kwargs):
+        '''
+        build the classpath from the h5_address
+        '''
+        path = h5_address.lstrip('/').split('@')[0]
+        if len(path) == 0:
+            return
+ 
+        # reconstruct the NeXus classpath
+        cp = ''     # classpath to be built
+        hp = ''     # HDF5 address to be built
+        for item in path.split('/'):
+            hp += '/' + item
+            if hp in self.h5:
+                if h5structure.isHdf5Dataset(self.h5[hp]):
+                    cp += '/field'
+                else:
+                    obj = self.h5[hp]
+                    nx_class = self.get_hdf5_attribute(obj, 'NX_class', '-')
+                    cp += '/' + nx_class
+        if '@' in h5_address:
+            cp += '@' + h5_address.split('@')[-1]
+         
+        return cp
+
+    def new_finding(self, test_name, h5_address, status, comment):
+        '''
+        accumulate a list of findings
+        '''
+        addr = str(h5_address)
+        f = finding.Finding(test_name, addr, status, comment)
+        self.findings.append(f)
+        if addr not in self.addresses:
+            # accumulate a dictionary of HDF5 object addresses
+            self.addresses[addr] = finding.CheckupResults(addr)
+            self.addresses[addr].classpath = self.reconstruct_classpath(addr)
+        self.addresses[addr].findings.append(f)
     
     def report_findings(self, statuses=()):
         '''
@@ -996,8 +1006,8 @@ class Data_File_Validator(object):
         import pyRestTable
         t = pyRestTable.Table()
         t.labels = 'HDF5-address  NeXus-classpath'.split()
-        for k, v in self.classpath_dict.items():
-            t.rows.append((k, v))
+        for k, v in self.addresses.items():
+            t.rows.append((k, v.classpath))
         return t.reST()
 
 

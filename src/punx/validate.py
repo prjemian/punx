@@ -316,16 +316,23 @@ class Data_File_Validator(object):
         for k, v in dataset.attrs.items():   # review the dataset's attributes
             aname = dataset.name + '@' + k
             self.validate_item_name(aname)
-            if k in field_rules.attrs:
-                pass
+            rules = field_rules.attrs.get(k)
+            if rules is not None:
+                pass    # TODO: other validations?
         
-        # TODO: review the dataset's content
+        # review the dataset's content
         nx_class_name = self.get_hdf5_attribute(group, 'NX_class')
         if nx_class_name is not None:
             nx_class = self.nxdl_dict[nx_class_name]
-            
-            if dataset.name.split('/')[-1] in nx_class.fields:
-                pass
+            rules = nx_class.fields.get(dataset.name.split('/')[-1])
+            if rules is not None:
+                if len(rules.enum) > 0:
+                    pass    # TODO:
+                # TODO: check rules.attributes['defaults'] for type, minOccurs, nameType
+                nx_type = rules.attributes['defaults']['type']
+                mo = rules.attributes['defaults']['minOccurs']
+                specified = rules.attributes['defaults']['nameType'] == 'specified'
+                __ = None
         
     def validate_NeXus_link(self, link, group):
         '''
@@ -358,15 +365,15 @@ class Data_File_Validator(object):
             return
 
         # TODO: review with NXDL specification: nx_class_object
-        msg = 'validate with ' + nx_class_name + ' specification'
-        self.new_finding('NXDL review', group.name, finding.TODO, msg)
+        msg = 'validate with ' + nx_class_name + ' specification (incomplete)'
+        self.new_finding('NXDL review', group.name, finding.COMMENT, msg)
 
-        # TODO: validate provided, required, and optional fields
-        for field_name, field in nx_class_object.fields.items():
-            nx_type = NXDL_DATA_TYPES[field.attributes['defaults']['type']]
+        # validate provided, required, and optional fields
+        for field_name, rules in nx_class_object.fields.items():
+            nx_type = NXDL_DATA_TYPES[rules.attributes['defaults']['type']]
 
-            mo = field.attributes['defaults']['minOccurs']
-            required_name = field.attributes['defaults']['nameType'] == 'specified'
+            mo = rules.attributes['defaults']['minOccurs']
+            required_name = rules.attributes['defaults']['nameType'] == 'specified'
             target_exists = field_name in group
             if int(mo) > 0 and required_name:
                 f = {True: finding.OK, False: finding.WARN}[target_exists]
@@ -374,8 +381,15 @@ class Data_File_Validator(object):
                 m = {True: '', False: ' not'}[target_exists] + ' found'
                 nm = group.name + '/' + field_name
                 self.new_finding(nx_class_name+' required field', nm, f, m)
+                # TODO:
 
-        # TODO: validate provided, required, and optional groups (recursive as directed)
+        # validate provided, required, and optional groups (recursive as directed)
+        for group_name, rules in nx_class_object.groups.items():
+            mo = rules.attributes['defaults']['minOccurs']
+            required_name = rules.attributes['defaults']['name'] is not None
+            target_exists = group_name in group
+            if int(mo) > 0 and required_name:
+                pass        # TODO:
 
     def validate_item_name(self, h5_addr):
         '''

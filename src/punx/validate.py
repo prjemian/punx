@@ -35,15 +35,12 @@ Checkboxes indicate which steps have been implemented in code below.
 #. [x] verify attributes
 #. [x] verify file level as group using NX_class = NXroot
 #. [ ] identify any objects at root level that are not in NXroot (which is OK)
-#. [x] verify classpath exists: /NXentry/NXdata & @signal
-#. [x] verify classpath exists: NXdata & @signal
-#. [x] verify file has valid /NXentry/NXdata/signal_data
-#. [x] verify every NXentry has NXdata/signal_data
-#. [x] verify every NXdata has signal_data
+#. [x] verify default plot identified
 
     #. [x] version 1
     #. [x] version 2
     #. [x] version 3
+    #. [x] version 3+niac2014
 
 .. rubric:: Groups
 
@@ -417,10 +414,49 @@ class Data_File_Validator(object):
         
         :see: http://download.nexusformat.org/doc/html/datarules.html#find-the-plottable-data
         '''
+        candidates = self.identify_default_plot_candidates()
+        if self.default_plot_addr_v3(candidates['v3']) is not None:
+            return
+        elif self.default_plot_addr_v2(candidates['v2']) is not None:
+            return
+        elif self.default_plot_addr_v1(candidates['v1']) is not None:
+            return
+        
+        m = 'no default plot: not a NeXus file'
+        self.new_finding('NeXus default plot', '/NXentry/NXdata/field', finding.ERROR, m)
+    
+    def identify_default_plot_candidates(self):
+        '''
+        find the HDF5 addresses that might provide the default plottable data
+        
+        :see: http://download.nexusformat.org/doc/html/datarules.html#find-the-plottable-data
+        :see: http://download.nexusformat.org/doc/html/preface.html?highlight=class%20path#class-path-specification
+        
+        There are different methods to identify the default data to be plotted.
+        These can be distinguished by differences in the NeXus class path
+        (the sequence of NeXus classes and other elements that describe an object in
+        a NeXus HDF5 data file).  As used here, the text ``field`` is used
+        instead of the name of the field (as shown in the NeXus manual) but the name of the
+        attribute is given.
+        
+        ===========   =======================================
+        version       NeXus classpath signature
+        ===========   =======================================
+        v3            /NXentry/NXdata@signal
+        v3+niac2014   /@default/NXentry@default/NXdata@signal
+        v2            /NXentry/NXdata/field@signal
+        v1            /NXentry/NXdata/field@signal
+        ===========   =======================================
+        
+        Versions *v1* and *v2* differ in their use of other attributes
+        such as *axes* (v2) versus *axis* (v1) and *primary* (v1).
+        with other attributes such as */NXentry/NXdata/field2@primary*.
+        Since these other attributes are not always present, or
+        might be used to indicate alternatives, a test for *v1*
+        can fail due to both false negatives and false positives.
+        '''
         # prepare dictionaries of candidates for the default plot
-        v1 = collections.OrderedDict()
-        v2 = collections.OrderedDict()
-        v3 = collections.OrderedDict()
+        candidates = dict(v1 = {}, v2 = {}, v3 = {})
         for node_name in self.h5:
             node = self.h5[node_name]
             if h5structure.isNeXusGroup(node, 'NXentry'):
@@ -429,338 +465,447 @@ class Data_File_Validator(object):
                     if h5structure.isNeXusGroup(subnode, 'NXdata'):
                         if subnode.attrs.get('signal') is not None:
                             k = subnode.name + '@signal'
-                            v3[k] = '/NXentry/NXdata@signal'
+                            candidates['v3'][k] = '/NXentry/NXdata@signal'
                         for ss_node_name in subnode:
                             ss_node = subnode[ss_node_name]
                             if not h5structure.isNeXusDataset(ss_node):
                                 continue
                             if ss_node.attrs.get('signal') is not None:
                                 k = ss_node.name + '@signal'
-                                v2[k] = '/NXentry/NXdata/field@signal'
-                            if ss_node.attrs.get('primary') is not None:
-                                # FIXME: check this test
-                                k = subnode.name + '@primary'
-                                v1[k] = '/NXentry/NXdata/field@primary'
+                                candidates['v2'][k] = '/NXentry/NXdata/field@signal'
+                                candidates['v1'][k] = '/NXentry/NXdata/field@signal'
+        return candidates
 
-        for h5_addr, nx_classpath in v3.items():
-            title = 'NeXus default plot v3'
-            nxdata = self.h5[h5_addr.split('@')[0]]
-            signal_name = self.get_hdf5_attribute(nxdata, 'signal')
-            if signal_name not in nxdata:
-                m = 'signal field not found: ' + signal_name
-                self.new_finding(title, nx_classpath, finding.ERROR, m)
-                continue
-            # TODO: is this unique?
-            # TODO: NIAC2014 terms
-            m = 'signal data: ' + signal_name
-            self.new_finding(title, nxdata.name + '/' + signal_name, finding.OK, nx_classpath)
-            return
+    def default_plot_addr_v1(self, group_dict):
+        '''
+        return the HDF5 address of the v1 default plottable data or None
+        
+        :see: http://download.nexusformat.org/doc/html/datarules.html#version-1
+        '''
+        default_plot_addr = []
+        for primary_field_addr, nx_classpath in group_dict.items():
+            title = 'NXdata group default plot v1'
+            # need the NXdata group of this field
+            primary = self.h5[primary_field_addr.split('@')[0]]
+            nxdata_addr = '/'.join(primary.name.split('/')[:-1])
+            nxdata = self.h5[nxdata_addr]
+            signal_field_list = []
+            for field_name in nxdata:
+                field = nxdata[field_name]
+                if h5structure.isNeXusDataset(field):
+                    signal = self.get_hdf5_attribute(field, 'signal')
+                    if signal in (1, '1'):
+                        signal_field_list.append(field)
+                    else:
+                        m = 'expected @signal=1, found: ' + signal
+                        addr = field.name + '@signal'
+                        self.new_finding(title, addr, finding.ERROR, m)
+                        continue
+                # TODO: @axis, @primary, and dimension scales
+                # TODO: signal and dimension scales data shape
 
-        for h5_addr, nx_classpath in v2.items():
+            if len(signal_field_list) == 1:
+                m = 'NXdata group default plot using v1'
+                self.new_finding(title, signal_field_list[0], finding.OK, m)
+                default_plot_addr.append(signal_field_list[0])
+            elif len(signal_field_list) == 0:
+                m = 'NXdata group does not define a default plot using v1'
+                self.new_finding(title, nxdata_addr, finding.WARN, m)
+            else:
+                m = 'NXdata group defines more than one default plot using v1'
+                self.new_finding(title, nxdata_addr, finding.NOTE, m)
+        
+        cp = '/NXentry/NXdata/field@signal'
+        title = 'NeXus default plot v1'
+        if len(default_plot_addr) == 1:
+            m = 'NeXus data file default plot defined'
+            self.new_finding(title, default_plot_addr[0], finding.OK, m)
+            return default_plot_addr[0]
+        elif len(default_plot_addr) == 0:
+            m = 'NeXus data file does not define a default plot using v1'
+            self.new_finding(title, cp, finding.WARN, m)
+        else:
+            m = 'NeXus data file defines more than one default plot using v1'
+            self.new_finding(title, cp, finding.WARN, m)
+            return default_plot_addr
+    
+    def default_plot_addr_v2(self, group_dict):
+        '''
+        return the HDF5 address of the v2 default plottable data or None
+        
+        :see: http://download.nexusformat.org/doc/html/datarules.html#version-2
+        '''
+        default_plot_addr = []
+        for h5_addr, nx_classpath in group_dict.items():
             title = 'NeXus default plot v2'
             field = self.h5[h5_addr.split('@')[0]]
             signal = self.get_hdf5_attribute(field, 'signal')
             if signal in (1, '1'):
                 m = nx_classpath + ' = 1'
                 self.new_finding(title, field.name, finding.OK, m)
-                # TODO: is this unique?
-                # TODO: NIAC2014 terms
-                return
+                default_plot_addr.append(field.name)
             else:
                 m = 'expected @signal=1, found: ' + signal
                 self.new_finding(title, h5_addr, finding.ERROR, m)
+            # TODO: @axes, @AXISNAME_indices, and dimension scales
+            # TODO: signal and dimension scales data shape
+
+        cp = '/NXentry/NXdata/field@signal'
+        title = 'NeXus default plot v2'
+        if len(default_plot_addr) == 1:
+            m = 'NeXus data file default plot defined using v2'
+            self.new_finding(title, default_plot_addr[0], finding.OK, m)
+            return default_plot_addr[0]
+        elif len(default_plot_addr) == 0:
+            m = 'NeXus data file does not define a default plot using v2'
+            self.new_finding(title, cp, finding.WARN, m)
+        else:
+            m = 'NeXus data file defines more than one default plot using v2'
+            self.new_finding(title, cp, finding.NOTE, m)
+            return default_plot_addr
+    
+    def default_plot_addr_v3(self, group_dict):
+        '''
+        return the HDF5 address of the v3 default plottable data or None
+        
+        :see: http://download.nexusformat.org/doc/html/datarules.html#version-3
+        '''
+        default_plot_addr = []
+        for h5_addr, nx_classpath in group_dict.items():
+            title = 'NXdata group default plot v3'
+            nxdata = self.h5[h5_addr.split('@')[0]]
+            signal_name = self.get_hdf5_attribute(nxdata, 'signal')
+            if signal_name not in nxdata:
+                m = 'signal field not found: ' + signal_name
+                self.new_finding(title, nx_classpath, finding.ERROR, m)
                 continue
+            m = 'signal data: ' + signal_name
+            addr = nxdata.name + '/' + signal_name
+            self.new_finding(title, addr, finding.OK, nx_classpath)
+            default_plot_addr.append(addr)
+            # TODO: @axes and dimension scales
+            # TODO: signal and dimension scales data shape
 
-        for h5_addr, nx_classpath in v1.items():
-            title = 'NeXus default plot v1'
-        self.new_finding(title, h5_addr, finding.TODO, m)    # TODO:
-        
-        m = 'no default plot: not a NeXus file'
-        self.new_finding('NeXus default plot', '/NXentry/NXentry', finding.ERROR, m)
+        cp = '/NXentry/NXdata@signal'
+        title = 'NeXus default plot v3'
+        if len(default_plot_addr) == 1:
+            m = 'NeXus data file default plot defined using v3'
+            self.new_finding(title, default_plot_addr[0], finding.OK, m)
+            return default_plot_addr[0]
+        elif len(default_plot_addr) == 0:
+            m = 'NeXus data file does not define a default plot using v3'
+            self.new_finding(title, cp, finding.WARN, m)
+        else:
+            # use NIAC2014 terms to find unique address
+            unique_list = self.default_plot_addr_v3_niac2014(default_plot_addr)
+            if len(unique_list) == 1:
+                m = 'NeXus data file default plot defined using v3+niac2014'
+                self.new_finding(title, unique_list[0], finding.OK, m)
+                return unique_list[0]
+            else:
+                m = 'NeXus data file defines more than one default plot'
+                self.new_finding(title, cp, finding.NOTE, m)
+                return default_plot_addr
     
-    def validate_default_plot_v1(self):
+    def default_plot_addr_v3_niac2014(self, address_list):
         '''
-        check that data file defines the default plottable data
-        
-        :see: http://download.nexusformat.org/doc/html/datarules.html#find-the-plottable-data
+        return a list of default plottable data as directed by @default attributes
         '''
-        # - - - - - - - - - -
-        def find_NXdata_in_group(group):
-            if h5structure.isNeXusGroup(group, 'NXdata'):
-                nxdata_dict[group.name] = group
-            for h5_child in sorted(group):
-                h5_obj = group.get(h5_child)
-                if h5structure.isHdf5Group(h5_obj):
-                    find_NXdata_in_group(h5_obj)
-        # - - - - - - - - - -
-        def version1(group):
-            '''plottable data version 1
-            
-            :see: http://download.nexusformat.org/doc/html/datarules.html#design-findplottable-bydimnumber
-            '''
-            base_title = 'default plot v1'
-            dimension_scales = []
-            signal_count = 0
-            for field_name in group:
-                field = group.get(field_name)
-                signal = self.get_hdf5_attribute(field, 'signal')
-                primary = self.get_hdf5_attribute(field, 'primary')
-                if signal is not None:
-                    title = base_title + ' @signal attribute'
-                    msg = {True: 'value: ' + str(signal), False: 'does not exist'}
-                    self.new_finding(title, field.name + '@signal', finding.OK, msg)
-                    try:
-                        int_signal = int(signal)
-                        if int_signal == 1:
-                            signal_count += 1
-                            title = base_title + ' @signal value checked'
-                            self.new_finding(title, field.name + '@signal', finding.OK, 'default data')
-                    except ValueError:
-                        title = base_title + ' @signal value checked'
-                        m = '@signal="' + str(signal) + '" not interpreted as integer'
-                        self.new_finding(title, field.name + '@signal', finding.ERROR, m)
-                elif primary is not None:
-                    title = base_title + ' @primary attribute'
-                    msg = {True: 'value: ' + str(primary), False: 'does not exist'}
-                    self.new_finding(title, field.name + '@primary', finding.OK, 'value: ' + msg)
-                    try:
-                        int_primary = int(primary)
-                        if int_primary == 1:
-                            title = base_title + ' @primary value checked'
-                            m = 'possible dimension scale'
-                            self.new_finding(title, field.name + '@primary', finding.OK, m)
-                            # TODO: issue #15: verify that shape is 1-D
-                            m = 'verify the shape is 1-D'
-                            self.new_finding(title, field.name + '@primary', finding.TODO, m)
-                            dimension_scales.append(field_name)
-                    except ValueError:
-                        title = base_title + ' @primary value checked'
-                        m = '@primary="' + str(signal) + '" not interpreted as integer'
-                        self.new_finding(title, field.name + '@primary', finding.ERROR, m)
-                title = 'field @axis attribute'
-                self.new_finding(title, field.name + '@axis', finding.TODO, 'not checked')
-
-            if signal_count == 0:
-                m = 'no field marked with @signal="1"'
-                self.new_finding(base_title, group.name, finding.ERROR, m)
-            elif signal_count > 1:
-                m = 'too many fields marked with @signal="1"'
-                self.new_finding(base_title, field.name, finding.ERROR, m)
-            return signal_count == 1
-        # - - - - - - - - - -
-        def version2(group):
-            '''plottable data version 2
-            
-            :see: http://download.nexusformat.org/doc/html/datarules.html#design-findplottable-byname
-            '''
-            base_title = 'default plot v2'
-            signal_count = 0
-            for field_name in group:
-                field = group.get(field_name)
-                signal = self.get_hdf5_attribute(field, 'signal')
-                t = signal is not None
-                if t:
-                    title = base_title + ' @signal attribute'
-                    msg = {True: 'value: ' + str(signal), False: 'does not exist'}[t]
-                    self.new_finding(title, field.name + '@signal', finding.OK, 'value: ' + msg)
-                    try:
-                        int_signal = int(signal)
-                        if int_signal == 1:
-                            signal_count += 1
-                            title = base_title + ' @signal value checked'
-                            self.new_finding(title, field.name + '@signal', finding.OK, 'default data')
-                    except ValueError:
-                        title = base_title + ' @signal value checked'
-                        m = '@signal="' + str(signal) + '" not interpreted as integer'
-                        self.new_finding(title, field.name + '@signal', finding.ERROR, m)
-                title = base_title + ' @axes attribute'
-                # axes="axis1:xis2:xis3"
-                # delimiter could be either ":" or ","
-                self.new_finding(title, field.name + '@axes', finding.TODO, 'not checked')
-                
-            return signal_count == 1
-        # - - - - - - - - - -
-        def version3(group):
-            '''plottable data version 3
-            
-            :see: http://download.nexusformat.org/doc/html/datarules.html#design-findplottable-niac2014
-            '''
-            base_title = 'default plot v3'
-            
-            signal = self.get_hdf5_attribute(group, 'signal')
-            t = signal is not None
-            f = {True: finding.OK, False: finding.NOTE}[t]
-            title = base_title + ' @signal attribute'
-            msg = {True: 'exists', False: 'does not exist'}[t]
-            self.new_finding(title, group.name, f, msg)
-            if not t:
-                return False
-
-            t = signal in group
-            f = finding.TF_RESULT[t]
-            title = base_title + ' @signal value'
-            msg = {True: 'value: ' + signal, False: 'does not exist'}[t]
-            self.new_finding(title, group.name, f, msg)
-            if not t:
-                return False
-            signal_obj = group.get(signal)
-            signal_rank = len(signal_obj.shape)
-
-            axes = self.get_hdf5_attribute(group, 'axes')
-            t = axes is not None
-            f = {True: finding.OK, False: finding.NOTE}[t]
-            title = base_title + ' @axes attribute'
-            msg = {True: 'exists', False: 'does not exist'}[t]
-            self.new_finding(title, group.name, f, msg)
-            if axes is not None:
-                for a in axes.split(','):
-                    t = a in group and a != signal
-                    f = finding.TF_RESULT[t]
-                    title = base_title + ' @axes value'
-                    msg = {True: 'value: ' + a, False: 'does not exist'}[t]
-                    self.new_finding(title, group.name, f, 'value: ' + a)
-
-                    if t:
-                        # AXISNAME_indices
-                        axis_index = self.get_hdf5_attribute(group, a + '_indices')
-                        t = axis_index is not None
-                        f = {True: finding.OK, False: finding.NOTE}[t]
-                        gn = group.name + '@' + a + '_indices'
-                        title = base_title + ' @AXISNAME_indices attribute'
-                        msg = {True: 'value: ' + str(axis_index), False: 'does not exist'}[t]
-                        self.new_finding(title, gn, f, msg)
-
-                        if t:
-                            # value of AXISNAME_indices is within the rank of the signal data
-                            title = base_title + ' @AXISNAME_indices value'
-                            t = 0 <= axis_index < signal_rank
-                            f = finding.TF_RESULT[t]
-                            msg = 'rank test: 0 <= ' + str(axis_index) + ' < ' + str(signal_rank)
-                            self.new_finding(title, gn, f, msg)
-
-            self.new_finding('default plot v3 dimension scales', group.name, finding.TODO, 'unchecked')
-            return True
-        # - - - - - - - - - -
-        def niac2015_default_path(group, subgroup_class):
-            group_default = self.get_hdf5_attribute(group, 'default')
-            title = '@default attribute'
-            t = group_default is not None
-            f = {True: finding.OK, False: finding.NOTE}[t]
-            m = {True: 'exists', False: 'does not exist'}[t]
-            gn = group.name or '/'
-            self.new_finding(title, gn+'@default', f, m)
-
-            if t:
-                title = '@default value'
-                t = group_default in group
-                f = finding.TF_RESULT[t]
-                m = 'HDF5 item ' + {True: 'exists', False: 'does not exist'}[t]
-                self.new_finding(title, gn+'@default', f, m)
-                
-                if t:
-                    title = '@default value test'
-                    subgroup = group[group_default]
-                    t = h5structure.isNeXusGroup(subgroup, subgroup_class)
-                    m = 'HDF5 item is ' + subgroup_class
-                    self.new_finding(title, gn+'@default', f, m)
-            return group_default
-        # - - - - - - - - - -
-        def list_groups(parent, classname):
-            return [c for c in parent if h5structure.isNeXusGroup(parent[c], classname)]
-        # - - - - - - - - - -
-
-        # identify the NXdata groups to check, do not treat links differently
-        nxdata_dict = collections.OrderedDict()
-        find_NXdata_in_group(self.h5)
-
-        title = 'NXdata default plottable data'
-        valid_nxdata_dict = collections.OrderedDict()
-        for h5_addr, nxdata_group in nxdata_dict.items():
-            if version3(nxdata_group):
-                self.new_finding(title, h5_addr, finding.OK, 'version 3')
-                valid_nxdata_dict[h5_addr] = nxdata_group
-            elif version2(nxdata_group):
-                self.new_finding(title, h5_addr, finding.OK, 'version 2')
-                valid_nxdata_dict[h5_addr] = nxdata_group
-            elif version1(nxdata_group):
-                self.new_finding(title, h5_addr, finding.OK, 'version 1')
-                valid_nxdata_dict[h5_addr] = nxdata_group
-            else:
-                m = 'no default plottable data indicated'
-                self.new_finding(title, h5_addr, finding.ERROR, m)
-
-        # search each NXentry for valid NXdata
-        for h5_addr in sorted(self.h5):
-            nxentry = self.h5.get(h5_addr)
-            if h5structure.isNeXusGroup(nxentry, 'NXentry'):
-                count = 0
-                for item in sorted(nxentry):
-                    nxdata = nxentry.get(item)
-                    if h5structure.isNeXusGroup(nxdata, 'NXdata'):
-                        if nxdata.name in valid_nxdata_dict.keys():
-                            count += 1
-                t = count > 0
-                f = finding.TF_RESULT[t]
-                title = '/NXentry/NXdata/signal_data'
-                m = 'basic NeXus requirement: default plot'
-                m += {True: '', False: ' not'}[t] + ' described'
-                self.new_finding(title, nxentry.name, f, m)
-
-        title = '/@default/NXentry'
-        nxentry = niac2015_default_path(self.h5, 'NXentry')
-        if nxentry is None:
-            # count number of NXentry groups
-            g = list_groups(self.h5, 'NXentry')
-            if len(g) == 1:
-                nxentry = g[0]
-                title = '/NXentry'
-                m = 'no @default attribute, one NXentry group: not ambiguous'
-                f = finding.OK
-            elif len(g) > 1:
-                nxentry = g[0]
-                title = '/NXentry[?]'
-                m = 'no @default attribute, multiple NXentry groups: ambiguous'
-                f = finding.NOTE
-            else:
-                nxentry = None
-                title = '/?NeXus?'
-                m = 'no @default attribute, no NXentry groups: not a NeXus file'
-                f = finding.ERROR
-            self.new_finding(title, self.h5.name, f, m)
-
-        if nxentry is not None:
-            if nxentry in self.h5:
-                #title += '/@default/NXentry@default/NXdata'
-                nxdata = niac2015_default_path(self.h5[nxentry], 'NXdata')
-                if nxdata is None:
-                    # count number of NXdata groups
-                    g = list_groups(self.h5[nxentry], 'NXdata')
-                    if len(g) == 1:
-                        nxdata = g[0]
-                        title = title + '/NXdata'
-                        m = 'no @default attribute, one NXdata group: not ambiguous'
-                        f = finding.OK
-                    elif len(g) > 1:
-                        nxdata = g[0]
-                        title = title + '/NXdata[?]'
-                        m = 'no @default attribute, multiple NXdata groups: ambiguous'
-                        f = finding.NOTE
-                    else:
-                        nxdata = None
-                        m = 'no @default attribute, no NXdata groups: not a NeXus file'
-                        f = finding.ERROR
-                    self.new_finding(title, self.h5[nxentry].name, f, m)
+        unique_list = []
+        for k in address_list:
+            nxentry_name = k.split('/')[1]
+            root_default = self.get_hdf5_attribute(self.h5, 'default', nxentry_name)
+            if root_default == nxentry_name:
+                nxentry = self.h5[nxentry_name]
+                nxdata_name = k.split('/')[2]
+                nxentry_default = self.get_hdf5_attribute(nxentry, 'default', nxdata_name)
+                if nxentry_default == nxdata_name:
+                    unique_list.append(k)
+        return unique_list
     
-                if nxdata is not None:
-                    if nxdata in self.h5[nxentry]:
-                        m = 'absolute path to default plot'
-                        self.new_finding(title, self.h5[nxentry][nxdata].name, finding.OK, m)
-                    else:
-                        m = 'NXentry group has no subgroup named: ' + nxdata
-                        self.new_finding(title, self.h5[nxentry].name, finding.ERROR, m)
-            else:
-                m = 'file root has no subgroup named: ' + nxentry
-                self.new_finding(title, self.h5.name, finding.ERROR, m)
+#     def validate_default_plot_v1(self):
+#         '''
+#         check that data file defines the default plottable data
+#         
+#         :see: http://download.nexusformat.org/doc/html/datarules.html#find-the-plottable-data
+#         '''
+#         # - - - - - - - - - -
+#         def find_NXdata_in_group(group):
+#             if h5structure.isNeXusGroup(group, 'NXdata'):
+#                 nxdata_dict[group.name] = group
+#             for h5_child in sorted(group):
+#                 h5_obj = group.get(h5_child)
+#                 if h5structure.isHdf5Group(h5_obj):
+#                     find_NXdata_in_group(h5_obj)
+#         # - - - - - - - - - -
+#         def version1(group):
+#             '''plottable data version 1
+#             
+#             :see: http://download.nexusformat.org/doc/html/datarules.html#design-findplottable-bydimnumber
+#             '''
+#             base_title = 'default plot v1'
+#             dimension_scales = []
+#             signal_count = 0
+#             for field_name in group:
+#                 field = group.get(field_name)
+#                 signal = self.get_hdf5_attribute(field, 'signal')
+#                 primary = self.get_hdf5_attribute(field, 'primary')
+#                 if signal is not None:
+#                     title = base_title + ' @signal attribute'
+#                     msg = {True: 'value: ' + str(signal), False: 'does not exist'}
+#                     self.new_finding(title, field.name + '@signal', finding.OK, msg)
+#                     try:
+#                         int_signal = int(signal)
+#                         if int_signal == 1:
+#                             signal_count += 1
+#                             title = base_title + ' @signal value checked'
+#                             self.new_finding(title, field.name + '@signal', finding.OK, 'default data')
+#                     except ValueError:
+#                         title = base_title + ' @signal value checked'
+#                         m = '@signal="' + str(signal) + '" not interpreted as integer'
+#                         self.new_finding(title, field.name + '@signal', finding.ERROR, m)
+#                 elif primary is not None:
+#                     title = base_title + ' @primary attribute'
+#                     msg = {True: 'value: ' + str(primary), False: 'does not exist'}
+#                     self.new_finding(title, field.name + '@primary', finding.OK, 'value: ' + msg)
+#                     try:
+#                         int_primary = int(primary)
+#                         if int_primary == 1:
+#                             title = base_title + ' @primary value checked'
+#                             m = 'possible dimension scale'
+#                             self.new_finding(title, field.name + '@primary', finding.OK, m)
+#                             # TODO: issue #15: verify that shape is 1-D
+#                             m = 'verify the shape is 1-D'
+#                             self.new_finding(title, field.name + '@primary', finding.TODO, m)
+#                             dimension_scales.append(field_name)
+#                     except ValueError:
+#                         title = base_title + ' @primary value checked'
+#                         m = '@primary="' + str(signal) + '" not interpreted as integer'
+#                         self.new_finding(title, field.name + '@primary', finding.ERROR, m)
+#                 title = 'field @axis attribute'
+#                 self.new_finding(title, field.name + '@axis', finding.TODO, 'not checked')
+# 
+#             if signal_count == 0:
+#                 m = 'no field marked with @signal="1"'
+#                 self.new_finding(base_title, group.name, finding.ERROR, m)
+#             elif signal_count > 1:
+#                 m = 'too many fields marked with @signal="1"'
+#                 self.new_finding(base_title, field.name, finding.ERROR, m)
+#             return signal_count == 1
+#         # - - - - - - - - - -
+#         def version2(group):
+#             '''plottable data version 2
+#             
+#             :see: http://download.nexusformat.org/doc/html/datarules.html#design-findplottable-byname
+#             '''
+#             base_title = 'default plot v2'
+#             signal_count = 0
+#             for field_name in group:
+#                 field = group.get(field_name)
+#                 signal = self.get_hdf5_attribute(field, 'signal')
+#                 t = signal is not None
+#                 if t:
+#                     title = base_title + ' @signal attribute'
+#                     msg = {True: 'value: ' + str(signal), False: 'does not exist'}[t]
+#                     self.new_finding(title, field.name + '@signal', finding.OK, 'value: ' + msg)
+#                     try:
+#                         int_signal = int(signal)
+#                         if int_signal == 1:
+#                             signal_count += 1
+#                             title = base_title + ' @signal value checked'
+#                             self.new_finding(title, field.name + '@signal', finding.OK, 'default data')
+#                     except ValueError:
+#                         title = base_title + ' @signal value checked'
+#                         m = '@signal="' + str(signal) + '" not interpreted as integer'
+#                         self.new_finding(title, field.name + '@signal', finding.ERROR, m)
+#                 title = base_title + ' @axes attribute'
+#                 # axes="axis1:xis2:xis3"
+#                 # delimiter could be either ":" or ","
+#                 self.new_finding(title, field.name + '@axes', finding.TODO, 'not checked')
+#                 
+#             return signal_count == 1
+#         # - - - - - - - - - -
+#         def version3(group):
+#             '''plottable data version 3
+#             
+#             :see: http://download.nexusformat.org/doc/html/datarules.html#design-findplottable-niac2014
+#             '''
+#             base_title = 'default plot v3'
+#             
+#             signal = self.get_hdf5_attribute(group, 'signal')
+#             t = signal is not None
+#             f = {True: finding.OK, False: finding.NOTE}[t]
+#             title = base_title + ' @signal attribute'
+#             msg = {True: 'exists', False: 'does not exist'}[t]
+#             self.new_finding(title, group.name, f, msg)
+#             if not t:
+#                 return False
+# 
+#             t = signal in group
+#             f = finding.TF_RESULT[t]
+#             title = base_title + ' @signal value'
+#             msg = {True: 'value: ' + signal, False: 'does not exist'}[t]
+#             self.new_finding(title, group.name, f, msg)
+#             if not t:
+#                 return False
+#             signal_obj = group.get(signal)
+#             signal_rank = len(signal_obj.shape)
+# 
+#             axes = self.get_hdf5_attribute(group, 'axes')
+#             t = axes is not None
+#             f = {True: finding.OK, False: finding.NOTE}[t]
+#             title = base_title + ' @axes attribute'
+#             msg = {True: 'exists', False: 'does not exist'}[t]
+#             self.new_finding(title, group.name, f, msg)
+#             if axes is not None:
+#                 for a in axes.split(','):
+#                     t = a in group and a != signal
+#                     f = finding.TF_RESULT[t]
+#                     title = base_title + ' @axes value'
+#                     msg = {True: 'value: ' + a, False: 'does not exist'}[t]
+#                     self.new_finding(title, group.name, f, 'value: ' + a)
+# 
+#                     if t:
+#                         # AXISNAME_indices
+#                         axis_index = self.get_hdf5_attribute(group, a + '_indices')
+#                         t = axis_index is not None
+#                         f = {True: finding.OK, False: finding.NOTE}[t]
+#                         gn = group.name + '@' + a + '_indices'
+#                         title = base_title + ' @AXISNAME_indices attribute'
+#                         msg = {True: 'value: ' + str(axis_index), False: 'does not exist'}[t]
+#                         self.new_finding(title, gn, f, msg)
+# 
+#                         if t:
+#                             # value of AXISNAME_indices is within the rank of the signal data
+#                             title = base_title + ' @AXISNAME_indices value'
+#                             t = 0 <= axis_index < signal_rank
+#                             f = finding.TF_RESULT[t]
+#                             msg = 'rank test: 0 <= ' + str(axis_index) + ' < ' + str(signal_rank)
+#                             self.new_finding(title, gn, f, msg)
+# 
+#             self.new_finding('default plot v3 dimension scales', group.name, finding.TODO, 'unchecked')
+#             return True
+#         # - - - - - - - - - -
+#         def niac2015_default_path(group, subgroup_class):
+#             group_default = self.get_hdf5_attribute(group, 'default')
+#             title = '@default attribute'
+#             t = group_default is not None
+#             f = {True: finding.OK, False: finding.NOTE}[t]
+#             m = {True: 'exists', False: 'does not exist'}[t]
+#             gn = group.name or '/'
+#             self.new_finding(title, gn+'@default', f, m)
+# 
+#             if t:
+#                 title = '@default value'
+#                 t = group_default in group
+#                 f = finding.TF_RESULT[t]
+#                 m = 'HDF5 item ' + {True: 'exists', False: 'does not exist'}[t]
+#                 self.new_finding(title, gn+'@default', f, m)
+#                 
+#                 if t:
+#                     title = '@default value test'
+#                     subgroup = group[group_default]
+#                     t = h5structure.isNeXusGroup(subgroup, subgroup_class)
+#                     m = 'HDF5 item is ' + subgroup_class
+#                     self.new_finding(title, gn+'@default', f, m)
+#             return group_default
+#         # - - - - - - - - - -
+#         def list_groups(parent, classname):
+#             return [c for c in parent if h5structure.isNeXusGroup(parent[c], classname)]
+#         # - - - - - - - - - -
+# 
+#         # identify the NXdata groups to check, do not treat links differently
+#         nxdata_dict = collections.OrderedDict()
+#         find_NXdata_in_group(self.h5)
+# 
+#         title = 'NXdata default plottable data'
+#         valid_nxdata_dict = collections.OrderedDict()
+#         for h5_addr, nxdata_group in nxdata_dict.items():
+#             if version3(nxdata_group):
+#                 self.new_finding(title, h5_addr, finding.OK, 'version 3')
+#                 valid_nxdata_dict[h5_addr] = nxdata_group
+#             elif version2(nxdata_group):
+#                 self.new_finding(title, h5_addr, finding.OK, 'version 2')
+#                 valid_nxdata_dict[h5_addr] = nxdata_group
+#             elif version1(nxdata_group):
+#                 self.new_finding(title, h5_addr, finding.OK, 'version 1')
+#                 valid_nxdata_dict[h5_addr] = nxdata_group
+#             else:
+#                 m = 'no default plottable data indicated'
+#                 self.new_finding(title, h5_addr, finding.ERROR, m)
+# 
+#         # search each NXentry for valid NXdata
+#         for h5_addr in sorted(self.h5):
+#             nxentry = self.h5.get(h5_addr)
+#             if h5structure.isNeXusGroup(nxentry, 'NXentry'):
+#                 count = 0
+#                 for item in sorted(nxentry):
+#                     nxdata = nxentry.get(item)
+#                     if h5structure.isNeXusGroup(nxdata, 'NXdata'):
+#                         if nxdata.name in valid_nxdata_dict.keys():
+#                             count += 1
+#                 t = count > 0
+#                 f = finding.TF_RESULT[t]
+#                 title = '/NXentry/NXdata/signal_data'
+#                 m = 'basic NeXus requirement: default plot'
+#                 m += {True: '', False: ' not'}[t] + ' described'
+#                 self.new_finding(title, nxentry.name, f, m)
+# 
+#         title = '/@default/NXentry'
+#         nxentry = niac2015_default_path(self.h5, 'NXentry')
+#         if nxentry is None:
+#             # count number of NXentry groups
+#             g = list_groups(self.h5, 'NXentry')
+#             if len(g) == 1:
+#                 nxentry = g[0]
+#                 title = '/NXentry'
+#                 m = 'no @default attribute, one NXentry group: not ambiguous'
+#                 f = finding.OK
+#             elif len(g) > 1:
+#                 nxentry = g[0]
+#                 title = '/NXentry[?]'
+#                 m = 'no @default attribute, multiple NXentry groups: ambiguous'
+#                 f = finding.NOTE
+#             else:
+#                 nxentry = None
+#                 title = '/?NeXus?'
+#                 m = 'no @default attribute, no NXentry groups: not a NeXus file'
+#                 f = finding.ERROR
+#             self.new_finding(title, self.h5.name, f, m)
+# 
+#         if nxentry is not None:
+#             if nxentry in self.h5:
+#                 #title += '/@default/NXentry@default/NXdata'
+#                 nxdata = niac2015_default_path(self.h5[nxentry], 'NXdata')
+#                 if nxdata is None:
+#                     # count number of NXdata groups
+#                     g = list_groups(self.h5[nxentry], 'NXdata')
+#                     if len(g) == 1:
+#                         nxdata = g[0]
+#                         title = title + '/NXdata'
+#                         m = 'no @default attribute, one NXdata group: not ambiguous'
+#                         f = finding.OK
+#                     elif len(g) > 1:
+#                         nxdata = g[0]
+#                         title = title + '/NXdata[?]'
+#                         m = 'no @default attribute, multiple NXdata groups: ambiguous'
+#                         f = finding.NOTE
+#                     else:
+#                         nxdata = None
+#                         m = 'no @default attribute, no NXdata groups: not a NeXus file'
+#                         f = finding.ERROR
+#                     self.new_finding(title, self.h5[nxentry].name, f, m)
+#     
+#                 if nxdata is not None:
+#                     if nxdata in self.h5[nxentry]:
+#                         m = 'absolute path to default plot'
+#                         self.new_finding(title, self.h5[nxentry][nxdata].name, finding.OK, m)
+#                     else:
+#                         m = 'NXentry group has no subgroup named: ' + nxdata
+#                         self.new_finding(title, self.h5[nxentry].name, finding.ERROR, m)
+#             else:
+#                 m = 'file root has no subgroup named: ' + nxentry
+#                 self.new_finding(title, self.h5.name, finding.ERROR, m)
 
     def get_hdf5_attribute(self, obj, attribute, default=None):
         '''

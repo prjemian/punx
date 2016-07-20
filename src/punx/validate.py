@@ -386,10 +386,22 @@ class Data_File_Validator(object):
         # validate provided, required, and optional groups (recursive as directed)
         for group_name, rules in nx_class_object.groups.items():
             mo = rules.attributes['defaults']['minOccurs']
-            required_name = rules.attributes['defaults']['name'] is not None
-            target_exists = group_name in group
-            if int(mo) > 0 and required_name:
-                pass        # TODO:
+            if int(mo) > 0:
+                if rules.attributes['defaults']['name'] is not None:
+                    nm = group.name + '/' + group_name
+                    t = group_name in group
+                    f = {True: finding.OK, False: finding.WARN}[t]
+                    m = rules.NX_class + {True: ' found', False: ' not found'}[t]
+                    self.new_finding(nx_class_name+' required group', nm, f, m)
+                else:
+                    matches = [node for node in group.values() if h5structure.isNeXusGroup(node, rules.NX_class)]
+                    if len(matches) < int(mo):
+                        nm = group.name
+                        m = 'must have at least ' + str(mo) + ' group: ' + rules.NX_class 
+                        f = finding.WARN
+                        self.new_finding(nx_class_name+' required group', nm, f, m)
+            # TODO: what else?
+                       
 
     def validate_item_name(self, h5_addr):
         '''

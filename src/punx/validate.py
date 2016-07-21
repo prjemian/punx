@@ -84,8 +84,8 @@ Checkboxes indicate which steps have been implemented in code below.
 #. [ ] is name flexible?
 #. [ ] observe attributes: minOccurs maxOccurs
 #. [ ] is deprecated?
-#. [ ] is units attribute defined?
-#. [ ] check units are consistent against NXDL
+#. [x] is units attribute defined?
+#. [x] check units are consistent against NXDL
 #. [ ] check data shape against NXDL
 #. [ ] check data type against NXDL
 #. [ ] check for attributes defined by NXDL
@@ -320,6 +320,19 @@ class Data_File_Validator(object):
             if rules is not None:
                 pass    # TODO: other validations?
         
+        # check the units of numerical fields
+        if dataset.dtype in NXDL_DATA_TYPES['NX_NUMBER']:
+            title = 'field units attribute'
+            units = self.get_hdf5_attribute(dataset, 'units')
+            t = units is not None
+            f = {True: finding.OK, False: finding.NOTE}[t]
+            msg = {True: 'exists', False: 'does not exist'}[t]
+            if t:
+                t = len(units) > 0
+                f = {True: finding.OK, False: finding.NOTE}[t]
+                msg = {True: 'value: ' + units, False: 'has no value'}[t]
+            self.new_finding(title, dataset.name + '@units', f, msg)
+
         # review the dataset's content
         nx_class_name = self.get_hdf5_attribute(group, 'NX_class')
         if nx_class_name is not None:
@@ -333,7 +346,7 @@ class Data_File_Validator(object):
                 mo = rules.attributes['defaults']['minOccurs']
                 specified = rules.attributes['defaults']['nameType'] == 'specified'
                 __ = None
-        
+                        
     def validate_NeXus_link(self, link, group):
         '''
         review the NeXus link: link
@@ -366,7 +379,7 @@ class Data_File_Validator(object):
 
         # TODO: review with NXDL specification: nx_class_object
         msg = 'validate with ' + nx_class_name + ' specification (incomplete)'
-        self.new_finding('NXDL review', group.name, finding.COMMENT, msg)
+        self.new_finding('NXDL review', group.name, finding.TODO, msg)
 
         # validate provided, required, and optional fields
         for field_name, rules in nx_class_object.fields.items():

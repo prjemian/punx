@@ -252,6 +252,8 @@ class Data_File_Validator(object):
         review the HDF5 group: group
 
         :param obj group: instance of h5py.File of h5py.Group
+        
+        Verify that items presented in data file are valid.
         '''
         nx_class_name = self.get_hdf5_attribute(group, 'NX_class')
         if nx_class_name is None:
@@ -272,6 +274,15 @@ class Data_File_Validator(object):
             f = finding.TF_RESULT[t]
             msg = nx_class_name + {True: ' is ', False: ' is not '}[t] + 'known'
             self.new_finding('@NX_class known', aname, f, msg)
+        
+        nx_class_object = self.nxdl_dict[nx_class_name]
+        #ignoreExtraAttributes = nx_class_object.attributes['defaults']['ignoreExtraAttributes']
+        #ignoreExtraFields = nx_class_object.attributes['defaults']['ignoreExtraFields']
+        #ignoreExtraGroups = nx_class_object.attributes['defaults']['ignoreExtraGroups']
+        for item in 'ignoreExtraAttributes ignoreExtraFields ignoreExtraGroups'.split():
+            if nx_class_object.attributes['defaults'][item]:
+                msg = 'True'
+                self.new_finding(nx_class_name+'@'+item, group.name, finding.TODO, msg)
         
         # NeXus special case
         if nx_class_name == 'NXcollection':
@@ -308,17 +319,24 @@ class Data_File_Validator(object):
         review the HDF5 dataset: dataset
 
         :param obj dataset: instance of h5py.Dataset
-        :param obj group: instance of h5py.Group, needed to check against NXDL
+        :param obj group: instance of h5py.Group or h5py.File, needed to check against NXDL
         '''
         self.validate_item_name(dataset.name)
         field_rules = self.nxdl_rules.nxdl.children['field']
+        nx_class_name = self.get_hdf5_attribute(group, 'NX_class')
+        nx_class_object = self.nxdl_dict[nx_class_name]
 
         for k, v in dataset.attrs.items():   # review the dataset's attributes
             aname = dataset.name + '@' + k
             self.validate_item_name(aname)
-            rules = field_rules.attrs.get(k)
-            if rules is not None:
+            if k in field_rules.attrs:
+                rules = field_rules.attrs[k]
                 pass    # TODO: other validations?
+            else:
+                if k not in ('target',):    # could be one end of a link
+                    if not nx_class_object.attributes['defaults']['ignoreExtraAttributes']:
+                        msg = 'attribute not defined in NXDL'
+                        self.new_finding(nx_class_name + '@' + k, aname, finding.NOTE, msg)
         
         # check the units of numerical fields
         if dataset.dtype in NXDL_DATA_TYPES['NX_NUMBER']:
@@ -332,6 +350,9 @@ class Data_File_Validator(object):
                 f = {True: finding.OK, False: finding.NOTE}[t]
                 msg = {True: 'value: ' + units, False: 'has no value'}[t]
             self.new_finding(title, dataset.name + '@units', f, msg)
+
+        # check the type of this field
+        # https://github.com/prjemian/punx/blob/b595fdf9910dbab113cfe8febbb37e6c5b48d74f/src/punx/validate.py#L761
 
         # review the dataset's content
         nx_class_name = self.get_hdf5_attribute(group, 'NX_class')
@@ -372,6 +393,8 @@ class Data_File_Validator(object):
 
         :param obj group: instance of h5py.Group or h5py.File
         :param str nx_class_name: name of a NeXus NXDL class
+        
+        Verify that items specified in NXDL file are present in the data file.
         '''
         nx_class_object = self.nxdl_dict.get(nx_class_name)
         if nx_class_object is None:
@@ -599,7 +622,7 @@ class Data_File_Validator(object):
                 m = 'NXdata group defines more than one default plot using v1'
                 self.new_finding(title, nxdata_addr, finding.NOTE, m)
         
-        cp = '/NXentry/NXdata/field@signal'
+        cp = 'NXdata/field@signal'
         title = 'NeXus default plot v1'
         if len(default_plot_addr) == 1:
             m = 'NeXus data file default plot defined'
@@ -634,7 +657,7 @@ class Data_File_Validator(object):
             # TODO: @axes, @AXISNAME_indices, and dimension scales    (see issue #41)
             # TODO: signal and dimension scales data shape
 
-        cp = '/NXentry/NXdata/field@signal'
+        cp = 'NXdata/field@signal'
         title = 'NeXus default plot v2'
         if len(default_plot_addr) == 1:
             m = 'NeXus data file default plot defined using v2'
@@ -664,17 +687,18 @@ class Data_File_Validator(object):
                 self.new_finding(title, nx_classpath, finding.ERROR, m)
                 continue
             #m = 'signal data: ' + signal_name
-            m = nx_classpath + ' = ' + signal_name
+            # m = nx_classpath + ' = ' + signal_name
+            m = 'NXdata@signal = ' + signal_name
             addr = nxdata.name + '/' + signal_name
             self.new_finding(title, addr, finding.OK, m)
             default_plot_addr.append(addr)
             # TODO: @axes and dimension scales    (see issue #41)
             # TODO: signal and dimension scales data shape
 
-        cp = '/NXentry/NXdata@signal'
+        cp = 'NXdata@signal'
         title = 'NeXus default plot v3'
         if len(default_plot_addr) == 1:
-            m = 'NeXus data file default plot defined using v3'
+            m = 'NeXus data file default plot: /NXentry/NXdata@signal'
             self.new_finding(title, default_plot_addr[0], finding.OK, m)
             return default_plot_addr[0]
         elif len(default_plot_addr) == 0:

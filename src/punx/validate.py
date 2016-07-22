@@ -255,12 +255,12 @@ class Data_File_Validator(object):
         
         Verify that items presented in data file are valid.
         '''
-        nx_class_name = self.get_hdf5_attribute(group, 'NX_class')
+        nx_class_name = self.get_hdf5_attribute(group, 'NX_class', report=True)
         if nx_class_name is None:
             if isinstance(group, h5py.File):
                 nx_class_name = 'NXroot'
-                msg = 'assuming file root is NeXus base class: NXroot'
-                self.new_finding('@NX_class exists', group.name, finding.OK, msg)
+                msg = 'file root: NXroot'
+                self.new_finding('@NX_class assumed', group.name, finding.OK, msg)
             else:
                 self.validate_item_name(group.name)
                 msg = 'no @NX_class attribute, not a NeXus group'
@@ -275,14 +275,12 @@ class Data_File_Validator(object):
             msg = nx_class_name + {True: ' is ', False: ' is not '}[t] + 'known'
             self.new_finding('@NX_class known', aname, f, msg)
         
-        nx_class_object = self.nxdl_dict[nx_class_name]
-        #ignoreExtraAttributes = nx_class_object.attributes['defaults']['ignoreExtraAttributes']
-        #ignoreExtraFields = nx_class_object.attributes['defaults']['ignoreExtraFields']
-        #ignoreExtraGroups = nx_class_object.attributes['defaults']['ignoreExtraGroups']
-        for item in 'ignoreExtraAttributes ignoreExtraFields ignoreExtraGroups'.split():
-            if nx_class_object.attributes['defaults'][item]:
-                msg = 'True'
-                self.new_finding(nx_class_name+'@'+item, group.name, finding.TODO, msg)
+        nx_class_object = self.nxdl_dict.get(nx_class_name)
+        if nx_class_object is not None:
+            for item in 'ignoreExtraAttributes ignoreExtraFields ignoreExtraGroups'.split():
+                if nx_class_object.attributes['defaults'][item]:
+                    msg = 'True'
+                    self.new_finding(nx_class_name+'@'+item, group.name, finding.TODO, msg)
         
         # NeXus special case
         if nx_class_name == 'NXcollection':
@@ -290,7 +288,7 @@ class Data_File_Validator(object):
             self.new_finding('NXcollection group', group.name, finding.OK, msg)
             return
         
-        for k, v in group.attrs.items():   # review the group's attributes
+        for k in group.attrs.keys():   # review the group's attributes
             if k not in ('NX_class',):
                 aname = group.name + '@' + k
                 self.validate_item_name(aname)
@@ -324,24 +322,35 @@ class Data_File_Validator(object):
         self.validate_item_name(dataset.name)
         field_rules = self.nxdl_rules.nxdl.children['field']
         nx_class_name = self.get_hdf5_attribute(group, 'NX_class')
-        nx_class_object = self.nxdl_dict[nx_class_name]
+        nx_class_object = self.nxdl_dict.get(nx_class_name)
 
-        for k, v in dataset.attrs.items():   # review the dataset's attributes
+        for k in dataset.attrs.keys():   # review the dataset's attributes
             aname = dataset.name + '@' + k
             self.validate_item_name(aname)
+            v = self.get_hdf5_attribute(dataset, k, report=True)
             if k in field_rules.attrs:
                 rules = field_rules.attrs[k]
+                if len(rules.enum) > 0:
+                    t = v in rules.enum
+                    f = {True: finding.OK, False: finding.WARN}[t]
+                    msg = 'value=' + v
+                    if t:
+                        msg += ' :recognized'
+                    else:
+                        msg += ' : expected one of these: ' + '|'.join(rules.enum)
+                    self.new_finding('enumeration: @' + k, aname, f, msg)
                 pass    # TODO: other validations?
             else:
                 if k not in ('target',):    # could be one end of a link
-                    if not nx_class_object.attributes['defaults']['ignoreExtraAttributes']:
-                        msg = 'attribute not defined in NXDL'
-                        self.new_finding(nx_class_name + '@' + k, aname, finding.NOTE, msg)
+                    if nx_class_object is not None:
+                        if not nx_class_object.attributes['defaults']['ignoreExtraAttributes']:
+                            msg = 'attribute not defined in NXDL'
+                            self.new_finding(nx_class_name + '@' + k, aname, finding.NOTE, msg)
         
         # check the units of numerical fields
         if dataset.dtype in NXDL_DATA_TYPES['NX_NUMBER']:
-            title = 'field units attribute'
-            units = self.get_hdf5_attribute(dataset, 'units')
+            title = 'field@units'
+            units = self.get_hdf5_attribute(dataset, 'units', report=True)
             t = units is not None
             f = {True: finding.OK, False: finding.NOTE}[t]
             msg = {True: 'exists', False: 'does not exist'}[t]
@@ -350,13 +359,17 @@ class Data_File_Validator(object):
                 f = {True: finding.OK, False: finding.NOTE}[t]
                 msg = {True: 'value: ' + units, False: 'has no value'}[t]
             self.new_finding(title, dataset.name + '@units', f, msg)
+            
+            # TODO: issue #13: check field dimensions against "rank" attribute 
+            shape = dataset.shape
+            __ = None   # used as a NOP breakpoint after previous definition
 
         # check the type of this field
         # https://github.com/prjemian/punx/blob/b595fdf9910dbab113cfe8febbb37e6c5b48d74f/src/punx/validate.py#L761
 
         # review the dataset's content
         nx_class_name = self.get_hdf5_attribute(group, 'NX_class')
-        if nx_class_name is not None:
+        if nx_class_name in self.nxdl_dict:
             nx_class = self.nxdl_dict[nx_class_name]
             rules = nx_class.fields.get(dataset.name.split('/')[-1])
             if rules is not None:
@@ -377,7 +390,7 @@ class Data_File_Validator(object):
         '''
         self.validate_item_name(link.name)
 
-        target = self.get_hdf5_attribute(link, 'target')
+        target = self.get_hdf5_attribute(link, 'target', report=True)
         if target is not None:
             aname = link.name + '@target'
             target_exists = target in self.h5
@@ -402,7 +415,7 @@ class Data_File_Validator(object):
 
         # TODO: review with NXDL specification: nx_class_object
         msg = 'validate with ' + nx_class_name + ' specification (incomplete)'
-        self.new_finding('NXDL review', group.name, finding.TODO, msg)
+        self.new_finding('NXDL review: '+nx_class_name, group.name, finding.TODO, msg)
 
         # validate provided, required, and optional fields
         for field_name, rules in nx_class_object.fields.items():
@@ -598,7 +611,7 @@ class Data_File_Validator(object):
             for field_name in nxdata:
                 field = nxdata[field_name]
                 if h5structure.isNeXusDataset(field):
-                    signal = self.get_hdf5_attribute(field, 'signal')
+                    signal = self.get_hdf5_attribute(field, 'signal', report=True)
                     if signal is None:
                         continue
                     elif signal in (1, '1'):
@@ -646,7 +659,7 @@ class Data_File_Validator(object):
         for h5_addr, nx_classpath in group_dict.items():
             title = 'NeXus default plot v2'
             field = self.h5[h5_addr.split('@')[0]]
-            signal = self.get_hdf5_attribute(field, 'signal')
+            signal = self.get_hdf5_attribute(field, 'signal', report=True)
             if signal in (1, '1'):
                 m = nx_classpath + ' = 1'
                 self.new_finding(title, field.name, finding.OK, m)
@@ -681,7 +694,7 @@ class Data_File_Validator(object):
         for h5_addr, nx_classpath in group_dict.items():
             title = 'NXdata group default plot v3'
             nxdata = self.h5[h5_addr.split('@')[0]]
-            signal_name = self.get_hdf5_attribute(nxdata, 'signal')
+            signal_name = self.get_hdf5_attribute(nxdata, 'signal', report=True)
             if signal_name not in nxdata:
                 m = 'signal field not found: ' + signal_name
                 self.new_finding(title, nx_classpath, finding.ERROR, m)
@@ -736,15 +749,21 @@ class Data_File_Validator(object):
                     unique_list.append(k)
         return unique_list
 
-    def get_hdf5_attribute(self, obj, attribute, default=None):
+    def get_hdf5_attribute(self, obj, attribute, default=None, report=False):
         '''
         HDF5 attribute strings might be coded in several ways
+        
+        :param obj obj: instance of h5py.File, h5py.Group, or h5py.Dataset
+        :param str attribute: name of requested attribute
+        :param obj default: value if attribute not found (usually str)
+        :param bool report: check & report if value is a variable length string (actually an ndarray)
         '''
         a = obj.attrs.get(attribute, default)
         if isinstance(a, numpy.ndarray):
-            gname = obj.name + '@' + attribute
-            msg = '[variable length string]: ' + str(a)
-            self.new_finding('attribute data type', gname, finding.NOTE, msg)
+            if report:
+                gname = obj.name + '@' + attribute
+                msg = '[variable length string]: ' + str(a)
+                self.new_finding('attribute data type', gname, finding.NOTE, msg)
             a = a[0]
         return a
 

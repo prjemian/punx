@@ -239,6 +239,7 @@ class Data_File_Validator(object):
         # advisory changed to finding.NOTE
         p = CustomNxdlPattern(self, 'validItemName-strict', r'[a-z_][a-z0-9_]*')
         self.patterns[p.name] = p
+        self.__unique_findings__ = {}
         
     def validate(self):
         '''
@@ -798,10 +799,21 @@ class Data_File_Validator(object):
     def new_finding(self, test_name, h5_address, status, comment):
         '''
         accumulate a list of findings
+        
+        :param str test_name: brief name of this test
+        :param str h5_address: HDF5 address
+        :param obj status: instance of finding.ValidationResultStatus,
+                should be the same text as other instances of this test
+        :param str comment: free-form explanation
         '''
         addr = str(h5_address)
+        unique_key = addr + ':' + test_name
+        if unique_key in self.__unique_findings__:
+            # ensure that each test is only recorded once
+            return
         f = finding.Finding(test_name, addr, status, comment)
         self.findings.append(f)
+        self.__unique_findings__[unique_key] = f
         if addr not in self.addresses:
             # accumulate a dictionary of HDF5 object addresses
             self.addresses[addr] = finding.CheckupResults(addr)

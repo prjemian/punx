@@ -88,7 +88,7 @@ Checkboxes indicate which steps have been implemented in code below.
 #. [x] check units are consistent against NXDL
 #. [ ] check data shape against NXDL
 #. [ ] check data type against NXDL
-#. [ ] check for attributes defined by NXDL
+#. [x] check for attributes defined by NXDL
 #. [ ] check AXISNAME_indices are each within signal data rank
 
 .. rubric:: Attributes
@@ -377,7 +377,8 @@ class Data_File_Validator(object):
                     pass    # TODO:
                 # TODO: check rules.attributes['defaults'] for type, minOccurs, nameType
                 nx_type = rules.attributes['defaults']['type']
-                mo = rules.attributes['defaults']['minOccurs']
+                minO = rules.attributes['defaults']['minOccurs']
+                maxO = rules.attributes['defaults']['maxOccurs']
                 specified = rules.attributes['defaults']['nameType'] == 'specified'
                 __ = None
                         
@@ -421,10 +422,11 @@ class Data_File_Validator(object):
         for field_name, rules in nx_class_object.fields.items():
             nx_type = NXDL_DATA_TYPES[rules.attributes['defaults']['type']]
 
-            mo = rules.attributes['defaults']['minOccurs']
+            minO = rules.attributes['defaults']['minOccurs']
+            maxO = rules.attributes['defaults']['maxOccurs']
             required_name = rules.attributes['defaults']['nameType'] == 'specified'
             target_exists = field_name in group
-            if int(mo) > 0 and required_name:
+            if int(minO) > 0 and required_name:
                 f = {True: finding.OK, False: finding.WARN}[target_exists]
                 finding.TF_RESULT[target_exists]
                 m = {True: '', False: ' not'}[target_exists] + ' found'
@@ -434,8 +436,9 @@ class Data_File_Validator(object):
 
         # validate provided, required, and optional groups (recursive as directed)
         for group_name, rules in nx_class_object.groups.items():
-            mo = rules.attributes['defaults']['minOccurs']
-            if int(mo) > 0:
+            minO = rules.attributes['defaults']['minOccurs']
+            maxO = rules.attributes['defaults']['maxOccurs']
+            if int(minO) > 0:
                 if rules.attributes['defaults']['name'] is not None:
                     nm = group.name + '/' + group_name
                     t = group_name in group
@@ -444,9 +447,9 @@ class Data_File_Validator(object):
                     self.new_finding(nx_class_name+' required group', nm, f, m)
                 else:
                     matches = [node for node in group.values() if h5structure.isNeXusGroup(node, rules.NX_class)]
-                    if len(matches) < int(mo):
+                    if len(matches) < int(minO):
                         nm = group.name
-                        m = 'must have at least ' + str(mo) + ' group: ' + rules.NX_class 
+                        m = 'must have at least ' + str(minO) + ' group: ' + rules.NX_class 
                         f = finding.WARN
                         self.new_finding(nx_class_name+' required group', nm, f, m)
             # TODO: what else?

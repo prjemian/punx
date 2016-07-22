@@ -50,7 +50,6 @@ Checkboxes indicate which steps have been implemented in code below.
 #. [ ] is name flexible?
 #. [ ] What to do with NXDL symbol tables?
 #. [ ] observe attributes: minOccurs maxOccurs
-#. [ ] is deprecated?
 #. [ ] special cases:
 
     #. [ ] NXentry
@@ -83,7 +82,6 @@ Checkboxes indicate which steps have been implemented in code below.
 #. [x] compare name with pattern
 #. [ ] is name flexible?
 #. [ ] observe attributes: minOccurs maxOccurs
-#. [ ] is deprecated?
 #. [x] is units attribute defined?
 #. [x] check units are consistent against NXDL
 #. [ ] check data shape against NXDL
@@ -340,11 +338,12 @@ class Data_File_Validator(object):
                     else:
                         msg += ' : expected one of these: ' + '|'.join(rules.enum)
                     self.new_finding('enumeration: @' + k, aname, f, msg)
-                pass    # TODO: other validations?
             else:
-                if k not in ('target',):    # could be one end of a link
-                    if nx_class_object is not None:
-                        if not nx_class_object.attributes['defaults']['ignoreExtraAttributes']:
+                if k not in ('target',):  # link target attribute checked elsewhere
+                    if nx_class_object is not None: # only check if NXDL exists
+                        if nx_class_object.attributes['defaults']['ignoreExtraAttributes']:
+                            pass        # so, ignore this one
+                        else:
                             msg = 'attribute not defined in NXDL'
                             self.new_finding(nx_class_name + '@' + k, aname, finding.NOTE, msg)
         

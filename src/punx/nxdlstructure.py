@@ -392,7 +392,7 @@ class NX_field(NX_mixin):
             s += ' = ' + ' | '.join(self.enum)
         return s
     
-    def field_dimensions( self, parent):
+    def field_dimensions(self, parent):
         '''
         '''
         node_list = parent.xpath('nx:dimensions', namespaces=get_ns_dict())

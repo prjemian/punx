@@ -21,6 +21,8 @@ validate NeXus NXDL and HDF5 data files
    ~CustomNxdlPattern
    ~Data_File_Validator
 
+.. rubric:: CHECKLIST
+
 These are considerata for the validation of NeXus HDF5 data files.
 Compare these validation steps with rules and documentation
 in the NeXus manual and the XML Schema files (``nxdl.xsd`` and ``nxdlTypes.xsd``).
@@ -60,9 +62,9 @@ Checkboxes indicate which steps have been implemented in code below.
 #. [ ] check for items defined by NX_class
 #. [ ] check for items required by NX_class
 #. [ ] check for items not defined by NX_class
-#. [ ] observe NXDL setting: ignoreExtraGroups
-#. [ ] observe NXDL setting: ignoreExtraFields
-#. [ ] observe NXDL setting: ignoreExtraAttributes
+#. [x] observe NXDL setting: ignoreExtraGroups
+#. [x] observe NXDL setting: ignoreExtraFields
+#. [x] observe NXDL setting: ignoreExtraAttributes
 #. [x] validate any attributes
 #. [x] validate any links
 #. [x] validate any fields
@@ -95,12 +97,6 @@ Checkboxes indicate which steps have been implemented in code below.
 #. [ ] is deprecated?
 #. [ ] check data type against NXDL
 #. [ ] check nxdl.xsd for how to handle these attributes regarding finding.WARN
-
-    #. [ ] restricts
-    #. [ ] ignoreExtraGroups
-    #. [ ] ignoreExtraFields
-    #. [ ] ignoreExtraAttributes
-
 '''
 
 import collections
@@ -275,41 +271,46 @@ class Data_File_Validator(object):
             self.new_finding('@NX_class known', aname, f, msg)
         
         nx_class_object = self.nxdl_dict.get(nx_class_name)
-        if nx_class_object is not None:
-            for item in 'ignoreExtraAttributes ignoreExtraFields ignoreExtraGroups'.split():
-                if nx_class_object.attributes['defaults'][item]:
-                    msg = 'True'
-                    self.new_finding(nx_class_name+'@'+item, group.name, finding.TODO, msg)
-        
-        # NeXus special case
-        if nx_class_name == 'NXcollection':
-            msg = 'NXcollection content will not be validated'
-            self.new_finding('NXcollection group', group.name, finding.OK, msg)
-            return
         
         for k in group.attrs.keys():   # review the group's attributes
             if k not in ('NX_class',):
-                aname = group.name + '@' + k
-                self.validate_item_name(aname)
+                if not nx_class_object.attributes['defaults']['ignoreExtraAttributes']:
+                    aname = group.name + '@' + k
+                    self.validate_item_name(aname)
 
         for child_name in group:           # review the group's children
             child = group[child_name]
             if h5structure.isNeXusLink(child):
-                self.validate_NeXus_link(child, group)
+                if nx_class_object.attributes['defaults']['ignoreExtraGroups']:
+                    title = nx_class_name+'@ignoreExtraGroups'
+                    msg = 'link ignored due to group attribute setting'
+                    self.new_finding(title, child.name, finding.OK, msg)
+                else:
+                    self.validate_NeXus_link(child, group)
             elif h5structure.isHdf5Group(child):
-                self.validate_HDF5_group(child)
+                if nx_class_object.attributes['defaults']['ignoreExtraGroups']:
+                    title = nx_class_name+'@ignoreExtraGroups'
+                    msg = 'subgroup ignored due to group attribute setting'
+                    self.new_finding(title, child.name, finding.OK, msg)
+                else:
+                    self.validate_HDF5_group(child)
             elif h5structure.isHdf5Dataset(child):
-                self.validate_HDF5_dataset(child, group)
+                if nx_class_object.attributes['defaults']['ignoreExtraFields']:
+                    title = nx_class_name+'@ignoreExtraFields'
+                    msg = 'field ignored due to group attribute setting'
+                    self.new_finding(title, child.name, finding.OK, msg)
+                else:
+                    self.validate_HDF5_dataset(child, group)
             else:
                 msg = 'unexpected: ' + child.name
                 raise ValueError(msg)
         
         self.validate_NXDL_specification(group, nx_class_name)
-        if nx_class_name in ('NXsubentry', 'NXentry') and 'definition' in group:
-            # application definition masquerading as NXentry or NXsubentry
-            app_def_name = group['definition'][0]
-            # TODO: need special handling for application definitions
-            self.validate_NXDL_specification(group, app_def_name)
+        # FIXME: need special handling for application definitions
+#         if nx_class_name in ('NXsubentry', 'NXentry') and 'definition' in group:
+#             # application definition masquerading as NXentry or NXsubentry
+#             app_def_name = group['definition'][0]
+#             self.validate_NXDL_specification(group, app_def_name)
    
     def validate_HDF5_dataset(self, dataset, group):
         '''

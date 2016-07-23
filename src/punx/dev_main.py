@@ -63,7 +63,7 @@ def datafile_prep():
     ''' '''
     # sys.argv.append('data/writer_1_3.hdf5')
     # sys.argv.append('data/writer_2_1.hdf5')
-    sys.argv.append('data/chopper.nxs')
+    # sys.argv.append('data/chopper.nxs')
     # sys.argv.append('data/compression.h5')
     # sys.argv.append('data/prj_test.nexus.hdf5')
     # sys.argv.append('data/scan101.nxs')
@@ -72,6 +72,7 @@ def datafile_prep():
     # sys.argv.append('data/verysimple.nx5')
     # sys.argv.append('data/1998spheres.h5')
     # sys.argv.append('data/cs_af1410.h5')
+    sys.argv.append('data/USAXS_flyScan_GC_M4_NewD_15.h5')
 
 
 if __name__ == '__main__':

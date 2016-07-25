@@ -1,81 +1,41 @@
-console> punx validate d:\apps\python\lib\site-packages\punx\data\writer_1_3.hdf5
+console> punx validate C:\Users\shoun\Apps\Anaconda\lib\site-packages\punx\data\writer_1_3.hdf5
 Validation findings
 :file: writer_1_3.hdf5
 :validation results shown:  COMMENT, ERROR, NOTE, OK, TODO, UNUSED, WARN
-============================ =========================================== ======= ===============================================
-address                      validation                                  status  comment(s)                                     
-============================ =========================================== ======= ===============================================
-/                            validate all names                          COMMENT ----------                                     
-/Scan                        validItemName                               NOTE    relaxed re: [A-Za-z_][\w_]*                    
-/Scan@NX_class               validItemName                               NOTE    relaxed re: [A-Za-z_][\w_]*                    
-/Scan/data                   validItemName-strict                        OK      strict re: [a-z_][a-z0-9_]*                    
-/Scan/data@NX_class          validItemName                               NOTE    relaxed re: [A-Za-z_][\w_]*                    
-/Scan/data@axes              validItemName-strict                        OK      strict re: [a-z_][a-z0-9_]*                    
-/Scan/data@signal            validItemName-strict                        OK      strict re: [a-z_][a-z0-9_]*                    
-/Scan/data@two_theta_indices validItemName-strict                        OK      strict re: [a-z_][a-z0-9_]*                    
-/Scan/data/counts            validItemName-strict                        OK      strict re: [a-z_][a-z0-9_]*                    
-/Scan/data/counts@units      validItemName-strict                        OK      strict re: [a-z_][a-z0-9_]*                    
-/Scan/data/two_theta         validItemName-strict                        OK      strict re: [a-z_][a-z0-9_]*                    
-/Scan/data/two_theta@units   validItemName-strict                        OK      strict re: [a-z_][a-z0-9_]*                    
-/                            validate all objects                        COMMENT ----------                                     
-/Scan                        NX_class known                              OK      value: NXentry                                 
-/Scan                        NXDL known                                  OK      NXentry                                        
-/Scan/data                   NXentry subgroup                            OK      NXdata                                         
-/Scan/data                   NX_class known                              OK      value: NXdata                                  
-/Scan/data                   NXDL known                                  OK      NXdata                                         
-/Scan/data@axes              NXdata attribute                            OK      defined in NXdata                              
-/Scan/data@axes              NXDL NX_type                                OK      <type 'str'> : NX_CHAR                         
-/Scan/data@signal            NXdata attribute                            OK      defined in NXdata                              
-/Scan/data@signal            NXDL NX_type                                OK      <type 'str'> : NX_CHAR                         
-/Scan/data/counts            NXdata defined field                        OK      acceptable                                     
-/Scan/data/counts            NXdata field                                TODO    need to complete check with NXDL               
-/Scan/data/two_theta         NXdata defined field                        OK      acceptable                                     
-/Scan/data/two_theta         NXdata field                                TODO    need to complete check with NXDL               
-/Scan/data@axes              NXdata attribute                            OK      defined in NXdata                              
-/Scan/data@axes              NXDL NX_type                                OK      <type 'str'> : NX_CHAR                         
-/Scan/data@signal            NXdata attribute                            OK      defined in NXdata                              
-/Scan/data@signal            NXDL NX_type                                OK      <type 'str'> : NX_CHAR                         
-/Scan/data/counts            field data type                             OK      data type: int32                               
-/Scan/data/counts@units      field units attribute                       OK      exists                                         
-/Scan/data/counts@units      field units attribute                       OK      value: counts                                  
-/Scan/data/two_theta         field data type                             OK      data type: float64                             
-/Scan/data/two_theta@units   field units attribute                       OK      exists                                         
-/Scan/data/two_theta@units   field units attribute                       OK      value: degrees                                 
-/                            review file root with NXroot                COMMENT ----------                                     
-/                            NXDL known                                  OK      NXroot                                         
-/Scan                        NXroot subgroup                             OK      NXentry                                        
-/                            check for default plot                      COMMENT ----------                                     
-/Scan/data                   default plot v3 @signal attribute           OK      exists                                         
-/Scan/data                   default plot v3 @signal value               OK      value: counts                                  
-/Scan/data                   default plot v3 @axes attribute             OK      exists                                         
-/Scan/data                   default plot v3 @axes value                 OK      value: two_theta                               
-/Scan/data@two_theta_indices attribute data type                         NOTE    [variable length string]: [0]                  
-/Scan/data@two_theta_indices default plot v3 @AXISNAME_indices attribute OK      value: 0                                       
-/Scan/data@two_theta_indices default plot v3 @AXISNAME_indices value     OK      rank test: 0 <= 0 < 1                          
-/Scan/data                   default plot v3 dimension scales            TODO    unchecked                                      
-/Scan/data                   NXdata default plottable data               OK      version 3                                      
-/Scan                        /NXentry/NXdata/signal_data                 OK      basic NeXus requirement: default plot described
-/@default                    @default attribute                          NOTE    does not exist                                 
-============================ =========================================== ======= ===============================================
+==================== ============================ ====== ====================================================
+address              validation                   status comment(s)
+==================== ============================ ====== ====================================================
+/                    @NX_class assumed            OK     file root: NXroot
+/Scan                validItemName                NOTE   relaxed re: [A-Za-z_][\w_]*
+/Scan@NX_class       @NX_class known              OK     NXentry is known
+/Scan/data           validItemName-strict         OK     strict re: [a-z_][a-z0-9_]*
+/Scan/data@NX_class  @NX_class known              OK     NXdata is known
+/Scan/data/counts    NXdata@ignoreExtraFields     OK     field ignored due to group attribute setting
+/Scan/data/two_theta NXdata@ignoreExtraFields     OK     field ignored due to group attribute setting
+/Scan/data           NXDL review: NXdata          TODO   validate with NXdata specification (incomplete)
+/Scan                NXDL review: NXentry         TODO   validate with NXentry specification (incomplete)
+/                    NXDL review: NXroot          TODO   validate with NXroot specification (incomplete)
+/Scan/data/counts    NXdata group default plot v3 OK     NXdata@signal = counts
+/Scan/data/counts    NeXus default plot v3        OK     NeXus data file default plot: /NXentry/NXdata@signal
+==================== ============================ ====== ====================================================
 
 summary statistics
 ======= ===== ===========================================================
-status  count description                                                
+status  count description
 ======= ===== ===========================================================
-OK      39    meets NeXus specification                                  
-NOTE    5     does not meet NeXus specification, but acceptable          
+OK      8     meets NeXus specification
+NOTE    1     does not meet NeXus specification, but acceptable
 WARN    0     does not meet NeXus specification, not generally acceptable
-ERROR   0     violates NeXus specification                               
-TODO    3     validation not implemented yet                             
-UNUSED  0     optional NeXus item not used in data file                  
-COMMENT 4     comment from the punx source code                          
---      --    --                                                         
-TOTAL   51    --                                                         
+ERROR   0     violates NeXus specification
+TODO    3     validation not implemented yet
+UNUSED  0     optional NeXus item not used in data file
+COMMENT 0     comment from the punx source code
+--      --    --
+TOTAL   12    --
 ======= ===== ===========================================================
 
-
-console> punx structure d:\apps\python\lib\site-packages\punx\data\writer_1_3.hdf5
-d:\apps\python\lib\site-packages\punx\data\writer_1_3.hdf5 : NeXus data file
+console> punx structure C:\Users\shoun\Apps\Anaconda\lib\site-packages\punx\data\writer_1_3.hdf5
+C:\Users\shoun\Apps\Anaconda\lib\site-packages\punx\data\writer_1_3.hdf5 : NeXus data file
   Scan:NXentry
     @NX_class = NXentry
     data:NXdata

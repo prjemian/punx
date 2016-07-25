@@ -438,11 +438,14 @@ def get_nxdl_xsd():
     global __singleton_nxdl_xsd__
 
     if __singleton_nxdl_xsd__ is None:
-        xsd_file_name = abs_NXDL_filename(NXDL_SCHEMA_FILE)
+        try:
+            xsd_file_name = abs_NXDL_filename(NXDL_SCHEMA_FILE)
+        except __init__.FileNotFound, _exc:
+            raise __init__.SchemaNotFound(_exc)
 
         if not os.path.exists(xsd_file_name):
             msg = 'Could not find XML Schema file: ' + xsd_file_name
-            raise IOError(msg)
+            raise __init__.SchemaNotFound(msg)
     
         __singleton_nxdl_xsd__ = lxml.etree.parse(xsd_file_name)
 

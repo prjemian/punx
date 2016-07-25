@@ -96,11 +96,13 @@ CONSOLE_ONLY = -1
 DEFAULT_LOG_LEVEL = INFO
 
 class FileNotFound(Exception): 
-    'custom exception '
-    pass
+    'custom exception'
+
 class HDF5_Open_Error(Exception): 
-    'custom exception '
-    pass
+    'custom exception'
+
+class SchemaNotFound(Exception): 
+    'custom exception'
 
 
 import os

@@ -76,7 +76,7 @@ Checkboxes indicate which steps have been implemented in code below.
 .. rubric:: Fields
 
 #. [x] compare name with pattern
-#. [ ] is name flexible?
+#. [x] is name flexible?
 #. [ ] observe attribute: minOccurs
 #. [x] is units attribute defined?
 #. [x] check units are consistent against NXDL
@@ -248,12 +248,12 @@ class Data_File_Validator(object):
         if nx_class_name is None:
             if isinstance(group, h5py.File):
                 nx_class_name = 'NXroot'
-                msg = 'file root: NXroot'
-                self.new_finding('@NX_class assumed', group.name, finding.OK, msg)
+                msg = 'file root (assumed): NXroot'
+                self.new_finding('@NX_class', group.name, finding.OK, msg)
             else:
                 self.validate_item_name(group.name)
                 msg = 'no @NX_class attribute, not a NeXus group'
-                self.new_finding('@NX_class exists', group.name, finding.NOTE, msg)
+                self.new_finding('@NX_class', group.name, finding.NOTE, msg)
                 return  # evaluate any further?
         else:
             self.validate_item_name(group.name)
@@ -261,8 +261,8 @@ class Data_File_Validator(object):
             aname = group.name + '@NX_class'
             t = nx_class_name in self.nxdl_dict
             f = finding.TF_RESULT[t]
-            msg = nx_class_name + {True: ' is ', False: ' is not '}[t] + 'known'
-            self.new_finding('@NX_class known', aname, f, msg)
+            msg = {True: 'known: ', False: 'unknown: '}[t] + nx_class_name
+            self.new_finding('@NX_class', aname, f, msg)
         
         nx_class_object = self.nxdl_dict.get(nx_class_name)
         
@@ -370,14 +370,17 @@ class Data_File_Validator(object):
             if rules is not None:
                 if len(rules.enum) > 0:
                     pass    # TODO:
-                # TODO: check rules.attributes['defaults'] for type, minOccurs, nameType
-                nx_type = rules.attributes['defaults']['type']
-                minO = rules.attributes['defaults']['minOccurs']
+                defaults = rules.attributes['defaults']
+                # TODO: check defaults for type, minOccurs, nameType
+                nx_type = defaults['type']
+                minO = defaults['minOccurs']
                 # in either case, validation of maxOccurs for datasets is not informative
                 # HDF5 will not allow more than one instance of a name within a group
-                # maxOccurs: is either 1 of, if name is flexible, unbounded
-                specified = rules.attributes['defaults']['nameType'] == 'specified'
-                __ = None
+                # maxOccurs: is either 1 or, if name is flexible, unbounded
+                isSpecifiedName = defaults['nameType'] == 'specified'
+                f = finding.NOTE
+                msg = 'name is ' + {True: 'specified', False: 'flexible'}[isSpecifiedName]
+                self.new_finding('@nameType', dataset.name, f, msg)
                         
     def validate_NeXus_link(self, link, group):
         '''
@@ -413,7 +416,7 @@ class Data_File_Validator(object):
 
         # TODO: review with NXDL specification: nx_class_object
         msg = 'validate with ' + nx_class_name + ' specification (incomplete)'
-        self.new_finding('NXDL review: '+nx_class_name, group.name, finding.TODO, msg)
+        self.new_finding('NXDL review', group.name, finding.TODO, msg)
 
         # validate provided, required, and optional fields
         for field_name, rules in nx_class_object.fields.items():

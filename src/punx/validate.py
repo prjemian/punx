@@ -51,14 +51,8 @@ Checkboxes indicate which steps have been implemented in code below.
 #. [x] verify NX_class in nxdl_dict
 #. [ ] is name flexible?
 #. [ ] What to do with NXDL symbol tables?
-#. [ ] observe attributes: minOccurs maxOccurs
-#. [ ] special cases:
-
-    #. [ ] NXentry
-    #. [ ] NXsubentry
-    #. [ ] NXdata
-    #. [x] NXcollection
-
+#. [x] observe attribute: minOccurs
+#. [ ] observe attribute: maxOccurs
 #. [ ] check for items defined by NX_class
 #. [ ] check for items required by NX_class
 #. [ ] check for items not defined by NX_class
@@ -83,7 +77,7 @@ Checkboxes indicate which steps have been implemented in code below.
 
 #. [x] compare name with pattern
 #. [ ] is name flexible?
-#. [ ] observe attributes: minOccurs maxOccurs
+#. [ ] observe attribute: minOccurs
 #. [x] is units attribute defined?
 #. [x] check units are consistent against NXDL
 #. [ ] check data shape against NXDL
@@ -379,7 +373,9 @@ class Data_File_Validator(object):
                 # TODO: check rules.attributes['defaults'] for type, minOccurs, nameType
                 nx_type = rules.attributes['defaults']['type']
                 minO = rules.attributes['defaults']['minOccurs']
-                maxO = rules.attributes['defaults']['maxOccurs']
+                # in either case, validation of maxOccurs for datasets is not informative
+                # HDF5 will not allow more than one instance of a name within a group
+                # maxOccurs: is either 1 of, if name is flexible, unbounded
                 specified = rules.attributes['defaults']['nameType'] == 'specified'
                 __ = None
                         
@@ -453,6 +449,8 @@ class Data_File_Validator(object):
                         m = 'must have at least ' + str(minO) + ' group: ' + rules.NX_class 
                         f = finding.WARN
                         self.new_finding(nx_class_name+' required group', nm, f, m)
+            if maxO == 'unbounded':
+                pass
             # TODO: what else?
                        
 

@@ -88,7 +88,6 @@ Checkboxes indicate which steps have been implemented in code below.
 .. rubric:: Attributes
 
 #. [x] compare name with pattern
-#. [ ] is deprecated?
 #. [ ] check data type against NXDL
 #. [ ] check nxdl.xsd for how to handle these attributes regarding finding.WARN
 '''
@@ -432,12 +431,16 @@ class Data_File_Validator(object):
         # TODO: review with NXDL specification: nx_class_object
         msg = 'validate with ' + nx_class_name + ' specification (incomplete)'
         self.new_finding('NXDL review', group.name, finding.TODO, msg)
+        
+        # TODO: group attributes
 
         # validate provided, required, and optional fields
         for field_name, rules in nx_class_object.fields.items():
+            # TODO: field attributes
             defaults = rules.attributes['defaults']
             nx_type = NXDL_DATA_TYPES[defaults['type']]
 
+            deprecated = defaults['deprecated']
             minO = defaults['minOccurs']
             maxO = defaults['maxOccurs']
             required_name = defaults['nameType'] == 'specified'
@@ -453,6 +456,8 @@ class Data_File_Validator(object):
         # validate provided, required, and optional groups (recursive as directed)
         for group_name, rules in nx_class_object.groups.items():
             defaults = rules.attributes['defaults']
+
+            deprecated = defaults['deprecated']
             minO = defaults['minOccurs']
             maxO = defaults['maxOccurs']
             if int(minO) > 0:

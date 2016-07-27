@@ -56,9 +56,9 @@ Checkboxes indicate which steps have been implemented in code below.
 #. [ ] check for items defined by NX_class
 #. [ ] check for items required by NX_class
 #. [ ] check for items not defined by NX_class
-#. [x] observe NXDL setting: ignoreExtraGroups
-#. [x] observe NXDL setting: ignoreExtraFields
-#. [x] observe NXDL setting: ignoreExtraAttributes
+#. [x] observe NXDL specification: ignoreExtraGroups
+#. [x] observe NXDL specification: ignoreExtraFields
+#. [x] observe NXDL specification: ignoreExtraAttributes
 #. [x] validate any attributes
 #. [x] validate any links
 #. [x] validate any fields
@@ -267,38 +267,46 @@ class Data_File_Validator(object):
         nx_class_object = self.nxdl_dict.get(nx_class_name)
         if nx_class_object is None:
             msg = 'ignoring content in group not defined by NeXus'
-            self.new_finding('not NeXus', group.name, finding.NOTE, msg)
+            self.new_finding('not NeXus group', group.name, finding.UNUSED, msg)
             return  # ignore content in HDF5 groups that are not NeXus classes
 
         nx_class_defaults = nx_class_object.attributes['defaults']
         
         for k in group.attrs.keys():   # review the group's attributes
-            if k not in ('NX_class',):
+            if k in ('NX_class', ):
+                pass    # handled elsewhere
+            else:
+                aname = group.name + '@' + k
                 if not nx_class_defaults['ignoreExtraAttributes']:
-                    aname = group.name + '@' + k
                     self.validate_item_name(aname)
+                if k == 'default' and nx_class_name in ('NXroot', 'NXentry', 'NXsubentry'):
+                    target = self.get_hdf5_attribute(group, 'default')
+                    t = target in group
+                    f = finding.TF_RESULT[t]
+                    msg = {True: 'exists: ', False: 'does not exist: '}[t] + target
+                    self.new_finding('default plot group', aname, f, msg)
 
         for child_name in group:           # review the group's children
             child = group[child_name]
             if h5structure.isNeXusLink(child):
                 if nx_class_defaults['ignoreExtraGroups']:
                     title = nx_class_name+'@ignoreExtraGroups'
-                    msg = 'link ignored due to group attribute setting'
-                    self.new_finding(title, child.name, finding.OK, msg)
+                    msg = 'link ignored per NXDL specification'
+                    self.new_finding(title, child.name, finding.UNUSED, msg)
                 else:
                     self.validate_NeXus_link(child, group)
             elif h5structure.isHdf5Group(child):
                 if nx_class_defaults['ignoreExtraGroups']:
                     title = nx_class_name+'@ignoreExtraGroups'
-                    msg = 'subgroup ignored due to group attribute setting'
-                    self.new_finding(title, child.name, finding.OK, msg)
+                    msg = 'subgroup ignored per NXDL specification'
+                    self.new_finding(title, child.name, finding.UNUSED, msg)
                 else:
                     self.validate_HDF5_group(child)
             elif h5structure.isHdf5Dataset(child):
                 if nx_class_defaults['ignoreExtraFields']:
                     title = nx_class_name+'@ignoreExtraFields'
-                    msg = 'field ignored due to group attribute setting'
-                    self.new_finding(title, child.name, finding.OK, msg)
+                    msg = 'field ignored per NXDL specification'
+                    self.new_finding(title, child.name, finding.UNUSED, msg)
                 else:
                     self.validate_HDF5_dataset(child, group)
             else:
@@ -343,7 +351,8 @@ class Data_File_Validator(object):
                 if k not in ('target',):  # link target attribute checked elsewhere
                     if nx_class_object is not None: # only check if NXDL exists
                         if nx_class_object.attributes['defaults']['ignoreExtraAttributes']:
-                            pass        # so, ignore this one
+                            msg = 'attribute ignored per NXDL specification'
+                            self.new_finding(nx_class_name + '@ignoreExtraAttributes', aname, finding.NOTE, msg)
                         else:
                             msg = 'attribute not defined in NXDL'
                             self.new_finding(nx_class_name + '@' + k, aname, finding.NOTE, msg)
@@ -881,7 +890,6 @@ class Data_File_Validator(object):
         for k, v in self.addresses.items():
             t.rows.append((k, v.classpath))
         return t.reST()
-
 
 if __name__ == '__main__':
     print "Start this module using:  python main.py validate ..."

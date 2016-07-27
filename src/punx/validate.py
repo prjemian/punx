@@ -265,31 +265,37 @@ class Data_File_Validator(object):
             self.new_finding('@NX_class', aname, f, msg)
         
         nx_class_object = self.nxdl_dict.get(nx_class_name)
+        if nx_class_object is None:
+            msg = 'ignoring content in group not defined by NeXus'
+            self.new_finding('not NeXus', group.name, finding.NOTE, msg)
+            return  # ignore content in HDF5 groups that are not NeXus classes
+
+        nx_class_defaults = nx_class_object.attributes['defaults']
         
         for k in group.attrs.keys():   # review the group's attributes
             if k not in ('NX_class',):
-                if not nx_class_object.attributes['defaults']['ignoreExtraAttributes']:
+                if not nx_class_defaults['ignoreExtraAttributes']:
                     aname = group.name + '@' + k
                     self.validate_item_name(aname)
 
         for child_name in group:           # review the group's children
             child = group[child_name]
             if h5structure.isNeXusLink(child):
-                if nx_class_object.attributes['defaults']['ignoreExtraGroups']:
+                if nx_class_defaults['ignoreExtraGroups']:
                     title = nx_class_name+'@ignoreExtraGroups'
                     msg = 'link ignored due to group attribute setting'
                     self.new_finding(title, child.name, finding.OK, msg)
                 else:
                     self.validate_NeXus_link(child, group)
             elif h5structure.isHdf5Group(child):
-                if nx_class_object.attributes['defaults']['ignoreExtraGroups']:
+                if nx_class_defaults['ignoreExtraGroups']:
                     title = nx_class_name+'@ignoreExtraGroups'
                     msg = 'subgroup ignored due to group attribute setting'
                     self.new_finding(title, child.name, finding.OK, msg)
                 else:
                     self.validate_HDF5_group(child)
             elif h5structure.isHdf5Dataset(child):
-                if nx_class_object.attributes['defaults']['ignoreExtraFields']:
+                if nx_class_defaults['ignoreExtraFields']:
                     title = nx_class_name+'@ignoreExtraFields'
                     msg = 'field ignored due to group attribute setting'
                     self.new_finding(title, child.name, finding.OK, msg)
@@ -371,12 +377,12 @@ class Data_File_Validator(object):
                 if len(rules.enum) > 0:
                     pass    # TODO:
                 defaults = rules.attributes['defaults']
-                # TODO: check defaults for type, minOccurs, nameType
-                nx_type = defaults['type']
-                minO = defaults['minOccurs']
+                nx_type = defaults['type']      # TODO: check for this
+                minO = defaults['minOccurs']    # TODO: check for this
                 # in either case, validation of maxOccurs for datasets is not informative
                 # HDF5 will not allow more than one instance of a name within a group
                 # maxOccurs: is either 1 or, if name is flexible, unbounded
+
                 isSpecifiedName = defaults['nameType'] == 'specified'
                 f = finding.NOTE
                 msg = 'name is ' + {True: 'specified', False: 'flexible'}[isSpecifiedName]
@@ -420,11 +426,12 @@ class Data_File_Validator(object):
 
         # validate provided, required, and optional fields
         for field_name, rules in nx_class_object.fields.items():
-            nx_type = NXDL_DATA_TYPES[rules.attributes['defaults']['type']]
+            defaults = rules.attributes['defaults']
+            nx_type = NXDL_DATA_TYPES[defaults['type']]
 
-            minO = rules.attributes['defaults']['minOccurs']
-            maxO = rules.attributes['defaults']['maxOccurs']
-            required_name = rules.attributes['defaults']['nameType'] == 'specified'
+            minO = defaults['minOccurs']
+            maxO = defaults['maxOccurs']
+            required_name = defaults['nameType'] == 'specified'
             target_exists = field_name in group
             if int(minO) > 0 and required_name:
                 f = {True: finding.OK, False: finding.WARN}[target_exists]
@@ -436,10 +443,11 @@ class Data_File_Validator(object):
 
         # validate provided, required, and optional groups (recursive as directed)
         for group_name, rules in nx_class_object.groups.items():
-            minO = rules.attributes['defaults']['minOccurs']
-            maxO = rules.attributes['defaults']['maxOccurs']
+            defaults = rules.attributes['defaults']
+            minO = defaults['minOccurs']
+            maxO = defaults['maxOccurs']
             if int(minO) > 0:
-                if rules.attributes['defaults']['name'] is not None:
+                if defaults['name'] is not None:
                     nm = group.name + '/' + group_name
                     t = group_name in group
                     f = {True: finding.OK, False: finding.WARN}[t]

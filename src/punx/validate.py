@@ -77,13 +77,13 @@ Checkboxes indicate which steps have been implemented in code below.
 
 #. [x] compare name with pattern
 #. [x] is name flexible?
-#. [ ] observe attribute: minOccurs
+#. [x] observe attribute: minOccurs
 #. [x] is units attribute defined?
 #. [x] check units are consistent against NXDL
-#. [ ] check data shape against NXDL
-#. [ ] check data type against NXDL
+#. [x] check data shape against NXDL
+#. [x] check data type against NXDL
 #. [x] check for attributes defined by NXDL
-#. [ ] check AXISNAME_indices are each within signal data rank
+#. [x] check AXISNAME_indices are each within signal data rank
 
 .. rubric:: Attributes
 
@@ -441,10 +441,11 @@ class Data_File_Validator(object):
         '''
         nx_class_name = self.get_hdf5_attribute(group, 'NX_class')
         defaults = rules.attributes['defaults']
+        target_exists = subgroup_name in group
 
         deprecated = defaults['deprecated']
         if deprecated is not None:
-            if subgroup_name in group:
+            if target_exists:
                 obj = group[subgroup_name]
                 nm = '/'.join(nx_class_name, subgroup_name) + '@deprecated'
                 self.new_finding(nm, obj.name, finding.NOTE, deprecated)
@@ -454,9 +455,8 @@ class Data_File_Validator(object):
         if int(minO) > 0:
             if defaults['name'] is not None:
                 nm = group.name + '/' + subgroup_name
-                t = subgroup_name in group
-                f = {True: finding.OK, False: finding.WARN}[t]
-                m = rules.NX_class + {True: ' found', False: ' not found'}[t]
+                f = {True: finding.OK, False: finding.WARN}[target_exists]
+                m = rules.NX_class + {True: ' found', False: ' not found'}[target_exists]
                 self.new_finding(nx_class_name+' required group', nm, f, m)
             else:
                 matches = [node for node in group.values() if h5structure.isNeXusGroup(node, rules.NX_class)]
@@ -483,26 +483,40 @@ class Data_File_Validator(object):
         # TODO: field attributes
         defaults = rules.attributes['defaults']
         nx_type = NXDL_DATA_TYPES[defaults['type']]
+        target_exists = field_name in group
+        if target_exists:
+            dataset = group[field_name]
+        else:
+            dataset = None
 
         deprecated = defaults['deprecated']
         if deprecated is not None:
-            if field_name in group:
-                dataset = group[field_name]
+            if target_exists:
                 nm = '/'.join(nx_class_name, field_name) + '@deprecated'
                 self.new_finding(nm, dataset.name, finding.NOTE, deprecated)
 
         minO = defaults['minOccurs']
         maxO = defaults['maxOccurs']
         required_name = defaults['nameType'] == 'specified'
-        target_exists = field_name in group
         if int(minO) > 0 and required_name:
             f = {True: finding.OK, False: finding.WARN}[target_exists]
-            finding.TF_RESULT[target_exists]
             m = {True: '', False: ' not'}[target_exists] + ' found'
             nm = group.name + '/' + field_name
             self.new_finding(nx_class_name+' required field', nm, f, m)
-            # TODO:
-            # TODO: issue #13: check field dimensions against "rank" : len(shape) == len(NXDL/dims) 
+
+            t = len(dataset.shape) == len(rules.dims)   # check rank against specification
+            f = {True: finding.OK, False: finding.WARN}[t]  # TODO: ? change WARN to NOTE ?
+            m = {True: 'matches', False: 'does not match'}[target_exists] + ' NXDL specification'
+            self.new_finding(nx_class_name+' field rank', nm, f, m)
+
+        if target_exists:
+            is_nx_char = defaults['type'] == 'NX_CHAR' and isinstance(dataset[0], numpy.string_)
+            t = dataset.dtype in nx_type or is_nx_char
+            f = {True: finding.OK, False: finding.WARN}[t]
+            m = str(dataset.dtype) + {True: ' : ok', False: ' : not ok'}[t]
+            nm = group.name + '/' + field_name
+            ttl = '/'.join((nx_class_name, field_name))
+            self.new_finding(ttl+' data type', nm, f, m)
 
     def validate_item_name(self, h5_addr):
         '''

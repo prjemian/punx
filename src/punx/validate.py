@@ -356,22 +356,7 @@ class Data_File_Validator(object):
                             msg = 'attribute not defined in NXDL'
                             self.new_finding(nx_class_name + '@' + k, aname, finding.NOTE, msg)
         
-        # check the units of numerical fields
-        if dataset.dtype in NXDL_DATA_TYPES['NX_NUMBER']:
-            title = 'field@units'
-            units = self.get_hdf5_attribute(dataset, 'units', report=True)
-            t = units is not None
-            f = {True: finding.OK, False: finding.NOTE}[t]
-            msg = {True: 'exists', False: 'does not exist'}[t]
-            if t:
-                t = len(units) > 0
-                f = {True: finding.OK, False: finding.NOTE}[t]
-                msg = {True: 'value: ' + units, False: 'has no value'}[t]
-            self.new_finding(title, dataset.name + '@units', f, msg)
-            
-            # TODO: issue #13: check field dimensions against "rank" attribute 
-            shape = dataset.shape
-            __ = None   # used as a NOP breakpoint after previous definition
+        self.validate_numerical_dataset(dataset, group)
 
         # check the type of this field
         # https://github.com/prjemian/punx/blob/b595fdf9910dbab113cfe8febbb37e6c5b48d74f/src/punx/validate.py#L761
@@ -432,7 +417,9 @@ class Data_File_Validator(object):
         msg = 'validate with ' + nx_class_name + ' specification (incomplete)'
         self.new_finding('NXDL review', group.name, finding.TODO, msg)
         
-        # TODO: group attributes
+        # specified group attributes are handled elsewhere
+        # used a references here
+        group_defaults = nx_class_object.attributes['defaults']
 
         # validate provided, required, and optional fields
         for field_name, rules in nx_class_object.fields.items():
@@ -441,6 +428,12 @@ class Data_File_Validator(object):
             nx_type = NXDL_DATA_TYPES[defaults['type']]
 
             deprecated = defaults['deprecated']
+            if deprecated is not None:
+                if field_name in group:
+                    obj = group[field_name]
+                    nm = '/'.join(nx_class_name, field_name) + '@deprecated'
+                    self.new_finding(nm, obj.name, finding.NOTE, deprecated)
+
             minO = defaults['minOccurs']
             maxO = defaults['maxOccurs']
             required_name = defaults['nameType'] == 'specified'
@@ -458,6 +451,12 @@ class Data_File_Validator(object):
             defaults = rules.attributes['defaults']
 
             deprecated = defaults['deprecated']
+            if deprecated is not None:
+                if group_name in group:
+                    obj = group[group_name]
+                    nm = '/'.join(nx_class_name, group_name) + '@deprecated'
+                    self.new_finding(nm, obj.name, finding.NOTE, deprecated)
+
             minO = defaults['minOccurs']
             maxO = defaults['maxOccurs']
             if int(minO) > 0:
@@ -694,7 +693,7 @@ class Data_File_Validator(object):
             else:
                 m = 'expected @signal=1, found: ' + signal
                 self.new_finding(title, h5_addr, finding.ERROR, m)
-            # TODO: @axes, @AXISNAME_indices, and dimension scales    (see issue #41)
+            # TODO: @axes and dimension scales    (see issue #41)
             # TODO: signal and dimension scales data shape
 
         cp = 'NXdata/field@signal'
@@ -719,21 +718,103 @@ class Data_File_Validator(object):
         '''
         default_plot_addr = []
         for h5_addr, nx_classpath in group_dict.items():
+            dimension_scales = []
+            dimension_scales_ok = True  # assume until proven otherwise
             title = 'NXdata group default plot v3'
             nxdata = self.h5[h5_addr.split('@')[0]]
             signal_name = self.get_hdf5_attribute(nxdata, 'signal', report=True)
-            if signal_name not in nxdata:
+            if signal_name in nxdata:
+                signal_data = nxdata[signal_name]
+                m = 'NXdata@signal = ' + signal_name
+                addr = signal_data.name
+                self.new_finding(title, addr, finding.OK, m)
+
+                axes_names = self.get_hdf5_attribute(nxdata, 'axes', report=True)
+                if axes_names is None:  # no axes attribute: use array indices as dimension scales
+                    for dim in signal_data.shape:
+                        dimension_scales.append(numpy.ndarray(dim))
+                else:
+                    if isinstance(axes_names, str):
+                        for delim in (':', ' '):
+                            # replace alternate delimiters (":", " ") with ","
+                            axes_names = axes_names.replace(delim, ',')
+                        axes_names = axes_names.split(',')
+                    for axis_name in axes_names:
+                        ttl = 'NXdata@axes'
+                        if axis_name == '.':
+                            pass
+                        elif axis_name in nxdata:     # does axis exist?
+                            m = 'axes dataset found: ' + axis_name
+                            f = finding.OK
+                            self.new_finding(ttl+'='+axis_name, addr+'@axes', f, m)
+                            # check @AXISNAME_indices holds index of dimension scale data to use
+                            # dimension scale = index 'indx' of nxdata[axis_name]
+                            axis_data = nxdata[axis_name]
+                            indx = self.get_hdf5_attribute(nxdata, axis_name+'_indices')
+                            if indx is None:
+                                if len(axis_data.shape) == 1:
+                                    m = 'not provided, assume = 0'
+                                    self.new_finding('NXdata@'+axis_name+'_indices', 
+                                                     nxdata.name+'@'+axis_name+'_indices', 
+                                                     finding.NOTE, 
+                                                     m)
+                                else:
+                                    m = 'not provided, uncertain how to use'
+                                    self.new_finding('NXdata@'+axis_name+'_indices', 
+                                                     nxdata.name+'@'+axis_name+'_indices', 
+                                                     finding.WARN, 
+                                                     m)
+                                    dimension_scales_ok = False
+                            else:
+                                if isinstance(indx, tuple) > 1:
+                                    # might 'indx' be a list?  If this ever raises, then refactor
+                                    raise ValueError(axis_name+'_indices = ' + str(indx))
+                                t = indx < len(axis_data.shape)
+                                f = finding.TF_RESULT[t]
+                                m = 'value = ' + str(indx)
+                                m += {True:': ok', False:': invalid'}[t]
+                                self.new_finding('NXdata@'+axis_name+'_indices', 
+                                                     nxdata.name+'@'+axis_name+'_indices', 
+                                                     f, 
+                                                     m)
+                                if not t:
+                                    dimension_scales_ok = False
+
+                            if len(axis_data.shape) == 1:
+                                dimension_scales.append(axis_data)
+                            else:
+                                dimension_scales.append(axis_data[indx])    # will this work?
+                        else:
+                            m = 'axes dataset not found: ' + axis_name
+                            f = finding.WARN
+                            self.new_finding(ttl+'='+axis_name, addr+'@axes', f, m)
+                            dimension_scales_ok = False
+
+                if len(dimension_scales) == len(signal_data.shape):
+                    if len(dimension_scales) == 1:
+                        if dimension_scales[0].shape[0] != signal_data.shape[0]:
+                            ttl = 'dimension scale for NXdata@signal'
+                            m = 'array lengths are not the same'
+                            self.new_finding(ttl, signal_data.name, finding.WARN, m)
+                            dimension_scales_ok = False
+                    else:
+                        for i, dscale in enumerate(dimension_scales):
+                            if dscale.shape[0] != signal_data.shape[i]:
+                                ttl = 'dimension scale for NXdata@signal[' + str(i) + ']'
+                                m = 'array lengths are not the same'
+                                self.new_finding(ttl, signal_data.name, finding.WARN, m)
+                                dimension_scales_ok = False
+                else:
+                    m = 'rank(' + signal_name + ') != number of dimension scales'
+                    self.new_finding('NXdata@signal rank', signal_data.name, finding.WARN, m)
+                default_plot_addr.append(addr)
+                if dimension_scales_ok:
+                    m = 'dimension scale(s) verified'
+                    self.new_finding('NXdata dimension scale(s)', nxdata.name, finding.OK, m)
+            else:
                 m = 'signal field not found: ' + signal_name
                 self.new_finding(title, nx_classpath, finding.ERROR, m)
                 continue
-            #m = 'signal data: ' + signal_name
-            # m = nx_classpath + ' = ' + signal_name
-            m = 'NXdata@signal = ' + signal_name
-            addr = nxdata.name + '/' + signal_name
-            self.new_finding(title, addr, finding.OK, m)
-            default_plot_addr.append(addr)
-            # TODO: @axes and dimension scales    (see issue #41)
-            # TODO: signal and dimension scales data shape
 
         cp = 'NXdata@signal'
         title = 'NeXus default plot v3'
@@ -775,6 +856,35 @@ class Data_File_Validator(object):
                 if nxentry_default == nxdata_name:
                     unique_list.append(k)
         return unique_list
+   
+    def validate_numerical_dataset(self, dataset, group):
+        '''
+        review the units attribute of an HDF5 dataset
+
+        :param obj dataset: instance of h5py.Dataset
+        :param obj group: instance of h5py.Group or h5py.File, needed to check against NXDL
+        '''
+        if dataset.dtype not in NXDL_DATA_TYPES['NX_NUMBER']:
+            return
+
+        # check the units of numerical fields
+        title = 'field@units'
+        units = self.get_hdf5_attribute(dataset, 'units', report=True)
+        t = units is not None
+        f = {True: finding.OK, False: finding.NOTE}[t]
+        msg = {True: 'exists', False: 'does not exist'}[t]
+        if t:
+            t = len(units) > 0
+            f = {True: finding.OK, False: finding.NOTE}[t]
+            msg = {True: 'value: ' + units, False: 'has no value'}[t]
+        self.new_finding(title, dataset.name + '@units', f, msg)
+        # TODO: compare value of dataset@units with NXDL@units specification
+        # this could easily require a deep analysis
+        
+        # TODO: issue #13: check field dimensions against "rank" : len(shape) == len(NXDL/dims) 
+        shape = dataset.shape
+        if shape != (1,):   # ignore scalars
+            __ = None   # used as a NOP breakpoint after previous definition
 
     def get_hdf5_attribute(self, obj, attribute, default=None, report=False):
         '''
@@ -789,9 +899,13 @@ class Data_File_Validator(object):
         if isinstance(a, numpy.ndarray):
             if report:
                 gname = obj.name + '@' + attribute
-                msg = '[variable length string]: ' + str(a)
+                if len(a) > 1:
+                    msg = 'variable length string array: ' + str(a)
+                else:
+                    msg = 'variable length string: ' + str(a)
                 self.new_finding('attribute data type', gname, finding.NOTE, msg)
-            a = a[0]
+            if len(a) == 1:
+                a = a[0]
         return a
 
     def reconstruct_classpath(self, h5_address, *args, **kwargs):

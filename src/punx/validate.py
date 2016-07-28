@@ -423,60 +423,86 @@ class Data_File_Validator(object):
 
         # validate provided, required, and optional fields
         for field_name, rules in nx_class_object.fields.items():
-            # TODO: field attributes
-            defaults = rules.attributes['defaults']
-            nx_type = NXDL_DATA_TYPES[defaults['type']]
-
-            deprecated = defaults['deprecated']
-            if deprecated is not None:
-                if field_name in group:
-                    obj = group[field_name]
-                    nm = '/'.join(nx_class_name, field_name) + '@deprecated'
-                    self.new_finding(nm, obj.name, finding.NOTE, deprecated)
-
-            minO = defaults['minOccurs']
-            maxO = defaults['maxOccurs']
-            required_name = defaults['nameType'] == 'specified'
-            target_exists = field_name in group
-            if int(minO) > 0 and required_name:
-                f = {True: finding.OK, False: finding.WARN}[target_exists]
-                finding.TF_RESULT[target_exists]
-                m = {True: '', False: ' not'}[target_exists] + ' found'
-                nm = group.name + '/' + field_name
-                self.new_finding(nx_class_name+' required field', nm, f, m)
-                # TODO:
+            self.validate_NXDL_field_specification(field_name, group, rules)
 
         # validate provided, required, and optional groups (recursive as directed)
-        for group_name, rules in nx_class_object.groups.items():
-            defaults = rules.attributes['defaults']
+        for subgroup_name, rules in nx_class_object.groups.items():
+            self.validate_NXDL_group_specification(subgroup_name, group, rules)
+        
+    def validate_NXDL_group_specification(self, subgroup_name, group, rules):
+        '''
+        validate the group/subgroup with the NXDL specification
 
-            deprecated = defaults['deprecated']
-            if deprecated is not None:
-                if group_name in group:
-                    obj = group[group_name]
-                    nm = '/'.join(nx_class_name, group_name) + '@deprecated'
-                    self.new_finding(nm, obj.name, finding.NOTE, deprecated)
+        :param str subgroup_name: name of subgroup in group
+        :param obj group: instance of h5py.Group or h5py.File
+        :param obj rules: instance of nxdlstructure.NX_group
+        
+        Verify this HDF5 group conforms to the NXDL specification
+        '''
+        nx_class_name = self.get_hdf5_attribute(group, 'NX_class')
+        defaults = rules.attributes['defaults']
 
-            minO = defaults['minOccurs']
-            maxO = defaults['maxOccurs']
-            if int(minO) > 0:
-                if defaults['name'] is not None:
-                    nm = group.name + '/' + group_name
-                    t = group_name in group
-                    f = {True: finding.OK, False: finding.WARN}[t]
-                    m = rules.NX_class + {True: ' found', False: ' not found'}[t]
+        deprecated = defaults['deprecated']
+        if deprecated is not None:
+            if subgroup_name in group:
+                obj = group[subgroup_name]
+                nm = '/'.join(nx_class_name, subgroup_name) + '@deprecated'
+                self.new_finding(nm, obj.name, finding.NOTE, deprecated)
+
+        minO = defaults['minOccurs']
+        maxO = defaults['maxOccurs']
+        if int(minO) > 0:
+            if defaults['name'] is not None:
+                nm = group.name + '/' + subgroup_name
+                t = subgroup_name in group
+                f = {True: finding.OK, False: finding.WARN}[t]
+                m = rules.NX_class + {True: ' found', False: ' not found'}[t]
+                self.new_finding(nx_class_name+' required group', nm, f, m)
+            else:
+                matches = [node for node in group.values() if h5structure.isNeXusGroup(node, rules.NX_class)]
+                if len(matches) < int(minO):
+                    nm = group.name
+                    m = 'must have at least ' + str(minO) + ' group: ' + rules.NX_class 
+                    f = finding.WARN
                     self.new_finding(nx_class_name+' required group', nm, f, m)
-                else:
-                    matches = [node for node in group.values() if h5structure.isNeXusGroup(node, rules.NX_class)]
-                    if len(matches) < int(minO):
-                        nm = group.name
-                        m = 'must have at least ' + str(minO) + ' group: ' + rules.NX_class 
-                        f = finding.WARN
-                        self.new_finding(nx_class_name+' required group', nm, f, m)
-            if maxO == 'unbounded':
-                pass
-            # TODO: what else?
-                       
+        if maxO == 'unbounded':
+            pass
+        # TODO: what else?
+        
+    def validate_NXDL_field_specification(self, field_name, group, rules):
+        '''
+        validate the group/field with the NXDL specification
+
+        :param str field_name: name of field in group
+        :param obj group: instance of h5py.Group or h5py.File
+        :param obj rules: instance of nxdlstructure.NX_field
+        
+        Verify this HDF5 field conforms to the NXDL specification
+        '''
+        nx_class_name = self.get_hdf5_attribute(group, 'NX_class')
+        # TODO: field attributes
+        defaults = rules.attributes['defaults']
+        nx_type = NXDL_DATA_TYPES[defaults['type']]
+
+        deprecated = defaults['deprecated']
+        if deprecated is not None:
+            if field_name in group:
+                dataset = group[field_name]
+                nm = '/'.join(nx_class_name, field_name) + '@deprecated'
+                self.new_finding(nm, dataset.name, finding.NOTE, deprecated)
+
+        minO = defaults['minOccurs']
+        maxO = defaults['maxOccurs']
+        required_name = defaults['nameType'] == 'specified'
+        target_exists = field_name in group
+        if int(minO) > 0 and required_name:
+            f = {True: finding.OK, False: finding.WARN}[target_exists]
+            finding.TF_RESULT[target_exists]
+            m = {True: '', False: ' not'}[target_exists] + ' found'
+            nm = group.name + '/' + field_name
+            self.new_finding(nx_class_name+' required field', nm, f, m)
+            # TODO:
+            # TODO: issue #13: check field dimensions against "rank" : len(shape) == len(NXDL/dims) 
 
     def validate_item_name(self, h5_addr):
         '''

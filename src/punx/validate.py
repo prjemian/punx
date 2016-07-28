@@ -413,13 +413,11 @@ class Data_File_Validator(object):
         if nx_class_object is None:
             return
 
-        # TODO: review with NXDL specification: nx_class_object
         msg = 'validate with ' + nx_class_name + ' specification (incomplete)'
         self.new_finding('NXDL review', group.name, finding.TODO, msg)
         
         # specified group attributes are handled elsewhere
-        # used a references here
-        group_defaults = nx_class_object.attributes['defaults']
+        # group_defaults = nx_class_object.attributes['defaults']
 
         # validate provided, required, and optional fields
         for field_name, rules in nx_class_object.fields.items():

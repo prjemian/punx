@@ -379,7 +379,7 @@ class Data_File_Validator(object):
                 # maxOccurs: is either 1 or, if name is flexible, unbounded
 
                 isSpecifiedName = defaults['nameType'] == 'specified'
-                f = finding.NOTE
+                f = finding.OK
                 msg = 'name is ' + {True: 'specified', False: 'flexible'}[isSpecifiedName]
                 self.new_finding('@nameType', dataset.name, f, msg)
                         
@@ -513,10 +513,10 @@ class Data_File_Validator(object):
             is_nx_char = defaults['type'] == 'NX_CHAR' and isinstance(dataset[0], numpy.string_)
             t = dataset.dtype in nx_type or is_nx_char
             f = {True: finding.OK, False: finding.WARN}[t]
-            m = str(dataset.dtype) + {True: ' : ', False: ' != '}[t] + defaults['type']
+            m = str(dataset.dtype) + {True: ' : ', False: ' not '}[t] + defaults['type']
             nm = group.name + '/' + field_name
             ttl = '/'.join((nx_class_name, field_name))
-            self.new_finding(ttl+' data type', nm, f, m)
+            self.new_finding('NXDL data type: '+ttl, nm, f, m)
 
     def validate_item_name(self, h5_addr):
         '''
@@ -832,14 +832,18 @@ class Data_File_Validator(object):
 
                 if len(dimension_scales) == len(signal_data.shape):
                     if len(dimension_scales) == 1:
-                        if dimension_scales[0].shape[0] != signal_data.shape[0]:
+                        length_ok = dimension_scales[0].shape[0] - signal_data.shape[0] in (0, 1)
+                        # 0 : dimension scale values are bin centers
+                        # 1 : dimension scale values are bin edges
+                        if not length_ok:
                             ttl = 'dimension scale for NXdata@signal'
                             m = 'array lengths are not the same'
                             self.new_finding(ttl, signal_data.name, finding.WARN, m)
                             dimension_scales_ok = False
                     else:
                         for i, dscale in enumerate(dimension_scales):
-                            if dscale.shape[0] != signal_data.shape[i]:
+                            length_ok = dscale.shape[0] - signal_data.shape[i] in (0, 1)
+                            if not length_ok:
                                 ttl = 'dimension scale for NXdata@signal[' + str(i) + ']'
                                 m = 'array lengths are not the same'
                                 self.new_finding(ttl, signal_data.name, finding.WARN, m)

@@ -513,8 +513,7 @@ class Data_File_Validator(object):
             is_nx_char = defaults['type'] == 'NX_CHAR' and isinstance(dataset[0], numpy.string_)
             t = dataset.dtype in nx_type or is_nx_char
             f = {True: finding.OK, False: finding.WARN}[t]
-            # TODO: handle reporting of nx_type for default case (is_nx_char)
-            m = str(dataset.dtype) + {True: ' : ', False: ' != '}[t] + nx_type
+            m = str(dataset.dtype) + {True: ' : ', False: ' != '}[t] + defaults['type']
             nm = group.name + '/' + field_name
             ttl = '/'.join((nx_class_name, field_name))
             self.new_finding(ttl+' data type', nm, f, m)

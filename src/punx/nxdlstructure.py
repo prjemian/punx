@@ -411,7 +411,7 @@ class NX_field(NX_mixin):
             dims[index] = value
         
         if len(dims) == 0:
-            # TODO: issue #13: read the "rank" attribute and create array of that length with "0" values
+            # TODO: issue #13: read the "rank" attribute and create array of that length with zeroes
             rank = int(node_list[0].get('rank'))
             return ['*' for _ in range(rank)]
         if len(dims) == 1 and min(dims.keys()) == 0:

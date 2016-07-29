@@ -113,7 +113,9 @@ __url__ = 'http://punx.readthedocs.org/en/latest/validate.html'
 # Is there a better way to define these?  Using nxdlTypes.xsd?
 NXDL_DATA_TYPES = {
     'NX_CHAR': (str, unicode, numpy.string_, numpy.ndarray),
-    'NX_INT':  (int, numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64),
+    'NX_INT':  (int, numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64,
+                numpy.uint, numpy.uint8, numpy.uint16, numpy.uint32, numpy.uint64,
+                ),
     'NX_FLOAT':  (float, ),
     'NX_BINARY': (None, ),     # #FIXME: issue #21
     'NX_BOOLEAN': (None, ),     # FIXME: issue #21

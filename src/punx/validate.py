@@ -116,7 +116,7 @@ NXDL_DATA_TYPES = {
     'NX_INT':  (int, numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64,
                 numpy.uint, numpy.uint8, numpy.uint16, numpy.uint32, numpy.uint64,
                 ),
-    'NX_FLOAT':  (float, ),
+    'NX_FLOAT':  (float, numpy.float, numpy.float16, numpy.float32, numpy.float64),
     'NX_BINARY': (None, ),     # #FIXME: issue #21
     'NX_BOOLEAN': (None, ),     # FIXME: issue #21
 }
@@ -279,6 +279,7 @@ class Data_File_Validator(object):
             else:
                 aname = group.name + '@' + k
                 if not nx_class_defaults['ignoreExtraAttributes']:
+                    # TODO: don't validate attribute names defined in NXDL rules!
                     self.validate_item_name(aname)
                 if k == 'default' and nx_class_name in ('NXroot', 'NXentry', 'NXsubentry'):
                     target = self.get_hdf5_attribute(group, 'default')
@@ -447,24 +448,24 @@ class Data_File_Validator(object):
         if deprecated is not None:
             if target_exists:
                 obj = group[subgroup_name]
-                nm = '/'.join(nx_class_name, subgroup_name) + '@deprecated'
+                nm = '/'.join(rules.NX_class, subgroup_name) + '@deprecated'
                 self.new_finding(nm, obj.name, finding.NOTE, deprecated)
 
         minO = defaults['minOccurs']
         maxO = defaults['maxOccurs']
         if int(minO) > 0:
-            if defaults['name'] is not None:
-                nm = group.name + '/' + subgroup_name
-                f = {True: finding.OK, False: finding.WARN}[target_exists]
-                m = rules.NX_class + {True: ' found', False: ' not found'}[target_exists]
-                self.new_finding(nx_class_name+' required group', nm, f, m)
-            else:
+            if defaults['name'] is None:
                 matches = [node for node in group.values() if h5structure.isNeXusGroup(node, rules.NX_class)]
                 if len(matches) < int(minO):
                     nm = group.name
                     m = 'must have at least ' + str(minO) + ' group: ' + rules.NX_class 
                     f = finding.WARN
-                    self.new_finding(nx_class_name+' required group', nm, f, m)
+                    self.new_finding(rules.NX_class+' required group', nm, f, m)
+            else:
+                nm = group.name + '/' + subgroup_name
+                f = {True: finding.OK, False: finding.WARN}[target_exists]
+                m = rules.NX_class + {True: ' found', False: ' not found'}[target_exists]
+                self.new_finding(rules.NX_class+' required group', nm, f, m)
         if maxO == 'unbounded':
             pass
         # TODO: what else?
@@ -480,7 +481,6 @@ class Data_File_Validator(object):
         Verify this HDF5 field conforms to the NXDL specification
         '''
         nx_class_name = self.get_hdf5_attribute(group, 'NX_class')
-        # TODO: field attributes
         defaults = rules.attributes['defaults']
         nx_type = NXDL_DATA_TYPES[defaults['type']]
         target_exists = field_name in group
@@ -488,12 +488,50 @@ class Data_File_Validator(object):
             dataset = group[field_name]
         else:
             dataset = None
+        nm = '/'.join((nx_class_name, field_name))
 
-        deprecated = defaults['deprecated']
-        if deprecated is not None:
-            if target_exists:
-                nm = '/'.join(nx_class_name, field_name) + '@deprecated'
-                self.new_finding(nm, dataset.name, finding.NOTE, deprecated)
+        # check the attributes specified in NXDL rules
+        for k, attr in rules.attributes['nxdl.xsd'].items():
+            if k in ('minOccurs maxOccurs name nameType type units'.split()):
+                pass
+            elif target_exists:
+                if k == 'deprecated':
+                    m = defaults['deprecated']
+                    if m is not None:
+                        self.new_finding(nm+'@deprecated', dataset.name, finding.NOTE, m)
+                elif k in dataset.attrs:
+                    aname = dataset.name + '@' + k
+                    ttl = 'NXDL attribute type: '
+                    ttl += '/'.join((nx_class_name, field_name))
+                    ttl += '@' + k
+                    v = dataset.attrs[k]
+                     
+                    # check type against NXDL
+                    attr_type = attr.type.split(':')[-1]    # strip off XML namespace prefix, if found
+                    t = type(v) in NXDL_DATA_TYPES[attr_type]
+                    f = {True: finding.OK, False: finding.WARN}[t]
+                    m = str(type(v)) + ' : ' + attr_type
+                    self.new_finding(ttl, aname, f, m)
+                     
+                    # check if value matches enumeration
+                    if len(attr.enum) > 0:
+                        t = v in attr.enum
+                        f = {True: finding.OK, False: finding.WARN}[t]
+                        m = str(v)
+                        if t:
+                            m += ': expected'
+                        else:
+                            m += ': not in list: ' + ','.join(attr.enum)
+                        ttl = 'NXDL attribute enum: '
+                        ttl += '/'.join((nx_class_name, field_name))
+                        ttl += '@' + k
+                        self.new_finding(ttl, aname, f, m)
+                elif attr.required:
+                    if k not in ('name', 'minOccurs', 'maxOccurs',):
+                        nm = 'NXDL attribute: ' + '/'.join((nx_class_name, field_name))
+                        nm += '@' + k
+                        m = 'required attribute not found'
+                        self.new_finding(nm, dataset.name, finding.WARN, m)
 
         minO = defaults['minOccurs']
         maxO = defaults['maxOccurs']
@@ -510,8 +548,10 @@ class Data_File_Validator(object):
             self.new_finding(nx_class_name+' field rank', nm, f, m)
 
         if target_exists:
-            is_nx_char = defaults['type'] == 'NX_CHAR' and isinstance(dataset[0], numpy.string_)
-            t = dataset.dtype in nx_type or is_nx_char
+            if str(dataset.dtype).startswith('|S'):
+                t = type('numpy string array') in nx_type
+            else:
+                t = dataset.dtype in nx_type
             f = {True: finding.OK, False: finding.WARN}[t]
             m = str(dataset.dtype) + {True: ' : ', False: ' not '}[t] + defaults['type']
             nm = group.name + '/' + field_name

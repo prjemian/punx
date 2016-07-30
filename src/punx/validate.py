@@ -557,6 +557,8 @@ class Data_File_Validator(object):
             nm = group.name + '/' + field_name
             ttl = '/'.join((nx_class_name, field_name))
             self.new_finding('NXDL data type: '+ttl, nm, f, m)
+        
+        # TODO: #16 check if unknown names are allowed to be flexible 
 
     def validate_item_name(self, h5_addr):
         '''
@@ -862,8 +864,13 @@ class Data_File_Validator(object):
 
                             if len(axis_data.shape) == 1:
                                 dimension_scales.append(axis_data)
-                            else:
+                            elif  len(axis_data.shape) == 2:
                                 dimension_scales.append(axis_data[indx])    # will this work?
+                            else:
+                                m = axis_data.name + '@axes, axis=' + axis_name
+                                m += ' has rank=' + str(len(axis_data.shape))
+                                m += '\n This needs special handling.  Send email to the developer.'
+                                raise ValueError(m)
                         else:
                             m = 'axes dataset not found: ' + axis_name
                             f = finding.WARN

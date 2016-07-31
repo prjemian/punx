@@ -631,6 +631,7 @@ class Data_File_Validator(object):
                     f = finding.WARN
                 except UnicodeDecodeError, _exc:
                     f = finding.ERROR
+                    msg += ', UnicodeDecodeError'
 
         self.new_finding(key, h5_addr, f, msg)
     

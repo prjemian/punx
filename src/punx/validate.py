@@ -117,8 +117,8 @@ NXDL_DATA_TYPES = {
                 numpy.uint, numpy.uint8, numpy.uint16, numpy.uint32, numpy.uint64,
                 ),
     'NX_FLOAT':  (float, numpy.float, numpy.float16, numpy.float32, numpy.float64),
-    'NX_BINARY': (None, ),     # #FIXME: issue #21
-    'NX_BOOLEAN': (None, ),     # FIXME: issue #21
+    'NX_BINARY': (None, ),     # #FIXME: issue #21 : ?get from nxdl.xsd ?
+    'NX_BOOLEAN': (None, ),     # FIXME: issue #21 : ?get from nxdl.xsd ?
 }
 # definitions dependent on other definitions
 # (can add the lists together as needed)
@@ -152,8 +152,9 @@ class NxdlPattern(object):
     def __init__(self, parent, pname, xpath_str):
         self.name = pname
         self.xpath_str = xpath_str
+        rules = cache.get_nxdl_xsd()
 
-        r = parent.nxdl_xsd.xpath(xpath_str, namespaces=parent.ns)
+        r = rules.xpath(xpath_str, namespaces=parent.ns)
 
         if r is None or len(r) != 1:
             msg = 'could not read *' + pname + '* from *nxdl.xsd*'
@@ -202,12 +203,9 @@ class Data_File_Validator(object):
         self.addresses = collections.OrderedDict()     # dictionary of all HDF5 address nodes in the data file
 
         self.ns = cache.NX_DICT
-        self.nxdl_xsd = cache.get_nxdl_xsd()
-        nxdlTypes_xsd_file = cache.abs_NXDL_filename(cache.NXDL_TYPES_SCHEMA_FILE)
-        self.nxdlTypes_xsd = lxml.etree.parse(nxdlTypes_xsd_file)
         self.nxdl_rules = nxdlstructure.get_nxdl_rules()
-
         self.nxdl_dict = nxdlstructure.get_NXDL_specifications()
+
         try:
             self.h5 = h5py.File(fname, 'r')
         except IOError:
@@ -252,6 +250,7 @@ class Data_File_Validator(object):
                 msg = 'file root (assumed): NXroot'
                 self.new_finding('@NX_class', group.name, finding.OK, msg)
             else:
+                # TODO: validNXClassName - use this instead
                 self.validate_item_name(group.name)
                 msg = 'no @NX_class attribute, not a NeXus group'
                 self.new_finding('@NX_class', group.name, finding.NOTE, msg)
@@ -391,6 +390,7 @@ class Data_File_Validator(object):
         :param obj link: instance of h5py.Group or h5py.Dataset
         :param obj group: instance of h5py.Group, needed to check against NXDL
         '''
+        #: TODO: validTargetName  - use this instead
         self.validate_item_name(link.name)
 
         target = self.get_hdf5_attribute(link, 'target', report=True)
@@ -560,7 +560,7 @@ class Data_File_Validator(object):
         
         # TODO: #16 check if unknown names are allowed to be flexible 
 
-    def validate_item_name(self, h5_addr):
+    def validate_item_name(self, h5_addr, key=None):
         '''
         validate *h5_addr* using *validItemName* regular expression
         
@@ -576,6 +576,8 @@ class Data_File_Validator(object):
             ``/entry/data01/data``           ``data``
             ``/entry/data01/data@signal``    ``signal``
             =============================    ============
+
+        :param str key: named key to search, default: None (``validItemName``)
 
         This method will separate out the last part of the name for validation.  
         Then, it is tested against the strict or relaxed regular expressions for 
@@ -593,45 +595,49 @@ class Data_File_Validator(object):
         
         :see: http://download.nexusformat.org/doc/html/datarules.html?highlight=regular%20expression
         '''
-        key_relaxed = 'validItemName'
-        key_strict = 'validItemName-strict'
+        if key is None:
+            key_relaxed = 'validItemName'
+            key_strict = 'validItemName-strict'
 
-        # h5_addr = obj.name
-        short_name = h5_addr.split('/')[-1].split('@')[-1]
-        if short_name == 'NX_class':
-            # special case
-            self.new_finding('NeXus internal attribute', 
-                             h5_addr, 
-                             finding.OK, 
-                             'marks this HDF5 group as NeXus group')
-            return
-        
-        # strict match: [a-z_][a-z\d_]*
-        # flexible match: [A-Za-z_][\w_]*  but gets finding.WARN per manual
-
-        p = self.patterns[key_strict]
-        m = p.match(short_name)
-        if m is not None and m.string == short_name:
-            f = finding.OK
-            key = key_strict
-            msg =  'strict re: ' + p.regexp_pattern_str
-        else:
-            p = self.patterns[key_relaxed]
+            # h5_addr = obj.name
+            short_name = h5_addr.split('/')[-1].split('@')[-1]
+            if short_name == 'NX_class':
+                # special case
+                self.new_finding('NeXus internal attribute', 
+                                 h5_addr, 
+                                 finding.OK, 
+                                 'marks this HDF5 group as NeXus group')
+                return
+            
+            # strict match: [a-z_][a-z\d_]*
+            # flexible match: [A-Za-z_][\w_]*  but gets finding.WARN per manual
+    
+            p = self.patterns[key_strict]
             m = p.match(short_name)
             if m is not None and m.string == short_name:
-                f = finding.NOTE
-                key = key_relaxed
-                msg =  'relaxed re: ' + p.regexp_pattern_str
+                f = finding.OK
+                key = key_strict
+                msg =  'strict re: ' + p.regexp_pattern_str
             else:
-                # test if string rendering raises UnicodeDecodeError
-                key = 'validItemName'
-                msg = 'valid HDF5 item name, not valid with NeXus'
-                try:    # to raise the exception
-                    _test = '%s' % str(m)
-                    f = finding.WARN
-                except UnicodeDecodeError, _exc:
-                    f = finding.ERROR
-                    msg += ', UnicodeDecodeError'
+                p = self.patterns[key_relaxed]
+                m = p.match(short_name)
+                if m is not None and m.string == short_name:
+                    f = finding.NOTE
+                    key = key_relaxed
+                    msg =  'relaxed re: ' + p.regexp_pattern_str
+                else:
+                    # test if string rendering raises UnicodeDecodeError
+                    key = 'validItemName'
+                    msg = 'valid HDF5 item name, not valid with NeXus'
+                    try:    # to raise the exception
+                        _test = '%s' % str(m)
+                        f = finding.WARN
+                    except UnicodeDecodeError, _exc:
+                        f = finding.ERROR
+                        msg += ', UnicodeDecodeError'
+        else:
+            # TODO: validate h5_addr against other keys
+            pass
 
         self.new_finding(key, h5_addr, f, msg)
     

@@ -109,25 +109,6 @@ import nxdlstructure
 
 __url__ = 'http://punx.readthedocs.org/en/latest/validate.html'
 
-# for each NeXus data type, make a list of acceptable Python data types
-# Is there a better way to define these?  Using nxdlTypes.xsd?
-NXDL_DATA_TYPES = {
-    'NX_CHAR': (str, unicode, numpy.string_, numpy.ndarray),
-    'NX_INT':  (int, numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64,
-                numpy.uint, numpy.uint8, numpy.uint16, numpy.uint32, numpy.uint64,
-                ),
-    'NX_FLOAT':  (float, numpy.float, numpy.float16, numpy.float32, numpy.float64),
-    'NX_BINARY': (None, ),     # #FIXME: issue #21 : ?get from nxdl.xsd ?
-    'NX_BOOLEAN': (None, ),     # FIXME: issue #21 : ?get from nxdl.xsd ?
-}
-# definitions dependent on other definitions
-# (can add the lists together as needed)
-NXDL_DATA_TYPES['NX_UINT']   = NXDL_DATA_TYPES['NX_INT']
-NXDL_DATA_TYPES['NX_POSINT'] = NXDL_DATA_TYPES['NX_INT']
-NXDL_DATA_TYPES['NX_NUMBER'] = NXDL_DATA_TYPES['NX_INT'] + NXDL_DATA_TYPES['NX_FLOAT']
-NXDL_DATA_TYPES['ISO8601']   = NXDL_DATA_TYPES['NX_CHAR']
-NXDL_DATA_TYPES['NX_DATE_TIME']   = NXDL_DATA_TYPES['NX_CHAR']
-
 
 def validate_xml(xml_file_name):
     '''
@@ -204,6 +185,7 @@ class Data_File_Validator(object):
 
         self.ns = cache.NX_DICT
         self.nxdl_rules = nxdlstructure.get_nxdl_rules()
+        self.get_data_types()
         self.nxdl_dict = nxdlstructure.get_NXDL_specifications()
 
         try:
@@ -227,6 +209,29 @@ class Data_File_Validator(object):
         p = CustomNxdlPattern(self, 'validItemName-strict', r'[a-z_][a-z0-9_]*')
         self.patterns[p.name] = p
         self.__unique_findings__ = {}
+    
+    def get_data_types(self):
+        '''
+        generate dictionary of acceptable Python data types, based on NeXus data type keys
+        '''
+        # Is there a better way to define these?  Using nxdlTypes.xsd?
+        # TODO: #21 : augment from self.nxdl_rules.nxdlTypes
+        
+        self.data_types = {
+            'NX_CHAR': (str, unicode, numpy.string_, numpy.ndarray),
+            'NX_UINT': (numpy.uint, numpy.uint8, numpy.uint16, numpy.uint32, numpy.uint64),
+            'NX_INT':  (int, numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64),
+            'NX_FLOAT':  (float, numpy.float, numpy.float16, numpy.float32, numpy.float64),
+            'NX_BINARY': (None, ),     # #FIXME:
+            'NX_BOOLEAN': (None, ),     # FIXME:
+        }
+        # definitions dependent on other definitions
+        # (can add the lists together as needed)
+        self.data_types['NX_INT']    += self.data_types['NX_UINT']
+        self.data_types['NX_POSINT'] = self.data_types['NX_INT']    # need to restrict this
+        self.data_types['NX_NUMBER'] = self.data_types['NX_INT'] + self.data_types['NX_FLOAT']
+        self.data_types['ISO8601']   = self.data_types['NX_CHAR']
+        self.data_types['NX_DATE_TIME']   = self.data_types['NX_CHAR']
         
     def validate(self):
         '''
@@ -482,7 +487,7 @@ class Data_File_Validator(object):
         '''
         nx_class_name = self.get_hdf5_attribute(group, 'NX_class')
         defaults = rules.attributes['defaults']
-        nx_type = NXDL_DATA_TYPES[defaults['type']]
+        nx_type = self.data_types[defaults['type']]
         target_exists = field_name in group
         if target_exists:
             dataset = group[field_name]
@@ -508,7 +513,7 @@ class Data_File_Validator(object):
                      
                     # check type against NXDL
                     attr_type = attr.type.split(':')[-1]    # strip off XML namespace prefix, if found
-                    t = type(v) in NXDL_DATA_TYPES[attr_type]
+                    t = type(v) in self.data_types[attr_type]
                     f = {True: finding.OK, False: finding.WARN}[t]
                     m = str(type(v)) + ' : ' + attr_type
                     self.new_finding(ttl, aname, f, m)
@@ -962,7 +967,7 @@ class Data_File_Validator(object):
         :param obj dataset: instance of h5py.Dataset
         :param obj group: instance of h5py.Group or h5py.File, needed to check against NXDL
         '''
-        if dataset.dtype not in NXDL_DATA_TYPES['NX_NUMBER']:
+        if dataset.dtype not in self.data_types['NX_NUMBER']:
             return
 
         # check the units of numerical fields

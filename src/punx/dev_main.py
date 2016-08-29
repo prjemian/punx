@@ -48,7 +48,8 @@ def validate_prep():
     logfile_prep()
     # sys.argv.append('--report')
     # sys.argv.append('ERROR,WARN')
-    datafile_prep()
+    # datafile_prep()
+    sys.argv.append('data/i22-331015.nxs')
 
 
 def logfile_prep():
@@ -84,7 +85,7 @@ if __name__ == '__main__':
     
     # demo_prep()
     # update_prep()
-    structure_prep()
-    # validate_prep()
+    # structure_prep()
+    validate_prep()
 
     main.main()

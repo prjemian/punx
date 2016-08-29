@@ -774,7 +774,7 @@ class Data_File_Validator(object):
                 m = 'NXdata group defines more than one default plot using v1'
                 self.new_finding(title, nxdata_addr, finding.NOTE, m)
         
-        cp = 'NXdata/field@signal'
+        cp = '/NXentry/NXdata/field@signal'
         title = 'NeXus default plot v1'
         if len(default_plot_addr) == 1:
             m = 'NeXus data file default plot defined'
@@ -812,7 +812,7 @@ class Data_File_Validator(object):
             # TODO: @axes and dimension scales    (see issue #41)
             # TODO: signal and dimension scales data shape
 
-        cp = 'NXdata/field@signal'
+        cp = '/NXentry/NXdata/field@signal'
         title = 'NeXus default plot v2'
         if len(default_plot_addr) == 1:
             m = 'NeXus data file default plot defined using v2'
@@ -1133,6 +1133,9 @@ class Data_File_Validator(object):
         return t.reST()
     
     def report_classpath(self):
+        '''
+        make a table of the known NeXus class paths
+        '''
         import pyRestTable
         t = pyRestTable.Table()
         t.labels = 'HDF5-address  NeXus-classpath'.split()
@@ -1147,6 +1150,10 @@ class Data_File_Validator(object):
         Such as::
         
             Unable to open object (Unable to open file: name = 'data\\../nt15698-1/processing/waxs_mask.nxs', errno = 2, error message = 'no such file or directory', flags = 0, o_flags = 0)
+        
+        Returns::
+        
+            data\\../nt15698-1/processing/waxs_mask.nxs
         
         '''
         filename = None

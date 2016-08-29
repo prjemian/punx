@@ -820,8 +820,8 @@ class Data_File_Validator(object):
             if signal_name in nxdata:
                 signal_data = nxdata[signal_name]
                 m = 'NXdata@signal = ' + signal_name
-                addr = signal_data.name
-                self.new_finding(title, addr, finding.OK, m)
+                addr = nxdata.name
+                self.new_finding(title, addr+'@signal', finding.OK, m)
 
                 axes_names = self.get_hdf5_attribute(nxdata, 'axes', report=True)
                 if axes_names is None:  # no axes attribute: use array indices as dimension scales

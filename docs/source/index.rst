@@ -2,10 +2,11 @@
 punx documentation
 ##################
 
-:version:    |version|
-:published:  |today|
-
 Python Utilities for NeXus HDF5 files
+
+:version:   |version|
+:release:   |release|
+:published: |today|
 
 NOTE: project is under initial construction, not yet released for public use
 

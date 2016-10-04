@@ -26,6 +26,11 @@ __email__     = 'prjemian@gmail.com'
 __copyright__ = '2016, Pete R. Jemian'
 
 __package_name__ = 'punx'
+
+from _version import git_release
+__version__ = u'0.0.9'
+__release__ = git_release(__package_name__, __version__)
+
 __license_url__  = 'http://creativecommons.org/licenses/by/4.0/deed.en_US'
 __license__      = 'Creative Commons Attribution 4.0 International Public License (see LICENSE file)'
 __description__  = 'Python Utilities for NeXus'
@@ -103,17 +108,3 @@ class HDF5_Open_Error(Exception):
 
 class SchemaNotFound(Exception): 
     'custom exception'
-
-
-import os
-on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
-try:
-    from ._version import get_versions
-except ValueError:
-    from _version import get_versions
-__version__ = get_versions()['version']
-del get_versions
-if on_rtd:
-    # special handling for readthedocs.org, remove distracting info
-    __version__ = __version__.split('+')[0]
-__release__   = __version__

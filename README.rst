@@ -3,6 +3,10 @@ punx
 
 Python Utilities for NeXus HDF5 files: validation, structure, hierarchy
 
+:version:   |version|
+:release:   |release|
+:published: |today|
+
 :author:    Pete R. Jemian
 :email:     prjemian@gmail.com
 :copyright: 2016, Pete R. Jemian

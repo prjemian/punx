@@ -293,7 +293,15 @@ class Data_File_Validator(object):
                     self.new_finding('default plot group', aname, f, msg)
 
         for child_name in group:           # review the group's children
-            child = group[child_name]
+            try:
+                child = group[child_name]
+            except KeyError, _exc:
+                filename = self.missing_file_link(_exc.message)
+                if filename is not None:
+                    title = 'external file link'
+                    msg = 'missing file: ' + filename
+                    self.new_finding(title, group.name+'/'+child_name, finding.ERROR, msg)
+                continue
             if h5structure.isNeXusLink(child):
                 if nx_class_defaults['ignoreExtraGroups']:
                     title = nx_class_name+'@ignoreExtraGroups'
@@ -490,7 +498,15 @@ class Data_File_Validator(object):
         nx_type = self.data_types[defaults['type']]
         target_exists = field_name in group
         if target_exists:
-            dataset = group[field_name]
+            try:
+                dataset = group[field_name]
+            except KeyError, _exc:
+                filename = self.missing_file_link(_exc.message)
+                if filename is not None:
+                    title = 'external file link'
+                    msg = 'missing file: ' + filename
+                    self.new_finding(title, group.name+'/'+field_name, finding.ERROR, msg)
+                    return
         else:
             dataset = None
         nm = '/'.join((nx_class_name, field_name))
@@ -705,7 +721,10 @@ class Data_File_Validator(object):
                             k = subnode.name + '@signal'
                             candidates['v3'][k] = '/NXentry/NXdata@signal'
                         for ss_node_name in subnode:
-                            ss_node = subnode[ss_node_name]
+                            try:
+                                ss_node = subnode[ss_node_name]
+                            except KeyError:
+                                continue
                             if not h5structure.isNeXusDataset(ss_node):
                                 continue
                             if ss_node.attrs.get('signal') is not None:
@@ -755,7 +774,7 @@ class Data_File_Validator(object):
                 m = 'NXdata group defines more than one default plot using v1'
                 self.new_finding(title, nxdata_addr, finding.NOTE, m)
         
-        cp = 'NXdata/field@signal'
+        cp = '/NXentry/NXdata/field@signal'
         title = 'NeXus default plot v1'
         if len(default_plot_addr) == 1:
             m = 'NeXus data file default plot defined'
@@ -778,7 +797,10 @@ class Data_File_Validator(object):
         default_plot_addr = []
         for h5_addr, nx_classpath in group_dict.items():
             title = 'NeXus default plot v2'
-            field = self.h5[h5_addr.split('@')[0]]
+            try:
+                field = self.h5[h5_addr.split('@')[0]]
+            except KeyError:
+                continue
             signal = self.get_hdf5_attribute(field, 'signal', report=True)
             if signal in (1, '1'):
                 m = nx_classpath + ' = 1'
@@ -790,7 +812,7 @@ class Data_File_Validator(object):
             # TODO: @axes and dimension scales    (see issue #41)
             # TODO: signal and dimension scales data shape
 
-        cp = 'NXdata/field@signal'
+        cp = '/NXentry/NXdata/field@signal'
         title = 'NeXus default plot v2'
         if len(default_plot_addr) == 1:
             m = 'NeXus data file default plot defined using v2'
@@ -1025,7 +1047,12 @@ class Data_File_Validator(object):
         for item in path.split('/'):
             hp += '/' + item
             if hp in self.h5:
-                if h5structure.isHdf5Dataset(self.h5[hp]):
+                try:
+                    item = self.h5[hp]
+                except KeyError, _exc:
+                    cp += '/missing_external_file_link'
+                    continue
+                if h5structure.isHdf5Dataset(item):
                     cp += '/field'
                 else:
                     obj = self.h5[hp]
@@ -1106,12 +1133,36 @@ class Data_File_Validator(object):
         return t.reST()
     
     def report_classpath(self):
+        '''
+        make a table of the known NeXus class paths
+        '''
         import pyRestTable
         t = pyRestTable.Table()
         t.labels = 'HDF5-address  NeXus-classpath'.split()
         for k, v in self.addresses.items():
             t.rows.append((k, v.classpath))
         return t.reST()
+    
+    def missing_file_link(self, text):
+        '''
+        Return file name if error message from KeyError due to missing external file link, else None
+        
+        Such as::
+        
+            Unable to open object (Unable to open file: name = 'data\\../nt15698-1/processing/waxs_mask.nxs', errno = 2, error message = 'no such file or directory', flags = 0, o_flags = 0)
+        
+        Returns::
+        
+            data\\../nt15698-1/processing/waxs_mask.nxs
+        
+        '''
+        filename = None
+        m1 = 'Unable to open object (Unable to open file: name = '
+        p1 = text.find(m1)
+        if p1 >= 0:
+            p2 = text.find(', errno =')
+            filename = text[p1 + len(m1) : p2].strip("'")
+        return filename
 
 if __name__ == '__main__':
     print "Start this module using:  python main.py validate ..."

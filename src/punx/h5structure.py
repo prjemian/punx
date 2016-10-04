@@ -267,7 +267,9 @@ class h5structure(object):
                     item = str(_exc)
             else:
                 # this replaces a lot of code: if rank == ...
-                indices = ', '.join( [str(key)] + (':'*(rank-1)).split() )
+                indices = [':' for _ in range(rank)]
+                indices[0] = '0'
+                indices = ', '.join(indices)
                 try:
                     part = eval('obj[%s]' % indices)
                 except IOError, _exc:

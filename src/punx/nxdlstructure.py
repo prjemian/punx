@@ -385,7 +385,8 @@ class NX_field(NX_mixin):
 
     def __str__(self):
         s = self.name
-        s += ' : ' + self.attributes['defined']['type']
+        if 'type' in self.attributes['defined']:
+            s += ' : ' + self.attributes['defined']['type']
         if len(self.dims):
             s += '[' + ', '.join(map(str, self.dims)) + ']'
         if len(self.enum):

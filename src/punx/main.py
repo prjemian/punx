@@ -260,8 +260,9 @@ class MyArgumentParser(argparse.ArgumentParser):
 def parse_command_line_arguments():
     '''process command line'''
     doc = __doc__.strip().splitlines()[0]
+    doc += '\n  version: ' + __init__.__version__
+    doc += '\n  release: ' + __init__.__release__
     doc += '\n  URL: ' + __init__.__url__
-    doc += '\n  v' + __init__.__version__
     epilog = 'Note: It is only necessary to use the first two (or'
     epilog += ' more) characters of any subcommand, enough that the'
     epilog += ' abbreviation is unique. '

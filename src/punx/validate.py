@@ -118,7 +118,14 @@ def validate_xml(xml_file_name):
     '''
     xml_tree = lxml.etree.parse(xml_file_name)
     xsd = cache.get_XML_Schema()
-    return xsd.assertValid(xml_tree)
+    try:
+        result = xsd.assertValid(xml_tree)
+    except lxml.etree.DocumentInvalid, exc:
+        msg = 'DocumentInvalid:\n'
+        msg += 'file: ' + xml_file_name + '\n'
+        msg += str(exc)
+        raise Exception(msg)
+    return result
 
 
 class NxdlPattern(object):

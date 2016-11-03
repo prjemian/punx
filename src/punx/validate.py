@@ -907,9 +907,12 @@ class Data_File_Validator(object):
 
                             if len(axis_data.shape) == 1:
                                 dimension_scales.append(axis_data)
-                            elif  len(axis_data.shape) == 2:
-                                for indx in indices:
-                                    dimension_scales.append(axis_data[indx])
+                            elif len(axis_data.shape) == 2:
+                                if not isinstance(indices, numpy.ndarray):
+                                    dimension_scales.append(axis_data[indices])
+                                else:
+                                    for indx in indices:
+                                        dimension_scales.append(axis_data[indx])
                             else:
                                 m = axis_data.name + '@axes, axis=' + axis_name
                                 m += ' has rank=' + str(len(axis_data.shape))

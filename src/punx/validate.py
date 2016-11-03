@@ -892,9 +892,9 @@ class Data_File_Validator(object):
                                 if isinstance(indices, tuple):
                                     indices = numpy.ndarray(indices)
                                 if isinstance(indices, numpy.ndarray) and len(indices) > 1:
-                                    t = numpy.all(indices < len(axis_data.shape))
+                                    t = numpy.all(indices < len(signal_data.shape))
                                 else:
-                                    t = indices < len(axis_data.shape)
+                                    t = indices < len(signal_data.shape)
                                 f = finding.TF_RESULT[t]
                                 m = 'value = ' + str(indices)
                                 m += {True:': ok', False:': invalid'}[t]

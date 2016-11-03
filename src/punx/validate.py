@@ -889,10 +889,12 @@ class Data_File_Validator(object):
                                                      m)
                                     dimension_scales_ok = False
                             else:
-                                if (isinstance(indices, tuple) or isinstance(indices, numpy.ndarray)) and len(indices) > 1:
-                                    # might 'indices' be a list?  If this ever raises, then refactor (see #52)
-                                    raise ValueError(axis_name+'_indices = ' + str(indices))
-                                t = indices < len(axis_data.shape)
+                                if isinstance(indices, tuple):
+                                    indices = numpy.ndarray(indices)
+                                if isinstance(indices, numpy.ndarray) and len(indices) > 1:
+                                    t = numpy.all(indices < len(axis_data.shape))
+                                else:
+                                    t = indices < len(axis_data.shape)
                                 f = finding.TF_RESULT[t]
                                 m = 'value = ' + str(indices)
                                 m += {True:': ok', False:': invalid'}[t]
@@ -906,7 +908,8 @@ class Data_File_Validator(object):
                             if len(axis_data.shape) == 1:
                                 dimension_scales.append(axis_data)
                             elif  len(axis_data.shape) == 2:
-                                dimension_scales.append(axis_data[indices])    # will this work?
+                                for indx in indices:
+                                    dimension_scales.append(axis_data[indx])
                             else:
                                 m = axis_data.name + '@axes, axis=' + axis_name
                                 m += ' has rank=' + str(len(axis_data.shape))

@@ -871,10 +871,10 @@ class Data_File_Validator(object):
                             f = finding.OK
                             self.new_finding(ttl+'='+axis_name, addr+'@axes', f, m)
                             # check @AXISNAME_indices holds index of dimension scale data to use
-                            # dimension scale = index 'indx' of nxdata[axis_name]
+                            # dimension scale = index 'indices' of nxdata[axis_name]
                             axis_data = nxdata[axis_name]
-                            indx = self.get_hdf5_attribute(nxdata, axis_name+'_indices')
-                            if indx is None:
+                            indices = self.get_hdf5_attribute(nxdata, axis_name+'_indices')
+                            if indices is None:
                                 if len(axis_data.shape) == 1:
                                     m = 'not provided, assume = 0'
                                     self.new_finding('NXdata@'+axis_name+'_indices', 
@@ -889,12 +889,12 @@ class Data_File_Validator(object):
                                                      m)
                                     dimension_scales_ok = False
                             else:
-                                if isinstance(indx, tuple) > 1:
-                                    # might 'indx' be a list?  If this ever raises, then refactor
-                                    raise ValueError(axis_name+'_indices = ' + str(indx))
-                                t = indx < len(axis_data.shape)
+                                if (isinstance(indices, tuple) or isinstance(indices, numpy.ndarray)) and len(indices) > 1:
+                                    # might 'indices' be a list?  If this ever raises, then refactor (see #52)
+                                    raise ValueError(axis_name+'_indices = ' + str(indices))
+                                t = indices < len(axis_data.shape)
                                 f = finding.TF_RESULT[t]
-                                m = 'value = ' + str(indx)
+                                m = 'value = ' + str(indices)
                                 m += {True:': ok', False:': invalid'}[t]
                                 self.new_finding('NXdata@'+axis_name+'_indices', 
                                                      nxdata.name+'@'+axis_name+'_indices', 
@@ -906,7 +906,7 @@ class Data_File_Validator(object):
                             if len(axis_data.shape) == 1:
                                 dimension_scales.append(axis_data)
                             elif  len(axis_data.shape) == 2:
-                                dimension_scales.append(axis_data[indx])    # will this work?
+                                dimension_scales.append(axis_data[indices])    # will this work?
                             else:
                                 m = axis_data.name + '@axes, axis=' + axis_name
                                 m += ' has rank=' + str(len(axis_data.shape))

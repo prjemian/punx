@@ -149,11 +149,11 @@ class h5structure(object):
             for name in obj.attrs:
                 try:
                     value = obj.attrs.get(name, '')
-                except IOError, _exc:
+                except IOError as _exc:
                     value = 'IOError: ' +  str(_exc)
                 try:
                     s.append("%s  @%s = %s" % (indentation, name, str(value)))
-                except UnicodeDecodeError, _exc:
+                except UnicodeDecodeError as _exc:
                     s.append("%s  @%s = %s" % (indentation, name, 'UnicodeDecodeError: ' + str(_exc)))
         return s
 
@@ -181,7 +181,7 @@ class h5structure(object):
                 value = " = %s" % str(dset.value)
             try:
                 s += [ "%s%s:%s%s" % (indentation, name, txType, str(value)) ]
-            except UnicodeDecodeError, _exc:
+            except UnicodeDecodeError as _exc:
                 s += [ "%s%s:%s%s" % (indentation, name, txType, 'UnicodeDecodeError: ' + str(_exc)) ]
             s += self._renderAttributes(dset, indentation)
             # dset.dtype.kind == 'S', nchar = dset.dtype.itemsize
@@ -263,7 +263,7 @@ class h5structure(object):
             if rank == 1:
                 try:
                     item = obj[key]
-                except Exception, _exc:
+                except Exception as _exc:
                     item = str(_exc)
             else:
                 # this replaces a lot of code: if rank == ...
@@ -272,7 +272,7 @@ class h5structure(object):
                 indices = ', '.join(indices)
                 try:
                     part = eval('obj[%s]' % indices)
-                except IOError, _exc:
+                except IOError as _exc:
                     return 'IOError: ' + str(_exc)
                 item = self._renderNdArray(part, indents + '  ')    # recursion
             return item
@@ -401,7 +401,7 @@ def isNeXusFile_ByNXdataAttrs(filename):
 
         f.close()
         return True
-    except Exception, _exc:
+    except Exception as _exc:
         pass    # ignore any Exceptions, they mean that result stays "False"
     return False
 

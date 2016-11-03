@@ -42,7 +42,7 @@ def git_release(package, version='release_undefined'):
         out, _err = p.communicate()
         if out:
             release = out.decode().strip()
-    except Exception, _exc:
+    except Exception as _exc:
         pass
     return release
 

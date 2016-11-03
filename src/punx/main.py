@@ -183,7 +183,7 @@ def func_validate(args):
             exit_message('File not found: ' + args.infile)
         except __init__.HDF5_Open_Error:
             exit_message('Could not open as HDF5: ' + args.infile)
-        except __init__.SchemaNotFound, _exc:
+        except __init__.SchemaNotFound as _exc:
             exit_message(str(_exc))
     
         # determine which findings are to be reported

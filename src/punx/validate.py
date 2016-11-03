@@ -120,7 +120,7 @@ def validate_xml(xml_file_name):
     xsd = cache.get_XML_Schema()
     try:
         result = xsd.assertValid(xml_tree)
-    except lxml.etree.DocumentInvalid, exc:
+    except lxml.etree.DocumentInvalid as exc:
         msg = 'DocumentInvalid:\n'
         msg += 'file: ' + xml_file_name + '\n'
         msg += str(exc)
@@ -302,7 +302,7 @@ class Data_File_Validator(object):
         for child_name in group:           # review the group's children
             try:
                 child = group[child_name]
-            except KeyError, _exc:
+            except KeyError as _exc:
                 filename = self.missing_file_link(_exc.message)
                 if filename is not None:
                     title = 'external file link'
@@ -507,7 +507,7 @@ class Data_File_Validator(object):
         if target_exists:
             try:
                 dataset = group[field_name]
-            except KeyError, _exc:
+            except KeyError as _exc:
                 filename = self.missing_file_link(_exc.message)
                 if filename is not None:
                     title = 'external file link'
@@ -660,7 +660,7 @@ class Data_File_Validator(object):
                     try:    # to raise the exception
                         _test = '%s' % str(m)
                         f = finding.WARN
-                    except UnicodeDecodeError, _exc:
+                    except UnicodeDecodeError as _exc:
                         f = finding.ERROR
                         msg += ', UnicodeDecodeError'
         else:
@@ -1056,7 +1056,7 @@ class Data_File_Validator(object):
             if hp in self.h5:
                 try:
                     item = self.h5[hp]
-                except KeyError, _exc:
+                except KeyError as _exc:
                     cp += '/missing_external_file_link'
                     continue
                 if h5structure.isHdf5Dataset(item):

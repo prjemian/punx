@@ -199,7 +199,7 @@ def githubMasterInfo(org, repo):
     for _retry in range(__init__.GITHUB_RETRY_COUNT):
         try:
             r = requests.get(url, verify=False)
-        except requests.exceptions.ConnectionError, _exc:
+        except requests.exceptions.ConnectionError as _exc:
             # see: http://docs.python-requests.org/en/master/user/quickstart/#errors-and-exceptions
             # see: http://docs.python-requests.org/en/master/api/#id1
             __init__.LOG_MESSAGE('ConnectionError from ' + str(url), __init__.ERROR)
@@ -268,7 +268,7 @@ def update_NXDL_Cache(force_update=False):
     for _retry in range(__init__.GITHUB_RETRY_COUNT):
         try:
             content = requests.get(url, verify=False).content
-        except requests.exceptions.ConnectionError, _exc:
+        except requests.exceptions.ConnectionError as _exc:
             msg = 'ConnectionError from ' + str(url)
             msg += ', ' + str(_exc)
             __init__.LOG_MESSAGE(msg, __init__.ERROR)
@@ -440,7 +440,7 @@ def get_nxdl_xsd():
     if __singleton_nxdl_xsd__ is None:
         try:
             xsd_file_name = abs_NXDL_filename(NXDL_SCHEMA_FILE)
-        except __init__.FileNotFound, _exc:
+        except __init__.FileNotFound as _exc:
             raise __init__.SchemaNotFound(_exc)
 
         if not os.path.exists(xsd_file_name):

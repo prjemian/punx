@@ -205,7 +205,7 @@ class NX_mixin(object):
         '''
         try:
             name = obj.name
-        except AttributeError, _exc:
+        except AttributeError as _exc:
             name = 'symbol'    # FIXME: NX_symbols.name is not defined
         if name in db:
             for i in range(1, 1+len(db)):

@@ -81,7 +81,7 @@ def exit_message(msg, status=None, exit_code=1):
         status = __init__.ERROR
     __init__.LOG_MESSAGE(msg, status)
     if __init__.LOG_MESSAGE != logs.to_console:
-        print msg
+        print(msg)
     exit(exit_code)
 
 
@@ -113,37 +113,37 @@ def func_demo(args):
     path = os.path.dirname(__file__)
     args.infile = os.path.abspath(os.path.join(path, 'data', 'writer_1_3.hdf5'))
 
-    print 'console> punx validate ' + args.infile
+    print('console> punx validate ' + args.infile)
     args.report = ','.join(sorted(finding.VALID_STATUS_DICT.keys()))
     func_validate(args)
     del args.report
 
-    print 'console> punx structure ' + args.infile
+    print('console> punx structure ' + args.infile)
     import h5structure
     mc = h5structure.h5structure(args.infile)
     #    :param bool show_attributes: display attributes in output
     show_attributes=True
     mc.array_items_shown = 5
-    print '\n'.join(mc.report(show_attributes))
+    print('\n'.join(mc.report(show_attributes)))
 
 
 def func_hierarchy(args):
     url = 'http://punx.readthedocs.io/en/latest/analyze.html'
-    print 'A chart of the NeXus hierarchy is in the **punx** documentation.'
-    print 'see: ' + url
+    print('A chart of the NeXus hierarchy is in the **punx** documentation.')
+    print('see: ' + url)
     # TODO: issue #1 & #10 show NeXus base class hierarchy from a given base class
 
 
 def func_show(args):
-    print 'still in development -- not implemented yet'
-    print args
+    print('still in development -- not implemented yet')
+    print(args)
 
 
 def func_structure(args):
     if args.infile.endswith('.nxdl.xml'):
         import nxdlstructure
         nxdl = nxdlstructure.NX_definition(args.infile)
-        print nxdl.render()
+        print(nxdl.render())
     else:
         import h5structure
         
@@ -161,7 +161,7 @@ def func_structure(args):
             report = mc.report(show_attributes)
         except __init__.HDF5_Open_Error:
             exit_message('Could not open as HDF5: ' + args.infile)
-        print '\n'.join(report or '')
+        print('\n'.join(report or ''))
 
 
 def func_update(args):
@@ -175,7 +175,7 @@ def func_validate(args):
     if args.infile.endswith('.nxdl.xml'):
         result = validate.validate_xml(args.infile)
         if result is None:
-            print args.infile, ' validates'
+            print(args.infile, ' validates')
     else:
         try:
             validator = validate.Data_File_Validator(args.infile)
@@ -205,13 +205,19 @@ def func_validate(args):
         validator.validate()
 
         # report the findings from the validation
-        print 'Validation findings'
-        print ':file: ' + os.path.basename(validator.fname)
-        print ':validation results shown: ', ', '.join(sorted(map(str, report_choices)))
-        print validator.report_findings(report_choices)
+        import cache
+        qset = cache.qsettings()
+        print('Validate file ' + os.path.basename(validator.fname))
+        print(':NXDL cache: ' + cache.get_nxdl_dir())
+        print(':NXDL GIT sha: ' + qset.getKey('git_sha'))
+        print(':NXDL GIT date/time: ' + qset.getKey('git_time'))
+        print(':validation results shown: ' + ' '.join(sorted(map(str, report_choices))))
+        print('')
+        print('Validation findings')
+        print(validator.report_findings(report_choices))
         
-        print 'summary statistics'
-        print validator.report_findings_summary()
+        print('summary statistics')
+        print(validator.report_findings_summary())
 
 
 class MyArgumentParser(argparse.ArgumentParser):

@@ -134,7 +134,7 @@ class h5structure(object):
                         s += [ fmt % (indentation, '@path', linkref.path) ]
                 else:
                     msg = "unidentified %s: %s, %s", itemname, repr(classref), repr(linkref)
-                    raise Exception, msg
+                    raise Exception(msg)
 
         for value in groups:        # show things that look like groups
             itemname = value.name.split("/")[-1]
@@ -504,5 +504,5 @@ def isHdf5ExternalLink(obj):
 
 
 if __name__ == '__main__':
-    print "Start this module using:  python main.py structure ..."
+    print("Start this module using:  python main.py structure ...")
     exit(0)

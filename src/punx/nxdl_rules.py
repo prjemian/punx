@@ -446,7 +446,7 @@ class Recursion(Mixin):
 
 def main():
     rules = NxdlRules()
-    print rules
+    print(rules)
 
 
 if __name__ == '__main__':  # remove for production

@@ -474,5 +474,5 @@ if __name__ == '__main__':
 #     update_NXDL_Cache(True)
 # #     # print user_cache_settings().fileName()
 # #     # print source_cache_settings().fileName()
-    print "Start this module using:  python main.py update ..."
+    print("Start this module using:  python main.py update ...")
     exit(0)

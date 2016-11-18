@@ -559,11 +559,11 @@ def _developer():
     import logs
     __init__.LOG_MESSAGE = logs.to_console
     nxdl_dict = _get_specs_from_NXDL_files()
-    print sorted(nxdl_dict.keys())
+    print(sorted(nxdl_dict.keys()))
 
 
 if __name__ == '__main__':
     # TODO: remove for production
-    # print "Start this module using:  python main.py structure ..."
+    # print("Start this module using:  python main.py structure ...")
     # exit(0)
     _developer()

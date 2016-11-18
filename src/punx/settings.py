@@ -59,10 +59,10 @@ class QSettingsMixin(object):
             default group (unspecified) is ``__init__.GLOBAL_INI_GROUP``
         '''
         if len(full_key) == 0:
-            raise KeyError, 'must supply a key'
+            raise KeyError('must supply a key')
         parts = full_key.split('/')
         if len(parts) > 2:
-            raise KeyError, 'too many "/" separators: ' + full_key
+            raise KeyError('too many "/" separators: ' + full_key)
         if len(parts) == 1:
             group, key = __init__.GLOBAL_INI_GROUP, str(parts[0])
         elif len(parts) == 2:

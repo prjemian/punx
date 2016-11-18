@@ -77,7 +77,7 @@ class Logger(object):
         text = "(%d,%s,%s) %s" % (self.pid, self.filename, timestamp, message)
 
         if self.level == __init__.CONSOLE_ONLY:
-            print text
+            print(text)
         else:
             logging.log(interest, text)
 
@@ -113,7 +113,7 @@ def to_console(message, interest=None):
     '''
     if interest >= __init__.DEFAULT_LOG_LEVEL:
         status = logging.getLevelName(interest) + ':'
-        print status, message
+        print(status, message)
 
 
 def _now():

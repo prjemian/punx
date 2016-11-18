@@ -61,17 +61,17 @@ def base_class_hierarchy(nxdl_dict):
     
     # print out commands for graphviz
     #   dot -Tpng graph.dot -o graph.png
-    print 'digraph G {'
-    print '  rankdir=LR;'
-    print '  NXentry [shape=box,color=red];'
-    print '  NXdata [shape=box,color=red];'
+    print('digraph G {')
+    print('  rankdir=LR;')
+    print('  NXentry [shape=box,color=red];')
+    print('  NXdata [shape=box,color=red];')
     for p, db in sorted(ab.items()):
         for c, n in sorted(db.items()):
             if p == 'NXentry' and c == 'NXdata':
-                print '  %s -> %s [weight=%d,shape=box,style=filled,color=red];' % (p, c, n+100)
+                print('  %s -> %s [weight=%d,shape=box,style=filled,color=red];' % (p, c, n+100))
             else:
-                print '  %s -> %s [weight=%d];' % (p, c, n)
-    print '}'
+                print('  %s -> %s [weight=%d];' % (p, c, n))
+    print('}')
 
 
 if __name__ == '__main__':

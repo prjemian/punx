@@ -1178,5 +1178,5 @@ class Data_File_Validator(object):
         return filename
 
 if __name__ == '__main__':
-    print "Start this module using:  python main.py validate ..."
+    print("Start this module using:  python main.py validate ...")
     exit(0)

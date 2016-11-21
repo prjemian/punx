@@ -90,8 +90,3 @@ Example::
    It is only necessary to use the first two (or more) characters of any
    subcommand enough that the abbreviation is unique. 
    Such as: ``demonstrate`` can be abbreviated to ``demo`` or even ``de``.
-
-README
-******
-
-.. include:: ../../README.rst

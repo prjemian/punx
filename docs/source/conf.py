@@ -237,69 +237,29 @@ latex_documents = [
 #latex_domain_indices = True
 
 
-# -- Options for manual page output ---------------------------------------
+# -- Mock  ---------------------------------------------
+# substitute calls for packages not used in building documentation
 
-# One entry per manual page. List of tuples
-# (source start file, name, description, authors, manual section).
-man_pages = [
-    ('index', 
-    punx.__package_name__+'.tex', 
-    punx.__package_name__+u' Documentation',
-    [punx.__author__],
-    1)
-]
-
-# If true, show URL addresses after external links.
-#man_show_urls = False
-
-
-# -- Options for Texinfo output -------------------------------------------
-
-# Grouping the document tree into Texinfo files. List of tuples
-# (source start file, target name, title, author,
-#  dir menu entry, description, category)
-texinfo_documents = [
-  ('index', 
-    punx.__package_name__+'.tex', 
-    punx.__package_name__+u' Documentation',
-    punx.__author__,
-    punx.__package_name__, 
-    punx.__description__,
-    'Miscellaneous'),
-]
-
-# Documents to append as an appendix to all manuals.
-#texinfo_appendices = []
-
-# If false, no module index is generated.
-#texinfo_domain_indices = True
-
-# How to display URL addresses: 'footnote', 'no', or 'inline'.
-#texinfo_show_urls = 'footnote'
-
-# If true, do not generate a @detailmenu in the "Top" node's menu.
-#texinfo_no_detailmenu = False
-
-
-# picked from http://read-the-docs.readthedocs.org/en/latest/faq.html#i-get-import-errors-on-libraries-that-depend-on-c-modules  # noqa
-class Mock(object):
-
-    __all__ = []
-
-    def __init__(self, *args, **kwargs):
-        pass
-
-    def __call__(self, *args, **kwargs):
-        return Mock()
-
-    @classmethod
-    def __getattr__(cls, name):
-        if name in ('__file__', '__path__'):
-            return '/dev/null'
-        elif name == 'c_byte':
-            return 0
-        else:
-            return Mock()
+try:
+    from unittest.mock import MagicMock
+except ImportError:
+    try:
+        from mock import MagicMock
+    except ImportError:
+        raise ImportError("No module named mock - you need to install "
+                           "mock to build the documentation")
 
 for mod_name in punx.__sphinx_mock_list__:
-    sys.modules[mod_name] = Mock()
+    sys.modules[mod_name] = MagicMock()
+
+
+class MyPyQt4(MagicMock):
+    class QtCore(object):
+        # PyQt4.QtCore public class mocks
+        _QtCore_public_classes = """QSettings QVariant"""
+        for _name in _QtCore_public_classes.split():
+            locals()[_name] = type(_name, (), {})
+        del _name
+
+
+sys.modules['PyQt4'] = MyPyQt4()

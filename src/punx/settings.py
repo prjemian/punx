@@ -23,12 +23,7 @@ manage the settings file for this application
 
 import datetime
 import os
-
-on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
-if on_rtd:
-    from mock_PyQt4 import QtCore
-else:
-    from PyQt4 import QtCore
+from PyQt4 import QtCore
 
 import __init__
 

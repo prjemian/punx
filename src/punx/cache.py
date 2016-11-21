@@ -74,12 +74,7 @@ import requests.packages.urllib3
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 import StringIO
 import zipfile
-
-on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
-if on_rtd:
-    from mock_PyQt4 import QtCore
-else:
-    from PyQt4 import QtCore
+from PyQt4 import QtCore
 
 import nxdlstructure
 import settings

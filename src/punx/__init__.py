@@ -21,14 +21,18 @@ Python Utilities for NeXus HDF5 files
 # The full license is in the file LICENSE.txt, distributed with this software.
 #-----------------------------------------------------------------------------
 
+import os
+from _version import git_release
+
 __author__    = 'Pete R. Jemian'
 __email__     = 'prjemian@gmail.com'
 __copyright__ = '2016, Pete R. Jemian'
 
 __package_name__ = 'punx'
 
-from _version import git_release
-__version__ = u'0.0.9'
+_path = os.path.dirname(__file__)
+_vfile = os.path.join(_path, 'VERSION')
+__version__ = open(_vfile, 'r').read()
 __release__ = git_release(__package_name__, __version__)
 
 __license_url__  = 'http://creativecommons.org/licenses/by/4.0/deed.en_US'

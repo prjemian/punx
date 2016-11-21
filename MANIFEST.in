@@ -1,6 +1,6 @@
 include README.rst
 include src/punx/LICENSE.txt
-include versioneer.py
+include src/punx/VERSION
 include src/punx/_version.py
 include src/punx/cache/*
 include src/punx/cache/*/*.xsd

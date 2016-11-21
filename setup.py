@@ -26,7 +26,6 @@ long_description = open('README.rst', 'r').read()
 
 
 setup (name =  punx.__package_name__,        # punx
-       #version          = punx.__version__,
        license          = punx.__license__,
        version          = punx.__version__,
        description      = punx.__description__,
@@ -49,6 +48,8 @@ setup (name =  punx.__package_name__,        # punx
                                      'cache/*/*/*.xml',
                                      'cache/*/*/*.xsl',
                                      'data/writer_*.hdf5',
+                                     'LICENSE.txt',
+                                     'VERSION',
                                      ],
                          },
        classifiers      = punx.__classifiers__,

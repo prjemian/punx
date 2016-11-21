@@ -1,0 +1,819 @@
+======================================== ================================== ====== ====================================================
+address                                  validation                         status comment(s)
+======================================== ================================== ====== ====================================================
+/                                        @NX_class                          OK     file root (assumed): NXroot
+/@SPEC_date                              validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/@HDF5_Version                           validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/@SPEC_file                              validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/@SPEC_epoch                             validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/@SPEC_user                              validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/@numpy_version                          validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/@spec2nexus_version                     validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/@h5py_version                           validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/@SPEC_comments                          validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/@SPEC_num_headers                       validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/@default                                validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/@default                                default plot group                 OK     exists: S22
+/S22                                     validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22@NX_class                            @NX_class                          OK     known: NXentry
+/S22@default                             validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22@default                             default plot group                 OK     exists: data
+/S22/G                                   validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/G@NX_class                          @NX_class                          OK     known: NXnote
+/S22/G@description                       validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/G/G0                                validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/G/G0@spec_name                      validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/G/G0@spec_name                      NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/G/G0@units                          field@units                        NOTE   does not exist
+/S22/G/G1                                validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/G/G1@spec_name                      validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/G/G1@spec_name                      NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/G/G1@units                          field@units                        NOTE   does not exist
+/S22/G/G2                                validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/G/G2@spec_name                      validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/G/G2@spec_name                      NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/G/G2@units                          field@units                        NOTE   does not exist
+/S22/G                                   NXDL review                        TODO   validate with NXnote specification (incomplete)
+/S22/MCA                                 validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/MCA@NX_class                        @NX_class                          OK     known: NXnote
+/S22/MCA@description                     validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/MCA/first_saved                     validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/MCA/first_saved@units               field@units                        NOTE   does not exist
+/S22/MCA/last_saved                      validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/MCA/last_saved@units                field@units                        NOTE   does not exist
+/S22/MCA/number_saved                    validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/MCA/number_saved@units              field@units                        NOTE   does not exist
+/S22/MCA/reduction_coef                  validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/MCA/reduction_coef@units            field@units                        NOTE   does not exist
+/S22/MCA                                 NXDL review                        TODO   validate with NXnote specification (incomplete)
+/S22/Q                                   validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/Q@description                       validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/Q@description                       NXentry@description                NOTE   attribute not defined in NXDL
+/S22/Q@units                             field@units                        NOTE   does not exist
+/S22/T                                   validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/T@units                             validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/T@description                       validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/T@description                       NXentry@description                NOTE   attribute not defined in NXDL
+/S22/T@units                             field@units                        OK     value: s
+/S22/command                             validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/comments                            validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/counting_basis                      validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/data                                validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/data@NX_class                       @NX_class                          OK     known: NXdata
+/S22/data/Epoch                          NXdata@ignoreExtraFields           UNUSED field ignored per NXDL specification
+/S22/data/H                              NXdata@ignoreExtraFields           UNUSED field ignored per NXDL specification
+/S22/data/I0                             NXdata@ignoreExtraFields           UNUSED field ignored per NXDL specification
+/S22/data/I00                            NXdata@ignoreExtraFields           UNUSED field ignored per NXDL specification
+/S22/data/I0_1                           NXdata@ignoreExtraFields           UNUSED field ignored per NXDL specification
+/S22/data/K                              NXdata@ignoreExtraFields           UNUSED field ignored per NXDL specification
+/S22/data/Kalpha                         NXdata@ignoreExtraFields           UNUSED field ignored per NXDL specification
+/S22/data/L                              NXdata@ignoreExtraFields           UNUSED field ignored per NXDL specification
+/S22/data/_mca_                          NXdata@ignoreExtraFields           UNUSED field ignored per NXDL specification
+/S22/data/_mca_channel_                  NXdata@ignoreExtraFields           UNUSED field ignored per NXDL specification
+/S22/data/chi                            NXdata@ignoreExtraFields           UNUSED field ignored per NXDL specification
+/S22/data/elastic                        NXdata@ignoreExtraFields           UNUSED field ignored per NXDL specification
+/S22/data/eta                            NXdata@ignoreExtraFields           UNUSED field ignored per NXDL specification
+/S22/data/harmonic                       NXdata@ignoreExtraFields           UNUSED field ignored per NXDL specification
+/S22/data/seconds                        NXdata@ignoreExtraFields           UNUSED field ignored per NXDL specification
+/S22/data/signal                         NXdata@ignoreExtraFields           UNUSED field ignored per NXDL specification
+/S22/data/signal2                        NXdata@ignoreExtraFields           UNUSED field ignored per NXDL specification
+/S22/data                                NXDL review                        TODO   validate with NXdata specification (incomplete)
+/S22/date                                validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/definition                          validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/definition@description              validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/definition@description              NXentry@description                NOTE   attribute not defined in NXDL
+/S22/definition                          @nameType                          OK     name is specified
+/S22/metadata                            validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata@NX_class                   @NX_class                          OK     known: NXnote
+/S22/metadata@description                validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/COUPLE_ID_to_DCM           validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/COUPLE_ID_to_DCM@spec_name validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/COUPLE_ID_to_DCM@spec_name NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/COUPLE_ID_to_DCM@units     field@units                        NOTE   does not exist
+/S22/metadata/D3_Amps                    validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/D3_Amps@spec_name          validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/D3_Amps@spec_name          NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/D3_Amps@units              field@units                        NOTE   does not exist
+/S22/metadata/D3_VDC                     validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/D3_VDC@spec_name           validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/D3_VDC@spec_name           NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/D3_VDC@units               field@units                        NOTE   does not exist
+/S22/metadata/D3_bias                    validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/D3_bias@spec_name          validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/D3_bias@spec_name          NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/D3_bias@units              field@units                        NOTE   does not exist
+/S22/metadata/D3_dark                    validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/D3_dark@spec_name          validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/D3_dark@spec_name          NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/D3_dark@units              field@units                        NOTE   does not exist
+/S22/metadata/D3_gain                    validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/D3_gain@spec_name          validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/D3_gain@spec_name          NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/D3_gain@units              field@units                        NOTE   does not exist
+/S22/metadata/D3_pos                     validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/D3_pos@spec_name           validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/D3_pos@spec_name           NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/D3_pos@units               field@units                        NOTE   does not exist
+/S22/metadata/D3_suppr                   validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/D3_suppr@spec_name         validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/D3_suppr@spec_name         NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/D3_suppr@units             field@units                        NOTE   does not exist
+/S22/metadata/D3_time                    validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/D3_time@spec_name          validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/D3_time@spec_name          NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/D3_time@units              field@units                        NOTE   does not exist
+/S22/metadata/DCM_energy                 validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/DCM_energy@spec_name       validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/DCM_energy@spec_name       NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/DCM_energy@units           field@units                        NOTE   does not exist
+/S22/metadata/DCM_lambda                 validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/DCM_lambda@spec_name       validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/DCM_lambda@spec_name       NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/DCM_lambda@units           field@units                        NOTE   does not exist
+/S22/metadata/DCM_mode                   validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/DCM_mode@spec_name         validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/DCM_mode@spec_name         NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/DCM_mode@units             field@units                        NOTE   does not exist
+/S22/metadata/DCM_omega2                 validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/DCM_omega2@spec_name       validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/DCM_omega2@spec_name       NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/DCM_omega2@units           field@units                        NOTE   does not exist
+/S22/metadata/DCM_theta0                 validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/DCM_theta0@spec_name       validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/DCM_theta0@spec_name       NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/DCM_theta0@units           field@units                        NOTE   does not exist
+/S22/metadata/DCM_thetaEnc               validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/DCM_thetaEnc@spec_name     validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/DCM_thetaEnc@spec_name     NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/DCM_thetaEnc@units         field@units                        NOTE   does not exist
+/S22/metadata/FB_o2_on                   validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/FB_o2_on@spec_name         validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/FB_o2_on@spec_name         NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/FB_o2_on@units             field@units                        NOTE   does not exist
+/S22/metadata/FB_o2_r                    validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/FB_o2_r@spec_name          validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/FB_o2_r@spec_name          NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/FB_o2_r@units              field@units                        NOTE   does not exist
+/S22/metadata/FB_o2_sp                   validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/FB_o2_sp@spec_name         validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/FB_o2_sp@spec_name         NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/FB_o2_sp@units             field@units                        NOTE   does not exist
+/S22/metadata/HSC1b                      validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/HSC1b@spec_name            validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/HSC1b@spec_name            NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/HSC1b@units                field@units                        NOTE   does not exist
+/S22/metadata/HSC1h                      validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/HSC1h@spec_name            validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/HSC1h@spec_name            NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/HSC1h@units                field@units                        NOTE   does not exist
+/S22/metadata/HSC1h0                     validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/HSC1h0@spec_name           validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/HSC1h0@spec_name           NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/HSC1h0@units               field@units                        NOTE   does not exist
+/S22/metadata/HSC1l                      validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/HSC1l@spec_name            validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/HSC1l@spec_name            NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/HSC1l@units                field@units                        NOTE   does not exist
+/S22/metadata/HSC1r                      validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/HSC1r@spec_name            validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/HSC1r@spec_name            NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/HSC1r@units                field@units                        NOTE   does not exist
+/S22/metadata/HSC1t                      validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/HSC1t@spec_name            validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/HSC1t@spec_name            NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/HSC1t@units                field@units                        NOTE   does not exist
+/S22/metadata/HSC1v                      validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/HSC1v@spec_name            validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/HSC1v@spec_name            NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/HSC1v@units                field@units                        NOTE   does not exist
+/S22/metadata/HSC1v0                     validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/HSC1v0@spec_name           validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/HSC1v0@spec_name           NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/HSC1v0@units               field@units                        NOTE   does not exist
+/S22/metadata/HSC2b                      validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/HSC2b@spec_name            validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/HSC2b@spec_name            NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/HSC2b@units                field@units                        NOTE   does not exist
+/S22/metadata/HSC2h                      validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/HSC2h@spec_name            validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/HSC2h@spec_name            NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/HSC2h@units                field@units                        NOTE   does not exist
+/S22/metadata/HSC2h0                     validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/HSC2h0@spec_name           validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/HSC2h0@spec_name           NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/HSC2h0@units               field@units                        NOTE   does not exist
+/S22/metadata/HSC2l                      validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/HSC2l@spec_name            validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/HSC2l@spec_name            NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/HSC2l@units                field@units                        NOTE   does not exist
+/S22/metadata/HSC2r                      validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/HSC2r@spec_name            validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/HSC2r@spec_name            NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/HSC2r@units                field@units                        NOTE   does not exist
+/S22/metadata/HSC2t                      validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/HSC2t@spec_name            validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/HSC2t@spec_name            NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/HSC2t@units                field@units                        NOTE   does not exist
+/S22/metadata/HSC2v                      validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/HSC2v@spec_name            validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/HSC2v@spec_name            NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/HSC2v@units                field@units                        NOTE   does not exist
+/S22/metadata/HSC2v0                     validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/HSC2v0@spec_name           validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/HSC2v0@spec_name           NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/HSC2v0@units               field@units                        NOTE   does not exist
+/S22/metadata/HSC3b                      validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/HSC3b@spec_name            validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/HSC3b@spec_name            NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/HSC3b@units                field@units                        NOTE   does not exist
+/S22/metadata/HSC3h                      validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/HSC3h@spec_name            validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/HSC3h@spec_name            NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/HSC3h@units                field@units                        NOTE   does not exist
+/S22/metadata/HSC3h0                     validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/HSC3h0@spec_name           validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/HSC3h0@spec_name           NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/HSC3h0@units               field@units                        NOTE   does not exist
+/S22/metadata/HSC3l                      validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/HSC3l@spec_name            validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/HSC3l@spec_name            NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/HSC3l@units                field@units                        NOTE   does not exist
+/S22/metadata/HSC3r                      validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/HSC3r@spec_name            validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/HSC3r@spec_name            NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/HSC3r@units                field@units                        NOTE   does not exist
+/S22/metadata/HSC3t                      validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/HSC3t@spec_name            validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/HSC3t@spec_name            NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/HSC3t@units                field@units                        NOTE   does not exist
+/S22/metadata/HSC3v                      validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/HSC3v@spec_name            validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/HSC3v@spec_name            NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/HSC3v@units                field@units                        NOTE   does not exist
+/S22/metadata/HSC3v0                     validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/HSC3v0@spec_name           validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/HSC3v0@spec_name           NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/HSC3v0@units               field@units                        NOTE   does not exist
+/S22/metadata/HSC4b                      validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/HSC4b@spec_name            validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/HSC4b@spec_name            NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/HSC4b@units                field@units                        NOTE   does not exist
+/S22/metadata/HSC4h                      validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/HSC4h@spec_name            validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/HSC4h@spec_name            NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/HSC4h@units                field@units                        NOTE   does not exist
+/S22/metadata/HSC4h0                     validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/HSC4h0@spec_name           validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/HSC4h0@spec_name           NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/HSC4h0@units               field@units                        NOTE   does not exist
+/S22/metadata/HSC4l                      validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/HSC4l@spec_name            validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/HSC4l@spec_name            NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/HSC4l@units                field@units                        NOTE   does not exist
+/S22/metadata/HSC4r                      validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/HSC4r@spec_name            validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/HSC4r@spec_name            NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/HSC4r@units                field@units                        NOTE   does not exist
+/S22/metadata/HSC4t                      validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/HSC4t@spec_name            validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/HSC4t@spec_name            NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/HSC4t@units                field@units                        NOTE   does not exist
+/S22/metadata/HSC4v                      validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/HSC4v@spec_name            validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/HSC4v@spec_name            NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/HSC4v@units                field@units                        NOTE   does not exist
+/S22/metadata/HSC4v0                     validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/HSC4v0@spec_name           validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/HSC4v0@spec_name           NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/HSC4v0@units               field@units                        NOTE   does not exist
+/S22/metadata/I00_Amps                   validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/I00_Amps@spec_name         validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/I00_Amps@spec_name         NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/I00_Amps@units             field@units                        NOTE   does not exist
+/S22/metadata/I00_VDC                    validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/I00_VDC@spec_name          validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/I00_VDC@spec_name          NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/I00_VDC@units              field@units                        NOTE   does not exist
+/S22/metadata/I00_bias                   validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/I00_bias@spec_name         validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/I00_bias@spec_name         NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/I00_bias@units             field@units                        NOTE   does not exist
+/S22/metadata/I00_dark                   validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/I00_dark@spec_name         validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/I00_dark@spec_name         NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/I00_dark@units             field@units                        NOTE   does not exist
+/S22/metadata/I00_gain                   validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/I00_gain@spec_name         validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/I00_gain@spec_name         NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/I00_gain@units             field@units                        NOTE   does not exist
+/S22/metadata/I00_suppr                  validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/I00_suppr@spec_name        validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/I00_suppr@spec_name        NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/I00_suppr@units            field@units                        NOTE   does not exist
+/S22/metadata/I00_time                   validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/I00_time@spec_name         validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/I00_time@spec_name         NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/I00_time@units             field@units                        NOTE   does not exist
+/S22/metadata/I0_Amps                    validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/I0_Amps@spec_name          validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/I0_Amps@spec_name          NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/I0_Amps@units              field@units                        NOTE   does not exist
+/S22/metadata/I0_VDC                     validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/I0_VDC@spec_name           validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/I0_VDC@spec_name           NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/I0_VDC@units               field@units                        NOTE   does not exist
+/S22/metadata/I0_bias                    validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/I0_bias@spec_name          validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/I0_bias@spec_name          NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/I0_bias@units              field@units                        NOTE   does not exist
+/S22/metadata/I0_dark                    validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/I0_dark@spec_name          validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/I0_dark@spec_name          NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/I0_dark@units              field@units                        NOTE   does not exist
+/S22/metadata/I0_gain                    validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/I0_gain@spec_name          validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/I0_gain@spec_name          NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/I0_gain@units              field@units                        NOTE   does not exist
+/S22/metadata/I0_suppr                   validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/I0_suppr@spec_name         validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/I0_suppr@spec_name         NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/I0_suppr@units             field@units                        NOTE   does not exist
+/S22/metadata/I0_time                    validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/I0_time@spec_name          validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/I0_time@spec_name          NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/I0_time@units              field@units                        NOTE   does not exist
+/S22/metadata/ID_E                       validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/ID_E@spec_name             validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/ID_E@spec_name             NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/ID_E@units                 field@units                        NOTE   does not exist
+/S22/metadata/ID_E_Offset                validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/ID_E_Offset@spec_name      validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/ID_E_Offset@spec_name      NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/ID_E_Offset@units          field@units                        NOTE   does not exist
+/S22/metadata/ID_gap                     validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/ID_gap@spec_name           validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/ID_gap@spec_name           NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/ID_gap@units               field@units                        NOTE   does not exist
+/S22/metadata/ID_harmonic                validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/ID_harmonic@spec_name      validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/ID_harmonic@spec_name      NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/ID_harmonic@units          field@units                        NOTE   does not exist
+/S22/metadata/ID_taperE                  validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/ID_taperE@spec_name        validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/ID_taperE@spec_name        NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/ID_taperE@units            field@units                        NOTE   does not exist
+/S22/metadata/ID_taperGap                validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/ID_taperGap@spec_name      validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/ID_taperGap@spec_name      NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/ID_taperGap@units          field@units                        NOTE   does not exist
+/S22/metadata/JFK540_i0                  validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/JFK540_i0@spec_name        validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/JFK540_i0@spec_name        NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/JFK540_i0@units            field@units                        NOTE   does not exist
+/S22/metadata/JFK540_i1                  validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/JFK540_i1@spec_name        validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/JFK540_i1@spec_name        NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/JFK540_i1@units            field@units                        NOTE   does not exist
+/S22/metadata/JFK540_i10                 validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/JFK540_i10@spec_name       validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/JFK540_i10@spec_name       NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/JFK540_i10@units           field@units                        NOTE   does not exist
+/S22/metadata/JFK540_i11                 validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/JFK540_i11@spec_name       validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/JFK540_i11@spec_name       NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/JFK540_i11@units           field@units                        NOTE   does not exist
+/S22/metadata/JFK540_i12                 validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/JFK540_i12@spec_name       validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/JFK540_i12@spec_name       NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/JFK540_i12@units           field@units                        NOTE   does not exist
+/S22/metadata/JFK540_i13                 validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/JFK540_i13@spec_name       validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/JFK540_i13@spec_name       NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/JFK540_i13@units           field@units                        NOTE   does not exist
+/S22/metadata/JFK540_i14                 validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/JFK540_i14@spec_name       validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/JFK540_i14@spec_name       NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/JFK540_i14@units           field@units                        NOTE   does not exist
+/S22/metadata/JFK540_i15                 validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/JFK540_i15@spec_name       validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/JFK540_i15@spec_name       NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/JFK540_i15@units           field@units                        NOTE   does not exist
+/S22/metadata/JFK540_i2                  validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/JFK540_i2@spec_name        validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/JFK540_i2@spec_name        NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/JFK540_i2@units            field@units                        NOTE   does not exist
+/S22/metadata/JFK540_i3                  validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/JFK540_i3@spec_name        validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/JFK540_i3@spec_name        NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/JFK540_i3@units            field@units                        NOTE   does not exist
+/S22/metadata/JFK540_i4                  validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/JFK540_i4@spec_name        validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/JFK540_i4@spec_name        NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/JFK540_i4@units            field@units                        NOTE   does not exist
+/S22/metadata/JFK540_i5                  validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/JFK540_i5@spec_name        validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/JFK540_i5@spec_name        NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/JFK540_i5@units            field@units                        NOTE   does not exist
+/S22/metadata/JFK540_i6                  validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/JFK540_i6@spec_name        validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/JFK540_i6@spec_name        NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/JFK540_i6@units            field@units                        NOTE   does not exist
+/S22/metadata/JFK540_i7                  validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/JFK540_i7@spec_name        validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/JFK540_i7@spec_name        NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/JFK540_i7@units            field@units                        NOTE   does not exist
+/S22/metadata/JFK540_i8                  validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/JFK540_i8@spec_name        validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/JFK540_i8@spec_name        NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/JFK540_i8@units            field@units                        NOTE   does not exist
+/S22/metadata/JFK540_i9                  validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/JFK540_i9@spec_name        validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/JFK540_i9@spec_name        NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/JFK540_i9@units            field@units                        NOTE   does not exist
+/S22/metadata/JFK540_o0                  validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/JFK540_o0@spec_name        validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/JFK540_o0@spec_name        NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/JFK540_o0@units            field@units                        NOTE   does not exist
+/S22/metadata/JFK540_o1                  validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/JFK540_o1@spec_name        validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/JFK540_o1@spec_name        NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/JFK540_o1@units            field@units                        NOTE   does not exist
+/S22/metadata/JFK540_o2                  validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/JFK540_o2@spec_name        validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/JFK540_o2@spec_name        NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/JFK540_o2@units            field@units                        NOTE   does not exist
+/S22/metadata/JFK540_o3                  validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/JFK540_o3@spec_name        validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/JFK540_o3@spec_name        NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/JFK540_o3@units            field@units                        NOTE   does not exist
+/S22/metadata/Mirr1_angle                validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/Mirr1_angle@spec_name      validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/Mirr1_angle@spec_name      NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/Mirr1_angle@units          field@units                        NOTE   does not exist
+/S22/metadata/Mirr1_stripe               validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/Mirr1_stripe@spec_name     validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/Mirr1_stripe@spec_name     NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/Mirr1_stripe@units         field@units                        NOTE   does not exist
+/S22/metadata/Mirr1_y                    validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/Mirr1_y@spec_name          validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/Mirr1_y@spec_name          NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/Mirr1_y@units              field@units                        NOTE   does not exist
+/S22/metadata/Mirr2_angle                validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/Mirr2_angle@spec_name      validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/Mirr2_angle@spec_name      NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/Mirr2_angle@units          field@units                        NOTE   does not exist
+/S22/metadata/Mirr2_stripe               validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/Mirr2_stripe@spec_name     validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/Mirr2_stripe@spec_name     NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/Mirr2_stripe@units         field@units                        NOTE   does not exist
+/S22/metadata/Mirr2_y                    validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/Mirr2_y@spec_name          validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/Mirr2_y@spec_name          NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/Mirr2_y@units              field@units                        NOTE   does not exist
+/S22/metadata/PF4_bladeA1                validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/PF4_bladeA1@spec_name      validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/PF4_bladeA1@spec_name      NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/PF4_bladeA1@units          field@units                        NOTE   does not exist
+/S22/metadata/PF4_bladeA2                validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/PF4_bladeA2@spec_name      validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/PF4_bladeA2@spec_name      NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/PF4_bladeA2@units          field@units                        NOTE   does not exist
+/S22/metadata/PF4_bladeA3                validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/PF4_bladeA3@spec_name      validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/PF4_bladeA3@spec_name      NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/PF4_bladeA3@units          field@units                        NOTE   does not exist
+/S22/metadata/PF4_bladeA4                validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/PF4_bladeA4@spec_name      validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/PF4_bladeA4@spec_name      NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/PF4_bladeA4@units          field@units                        NOTE   does not exist
+/S22/metadata/PF4_bladeB1                validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/PF4_bladeB1@spec_name      validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/PF4_bladeB1@spec_name      NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/PF4_bladeB1@units          field@units                        NOTE   does not exist
+/S22/metadata/PF4_bladeB2                validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/PF4_bladeB2@spec_name      validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/PF4_bladeB2@spec_name      NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/PF4_bladeB2@units          field@units                        NOTE   does not exist
+/S22/metadata/PF4_bladeB3                validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/PF4_bladeB3@spec_name      validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/PF4_bladeB3@spec_name      NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/PF4_bladeB3@units          field@units                        NOTE   does not exist
+/S22/metadata/PF4_bladeB4                validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/PF4_bladeB4@spec_name      validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/PF4_bladeB4@spec_name      NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/PF4_bladeB4@units          field@units                        NOTE   does not exist
+/S22/metadata/PF4_thickAl                validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/PF4_thickAl@spec_name      validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/PF4_thickAl@spec_name      NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/PF4_thickAl@units          field@units                        NOTE   does not exist
+/S22/metadata/PF4_thickTi                validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/PF4_thickTi@spec_name      validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/PF4_thickTi@spec_name      NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/PF4_thickTi@units          field@units                        NOTE   does not exist
+/S22/metadata/PF4_trans                  validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/PF4_trans@spec_name        validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/PF4_trans@spec_name        NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/PF4_trans@units            field@units                        NOTE   does not exist
+/S22/metadata/PIN_Amps                   validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/PIN_Amps@spec_name         validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/PIN_Amps@spec_name         NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/PIN_Amps@units             field@units                        NOTE   does not exist
+/S22/metadata/PIN_VDC                    validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/PIN_VDC@spec_name          validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/PIN_VDC@spec_name          NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/PIN_VDC@units              field@units                        NOTE   does not exist
+/S22/metadata/PIN_bias                   validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/PIN_bias@spec_name         validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/PIN_bias@spec_name         NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/PIN_bias@units             field@units                        NOTE   does not exist
+/S22/metadata/PIN_dark                   validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/PIN_dark@spec_name         validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/PIN_dark@spec_name         NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/PIN_dark@units             field@units                        NOTE   does not exist
+/S22/metadata/PIN_gain                   validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/PIN_gain@spec_name         validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/PIN_gain@spec_name         NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/PIN_gain@units             field@units                        NOTE   does not exist
+/S22/metadata/PIN_suppr                  validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/PIN_suppr@spec_name        validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/PIN_suppr@spec_name        NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/PIN_suppr@units            field@units                        NOTE   does not exist
+/S22/metadata/PIN_time                   validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/PIN_time@spec_name         validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/PIN_time@spec_name         NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/PIN_time@units             field@units                        NOTE   does not exist
+/S22/metadata/SR_BPM_HA                  validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/SR_BPM_HA@spec_name        validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/SR_BPM_HA@spec_name        NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/SR_BPM_HA@units            field@units                        NOTE   does not exist
+/S22/metadata/SR_BPM_HP                  validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/SR_BPM_HP@spec_name        validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/SR_BPM_HP@spec_name        NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/SR_BPM_HP@units            field@units                        NOTE   does not exist
+/S22/metadata/SR_BPM_VA                  validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/SR_BPM_VA@spec_name        validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/SR_BPM_VA@spec_name        NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/SR_BPM_VA@units            field@units                        NOTE   does not exist
+/S22/metadata/SR_BPM_VP                  validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/SR_BPM_VP@spec_name        validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/SR_BPM_VP@spec_name        NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/SR_BPM_VP@units            field@units                        NOTE   does not exist
+/S22/metadata/SR_current                 validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/SR_current@spec_name       validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/SR_current@spec_name       NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/SR_current@units           field@units                        NOTE   does not exist
+/S22/metadata/SR_fb                      validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/SR_fb@spec_name            validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/SR_fb@spec_name            NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/SR_fb@units                field@units                        NOTE   does not exist
+/S22/metadata/SR_fbH                     validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/SR_fbH@spec_name           validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/SR_fbH@spec_name           NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/SR_fbH@units               field@units                        NOTE   does not exist
+/S22/metadata/SR_fbV                     validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/SR_fbV@spec_name           validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/SR_fbV@spec_name           NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/SR_fbV@units               field@units                        NOTE   does not exist
+/S22/metadata/SR_fill                    validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/SR_fill@spec_name          validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/SR_fill@spec_name          NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/SR_fill@units              field@units                        NOTE   does not exist
+/S22/metadata/SR_mode                    validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/SR_mode@spec_name          validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/SR_mode@spec_name          NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/SR_mode@units              field@units                        NOTE   does not exist
+/S22/metadata/SR_status                  validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/SR_status@spec_name        validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/SR_status@spec_name        NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/SR_status@units            field@units                        NOTE   does not exist
+/S22/metadata/SR_topUp                   validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/SR_topUp@spec_name         validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/SR_topUp@spec_name         NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/SR_topUp@units             field@units                        NOTE   does not exist
+/S22/metadata/barometer_mbar             validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/barometer_mbar@spec_name   validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/barometer_mbar@spec_name   NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/barometer_mbar@units       field@units                        NOTE   does not exist
+/S22/metadata/dark1                      validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/dark1@spec_name            validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/dark1@spec_name            NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/dark1@units                field@units                        NOTE   does not exist
+/S22/metadata/dark10                     validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/dark10@spec_name           validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/dark10@spec_name           NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/dark10@units               field@units                        NOTE   does not exist
+/S22/metadata/dark11                     validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/dark11@spec_name           validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/dark11@spec_name           NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/dark11@units               field@units                        NOTE   does not exist
+/S22/metadata/dark12                     validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/dark12@spec_name           validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/dark12@spec_name           NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/dark12@units               field@units                        NOTE   does not exist
+/S22/metadata/dark13                     validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/dark13@spec_name           validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/dark13@spec_name           NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/dark13@units               field@units                        NOTE   does not exist
+/S22/metadata/dark14                     validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/dark14@spec_name           validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/dark14@spec_name           NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/dark14@units               field@units                        NOTE   does not exist
+/S22/metadata/dark15                     validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/dark15@spec_name           validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/dark15@spec_name           NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/dark15@units               field@units                        NOTE   does not exist
+/S22/metadata/dark16                     validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/dark16@spec_name           validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/dark16@spec_name           NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/dark16@units               field@units                        NOTE   does not exist
+/S22/metadata/dark2                      validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/dark2@spec_name            validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/dark2@spec_name            NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/dark2@units                field@units                        NOTE   does not exist
+/S22/metadata/dark3                      validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/dark3@spec_name            validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/dark3@spec_name            NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/dark3@units                field@units                        NOTE   does not exist
+/S22/metadata/dark4                      validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/dark4@spec_name            validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/dark4@spec_name            NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/dark4@units                field@units                        NOTE   does not exist
+/S22/metadata/dark5                      validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/dark5@spec_name            validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/dark5@spec_name            NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/dark5@units                field@units                        NOTE   does not exist
+/S22/metadata/dark6                      validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/dark6@spec_name            validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/dark6@spec_name            NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/dark6@units                field@units                        NOTE   does not exist
+/S22/metadata/dark7                      validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/dark7@spec_name            validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/dark7@spec_name            NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/dark7@units                field@units                        NOTE   does not exist
+/S22/metadata/dark8                      validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/dark8@spec_name            validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/dark8@spec_name            NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/dark8@units                field@units                        NOTE   does not exist
+/S22/metadata/dark9                      validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/dark9@spec_name            validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/dark9@spec_name            NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/dark9@units                field@units                        NOTE   does not exist
+/S22/metadata/darkCoTime                 validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/darkCoTime@spec_name       validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/darkCoTime@spec_name       NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/darkCoTime@units           field@units                        NOTE   does not exist
+/S22/metadata/darkRing                   validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/darkRing@spec_name         validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/darkRing@spec_name         NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/darkRing@units             field@units                        NOTE   does not exist
+/S22/metadata/darkToTime                 validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/metadata/darkToTime@spec_name       validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/darkToTime@spec_name       NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/darkToTime@units           field@units                        NOTE   does not exist
+/S22/metadata/jfk_sclr_auto              validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/jfk_sclr_auto@spec_name    validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/metadata/jfk_sclr_auto@spec_name    NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/metadata/jfk_sclr_auto@units        field@units                        NOTE   does not exist
+/S22/metadata                            NXDL review                        TODO   validate with NXnote specification (incomplete)
+/S22/positioners                         validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/positioners@NX_class                @NX_class                          OK     known: NXnote
+/S22/positioners@description             validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/positioners/DCM                     validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/positioners/DCM@spec_name           validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/positioners/DCM@spec_name           NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/positioners/DCM@units               field@units                        NOTE   does not exist
+/S22/positioners/a2Theta                 validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/positioners/a2Theta@spec_name       validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/positioners/a2Theta@spec_name       NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/positioners/a2Theta@units           field@units                        NOTE   does not exist
+/S22/positioners/aTheta                  validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/positioners/aTheta@spec_name        validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/positioners/aTheta@spec_name        NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/positioners/aTheta@units            field@units                        NOTE   does not exist
+/S22/positioners/ana_chi                 validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/positioners/ana_chi@spec_name       validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/positioners/ana_chi@spec_name       NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/positioners/ana_chi@units           field@units                        NOTE   does not exist
+/S22/positioners/ana_theta               validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/positioners/ana_theta@spec_name     validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/positioners/ana_theta@spec_name     NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/positioners/ana_theta@units         field@units                        NOTE   does not exist
+/S22/positioners/chi                     validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/positioners/chi@spec_name           validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/positioners/chi@spec_name           NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/positioners/chi@units               field@units                        NOTE   does not exist
+/S22/positioners/delta                   validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/positioners/delta@spec_name         validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/positioners/delta@spec_name         NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/positioners/delta@units             field@units                        NOTE   does not exist
+/S22/positioners/eta                     validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/positioners/eta@spec_name           validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/positioners/eta@spec_name           NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/positioners/eta@units               field@units                        NOTE   does not exist
+/S22/positioners/ion_ch_vert             validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/positioners/ion_ch_vert@spec_name   validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/positioners/ion_ch_vert@spec_name   NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/positioners/ion_ch_vert@units       field@units                        NOTE   does not exist
+/S22/positioners/kEta                    validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/positioners/kEta@spec_name          validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/positioners/kEta@spec_name          NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/positioners/kEta@units              field@units                        NOTE   does not exist
+/S22/positioners/kappa                   validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/positioners/kappa@spec_name         validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/positioners/kappa@spec_name         NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/positioners/kappa@units             field@units                        NOTE   does not exist
+/S22/positioners/mr                      validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/positioners/mr@spec_name            validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/positioners/mr@spec_name            NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/positioners/mr@units                field@units                        NOTE   does not exist
+/S22/positioners/mu                      validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/positioners/mu@spec_name            validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/positioners/mu@spec_name            NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/positioners/mu@units                field@units                        NOTE   does not exist
+/S22/positioners/nu                      validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/positioners/nu@spec_name            validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/positioners/nu@spec_name            NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/positioners/nu@units                field@units                        NOTE   does not exist
+/S22/positioners/phi                     validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/positioners/phi@spec_name           validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/positioners/phi@spec_name           NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/positioners/phi@units               field@units                        NOTE   does not exist
+/S22/positioners/sampleX                 validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/positioners/sampleX@spec_name       validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/positioners/sampleX@spec_name       NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/positioners/sampleX@units           field@units                        NOTE   does not exist
+/S22/positioners/sampleY                 validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/positioners/sampleY@spec_name       validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/positioners/sampleY@spec_name       NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/positioners/sampleY@units           field@units                        NOTE   does not exist
+/S22/positioners/sampleZ                 validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*
+/S22/positioners/sampleZ@spec_name       validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/positioners/sampleZ@spec_name       NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/positioners/sampleZ@units           field@units                        NOTE   does not exist
+/S22/positioners/slitmb                  validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/positioners/slitmb@spec_name        validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/positioners/slitmb@spec_name        NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/positioners/slitmb@units            field@units                        NOTE   does not exist
+/S22/positioners/slitml                  validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/positioners/slitml@spec_name        validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/positioners/slitml@spec_name        NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/positioners/slitml@units            field@units                        NOTE   does not exist
+/S22/positioners/slitmr                  validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/positioners/slitmr@spec_name        validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/positioners/slitmr@spec_name        NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/positioners/slitmr@units            field@units                        NOTE   does not exist
+/S22/positioners/slitmt                  validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/positioners/slitmt@spec_name        validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/positioners/slitmt@spec_name        NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/positioners/slitmt@units            field@units                        NOTE   does not exist
+/S22/positioners/slitwb                  validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/positioners/slitwb@spec_name        validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/positioners/slitwb@spec_name        NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/positioners/slitwb@units            field@units                        NOTE   does not exist
+/S22/positioners/slitwl                  validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/positioners/slitwl@spec_name        validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/positioners/slitwl@spec_name        NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/positioners/slitwl@units            field@units                        NOTE   does not exist
+/S22/positioners/slitwr                  validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/positioners/slitwr@spec_name        validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/positioners/slitwr@spec_name        NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/positioners/slitwr@units            field@units                        NOTE   does not exist
+/S22/positioners/slitwt                  validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/positioners/slitwt@spec_name        validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/positioners/slitwt@spec_name        NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/positioners/slitwt@units            field@units                        NOTE   does not exist
+/S22/positioners/theta                   validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/positioners/theta@spec_name         validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/positioners/theta@spec_name         NXnote@spec_name                   NOTE   attribute not defined in NXDL
+/S22/positioners/theta@units             field@units                        NOTE   does not exist
+/S22/positioners                         NXDL review                        TODO   validate with NXnote specification (incomplete)
+/S22/scan_number                         validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/title                               validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*
+/S22/title                               @nameType                          OK     name is specified
+/S22                                     NXDL review                        TODO   validate with NXentry specification (incomplete)
+/S22/definition                          NXDL data type: NXentry/definition OK     |S10 : NX_CHAR
+/S22/title                               NXDL data type: NXentry/title      OK     |S43 : NX_CHAR
+/                                        NXDL review                        TODO   validate with NXroot specification (incomplete)
+/S22/data@signal                         NXdata group default plot v3       OK     NXdata@signal = I0
+/S22/data@axes                           attribute data type                NOTE   variable length string array: ['eta' 'chi']
+/S22/data@axes                           NXdata@axes=eta                    OK     axes dataset found: eta
+/S22/data@eta_indices                    NXdata@eta_indices                 OK     value = 0: ok
+/S22/data@axes                           NXdata@axes=chi                    OK     axes dataset found: chi
+/S22/data@chi_indices                    NXdata@chi_indices                 OK     value = 0: ok
+/S22/data                                NXdata dimension scale(s)          OK     dimension scale(s) verified
+/S22/data                                NeXus default plot v3              OK     NeXus data file default plot: /NXentry/NXdata@signal
+======================================== ================================== ====== ====================================================
+
+======= ===== ===========================================================
+status  count description
+======= ===== ===========================================================
+OK      263   meets NeXus specification
+NOTE    514   does not meet NeXus specification, but acceptable
+WARN    0     does not meet NeXus specification, not generally acceptable
+ERROR   0     violates NeXus specification
+TODO    7     validation not implemented yet
+UNUSED  17    optional NeXus item not used in data file
+COMMENT 0     comment from the punx source code
+--      --    --
+TOTAL   801   --
+======= ===== ===========================================================

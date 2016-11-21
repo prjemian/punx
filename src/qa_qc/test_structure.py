@@ -10,7 +10,7 @@ sys.path.insert(0, '..')
 import punx.h5structure
 
 
-class SimpleHdf5File(common.TestHdf5FileStructure):
+class Structure_SimpleHdf5File(common.TestStructureHdf5File):
     
     expected_output = []
     expected_output.append("test file name will be placed here automatically")
@@ -41,25 +41,25 @@ class SimpleHdf5File(common.TestHdf5FileStructure):
         self.report = xture.report(show_attributes)
 
 
-class File_writer_1_3(common.TestHdf5FileStructure):
+class Structure_writer_1_3(common.TestStructureHdf5File):
 
     testfile = 'writer_1_3.hdf5'
     expected_output = common.read_file('structure_writer_1_3.txt')
 
 
-class File_writer_2_1(common.TestHdf5FileStructure):
+class Structure_writer_2_1(common.TestStructureHdf5File):
 
     testfile = 'writer_2_1.hdf5'
     expected_output = common.read_file('structure_writer_2_1.txt')
 
 
-class File_33id_spec_22_2D(common.TestHdf5FileStructure):
+class Structure_33id_spec_22_2D(common.TestStructureHdf5File):
 
     testfile = '33id_spec_22_2D.hdf5'
     expected_output = common.read_file('structure_33id_spec_22_2D.txt')
 
 
-class File_compression(common.TestHdf5FileStructure):
+class Structure_compression(common.TestStructureHdf5File):
 
     testfile = 'compression.h5'
     expected_output = common.read_file('structure_compression.txt')
@@ -67,11 +67,11 @@ class File_compression(common.TestHdf5FileStructure):
 
 
 if __name__ == '__main__':
-    cases = [SimpleHdf5File, 
-             File_writer_1_3,
-             File_writer_2_1,
-             File_33id_spec_22_2D,
-             File_compression,
+    cases = [Structure_SimpleHdf5File, 
+             Structure_writer_1_3,
+             Structure_writer_2_1,
+             Structure_33id_spec_22_2D,
+             Structure_compression,
              ]
     for case in cases:
         common.test_case_runner(case)

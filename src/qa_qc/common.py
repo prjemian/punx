@@ -11,7 +11,6 @@ import unittest
 sys.path.insert(0, '..')
 
 
-
 __test_file_name__ = None   # singleton
 
 
@@ -62,7 +61,7 @@ def test_case_runner(MySuite):
     cleanup()
 
 
-def punx_data_file(fname):
+def punx_data_file_name(fname):
     return os.path.abspath(os.path.join('..', 'punx', 'data', fname))
 
 
@@ -72,32 +71,13 @@ def read_file(fname):
     fp.close()
     return buf.strip().splitlines()
 
-class TestHdf5FileStructure(unittest.TestCase):
+
+class TestBaseHdf5File(unittest.TestCase):
 
     # testfile = 'writer_1_3.hdf5'
     # expected_output = ['file',]
     # ...
     NeXus = True
-
-    def setUp(self):
-        '''
-        read the self.testfile from the punx data file collection
-        '''
-        import punx.h5structure
-
-        fname = punx_data_file(self.testfile)
-        self.expected_output[0] = fname
-        if self.NeXus:
-            self.expected_output[0] += " : NeXus data file"
-
-        #    :param int limit: maximum number of array items to be shown (default = 5)
-        limit = 1
-        #    :param bool show_attributes: display attributes in output
-        show_attributes = True
- 
-        xture = punx.h5structure.h5structure(fname)
-        xture.array_items_shown = limit
-        self.report = xture.report(show_attributes)
 
     def test_00_report_length(self):
         '''
@@ -115,8 +95,66 @@ class TestHdf5FileStructure(unittest.TestCase):
         test output of structure analysis on a HDF5 file
         '''
         for item, actual in enumerate(self.report):
-            expected = str(self.expected_output[item])
+            actual = str(actual).rstrip()
+            expected = str(self.expected_output[item]).rstrip()
             msg = '|' + str(expected) + '|'
             msg += ' != '
             msg += '|' + str(actual) + '|'
             self.assertEqual(expected, actual, msg)
+
+
+class TestStructureHdf5File(TestBaseHdf5File):
+
+    # testfile = 'writer_1_3.hdf5'
+    # expected_output = ['file',]
+    # ...
+    NeXus = True
+
+    def setUp(self):
+        '''
+        read the self.testfile from the punx data file collection
+        '''
+        import punx.h5structure
+
+        fname = punx_data_file_name(self.testfile)
+        self.expected_output[0] = fname
+        if self.NeXus:
+            self.expected_output[0] += " : NeXus data file"
+
+        #    :param int limit: maximum number of array items to be shown (default = 5)
+        limit = 1
+        #    :param bool show_attributes: display attributes in output
+        show_attributes = True
+ 
+        xture = punx.h5structure.h5structure(fname)
+        xture.array_items_shown = limit
+        self.report = xture.report(show_attributes)
+
+
+class TestValidHdf5File(TestBaseHdf5File):
+
+    # testfile = 'writer_1_3.hdf5'
+    # expected_output = ['file',]
+    # ...
+    NeXus = True
+
+    def setUp(self):
+        '''
+        read the self.testfile from the punx data file collection
+        '''
+        import punx.validate, punx.finding, punx.logs
+        
+        punx.logs.ignore_logging()
+
+        fname = punx_data_file_name(self.testfile)
+        # self.expected_output[0] = fname
+        # if self.NeXus:
+        #     self.expected_output[0] += " : NeXus data file"
+ 
+        validator = punx.validate.Data_File_Validator(fname)
+        validator.validate()
+        self.report = []
+        
+        self.report += validator.report_findings(punx.finding.VALID_STATUS_LIST).splitlines()
+        self.report.append('')
+        self.report += validator.report_findings_summary().splitlines()

@@ -1,0 +1,36 @@
+========================== ============================ ====== ====================================================
+address                    validation                   status comment(s)
+========================== ============================ ====== ====================================================
+/                          @NX_class                    OK     file root (assumed): NXroot
+/SASentry@NX_class         attribute data type          NOTE   variable length string: ['NXentry']
+/SASentry                  validItemName                NOTE   relaxed re: [A-Za-z_][\w_]*
+/SASentry@NX_class         @NX_class                    OK     known: NXentry
+/SASentry/SASdata@NX_class attribute data type          NOTE   variable length string: ['NXdata']
+/SASentry/SASdata          validItemName                NOTE   relaxed re: [A-Za-z_][\w_]*
+/SASentry/SASdata@NX_class @NX_class                    OK     known: NXdata
+/SASentry/SASdata/I        NXdata@ignoreExtraFields     UNUSED field ignored per NXDL specification
+/SASentry/SASdata/Idev     NXdata@ignoreExtraFields     UNUSED field ignored per NXDL specification
+/SASentry/SASdata/Q        NXdata@ignoreExtraFields     UNUSED field ignored per NXDL specification
+/SASentry/SASdata          NXDL review                  TODO   validate with NXdata specification (incomplete)
+/SASentry                  NXDL review                  TODO   validate with NXentry specification (incomplete)
+/                          NXDL review                  TODO   validate with NXroot specification (incomplete)
+/SASentry/SASdata/I@signal attribute data type          NOTE   variable length string: ['I']
+/SASentry/SASdata/I@signal NeXus default plot v2        ERROR  expected @signal=1, found: I
+/SASentry/SASdata/I@signal NXdata group default plot v1 ERROR  expected @signal=1, found: I
+/SASentry/SASdata          NXdata group default plot v1 WARN   NXdata group does not define a default plot using v1
+/NXentry/NXdata/field      NeXus default plot           ERROR  no default plot: not a NeXus file
+========================== ============================ ====== ====================================================
+
+======= ===== ===========================================================
+status  count description
+======= ===== ===========================================================
+OK      3     meets NeXus specification
+NOTE    5     does not meet NeXus specification, but acceptable
+WARN    1     does not meet NeXus specification, not generally acceptable
+ERROR   3     violates NeXus specification
+TODO    3     validation not implemented yet
+UNUSED  3     optional NeXus item not used in data file
+COMMENT 0     comment from the punx source code
+--      --    --
+TOTAL   18    --
+======= ===== ===========================================================

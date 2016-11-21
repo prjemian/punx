@@ -116,6 +116,14 @@ def to_console(message, interest=None):
         print(status, message)
 
 
+def ignore_logging():
+    '''
+    used during unit testing
+    '''
+    __init__.DEFAULT_LOG_LEVEL = 999999
+    __init__.LOG_MESSAGE = to_console
+
+
 def _now():
     ''' '''
     return datetime.datetime.now()

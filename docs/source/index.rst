@@ -1,14 +1,8 @@
-
-punx documentation
-##################
-
-Python Utilities for NeXus HDF5 files
+.. include:: ../../README.rst
 
 :version:   |version|
 :release:   |release|
 :published: |today|
-
-NOTE: project is under initial construction, not yet released for public use
 
 Use these three steps to :ref:`install <install>` and try the :ref:`demo <demo>`:
 

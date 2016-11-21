@@ -4,14 +4,13 @@ test structure analysis process of punx package
 '''
 
 import sys
-import unittest
 
 import common
 sys.path.insert(0, '..')
 import punx.h5structure
 
 
-class SimpleHdf5File(unittest.TestCase):
+class SimpleHdf5File(common.TestHdf5FileStructure):
     
     expected_output = []
     expected_output.append("test file name will be placed here automatically")
@@ -40,25 +39,53 @@ class SimpleHdf5File(unittest.TestCase):
         xture.array_items_shown = limit
         self.report = xture.report(show_attributes)
 
-    def test_00_report_length(self):
-        '''
-        test number of lines in the report
-        '''
-        self.assertEqual(len(self.expected_output), 
-                         len(self.report), 
-                         "lines in structure report")
 
-    def test_expected_output(self):
-        '''
-        test output of structure analysis on a HDF5 file
-        '''
-        for item, actual in enumerate(self.report):
-            expected = str(self.expected_output[item])
-            msg = '|' + str(expected) + '|'
-            msg += ' != '
-            msg += '|' + str(actual) + '|'
-            self.assertEqual(expected, actual, msg)
+class Writer_1_3(common.TestHdf5FileStructure):
+
+    testfile = 'writer_1_3.hdf5'
+    expected_output = ['file',]
+    expected_output.append("  Scan:NXentry")
+    expected_output.append("    @NX_class = NXentry")
+    expected_output.append("    data:NXdata")
+    expected_output.append("      @NX_class = NXdata")
+    expected_output.append("      @signal = counts")
+    expected_output.append("      @axes = two_theta")
+    expected_output.append("      @two_theta_indices = [0]")
+    expected_output.append("      counts:NX_INT32[31] = [ ... ]")
+    expected_output.append("        @units = counts")
+    expected_output.append("      two_theta:NX_FLOAT64[31] = [ ... ]")
+    expected_output.append("        @units = degrees")
+
+
+class Writer_2_1(common.TestHdf5FileStructure):
+
+    testfile = 'writer_2_1.hdf5'
+    expected_output = ['file',]
+    expected_output.append("  entry:NXentry")
+    expected_output.append("    @NX_class = NXentry")
+    expected_output.append("    data:NXdata")
+    expected_output.append("      @NX_class = NXdata")
+    expected_output.append("      @signal = counts")
+    expected_output.append("      @axes = two_theta")
+    expected_output.append("      @two_theta_indices = [0]")
+    expected_output.append("      counts --> /entry/instrument/detector/counts")
+    expected_output.append("      two_theta --> /entry/instrument/detector/two_theta")
+    expected_output.append("    instrument:NXinstrument")
+    expected_output.append("      @NX_class = NXinstrument")
+    expected_output.append("      detector:NXdetector")
+    expected_output.append("        @NX_class = NXdetector")
+    expected_output.append("        counts:NX_INT32[31] = [ ... ]")
+    expected_output.append("          @units = counts")
+    expected_output.append("          @target = /entry/instrument/detector/counts")
+    expected_output.append("        two_theta:NX_FLOAT64[31] = [ ... ]")
+    expected_output.append("          @units = degrees")
+    expected_output.append("          @target = /entry/instrument/detector/two_theta")
+    
+#     def test_print(self):
+#         print '\n'.join(self.report)
 
 
 if __name__ == '__main__':
     common.test_case_runner(SimpleHdf5File)
+    common.test_case_runner(Writer_1_3)
+    common.test_case_runner(Writer_2_1)

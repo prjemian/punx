@@ -12,6 +12,7 @@ Production
 Development
 ***********
 
+:0.1.0: 2016-11-21 -- unit tests added for reports
 :0.0.9: 2016-06-29 -- retry failed https requests to GitHub and cleanup a QString
 :0.0.8: 2016-06-29 -- refactor update procedure 
 :0.0.7: 2016-06-27 -- add "report" arguments to "demo" subcommand

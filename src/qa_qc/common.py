@@ -9,60 +9,50 @@ import tempfile
 import unittest
 
 
-class TestingBaseClass(unittest.TestCase):
+__test_file_name__ = None   # singleton
+
+
+def create_test_file(content_function=None):
+    """
+    create a new HDF5 test file
     
-    def setUp(self):
-        '''
-        run before *every* test method
-        '''
-        self.standard_setUp()
-    
-    def tearDown(self):
-        '''
-        this is run after *every* test method
-        '''
-        self.standard_tearDown()
-    
-    def standard_setUp(self):
-        '''
-        prepare for temporary file creation - this is run before *every* test method
-        '''
-        self.temp_files = []
-    
-    def standard_tearDown(self):
-        '''
-        remove any temporary files still remaining
-        '''
-        for fname in self.temp_files:
-            if os.path.exists(fname):
-                os.remove(fname)
-    
-    def set_hdf5_root_content(self, hdf5_root):
-        '''
-        each subclass must define the contents to be stored in the HDF5 file
-        
-        The base class will take of creating and closing the HDF5 file
-        during the setUp() method.
-        
-        :param obj hdf5_root: instance of h5py.File()
-        '''
-        msg = "must implement in each subclass of TestingBaseClass"
-        raise NotImplementedError(msg)
-    
-    def hdf5_setUp(self):
-        '''
-        prepare a temporary HDF5 file
-        '''
-        self.hfile = self.getNewTemporaryFile()
-        nxroot = h5py.File(self.hfile.name, "w")
-        self.set_hdf5_root_content(nxroot)
-        nxroot.close()
-    
-    def getNewTemporaryFile(self, suffix='.hdf5'):
-        '''
-        create a new temporary file, return its object
-        '''
-        hfile = tempfile.NamedTemporaryFile(suffix=suffix, delete=False)
-        hfile.close()
-        self.temp_files.append(hfile.name)
-        return hfile
+    :param obj content_function: method to add content(s) to hdf5root
+    """
+    hfile = tempfile.NamedTemporaryFile(suffix='.hdf5', delete=False)
+    hfile.close()
+    hdf5root = h5py.File(hfile.name, "w")
+    if content_function is not None:
+        content_function(hdf5root)
+    hdf5root.close()
+    return str(hfile.name)
+
+
+def getTestFileName(set_contents_function):
+    '''
+    create (or identify) the file to be tested
+    '''
+    global __test_file_name__
+    __test_file_name__ = __test_file_name__ or create_test_file(set_contents_function)
+    return __test_file_name__
+
+
+def cleanup():
+    '''
+    cleanup after all tests are done
+    '''
+    global __test_file_name__
+    if __test_file_name__ is not None:
+        if os.path.exists(__test_file_name__):
+            os.remove(__test_file_name__)
+        __test_file_name__ = None
+
+
+def suite_handler(MySuite):
+    test_suite = unittest.TestSuite()
+    test_suite.addTest(unittest.makeSuite(MySuite))
+    return test_suite
+
+
+def runner(MySuite):
+    runner=unittest.TextTestRunner(verbosity=2)
+    runner.run(suite_handler(MySuite))

@@ -7,46 +7,52 @@ import sys
 import unittest
 
 import common
+sys.path.insert(0, '..')
 import punx.h5structure
 
-sys.path.insert(0, '..')
+
+def set_hdf5_contents(root):
+    entry = root.create_group("entry")
+    entry.attrs["purpose"] = "punx unittest: test_hdf5_simple"
+    entry.create_dataset("item", data="a string of characters")
 
 
-class TestSimple(common.TestingBaseClass):
+class SimpleHdf5File(unittest.TestCase):
     
     expected_output = []
-    
-    def set_hdf5_root_content(self, nxroot):
-        nxentry = nxroot.create_group("entry")
-        nxentry.attrs["purpose"] = "punx unittest: test_hdf5_simple"
-        nxentry.create_dataset("item", data="a string of characters")
-
-        self.expected_output.append(self.hfile.name)
-        self.expected_output.append("  entry")
-        self.expected_output.append("    @purpose = punx unittest: test_hdf5_simple")
-        self.expected_output.append("    item:CHAR = a string of characters")
+    expected_output.append("test file name will be placed here automatically")
+    expected_output.append("  entry")
+    expected_output.append("    @purpose = punx unittest: test_hdf5_simple")
+    expected_output.append("    item:CHAR = a string of characters")
     
     def setUp(self):
         '''
         prepare for temporary file creation
         '''
-        self.standard_setUp()
-        self.hdf5_setUp()
+        fname = common.getTestFileName(set_hdf5_contents)
+        self.expected_output[0] = fname
 
         #    :param int limit: maximum number of array items to be shown (default = 5)
         limit = 5
         #    :param bool show_attributes: display attributes in output
         show_attributes = True
  
-        xture = punx.h5structure.h5structure(self.hfile.name)
+        xture = punx.h5structure.h5structure(fname)
         xture.array_items_shown = limit
         self.report = xture.report(show_attributes)
 
-    def test_hdf5_simple(self):
+    def test_00_report_length(self):
         '''
-        test structure analysis on a simple HDF5 structure
+        test number of lines in the report
         '''
-        self.assertEqual(4, len(self.report), "lines in structure report")
+        self.assertEqual(len(self.expected_output), 
+                         len(self.report), 
+                         "lines in structure report")
+
+    def test_expected_output(self):
+        '''
+        test output of structure analysis on a HDF5 file
+        '''
         for item, actual in enumerate(self.report):
             expected = str(self.expected_output[item])
             msg = '|' + str(expected) + '|'
@@ -56,4 +62,5 @@ class TestSimple(common.TestingBaseClass):
 
 
 if __name__ == '__main__':
-    unittest.main()
+    common.runner(SimpleHdf5File)
+    common.cleanup()

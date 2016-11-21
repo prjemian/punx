@@ -148,7 +148,7 @@ def func_structure(args):
         import h5structure
         
         #    :param int limit: maximum number of array items to be shown (default = 5)
-        limit=5
+        limit = args.max_array_items
         #    :param bool show_attributes: display attributes in output
         show_attributes=True
 
@@ -346,6 +346,12 @@ def parse_command_line_arguments():
                         default=True,
                         dest='show_attributes',
                         help='Do not print attributes of HDF5 file structure')
+    help_text = 'maximum number of array items to be shown'
+    p_structure.add_argument('-m', '--max_array_items',
+                       default=5,
+                       type=int,
+                       #choices=range(1,51),
+                       help=help_text)
     add_logging_argument(p_structure)
 
 

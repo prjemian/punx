@@ -62,11 +62,22 @@ def test_case_runner(MySuite):
     cleanup()
 
 
+def punx_data_file(fname):
+    return os.path.abspath(os.path.join('..', 'punx', 'data', fname))
+
+
+def read_file(fname):
+    fp = open(fname, 'r')
+    buf = fp.read()
+    fp.close()
+    return buf.strip().splitlines()
+
 class TestHdf5FileStructure(unittest.TestCase):
 
     # testfile = 'writer_1_3.hdf5'
     # expected_output = ['file',]
     # ...
+    NeXus = True
 
     def setUp(self):
         '''
@@ -74,8 +85,10 @@ class TestHdf5FileStructure(unittest.TestCase):
         '''
         import punx.h5structure
 
-        fname = os.path.abspath(os.path.join('..', 'punx', 'data', self.testfile))
-        self.expected_output[0] = fname + " : NeXus data file"
+        fname = punx_data_file(self.testfile)
+        self.expected_output[0] = fname
+        if self.NeXus:
+            self.expected_output[0] += " : NeXus data file"
 
         #    :param int limit: maximum number of array items to be shown (default = 5)
         limit = 1

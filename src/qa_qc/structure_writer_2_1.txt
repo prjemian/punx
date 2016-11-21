@@ -1,0 +1,20 @@
+C:\Users\Pete\Documents\eclipse\punx\src\punx\data\writer_2_1.hdf5 : NeXus data file
+  entry:NXentry
+    @NX_class = NXentry
+    data:NXdata
+      @NX_class = NXdata
+      @signal = counts
+      @axes = two_theta
+      @two_theta_indices = [0]
+      counts --> /entry/instrument/detector/counts
+      two_theta --> /entry/instrument/detector/two_theta
+    instrument:NXinstrument
+      @NX_class = NXinstrument
+      detector:NXdetector
+        @NX_class = NXdetector
+        counts:NX_INT32[31] = [ ... ]
+          @units = counts
+          @target = /entry/instrument/detector/counts
+        two_theta:NX_FLOAT64[31] = [ ... ]
+          @units = degrees
+          @target = /entry/instrument/detector/two_theta

@@ -17,6 +17,7 @@ class SimpleHdf5File(common.TestHdf5FileStructure):
     expected_output.append("  entry")
     expected_output.append("    @purpose = punx unittest: test_hdf5_simple")
     expected_output.append("    item:CHAR = a string of characters")
+    NeXus = False
 
     def set_hdf5_contents(self, root):
         entry = root.create_group("entry")
@@ -40,52 +41,37 @@ class SimpleHdf5File(common.TestHdf5FileStructure):
         self.report = xture.report(show_attributes)
 
 
-class Writer_1_3(common.TestHdf5FileStructure):
+class File_writer_1_3(common.TestHdf5FileStructure):
 
     testfile = 'writer_1_3.hdf5'
-    expected_output = ['file',]
-    expected_output.append("  Scan:NXentry")
-    expected_output.append("    @NX_class = NXentry")
-    expected_output.append("    data:NXdata")
-    expected_output.append("      @NX_class = NXdata")
-    expected_output.append("      @signal = counts")
-    expected_output.append("      @axes = two_theta")
-    expected_output.append("      @two_theta_indices = [0]")
-    expected_output.append("      counts:NX_INT32[31] = [ ... ]")
-    expected_output.append("        @units = counts")
-    expected_output.append("      two_theta:NX_FLOAT64[31] = [ ... ]")
-    expected_output.append("        @units = degrees")
+    expected_output = common.read_file('structure_writer_1_3.txt')
 
 
-class Writer_2_1(common.TestHdf5FileStructure):
+class File_writer_2_1(common.TestHdf5FileStructure):
 
     testfile = 'writer_2_1.hdf5'
-    expected_output = ['file',]
-    expected_output.append("  entry:NXentry")
-    expected_output.append("    @NX_class = NXentry")
-    expected_output.append("    data:NXdata")
-    expected_output.append("      @NX_class = NXdata")
-    expected_output.append("      @signal = counts")
-    expected_output.append("      @axes = two_theta")
-    expected_output.append("      @two_theta_indices = [0]")
-    expected_output.append("      counts --> /entry/instrument/detector/counts")
-    expected_output.append("      two_theta --> /entry/instrument/detector/two_theta")
-    expected_output.append("    instrument:NXinstrument")
-    expected_output.append("      @NX_class = NXinstrument")
-    expected_output.append("      detector:NXdetector")
-    expected_output.append("        @NX_class = NXdetector")
-    expected_output.append("        counts:NX_INT32[31] = [ ... ]")
-    expected_output.append("          @units = counts")
-    expected_output.append("          @target = /entry/instrument/detector/counts")
-    expected_output.append("        two_theta:NX_FLOAT64[31] = [ ... ]")
-    expected_output.append("          @units = degrees")
-    expected_output.append("          @target = /entry/instrument/detector/two_theta")
-    
-#     def test_print(self):
-#         print '\n'.join(self.report)
+    expected_output = common.read_file('structure_writer_2_1.txt')
+
+
+class File_33id_spec_22_2D(common.TestHdf5FileStructure):
+
+    testfile = '33id_spec_22_2D.hdf5'
+    expected_output = common.read_file('structure_33id_spec_22_2D.txt')
+
+
+class File_compression(common.TestHdf5FileStructure):
+
+    testfile = 'compression.h5'
+    expected_output = common.read_file('structure_compression.txt')
+    NeXus = False
 
 
 if __name__ == '__main__':
-    common.test_case_runner(SimpleHdf5File)
-    common.test_case_runner(Writer_1_3)
-    common.test_case_runner(Writer_2_1)
+    cases = [SimpleHdf5File, 
+             File_writer_1_3,
+             File_writer_2_1,
+             File_33id_spec_22_2D,
+             File_compression,
+             ]
+    for case in cases:
+        common.test_case_runner(case)

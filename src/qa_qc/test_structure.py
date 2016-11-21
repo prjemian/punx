@@ -11,12 +11,6 @@ sys.path.insert(0, '..')
 import punx.h5structure
 
 
-def set_hdf5_contents(root):
-    entry = root.create_group("entry")
-    entry.attrs["purpose"] = "punx unittest: test_hdf5_simple"
-    entry.create_dataset("item", data="a string of characters")
-
-
 class SimpleHdf5File(unittest.TestCase):
     
     expected_output = []
@@ -24,12 +18,17 @@ class SimpleHdf5File(unittest.TestCase):
     expected_output.append("  entry")
     expected_output.append("    @purpose = punx unittest: test_hdf5_simple")
     expected_output.append("    item:CHAR = a string of characters")
+
+    def set_hdf5_contents(self, root):
+        entry = root.create_group("entry")
+        entry.attrs["purpose"] = "punx unittest: test_hdf5_simple"
+        entry.create_dataset("item", data="a string of characters")
     
     def setUp(self):
         '''
         prepare for temporary file creation
         '''
-        fname = common.getTestFileName(set_hdf5_contents)
+        fname = common.getTestFileName(self.set_hdf5_contents)
         self.expected_output[0] = fname
 
         #    :param int limit: maximum number of array items to be shown (default = 5)
@@ -62,5 +61,4 @@ class SimpleHdf5File(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    common.runner(SimpleHdf5File)
-    common.cleanup()
+    common.test_case_runner(SimpleHdf5File)

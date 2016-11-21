@@ -53,6 +53,7 @@ def suite_handler(MySuite):
     return test_suite
 
 
-def runner(MySuite):
+def test_case_runner(MySuite):
     runner=unittest.TextTestRunner(verbosity=2)
     runner.run(suite_handler(MySuite))
+    cleanup()

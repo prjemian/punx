@@ -11,10 +11,10 @@ before_script:
   - which pip
   - which python
   - which conda
-  - conda install --yes numpy h5py lxml requests pyqt=4 coverage
+  - conda install --yes numpy h5py lxml requests pyqt=4 coverage docopt
   - pip install pyRestTable
   - pip install -r requirements.txt
-  - pip install -U --no-deps --force coveralls
+  - pip install coveralls
   - which coveralls
 
 cache:

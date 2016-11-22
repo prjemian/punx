@@ -14,7 +14,7 @@ addons:
       - libhdf5-serial-dev
 
 install:
-  - "pip install"
+  - "pip install -r requirements.txt"
   
 # command to run tests
 script:

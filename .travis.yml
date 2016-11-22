@@ -28,7 +28,7 @@ install:
 script:
   - cd $HOME/build/prjemian/punx/src/punx
   - python ./main.py -h
-  - python ./main.py -v
+  - python ./main.py --release
   - python ./main.py update --force
   - cd $HOME/build/prjemian/punx/src/qa_qc
   - for filename in test_*.py; do echo "==========  $filename ==========";python "$filename" -v; done

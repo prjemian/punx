@@ -1,0 +1,21 @@
+sudo: false
+language: python
+python:
+  - "2.7"
+
+cache:
+  directories:
+    - $HOME/.cache/pip
+    - $HOME/virtualenv/python$TRAVIS_PYTHON_VERSION/lib/python$TRAVIS_PYTHON_VERSION/site-packages
+
+addons:
+  apt:
+    packages:
+      - libhdf5-serial-dev
+
+install:
+  - "pip install"
+  
+# command to run tests
+script:
+  - for filename in src/qa_qc/test_*.py; do echo "==========  $filename ==========";python "$filename" -v; done

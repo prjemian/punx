@@ -23,13 +23,13 @@ addons:
 
 install:
   - cd $HOME/build/prjemian/punx
-  - $HOME/miniconda/bin/pip install -r requirements.txt
+  - pip install -r requirements.txt
   
 # command to run tests
 script:
   - cd $HOME/build/prjemian/punx/src/punx
-  - $HOME/miniconda/bin/python ./main.py -h
-  - $HOME/miniconda/bin/python ./main.py -v
-  - $HOME/miniconda/bin/python ./main.py update --force
+  - python ./main.py -h
+  - python ./main.py -v
+  - python ./main.py update --force
   - cd $HOME/build/prjemian/punx/src/qa_qc
   - for filename in test_*.py; do echo "==========  $filename ==========";python "$filename" -v; done

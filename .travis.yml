@@ -25,4 +25,4 @@ install:
   
 # command to run tests
 script:
-  - for filename in src/qa_qc/test_*.py; do echo "==========  $filename ==========";python "$filename" -v; done
+  - cd src/qa_qc; for filename in test_*.py; do echo "==========  $filename ==========";python "$filename" -v; done

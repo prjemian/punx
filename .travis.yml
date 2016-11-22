@@ -13,6 +13,9 @@ before_script:
   - which conda
   - conda install --yes numpy h5py lxml requests pyqt=4 coverage
   - pip install pyRestTable
+  - pip install -r requirements.txt
+  - pip install -U --no-deps --force coveralls
+  - which coveralls
 
 cache:
   directories:
@@ -23,12 +26,6 @@ addons:
   apt:
     packages:
       - libhdf5-serial-dev
-
-install:
-  - pip install -r requirements.txt
-  - which coveralls
-  - pip install -U --no-deps --force coveralls
-  - which coveralls
   
 # command to run tests
 script:

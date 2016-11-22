@@ -11,14 +11,6 @@ Python Utilities for NeXus HDF5 files: validation, structure, hierarchy
 
 NOTE: project is under initial construction
 
-.. image:: https://travis-ci.org/prjemian/punx.svg?branch=master
-          :target: https://travis-ci.org/prjemian/punx
-
-.. TODO:
-   image:: https://coveralls.io/repos/prjemian/punx/badge.svg?branch=master 
-          :target: https://coveralls.io/r/prjemian/punx?branch=master
-
-
 :author:    Pete R. Jemian
 :email:     prjemian@gmail.com
 :copyright: 2016, Pete R. Jemian
@@ -27,3 +19,11 @@ NOTE: project is under initial construction
 :git:       https://github.com/prjemian/punx
 :PyPI:      https://pypi.python.org/pypi/punx/ 
 :TODO list: https://github.com/prjemian/punx/issues
+:build:
+    .. image:: https://travis-ci.org/prjemian/punx.svg?branch=master
+               :target: https://travis-ci.org/prjemian/punx
+:coverage:  -tba-
+
+.. TODO:
+   image:: https://coveralls.io/repos/prjemian/punx/badge.svg?branch=master 
+          :target: https://coveralls.io/r/prjemian/punx?branch=master

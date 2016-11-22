@@ -8,7 +8,7 @@ before_script:
   - chmod +x miniconda.sh
   - bash miniconda.sh -b -p $HOME/miniconda
   - export PATH=$HOME/miniconda/bin:$PATH
-  - conda install --yes numpy h5py lxml requests pyqt=4
+  - conda install --yes numpy h5py lxml requests pyqt=4 coverage
   - pip install pyRestTable
 
 cache:
@@ -33,6 +33,10 @@ script:
   - python ./main.py update --force
   - cd $HOME/build/prjemian/punx/src/qa_qc
   - for filename in test_*.py; do echo "==========  $filename ==========";python "$filename" -v; done
+  - cd $HOME/build/prjemian/punx/src/qa_qc
+  - coverage run test_common.py
+  - coverage run -a test_structure.py
+  - coverage run -a test_validate.py
 
 after_success:
   - coveralls

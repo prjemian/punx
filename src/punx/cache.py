@@ -67,12 +67,15 @@ when users run from a copy of the *punx* package installed from PyPI
 :get new NXDL definitions from GitHub:     :meth:`~punx.cache.update_NXDL_Cache`
 '''
 
-import cPickle as pickle
+import pickle
 import lxml
 import os
 import requests.packages.urllib3
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
-import StringIO
+try:
+	import StringIO
+except ImportError:
+	from io import StringIO
 import zipfile
 from PyQt4 import QtCore
 

@@ -207,7 +207,7 @@ def func_validate(args):
         # report the findings from the validation
         import cache
         qset = cache.qsettings()
-        print('Validate file ' + os.path.basename(validator.fname))
+        print(':file: ' + os.path.basename(validator.fname))
         print(':NXDL cache: ' + cache.get_nxdl_dir())
         print(':NXDL GIT sha: ' + qset.getKey('git_sha'))
         print(':NXDL GIT date/time: ' + qset.getKey('git_time'))

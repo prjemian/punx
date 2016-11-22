@@ -98,7 +98,7 @@ class h5structure(object):
         if len(nxclass) > 0:
             if isinstance(nxclass, numpy.ndarray):      # attribute reported as DATATYPE SIMPLE
                 nxclass = nxclass[0]                    # convert as if DATATYPE SCALAR
-            nxclass = ":" + nxclass
+            nxclass = ":" + str(nxclass)
         s += [ indentation + name + nxclass ]
         s += self._renderAttributes(obj, indentation)
         # show datasets and links next

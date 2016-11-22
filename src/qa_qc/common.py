@@ -29,7 +29,7 @@ def create_test_file(content_function=None):
     return str(hfile.name)
 
 
-def getTestFileName(set_contents_function):
+def getTestFileName(set_contents_function=None):
     '''
     create (or identify) the file to be tested
     '''
@@ -49,6 +49,17 @@ def cleanup():
         __test_file_name__ = None
 
 
+def punx_data_file_name(fname):
+    return os.path.abspath(os.path.join('..', 'punx', 'data', fname))
+
+
+def read_file(fname):
+    fp = open(fname, 'r')
+    buf = fp.read()
+    fp.close()
+    return buf.strip().splitlines()
+
+
 def suite_handler(MySuite):
     test_suite = unittest.TestSuite()
     test_suite.addTest(unittest.makeSuite(MySuite))
@@ -59,17 +70,6 @@ def test_case_runner(MySuite):
     runner=unittest.TextTestRunner(verbosity=2)
     runner.run(suite_handler(MySuite))
     cleanup()
-
-
-def punx_data_file_name(fname):
-    return os.path.abspath(os.path.join('..', 'punx', 'data', fname))
-
-
-def read_file(fname):
-    fp = open(fname, 'r')
-    buf = fp.read()
-    fp.close()
-    return buf.strip().splitlines()
 
 
 class TestBaseHdf5File(unittest.TestCase):

@@ -225,13 +225,17 @@ class Data_File_Validator(object):
         # TODO: #21 : augment from self.nxdl_rules.nxdlTypes
         
         self.data_types = {
-            'NX_CHAR': (str, unicode, numpy.string_, numpy.ndarray),
+            'NX_CHAR': [str, numpy.string_, numpy.ndarray],
             'NX_UINT': (numpy.uint, numpy.uint8, numpy.uint16, numpy.uint32, numpy.uint64),
             'NX_INT':  (int, numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64),
             'NX_FLOAT':  (float, numpy.float, numpy.float16, numpy.float32, numpy.float64),
             'NX_BINARY': (None, ),     # #FIXME:
             'NX_BOOLEAN': (None, ),     # FIXME:
         }
+        try:
+            self.data_types['NX_CHAR'].append(unicode)  # python2, not in python3
+        except NameError:
+            pass
         # definitions dependent on other definitions
         # (can add the lists together as needed)
         self.data_types['NX_INT']    += self.data_types['NX_UINT']
@@ -273,7 +277,7 @@ class Data_File_Validator(object):
             aname = group.name + '@NX_class'
             t = nx_class_name in self.nxdl_dict
             f = finding.TF_RESULT[t]
-            msg = {True: 'known: ', False: 'unknown: '}[t] + nx_class_name
+            msg = {True: 'known: ', False: 'unknown: '}[t] + str(nx_class_name)
             self.new_finding('@NX_class', aname, f, msg)
         
         nx_class_object = self.nxdl_dict.get(nx_class_name)
@@ -1070,7 +1074,7 @@ class Data_File_Validator(object):
                 else:
                     obj = self.h5[hp]
                     nx_class = self.get_hdf5_attribute(obj, 'NX_class', '-')
-                    cp += '/' + nx_class
+                    cp += '/' + str(nx_class)
         if '@' in h5_address:
             cp += '@' + h5_address.split('@')[-1]
          

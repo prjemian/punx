@@ -16,16 +16,6 @@ before_script:
   - pip install coveralls
   - which coveralls
 
-cache:
-  directories:
-    - $HOME/.cache/pip
-    - $HOME/virtualenv/python$TRAVIS_PYTHON_VERSION/lib/python$TRAVIS_PYTHON_VERSION/site-packages
-
-addons:
-  apt:
-    packages:
-      - libhdf5-serial-dev
-  
 # command to run tests
 script:
   - cd $HOME/build/prjemian/punx/src/punx

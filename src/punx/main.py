@@ -282,6 +282,10 @@ def parse_command_line_arguments():
                     '--version', 
                     action='version', 
                     version=__init__.__version__)
+    p.add_argument('-r', 
+                    '--release',
+                    action='version', 
+                    version=__init__.__release__)
     
     def add_logging_argument(subp):
         '''

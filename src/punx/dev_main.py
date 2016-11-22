@@ -48,8 +48,8 @@ def validate_prep():
     logfile_prep()
     # sys.argv.append('--report')
     # sys.argv.append('ERROR,WARN')
-    # datafile_prep()
-    sys.argv.append('data/i22-331015.nxs')
+    datafile_prep()
+    # sys.argv.append('data/i22-331015.nxs')
 
 
 def logfile_prep():
@@ -62,7 +62,7 @@ def logfile_prep():
 
 def datafile_prep():
     ''' '''
-    # sys.argv.append('data/writer_1_3.hdf5')
+    sys.argv.append('data/writer_1_3.hdf5')
     # sys.argv.append('data/writer_2_1.hdf5')
     # sys.argv.append('data/chopper.nxs')
     # sys.argv.append('data/compression.h5')
@@ -74,7 +74,7 @@ def datafile_prep():
     # sys.argv.append('data/1998spheres.h5')
     # sys.argv.append('data/cs_af1410.h5')
     # sys.argv.append('data/USAXS_flyScan_GC_M4_NewD_15.h5')
-    sys.argv.append('data/33id_spec_22_2D.hdf5')
+    # sys.argv.append('data/33id_spec_22_2D.hdf5')
 
 
 if __name__ == '__main__':
@@ -82,6 +82,8 @@ if __name__ == '__main__':
     import main
     __init__.DEFAULT_LOG_LEVEL = __init__.NOISY
     # sys.argv.append('-h')
+    # sys.argv.append('--version')
+    # sys.argv.append('--release')
     
     # demo_prep()
     # update_prep()

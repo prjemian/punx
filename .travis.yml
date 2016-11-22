@@ -24,10 +24,13 @@ addons:
       - libhdf5-serial-dev
 
 install:
+  - cd $HOME/build/prjemian/punx
   - pip install -r requirements.txt
+  - pip install .
   
 # command to run tests
 script:
-  - python main.py -h
-  - python main.py update --force
-  - cd $HOME/build/prjemian/punx/src/qa_qc; for filename in test_*.py; do echo "==========  $filename ==========";python "$filename" -v; done
+  - punx -h
+  - punx update --force
+  - cd $HOME/build/prjemian/punx/src/qa_qc
+  - for filename in test_*.py; do echo "==========  $filename ==========";python "$filename" -v; done

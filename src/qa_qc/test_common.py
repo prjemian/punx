@@ -5,7 +5,6 @@ test punx qa_qc/common module (supports unit testing)
 
 import os
 import h5py
-import sys
 import unittest
 
 import common
@@ -20,6 +19,7 @@ class TestCommon(unittest.TestCase):
         for fname in self.file_list:
             if os.path.exists(fname):
                 os.remove(fname)
+        common.cleanup()
 
     def test_create_test_file(self):
         '''test that file creation and deletion are working'''
@@ -48,11 +48,30 @@ class TestCommon(unittest.TestCase):
         self.file_list.append(fname)
         fp = h5py.File(fname, 'r')
         self.assertIsInstance(fp, h5py.File, 'is HDF5 file')
+        self.assertEqual(None, fp.get('entry', None))
+        fp.close()
+
+    def test_hdf5_file_with_simple_content(self):
+        '''make an HDF5 file, add more content, and test it by reading'''
+        # - - - - - - - - - - - - - - -
+        def set_content(hdf5root):
+            entry = hdf5root.create_group('entry')
+            ds = entry.create_dataset('counter', data=[1,221,33])
+            entry.attrs["signal"] = "counter"
+            ds.attrs["units"] = "counts"
+        # - - - - - - - - - - - - - - -
+        fname = common.getTestFileName(set_content)
+        fp = h5py.File(fname, 'r')
+        self.assertIsInstance(fp, h5py.File, 'is HDF5 file')
+        self.assertIsInstance(fp['entry'], h5py.Group)
+        self.assertEqual('counter', fp['entry'].attrs['signal'])
+        self.assertIsInstance(fp['entry/counter'], h5py.Dataset)
+        self.assertEqual('counts', fp['entry/counter'].attrs['units'])
         fp.close()
 
     def test_is_not_hdf5_file(self):
-        '''try to open this python code as HDF5'''
-        self.assertRaises(OSError, h5py.File, __file__, 'r')
+        '''try to open this python code file as if it were HDF5'''
+        self.assertRaises((IOError, OSError), h5py.File, __file__, 'r')
 
     def test_punx_data_file_name(self):
         '''verify a punx data file exists and that it is HDF5'''

@@ -318,7 +318,7 @@ def update_NXDL_Cache(force_update=False):
         qset.setKey(key, v)
         for k in ('git_sha', 'git_time'):
             qset.setKey('___global___/'+k, info[k])
-    __init__.LOG_MESSAGE('update .ini file: ' + qset.fileName(), __init__.INFO)
+    __init__.LOG_MESSAGE('update .ini file: ' + str(qset.fileName()), __init__.INFO)
     qset.updateGroupKeys(info)
 
 

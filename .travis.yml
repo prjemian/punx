@@ -39,4 +39,4 @@ script:
   - coverage run -a test_validate.py
 
 after_success:
-  - coveralls
+  - coveralls --config_file $HOME/build/prjemian/punx/src/qa_qc/.coverage

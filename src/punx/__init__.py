@@ -7,6 +7,7 @@ Python Utilities for NeXus HDF5 files
    
    ~FileNotFound
    ~HDF5_Open_Error
+   ~SchemaNotFound
 
 
 '''

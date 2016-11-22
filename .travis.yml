@@ -10,7 +10,7 @@ before_script:
   - export PATH=$HOME/miniconda/bin:$PATH
   - conda install --yes numpy h5py lxml requests pyqt=4
   - cd $HOME/build/prjemian/punx/src/punx
-  - python main.py -f update
+  - python main.py update --force
   - cd $HOME
 
 cache:

@@ -9,7 +9,6 @@ before_script:
   - bash miniconda.sh -b -p $HOME/miniconda
   - export PATH=$HOME/miniconda/bin:$PATH
   - conda install --yes numpy h5py lxml requests pyqt=4
-  - pip install pyRestTable
   - cd $HOME/build/prjemian/punx/src/punx
   - python main.py update --force
   - cd $HOME
@@ -25,7 +24,8 @@ addons:
       - libhdf5-serial-dev
 
 install:
-  - "pip install -r requirements.txt"
+  - pip install pyRestTable
+  - pip install -r requirements.txt
   
 # command to run tests
 script:

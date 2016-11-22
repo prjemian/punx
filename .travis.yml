@@ -8,7 +8,7 @@ before_script:
   - chmod +x miniconda.sh
   - bash miniconda.sh -b -p $HOME/miniconda
   - export PATH=$HOME/miniconda/bin:$PATH
-  - conda install --yes numpy h5py lxml requests
+  - conda install --yes numpy h5py lxml requests pyqt=4
 
 cache:
   directories:

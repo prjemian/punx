@@ -7,7 +7,9 @@ before_script:
   - wget http://repo.continuum.io/miniconda/Miniconda2-4.2.12-Linux-x86_64.sh -O miniconda.sh
   - chmod +x miniconda.sh
   - export PATH=/home/travis/miniconda/bin:$PATH
-  - /home/travis/miniconda/bin/conda install --yes numpy h5py lxml requests
+  - echo $HOME
+  - ls -lAFh /home/travis/miniconda/bin/
+  - conda install --yes numpy h5py lxml requests
 
 cache:
   directories:

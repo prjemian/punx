@@ -28,4 +28,4 @@ install:
   
 # command to run tests
 script:
-  - cd src/qa_qc; for filename in test_*.py; do echo "==========  $filename ==========";python "$filename" -v; done
+  - cd $HOME/build/prjemian/punx/src/qa_qc; for filename in test_*.py; do echo "==========  $filename ==========";python "$filename" -v; done

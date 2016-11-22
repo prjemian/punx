@@ -23,6 +23,7 @@ addons:
 
 install:
   - pip install -r requirements.txt
+  - pip install coveralls
   
 # command to run tests
 script:
@@ -32,3 +33,6 @@ script:
   - python ./main.py update --force
   - cd $HOME/build/prjemian/punx/src/qa_qc
   - for filename in test_*.py; do echo "==========  $filename ==========";python "$filename" -v; done
+
+after_success:
+  - coveralls

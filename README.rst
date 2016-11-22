@@ -22,8 +22,7 @@ NOTE: project is under initial construction
 :build:
     .. image:: https://travis-ci.org/prjemian/punx.svg?branch=master
                :target: https://travis-ci.org/prjemian/punx
-:coverage:  -tba-
+:coverage:
+   .. image:: https://coveralls.io/repos/github/prjemian/punx/badge.svg?branch=master
+              :target: https://coveralls.io/github/prjemian/punx?branch=master
 
-.. TODO:
-   image:: https://coveralls.io/repos/prjemian/punx/badge.svg?branch=master 
-          :target: https://coveralls.io/r/prjemian/punx?branch=master

@@ -74,7 +74,7 @@ class TestCommon(unittest.TestCase):
         self.assertRaises((IOError, OSError), h5py.File, __file__, 'r')
 
     def test_punx_data_file_name(self):
-        '''verify a punx data file exists and that it is HDF5'''
+        '''verify a punx data file exists and verify that it is HDF5'''
         fname = common.punx_data_file_name('writer_1_3.hdf5')
         self.assertTrue(os.path.exists(fname), 'test file exists')
         fp = h5py.File(fname, 'r')

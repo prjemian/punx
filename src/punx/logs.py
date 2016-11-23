@@ -91,7 +91,7 @@ class Logger(object):
         '''
         first logging information after log file has been defined
         '''
-        user = os.environ.get('LOGNAME', None) or os.environ.get('USERNAME', None)
+        user = os.environ.get('LOGNAME', None) or os.environ.get('USERNAME', None) or 'unknown'
         if self.level == __init__.CONSOLE_ONLY:
             interest = 'no logging'
         else:

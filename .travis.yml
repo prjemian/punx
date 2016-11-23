@@ -24,17 +24,16 @@ before_script:
 
 # command to run tests
 script:
-  - cd $HOME/build/prjemian/punx/src/punx
-  - python ./main.py -h
-  - python ./main.py --release
-  - python ./main.py update --force
-  - cd $HOME/build/prjemian/punx/src/qa_qc
+  - python ./src/punx/main.py -h
+  - python ./src/punx/main.py --release
+  - python ./src/punx/main.py update --force
   - which coverage
-  - coverage run test_common.py
-  - coverage run -a test_structure.py
-  - coverage run -a test_validate.py
+  - coverage run tests/common_test.py
+  - coverage run -a tests/_version_test.py
+  - coverage run -a tests/h5structure_test.py
+  - coverage run -a tests/validate_test.py
 
 after_success:
-  - cd $HOME/build/prjemian/punx/src/qa_qc
+  - coverage report
   - which coveralls
   - coveralls

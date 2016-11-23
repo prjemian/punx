@@ -3,14 +3,15 @@
 test structure analysis process of punx package
 '''
 
+import os
 import sys
 
 import common
-sys.path.insert(0, '..')
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
 import punx.h5structure
 
 
-class Structure_SimpleHdf5File(common.TestStructureHdf5File):
+class Structure_SimpleHdf5File(common.StructureHdf5File):
     
     expected_output = []
     expected_output.append("test file name will be placed here automatically")
@@ -41,28 +42,28 @@ class Structure_SimpleHdf5File(common.TestStructureHdf5File):
         self.report = xture.report(show_attributes)
 
 
-class Structure_writer_1_3(common.TestStructureHdf5File):
+class Structure_writer_1_3(common.StructureHdf5File):
 
     testfile = 'writer_1_3.hdf5'
-    expected_output = common.read_file('structure_writer_1_3.txt')
+    expected_output = common.read_filelines('structure_writer_1_3.txt')
 
 
-class Structure_writer_2_1(common.TestStructureHdf5File):
+class Structure_writer_2_1(common.StructureHdf5File):
 
     testfile = 'writer_2_1.hdf5'
-    expected_output = common.read_file('structure_writer_2_1.txt')
+    expected_output = common.read_filelines('structure_writer_2_1.txt')
 
 
-class Structure_33id_spec_22_2D(common.TestStructureHdf5File):
+class Structure_33id_spec_22_2D(common.StructureHdf5File):
 
     testfile = '33id_spec_22_2D.hdf5'
-    expected_output = common.read_file('structure_33id_spec_22_2D.txt')
+    expected_output = common.read_filelines('structure_33id_spec_22_2D.txt')
 
 
-class Structure_compression(common.TestStructureHdf5File):
+class Structure_compression(common.StructureHdf5File):
 
     testfile = 'compression.h5'
-    expected_output = common.read_file('structure_compression.txt')
+    expected_output = common.read_filelines('structure_compression.txt')
     NeXus = False
 
 
@@ -74,4 +75,4 @@ if __name__ == '__main__':
              Structure_compression,
              ]
     for case in cases:
-        common.test_case_runner(case)
+        common.run_test_cases(case)

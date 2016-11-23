@@ -8,7 +8,7 @@ import os
 import sys
 import tempfile
 import unittest
-sys.path.insert(0, '..')
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
 
 
 __test_file_name__ = None   # singleton
@@ -50,29 +50,37 @@ def cleanup():
 
 
 def punx_data_file_name(fname):
-    return os.path.abspath(os.path.join('..', 'punx', 'data', fname))
+    '''
+    return the absolute path to the file in src/punx/data/fname
+    '''
+    path = os.path.join(os.path.dirname(__file__), '..', 'src', 'punx', 'data')
+    return os.path.abspath(os.path.join(path, fname))
 
 
-def read_file(fname):
-    fp = open(fname, 'r')
+def read_filelines(fname):
+    '''
+    read a text file and split into lines
+    '''
+    path = os.path.dirname(__file__)
+    fp = open(os.path.join(path, fname), 'r')
     buf = fp.read()
     fp.close()
     return buf.strip().splitlines()
 
 
-def suite_handler(MySuite):
+def suite_handler(list_of_test_classes):
     test_suite = unittest.TestSuite()
-    test_suite.addTest(unittest.makeSuite(MySuite))
+    test_suite.addTest(unittest.makeSuite(list_of_test_classes))
     return test_suite
 
 
-def test_case_runner(MySuite):
+def run_test_cases(list_of_test_classes):
     runner=unittest.TextTestRunner(verbosity=2)
-    runner.run(suite_handler(MySuite))
+    runner.run(suite_handler(list_of_test_classes))
     cleanup()
 
 
-class TestBaseHdf5File(unittest.TestCase):
+class BaseHdf5File(unittest.TestCase):
 
     # testfile = 'writer_1_3.hdf5'
     # expected_output = ['file',]
@@ -103,7 +111,7 @@ class TestBaseHdf5File(unittest.TestCase):
             self.assertEqual(expected, actual, msg)
 
 
-class TestStructureHdf5File(TestBaseHdf5File):
+class StructureHdf5File(BaseHdf5File):
 
     # testfile = 'writer_1_3.hdf5'
     # expected_output = ['file',]
@@ -131,7 +139,7 @@ class TestStructureHdf5File(TestBaseHdf5File):
         self.report = xture.report(show_attributes)
 
 
-class TestValidHdf5File(TestBaseHdf5File):
+class ValidHdf5File(BaseHdf5File):
 
     # testfile = 'writer_1_3.hdf5'
     # expected_output = ['file',]

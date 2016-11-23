@@ -60,4 +60,5 @@ setup (name =  punx.__package_name__,        # punx
 			],
             #'gui_scripts': [],
        },
-      )
+       test_suite       = "tests",
+)

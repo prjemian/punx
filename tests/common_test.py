@@ -1,6 +1,6 @@
 
 '''
-test punx qa_qc/common module (supports unit testing)
+test punx tests/common module (supports unit testing)
 '''
 
 import os
@@ -81,8 +81,8 @@ class TestCommon(unittest.TestCase):
         self.assertIsInstance(fp, h5py.File, 'is HDF5 file')
         fp.close()
 
-    def test_read_file(self):
-        lines = common.read_file('structure_writer_1_3.txt')
+    def test_read_filelines(self):
+        lines = common.read_filelines('structure_writer_1_3.txt')
         self.assertEqual(12, len(lines), 'number of lines in a text file')
 
 

@@ -82,7 +82,9 @@ class TestCacheExceptions(unittest.TestCase):
 
     def test_get_nxdl_xsd_exceptions(self):
         # FIXME: not working
-        with self.assertRaises((punx.SchemaNotFound, punx.CannotUpdateFromGithubNow)):
+        with self.assertRaises((punx.FileNotFound,
+                                punx.SchemaNotFound,
+                                punx.CannotUpdateFromGithubNow)):
             punx.cache.get_nxdl_xsd()
     
 

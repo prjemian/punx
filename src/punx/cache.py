@@ -206,7 +206,27 @@ def githubMasterInfo(org, repo):
             break
         __init__.LOG_MESSAGE('retry to get repo info: ' + str(url), __init__.WARN)
 
-    latest = r.json()[0]
+    knowledge = r.json()
+    if isinstance(knowledge, dict):     # is GitHub rate-limiting us?  <= 60/hr
+        if 'message' in knowledge:
+            msg = knowledge['message']
+            # TODO: could improve this
+            # - remove parenthetical expression from sg
+            # - follow advice in knowledge['docummentation_url']
+            #   - identify time when limit will be removed
+            #   - or how long until that happens (about an hour)
+            '''
+            curl -i https://api.github.com/nexusformat/definitions
+            HTTP/1.1 200 OK
+            Date: Mon, 01 Jul 2013 17:27:06 GMT
+            Status: 200 OK
+            X-RateLimit-Limit: 60
+            X-RateLimit-Remaining: 56
+            X-RateLimit-Reset: 1372700873
+            '''
+            raise __init__.CannotUpdateFromGithubNow(msg)
+        
+    latest = knowledge[0]
     sha = latest['sha']
     iso8601 = latest['commit']['committer']['date']
     zip_url = 'https://github.com/%s/%s/archive/master.zip' % (org, repo)

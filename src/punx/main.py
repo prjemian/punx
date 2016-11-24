@@ -285,6 +285,7 @@ def parse_command_line_arguments():
     p.add_argument('-r', 
                     '--release',
                     action='version', 
+                    help="show program's release number and exit",
                     version=__init__.__release__)
     
     def add_logging_argument(subp):

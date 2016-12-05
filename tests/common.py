@@ -16,16 +16,17 @@ __test_file_name__ = None   # singleton
 
 def create_test_file(content_function=None, suffix='.hdf5'):
     """
-    create a new HDF5 test file
+    create a new (HDF5) test file
     
     :param obj content_function: method to add content(s) to hdf5root
     """
     hfile = tempfile.NamedTemporaryFile(suffix=suffix, delete=False)
     hfile.close()
-    hdf5root = h5py.File(hfile.name, "w")
-    if content_function is not None:
-        content_function(hdf5root)
-    hdf5root.close()
+    if suffix == '.hdf5':
+        hdf5root = h5py.File(hfile.name, "w")
+        if content_function is not None:
+            content_function(hdf5root)
+        hdf5root.close()
     return str(hfile.name)
 
 

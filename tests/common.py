@@ -14,13 +14,13 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
 __test_file_name__ = None   # singleton
 
 
-def create_test_file(content_function=None):
+def create_test_file(content_function=None, suffix='.hdf5'):
     """
     create a new HDF5 test file
     
     :param obj content_function: method to add content(s) to hdf5root
     """
-    hfile = tempfile.NamedTemporaryFile(suffix='.hdf5', delete=False)
+    hfile = tempfile.NamedTemporaryFile(suffix=suffix, delete=False)
     hfile.close()
     hdf5root = h5py.File(hfile.name, "w")
     if content_function is not None:
@@ -29,12 +29,13 @@ def create_test_file(content_function=None):
     return str(hfile.name)
 
 
-def getTestFileName(set_contents_function=None):
+def getTestFileName(set_contents_function=None, suffix='.hdf5'):
     '''
     create (or identify) the file to be tested
     '''
     global __test_file_name__
-    __test_file_name__ = __test_file_name__ or create_test_file(set_contents_function)
+    __test_file_name__ = __test_file_name__ or create_test_file(set_contents_function, 
+                                                                suffix=suffix)
     return __test_file_name__
 
 

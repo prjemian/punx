@@ -31,7 +31,7 @@ script:
   - python ./src/punx/main.py --release
   - python ./src/punx/main.py update --force
   - which coverage
-  - coverage run tests/__init__.py
+  - coverage run tests/
 
 after_success:
   - coverage report

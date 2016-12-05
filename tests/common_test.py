@@ -5,9 +5,13 @@ test punx tests/common module (supports unit testing)
 
 import os
 import h5py
+import sys
 import unittest
 
-import common
+_path = os.path.join(os.path.dirname(__file__), '..',)
+if _path not in sys.path:
+    sys.path.insert(0, _path)
+from tests import common
 
 
 class TestCommon(unittest.TestCase):
@@ -86,5 +90,13 @@ class TestCommon(unittest.TestCase):
         self.assertEqual(12, len(lines), 'number of lines in a text file')
 
 
+def suite(*args, **kw):
+    test_suite = unittest.TestSuite()
+    test_suite.addTest(unittest.makeSuite(TestCommon))
+    return test_suite
+
+
 if __name__ == '__main__':
-    unittest.main()
+    test_suite=suite()
+    runner=unittest.TextTestRunner()
+    runner.run(test_suite)

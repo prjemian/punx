@@ -98,12 +98,12 @@ import lxml.etree
 import numpy
 import os
 import re
+import sys
 
-import __init__
-import cache
-import finding
-import h5structure
-import nxdlstructure
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+import punx
+from punx import finding
+from punx import h5structure
 
 # TODO: issue #14: http://download.nexusformat.org/doc/html/search.html?q=warning&check_keywords=yes&area=default
 
@@ -116,6 +116,7 @@ def validate_xml(xml_file_name):
 
     :param str xml_file_name: name of XML file
     '''
+    from punx import cache
     xml_tree = lxml.etree.parse(xml_file_name)
     xsd = cache.get_XML_Schema()
     try:
@@ -138,6 +139,7 @@ class NxdlPattern(object):
     '''
     
     def __init__(self, parent, pname, xpath_str):
+        from punx import cache
         self.name = pname
         self.xpath_str = xpath_str
         rules = cache.get_nxdl_xsd()
@@ -183,8 +185,10 @@ class Data_File_Validator(object):
     '''
     
     def __init__(self, fname):
+        from punx import cache
+        from punx import nxdlstructure
         if not os.path.exists(fname):
-            raise __init__.FileNotFound(fname)
+            raise punx.FileNotFound(fname)
         self.fname = fname
 
         self.findings = []      # list of Finding() instances
@@ -198,7 +202,7 @@ class Data_File_Validator(object):
         try:
             self.h5 = h5py.File(fname, 'r')
         except IOError:
-            raise __init__.HDF5_Open_Error(fname)
+            raise punx.HDF5_Open_Error(fname)
         self._init_patterns()
     
     def _init_patterns(self):

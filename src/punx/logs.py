@@ -27,7 +27,8 @@ import os
 import socket
 import sys
 
-import __init__
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+import punx
 
 
 class Logger(object):
@@ -35,14 +36,14 @@ class Logger(object):
     use Python logging package to record program history
 
     :param str log_file: name of file to store history
-    :param enum level: logging interest level (default=__init__.INFO, no logs = -1)
+    :param enum level: logging interest level (default=punx.INFO, no logs = -1)
     '''
 
     def __init__(self, log_file=None, level=None):
         if level is None:
-            level = __init__.INFO
+            level = punx.INFO
         self.level = level
-        if level == __init__.CONSOLE_ONLY:
+        if level == punx.CONSOLE_ONLY:
             # this means: only write ALL log messages to the console
             self.log_file = None
         else:
@@ -50,7 +51,7 @@ class Logger(object):
                 ymd = str(_now()).split()[0]
                 pid = os.getpid()
                 # current working directory?
-                log_file = '-'.join((__init__.__package_name__, ymd, str(pid) + '.log'))
+                log_file = '-'.join((punx.__package_name__, ymd, str(pid) + '.log'))
             self.log_file = os.path.abspath(log_file)
             logging.basicConfig(filename=log_file, level=level)
 
@@ -58,7 +59,7 @@ class Logger(object):
         self.filename = os.path.basename(sys.argv[0])
         self.pid = os.getpid()
 
-        __init__.LOG_MESSAGE = self.add
+        punx.LOG_MESSAGE = self.add
         self.first_logs()
 
     def add(self, message, interest=None):
@@ -69,14 +70,14 @@ class Logger(object):
         :param int interest: interest level of this message (default: logging.INFO)
         '''
         if interest is None:
-            interest = __init__.INFO
+            interest = punx.INFO
         if interest < self.level:
             return
 
         timestamp = _now()
         text = "(%d,%s,%s) %s" % (self.pid, self.filename, timestamp, message)
 
-        if self.level == __init__.CONSOLE_ONLY:
+        if self.level == punx.CONSOLE_ONLY:
             print(text)
         else:
             logging.log(interest, text)
@@ -92,7 +93,7 @@ class Logger(object):
         first logging information after log file has been defined
         '''
         user = os.environ.get('LOGNAME', None) or os.environ.get('USERNAME', None) or 'unknown'
-        if self.level == __init__.CONSOLE_ONLY:
+        if self.level == punx.CONSOLE_ONLY:
             interest = 'no logging'
         else:
             interest = logging.getLevelName(self.level)
@@ -111,7 +112,7 @@ def to_console(message, interest=None):
     '''
     used when *only* logging output to the console (not using the logging package)
     '''
-    if interest >= __init__.DEFAULT_LOG_LEVEL:
+    if interest >= punx.DEFAULT_LOG_LEVEL:
         status = logging.getLevelName(interest) + ':'
         print(status, message)
 
@@ -120,8 +121,8 @@ def ignore_logging():
     '''
     used during unit testing
     '''
-    __init__.DEFAULT_LOG_LEVEL = 999999
-    __init__.LOG_MESSAGE = to_console
+    punx.DEFAULT_LOG_LEVEL = 999999
+    punx.LOG_MESSAGE = to_console
 
 
 def _now():

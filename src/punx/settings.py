@@ -23,13 +23,15 @@ manage the settings file for this application
 
 import datetime
 import os
+import sys
 from PyQt4 import QtCore
 
-import __init__
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+import punx
 
 
-orgName = __init__.__settings_organization__
-appName = __init__.__settings_package__
+orgName = punx.__settings_organization__
+appName = punx.__settings_package__
 
 
 class QSettingsMixin(object):
@@ -41,7 +43,7 @@ class QSettingsMixin(object):
         self.updateGroupKeys({'file': os.path.abspath(str(self.fileName()))})
         self.updateGroupKeys({'version': '1.0'})
     
-    def updateGroupKeys(self, group_dict={}, group=__init__.GLOBAL_INI_GROUP):
+    def updateGroupKeys(self, group_dict={}, group=punx.GLOBAL_INI_GROUP):
         for k, v in sorted(group_dict.items()):
             if self.getKey(group + '/' + k) in ('', None):
                 self.setKey(group + '/' + k, v)
@@ -51,7 +53,7 @@ class QSettingsMixin(object):
         split full_key into (group, key) tuple
         
         :param str full_key: either `key` or `group/key`, 
-            default group (unspecified) is ``__init__.GLOBAL_INI_GROUP``
+            default group (unspecified) is ``punx.GLOBAL_INI_GROUP``
         '''
         if len(full_key) == 0:
             raise KeyError('must supply a key')
@@ -59,7 +61,7 @@ class QSettingsMixin(object):
         if len(parts) > 2:
             raise KeyError('too many "/" separators: ' + full_key)
         if len(parts) == 1:
-            group, key = __init__.GLOBAL_INI_GROUP, str(parts[0])
+            group, key = punx.GLOBAL_INI_GROUP, str(parts[0])
         elif len(parts) == 2:
             group, key = map(str, parts)
         return group, key
@@ -76,7 +78,7 @@ class QSettingsMixin(object):
         '''
         group, k = self._keySplit_(key)
         if group is None:
-            group = __init__.GLOBAL_INI_GROUP
+            group = punx.GLOBAL_INI_GROUP
         key = group + '/' + k
         v = self.value(key)
         if isinstance(v, QtCore.QVariant):
@@ -93,7 +95,7 @@ class QSettingsMixin(object):
         '''
         group, k = self._keySplit_(key)
         if group is None:
-            group = __init__.GLOBAL_INI_GROUP
+            group = punx.GLOBAL_INI_GROUP
         self.remove(key)
         self.beginGroup(group)
         self.setValue(k, value)

@@ -55,8 +55,11 @@ These NXDL structures are parsed now by the code below:
 
 
 import lxml.etree
+import os
+import sys
 
-import cache
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from punx import cache
 
 
 PROGRAM_NAME = 'nxdl_rules'

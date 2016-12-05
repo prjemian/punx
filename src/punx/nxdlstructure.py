@@ -70,11 +70,14 @@ __url__ = 'http://punx.readthedocs.org/en/latest/nxdlstructure.html'
 import collections
 import lxml.etree
 import os
+import sys
 
-import __init__
-import cache
-import nxdl_rules
-import validate
+_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+if _path not in sys.path:
+    sys.path.insert(0, _path)
+import punx
+from punx import nxdl_rules
+from punx import validate
 
 
 PROGRAM_NAME = 'nxdlstructure'
@@ -501,6 +504,7 @@ def _get_specs_from_pickle_file():
     
     :return: dict with definitions or None
     '''
+    from punx import cache
     qset = cache.qsettings()
     pfile = cache.get_pickle_file_name(qset.cache_dir())
     if not os.path.exists(pfile):
@@ -524,6 +528,7 @@ def _get_specs_from_NXDL_files():
     
     :return: dict with definitions
     '''
+    from punx import cache
     basedir = cache.get_nxdl_dir()
 
     path_list = [
@@ -556,8 +561,8 @@ def get_NXDL_specifications():
 
 def _developer():
     'working on issue #4'
-    import logs
-    __init__.LOG_MESSAGE = logs.to_console
+    from punx import logs
+    punx.LOG_MESSAGE = logs.to_console
     nxdl_dict = _get_specs_from_NXDL_files()
     print(sorted(nxdl_dict.keys()))
 

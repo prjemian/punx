@@ -9,6 +9,7 @@ import unittest
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
 
+import punx
 import punx.logs
 
 class TestLogs(unittest.TestCase):
@@ -27,7 +28,15 @@ class TestLogs(unittest.TestCase):
         logger = punx.logs.Logger(level=punx.CONSOLE_ONLY)
         self.assertEqual(punx.CONSOLE_ONLY, logger.level)
         self.assertEqual(None, logger.log_file)
+     
+
+def suite(*args, **kw):
+    test_suite = unittest.TestSuite()
+    test_suite.addTest(unittest.makeSuite(TestLogs))
+    return test_suite
 
 
 if __name__ == '__main__':
-    unittest.main()
+    test_suite=suite()
+    runner=unittest.TextTestRunner()
+    runner.run(test_suite)

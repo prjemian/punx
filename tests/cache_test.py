@@ -89,5 +89,14 @@ class TestCacheExceptions(unittest.TestCase):
         pass
      
 
+def suite(*args, **kw):
+    test_suite = unittest.TestSuite()
+    test_suite.addTest(unittest.makeSuite(TestCache))
+    test_suite.addTest(unittest.makeSuite(TestCacheExceptions))
+    return test_suite
+
+
 if __name__ == '__main__':
-    unittest.main()
+    test_suite=suite()
+    runner=unittest.TextTestRunner()
+    runner.run(test_suite)

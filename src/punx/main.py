@@ -57,9 +57,9 @@ import argparse
 import os
 import sys
 
-import __init__
-import finding
-import logs
+from . import __init__
+from . import finding
+from . import logs
 
 
 CONSOLE_LOGGING_DEFAULT_CHOICE = '__console__'

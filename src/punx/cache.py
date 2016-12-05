@@ -73,15 +73,15 @@ import os
 import requests.packages.urllib3
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 try:
-	import StringIO
+    import StringIO
 except ImportError:
-	from io import StringIO
+    from io import StringIO
 import zipfile
 from PyQt4 import QtCore
 
-import nxdlstructure
-import settings
-import __init__
+from . import nxdlstructure
+from . import settings
+from . import __init__
 
 
 orgName = __init__.__settings_organization__

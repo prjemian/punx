@@ -5,9 +5,12 @@ test structure analysis process of punx package
 
 import os
 import sys
+import unittest
 
 import common
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
+_path = os.path.join(os.path.dirname(__file__), '..', 'src')
+if _path not in sys.path:
+    sys.path.insert(0, _path)
 import punx.h5structure
 
 
@@ -65,14 +68,19 @@ class Structure_compression(common.StructureHdf5File):
     testfile = 'compression.h5'
     expected_output = common.read_filelines('structure_compression.txt')
     NeXus = False
+     
+
+def suite(*args, **kw):
+    test_suite = unittest.TestSuite()
+    test_suite.addTest(unittest.makeSuite(Structure_SimpleHdf5File))
+    test_suite.addTest(unittest.makeSuite(Structure_writer_1_3))
+    test_suite.addTest(unittest.makeSuite(Structure_writer_2_1))
+    test_suite.addTest(unittest.makeSuite(Structure_33id_spec_22_2D))
+    test_suite.addTest(unittest.makeSuite(Structure_compression))
+    return test_suite
 
 
 if __name__ == '__main__':
-    cases = [Structure_SimpleHdf5File, 
-             Structure_writer_1_3,
-             Structure_writer_2_1,
-             Structure_33id_spec_22_2D,
-             Structure_compression,
-             ]
-    for case in cases:
-        common.run_test_cases(case)
+    test_suite=suite()
+    runner=unittest.TextTestRunner()
+    runner.run(test_suite)

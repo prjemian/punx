@@ -25,7 +25,7 @@ import datetime
 import os
 from PyQt4 import QtCore
 
-import __init__
+from . import __init__
 
 
 orgName = __init__.__settings_organization__

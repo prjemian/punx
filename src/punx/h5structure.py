@@ -40,7 +40,7 @@ import sys      #@UnusedImport
 import h5py
 import numpy
 
-import __init__
+from . import __init__
 
 
 class h5structure(object):

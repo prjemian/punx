@@ -23,7 +23,7 @@ Python Utilities for NeXus HDF5 files
 #-----------------------------------------------------------------------------
 
 import os
-from _version import git_release
+from . import _version
 
 __author__    = 'Pete R. Jemian'
 __email__     = 'prjemian@gmail.com'
@@ -34,7 +34,7 @@ __package_name__ = 'punx'
 _path = os.path.dirname(__file__)
 _vfile = os.path.join(_path, 'VERSION')
 __version__ = open(_vfile, 'r').read()
-__release__ = git_release(__package_name__, __version__)
+__release__ = _version.git_release(__package_name__, __version__)
 
 __license_url__  = 'http://creativecommons.org/licenses/by/4.0/deed.en_US'
 __license__      = 'Creative Commons Attribution 4.0 International Public License (see LICENSE file)'

@@ -21,7 +21,15 @@ class TestGitRelease(unittest.TestCase):
 
     def test_git_release_package_exception(self):
         self.assertEqual('release_undefined', git_release('not_the_package_name'))
+     
+
+def suite(*args, **kw):
+    test_suite = unittest.TestSuite()
+    test_suite.addTest(unittest.makeSuite(TestGitRelease))
+    return test_suite
 
 
 if __name__ == '__main__':
-    unittest.main()
+    test_suite=suite()
+    runner=unittest.TextTestRunner()
+    runner.run(test_suite)

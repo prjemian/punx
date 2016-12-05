@@ -26,7 +26,7 @@ Perform various analyses on the NXDL files
 '''
 
 
-import nxdlstructure
+from . import nxdlstructure
 
 
 ab = {}

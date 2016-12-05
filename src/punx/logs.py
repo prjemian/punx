@@ -27,7 +27,7 @@ import os
 import socket
 import sys
 
-import __init__
+from . import __init__
 
 
 class Logger(object):

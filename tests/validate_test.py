@@ -5,6 +5,7 @@ test the punx validation process
 
 import os
 import sys
+import unittest
 
 import common
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
@@ -34,13 +35,18 @@ class Validate_compression(common.ValidHdf5File):
     testfile = 'compression.h5'
     expected_output = common.read_filelines('validate_compression.txt')
     NeXus = False
+     
+
+def suite(*args, **kw):
+    test_suite = unittest.TestSuite()
+    test_suite.addTest(unittest.makeSuite(Validate_writer_1_3))
+    test_suite.addTest(unittest.makeSuite(Validate_writer_2_1))
+    test_suite.addTest(unittest.makeSuite(Validate_33id_spec_22_2D))
+    test_suite.addTest(unittest.makeSuite(Validate_compression))
+    return test_suite
 
 
 if __name__ == '__main__':
-    cases = [Validate_writer_1_3,
-             Validate_writer_2_1,
-             Validate_33id_spec_22_2D,
-             Validate_compression,
-             ]
-    for case in cases:
-        common.run_test_cases(case)
+    test_suite=suite()
+    runner=unittest.TextTestRunner()
+    runner.run(test_suite)

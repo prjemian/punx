@@ -79,8 +79,8 @@ def datafile_prep():
 
 
 if __name__ == '__main__':
-    import __init__
-    import main
+    from . import __init__
+    from . import main
     __init__.DEFAULT_LOG_LEVEL = __init__.NOISY
     # sys.argv.append('-h')
     # sys.argv.append('--version')

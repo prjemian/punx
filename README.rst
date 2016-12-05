@@ -19,10 +19,10 @@ NOTE: project is under initial construction
 :git:       https://github.com/prjemian/punx
 :PyPI:      https://pypi.python.org/pypi/punx/ 
 :TODO list: https://github.com/prjemian/punx/issues
-:build:
+:travis-ci:
     .. image:: https://travis-ci.org/prjemian/punx.svg?branch=master
                :target: https://travis-ci.org/prjemian/punx
-:coverage:
+:coveralls:
    .. image:: https://coveralls.io/repos/github/prjemian/punx/badge.svg?branch=master
               :target: https://coveralls.io/github/prjemian/punx?branch=master
 

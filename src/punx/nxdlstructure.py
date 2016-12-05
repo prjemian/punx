@@ -227,6 +227,9 @@ class NX_mixin(object):
         for nx_dict in (group.attributes['NXDL.xml'], group.fields, group.links):
             for _k, v in sorted(nx_dict.items()):
                 t.append(str(v))
+                if isinstance(v, NX_field):
+                    for _kf, vf in sorted(v.attributes['defined'].items()):
+                        t.append(indentation + '@' + str(_kf) + ' = ' + str(vf))
         for _k, v in sorted(group.groups.items()):
             t.append(str(v))
             for line in group.render_group(v).splitlines():

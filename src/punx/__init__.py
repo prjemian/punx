@@ -24,7 +24,9 @@ Python Utilities for NeXus HDF5 files
 
 import os
 import sys
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+if _path not in sys.path:
+    sys.path.insert(0, _path)
 from punx import _version
 
 __author__    = 'Pete R. Jemian'

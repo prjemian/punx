@@ -2,20 +2,14 @@
 # advice: http://stackoverflow.com/questions/17001010/how-to-run-unittest-discover-from-python-setup-py-test#21726329
 # advice: http://stackoverflow.com/questions/6164004/python-package-structure-setup-py-for-running-unit-tests?noredirect=1&lq=1
 
-'''
-coverage run tests/common_test.py
-coverage run -a tests/cache_test.py
-coverage run -a tests/h5structure_test.py
-coverage run -a tests/logs_test.py
-coverage run -a tests/validate_test.py
-coverage run -a tests/_version_test.py
-'''
 
 import os
 import unittest
 import sys
 
-sys.path.insert(0, '..')
+_path = os.path.join(os.path.dirname(__file__), '..',)
+if _path not in sys.path:
+    sys.path.insert(0, _path)
 from tests import common
 from tests import common_test
 from tests import cache_test
@@ -31,8 +25,8 @@ def suite(*args, **kw):
                  logs_test, validate_test, _version_test,
                  ]
 
-    #test_suite = common.suite_handler([item.suite for item in test_list])
-    test_suite.addTests([unittest.makeSuite(item.suite) for item in test_list])
+    for test in test_list:
+        test_suite.addTest(test.suite())
     return test_suite
 
 

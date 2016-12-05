@@ -68,7 +68,7 @@ when users run from a copy of the *punx* package installed from PyPI
 '''
 
 import pickle
-import lxml
+import lxml.etree
 import os
 import requests.packages.urllib3
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
@@ -83,7 +83,6 @@ from PyQt4 import QtCore
 _path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 if _path not in sys.path:
     sys.path.insert(0, _path)
-from punx import nxdlstructure
 from punx import settings
 import punx
 
@@ -149,6 +148,7 @@ def write_pickle_file(info, path):
     '''
     write the parsed nxdl_dict and info to a Python pickle file
     '''
+    from punx import nxdlstructure
     info['pickle_file'] = get_pickle_file_name(path, use_fallback=False)
     for k, v in info.items():
         msg = 'info[%s] = %s' % (k, str(v))

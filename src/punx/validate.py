@@ -102,10 +102,8 @@ import sys
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import punx
-from punx import cache
 from punx import finding
 from punx import h5structure
-from punx import nxdlstructure
 
 # TODO: issue #14: http://download.nexusformat.org/doc/html/search.html?q=warning&check_keywords=yes&area=default
 
@@ -118,6 +116,7 @@ def validate_xml(xml_file_name):
 
     :param str xml_file_name: name of XML file
     '''
+    from punx import cache
     xml_tree = lxml.etree.parse(xml_file_name)
     xsd = cache.get_XML_Schema()
     try:
@@ -140,6 +139,7 @@ class NxdlPattern(object):
     '''
     
     def __init__(self, parent, pname, xpath_str):
+        from punx import cache
         self.name = pname
         self.xpath_str = xpath_str
         rules = cache.get_nxdl_xsd()
@@ -185,6 +185,8 @@ class Data_File_Validator(object):
     '''
     
     def __init__(self, fname):
+        from punx import cache
+        from punx import nxdlstructure
         if not os.path.exists(fname):
             raise punx.FileNotFound(fname)
         self.fname = fname

@@ -7,10 +7,15 @@ import os
 import sys
 import unittest
 
-import common
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
-# import punx.validate
+_path = os.path.join(os.path.dirname(__file__), '..', )
+if _path not in sys.path:
+    sys.path.insert(0, _path)
+from tests import common
 
+_path = os.path.join(_path, 'src')
+if _path not in sys.path:
+    sys.path.insert(0, _path)
+import punx.validate
 
 class Validate_writer_1_3(common.ValidHdf5File):
 

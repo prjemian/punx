@@ -8,8 +8,10 @@
 language: python
 python:
   - "2.7"
+# TODO: - "3.5"
 
 before_script:
+  # TODO: detect if py2 or py3 worker
   - wget http://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh -O miniconda.sh
   - chmod +x miniconda.sh
   - bash miniconda.sh -b -p $HOME/miniconda
@@ -28,12 +30,7 @@ script:
   - python ./src/punx/main.py --release
   - python ./src/punx/main.py update --force
   - which coverage
-  - coverage run tests/common_test.py
-  - coverage run -a tests/cache_test.py
-  - coverage run -a tests/h5structure_test.py
-  - coverage run -a tests/logs_test.py
-  - coverage run -a tests/validate_test.py
-  - coverage run -a tests/_version_test.py
+  - coverage run tests/__init__.py
 
 after_success:
   - coverage report

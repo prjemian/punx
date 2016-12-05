@@ -5,9 +5,13 @@ test punx tests/common module (supports unit testing)
 
 import os
 import h5py
+import sys
 import unittest
 
-import common
+_path = os.path.join(os.path.dirname(__file__), '..',)
+if _path not in sys.path:
+    sys.path.insert(0, _path)
+from tests import common
 
 
 class TestCommon(unittest.TestCase):

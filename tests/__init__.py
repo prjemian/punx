@@ -11,15 +11,18 @@ coverage run -a tests/validate_test.py
 coverage run -a tests/_version_test.py
 '''
 
+import os
 import unittest
+import sys
 
-import common
-import common_test
-import cache_test
-import h5structure_test
-import logs_test
-import validate_test
-import _version_test
+sys.path.insert(0, '..')
+from tests import common
+from tests import common_test
+from tests import cache_test
+from tests import h5structure_test
+from tests import logs_test
+from tests import validate_test
+from tests import _version_test
 
 
 def suite(*args, **kw):

@@ -98,12 +98,14 @@ import lxml.etree
 import numpy
 import os
 import re
+import sys
 
-import __init__
-import cache
-import finding
-import h5structure
-import nxdlstructure
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+import punx
+from punx import cache
+from punx import finding
+from punx import h5structure
+from punx import nxdlstructure
 
 # TODO: issue #14: http://download.nexusformat.org/doc/html/search.html?q=warning&check_keywords=yes&area=default
 
@@ -184,7 +186,7 @@ class Data_File_Validator(object):
     
     def __init__(self, fname):
         if not os.path.exists(fname):
-            raise __init__.FileNotFound(fname)
+            raise punx.FileNotFound(fname)
         self.fname = fname
 
         self.findings = []      # list of Finding() instances
@@ -198,7 +200,7 @@ class Data_File_Validator(object):
         try:
             self.h5 = h5py.File(fname, 'r')
         except IOError:
-            raise __init__.HDF5_Open_Error(fname)
+            raise punx.HDF5_Open_Error(fname)
         self._init_patterns()
     
     def _init_patterns(self):

@@ -57,9 +57,10 @@ import argparse
 import os
 import sys
 
-from . import __init__
-from . import finding
-from . import logs
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+import punx
+from punx import finding
+from punx import logs
 
 
 CONSOLE_LOGGING_DEFAULT_CHOICE = '__console__'
@@ -74,13 +75,13 @@ def exit_message(msg, status=None, exit_code=1):
     exit this code with a message and a status
     
     :param str msg: text to be reported
-    :param int status: 0 - 50 (default: __init__.ERROR = 40)
+    :param int status: 0 - 50 (default: punx.ERROR = 40)
     :param int exit_code: 0: no error, 1: error (default)
     '''
     if status is None:
-        status = __init__.ERROR
-    __init__.LOG_MESSAGE(msg, status)
-    if __init__.LOG_MESSAGE != logs.to_console:
+        status = punx.ERROR
+    punx.LOG_MESSAGE(msg, status)
+    if punx.LOG_MESSAGE != logs.to_console:
         print(msg)
     exit(exit_code)
 
@@ -154,12 +155,12 @@ def func_structure(args):
 
         try:
             mc = h5structure.h5structure(os.path.abspath(args.infile))
-        except __init__.FileNotFound:
+        except punx.FileNotFound:
             exit_message('File not found: ' + args.infile)
         mc.array_items_shown = limit
         try:
             report = mc.report(show_attributes)
-        except __init__.HDF5_Open_Error:
+        except punx.HDF5_Open_Error:
             exit_message('Could not open as HDF5: ' + args.infile)
         print('\n'.join(report or ''))
 
@@ -179,11 +180,11 @@ def func_validate(args):
     else:
         try:
             validator = validate.Data_File_Validator(args.infile)
-        except __init__.FileNotFound:
+        except punx.FileNotFound:
             exit_message('File not found: ' + args.infile)
-        except __init__.HDF5_Open_Error:
+        except punx.HDF5_Open_Error:
             exit_message('Could not open as HDF5: ' + args.infile)
-        except __init__.SchemaNotFound as _exc:
+        except punx.SchemaNotFound as _exc:
             exit_message(str(_exc))
     
         # determine which findings are to be reported
@@ -266,27 +267,27 @@ class MyArgumentParser(argparse.ArgumentParser):
 def parse_command_line_arguments():
     '''process command line'''
     doc = __doc__.strip().splitlines()[0]
-    doc += '\n  version: ' + __init__.__version__
-    doc += '\n  release: ' + __init__.__release__
-    doc += '\n  URL: ' + __init__.__url__
+    doc += '\n  version: ' + punx.__version__
+    doc += '\n  release: ' + punx.__release__
+    doc += '\n  URL: ' + punx.__url__
     epilog = 'Note: It is only necessary to use the first two (or'
     epilog += ' more) characters of any subcommand, enough that the'
     epilog += ' abbreviation is unique. '
     epilog += ' Such as: ``demonstrate`` can be abbreviated to'
     epilog += ' ``demo`` or even ``de``.'
-    p = MyArgumentParser(prog=__init__.__package_name__, 
+    p = MyArgumentParser(prog=punx.__package_name__, 
                                      description=doc,
                                      epilog=epilog)
 
     p.add_argument('-v', 
                     '--version', 
                     action='version', 
-                    version=__init__.__version__)
+                    version=punx.__version__)
     p.add_argument('-r', 
                     '--release',
                     action='version', 
                     help="show program's release number and exit",
-                    version=__init__.__release__)
+                    version=punx.__release__)
     
     def add_logging_argument(subp):
         '''
@@ -299,11 +300,11 @@ def parse_command_line_arguments():
                        nargs='?',
                        help=help_text)
         
-        level = __init__.DEFAULT_LOG_LEVEL
+        level = punx.DEFAULT_LOG_LEVEL
         help_text = 'logging interest level (%d - %d), default=%d (%s)'
-        help_text = help_text % (__init__.NOISY,
-                                 __init__.CRITICAL,
-                                 __init__.DEFAULT_LOG_LEVEL,
+        help_text = help_text % (punx.NOISY,
+                                 punx.CRITICAL,
+                                 punx.DEFAULT_LOG_LEVEL,
                                  logging.getLevelName(level)
                                  )
         subp.add_argument('-i', '--interest',
@@ -390,16 +391,16 @@ def interceptor_logfile(args):
     '''
     if 'logfile' in args:
         if args.logfile == CONSOLE_LOGGING_DEFAULT_CHOICE:
-            __init__.DEFAULT_LOG_LEVEL = args.interest
-            __init__.LOG_MESSAGE = logs.to_console
-            __init__.LOG_MESSAGE('logging output to console only', __init__.DEBUG)
+            punx.DEFAULT_LOG_LEVEL = args.interest
+            punx.LOG_MESSAGE = logs.to_console
+            punx.LOG_MESSAGE('logging output to console only', punx.DEBUG)
         else:
-            lo = __init__.NOISY
-            hi = __init__.CRITICAL
+            lo = punx.NOISY
+            hi = punx.CRITICAL
             args.interest = max(lo, min(hi, args.interest))
             _log = logs.Logger(log_file=args.logfile, level=args.interest)
-        __init__.LOG_MESSAGE('sys.argv: ' + ' '.join(sys.argv), __init__.DEBUG)
-        __init__.LOG_MESSAGE('args: ' + str(args), __init__.DEBUG)
+        punx.LOG_MESSAGE('sys.argv: ' + ' '.join(sys.argv), punx.DEBUG)
+        punx.LOG_MESSAGE('args: ' + str(args), punx.DEBUG)
 
 
 def main():

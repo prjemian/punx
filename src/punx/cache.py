@@ -72,6 +72,7 @@ import lxml
 import os
 import requests.packages.urllib3
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
+import sys
 try:
     import StringIO
 except ImportError:
@@ -79,16 +80,19 @@ except ImportError:
 import zipfile
 from PyQt4 import QtCore
 
-from . import nxdlstructure
-from . import settings
-from . import __init__
+_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+if _path not in sys.path:
+    sys.path.insert(0, _path)
+from punx import nxdlstructure
+from punx import settings
+import punx
 
 
-orgName = __init__.__settings_organization__
-appName = __init__.__settings_package__
+orgName = punx.__settings_organization__
+appName = punx.__settings_package__
 
 PKG_DIR = os.path.abspath(os.path.dirname(__file__))
-SOURCE_CACHE_ROOT = os.path.join(PKG_DIR, __init__.CACHE_SUBDIR)
+SOURCE_CACHE_ROOT = os.path.join(PKG_DIR, punx.CACHE_SUBDIR)
 
 SOURCE_CACHE_KEY_FILE = '__use_source_cache__'
 USE_SOURCE_CACHE = os.path.exists(os.path.join(PKG_DIR, SOURCE_CACHE_KEY_FILE))
@@ -125,7 +129,7 @@ def get_nxdl_dir():
         cache_dir = SOURCE_CACHE_ROOT
     else:
         cache_dir = qsettings().cache_dir()
-    path = os.path.abspath(os.path.join(cache_dir, __init__.NXDL_CACHE_SUBDIR))
+    path = os.path.abspath(os.path.join(cache_dir, punx.NXDL_CACHE_SUBDIR))
     return path
 
 
@@ -133,11 +137,11 @@ def get_pickle_file_name(path, use_fallback=True):
     '''
     The pickle file holds all known NXDL classes, parsed into Python data structures
     '''
-    pfile = os.path.join(path, __init__.PICKLE_FILE)
+    pfile = os.path.join(path, punx.PICKLE_FILE)
     if use_fallback and not USE_SOURCE_CACHE and not os.path.exists(pfile):
         # user cache has no pickle file, fall back to source cache
-        __init__.LOG_MESSAGE('using source cache pickle file', __init__.DEBUG)
-        pfile = os.path.join(SOURCE_CACHE_ROOT, __init__.PICKLE_FILE)
+        punx.LOG_MESSAGE('using source cache pickle file', punx.DEBUG)
+        pfile = os.path.join(SOURCE_CACHE_ROOT, punx.PICKLE_FILE)
     return os.path.abspath(pfile)
 
 
@@ -148,9 +152,9 @@ def write_pickle_file(info, path):
     info['pickle_file'] = get_pickle_file_name(path, use_fallback=False)
     for k, v in info.items():
         msg = 'info[%s] = %s' % (k, str(v))
-        __init__.LOG_MESSAGE(msg, __init__.DEBUG)
+        punx.LOG_MESSAGE(msg, punx.DEBUG)
     msg = 'update pickle file: ' + os.path.abspath(info['pickle_file'])
-    __init__.LOG_MESSAGE(msg, __init__.INFO)
+    punx.LOG_MESSAGE(msg, punx.INFO)
 
     nxdl_dict = nxdlstructure.get_NXDL_specifications()
     pickle_data = dict(nxdl_dict=nxdl_dict, info=info)
@@ -161,15 +165,15 @@ def read_pickle_file(pfile, sha):
     '''
     read the parsed nxdl_dict and info from a Python pickle file
     '''
-    __init__.LOG_MESSAGE('read pickle file', __init__.DEBUG)
+    punx.LOG_MESSAGE('read pickle file', punx.DEBUG)
     pickle_data = pickle.load(open(pfile, 'rb'))
     if 'info' in pickle_data:
         # any other tests to qualify this?
         if sha == pickle_data['info']['git_sha']:   # declare victory!
             # do not need to return ``info`` since it matches
-            __init__.LOG_MESSAGE('matching SHA', __init__.DEBUG)
+            punx.LOG_MESSAGE('matching SHA', punx.DEBUG)
             return pickle_data['nxdl_dict']
-    __init__.LOG_MESSAGE('SHA does not match', __init__.DEBUG)
+    punx.LOG_MESSAGE('SHA does not match', punx.DEBUG)
     return None
 
 
@@ -191,20 +195,20 @@ def githubMasterInfo(org, repo):
     url = 'https://api.github.com/repos/%s/%s/commits' % (org, repo)
     
     msg = 'disabling warnings about GitHub self-signed https certificates'
-    __init__.LOG_MESSAGE(msg, __init__.DEBUG)
+    punx.LOG_MESSAGE(msg, punx.DEBUG)
     requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
-    __init__.LOG_MESSAGE('get repo info: ' + str(url), __init__.INFO)
-    for _retry in range(__init__.GITHUB_RETRY_COUNT):
+    punx.LOG_MESSAGE('get repo info: ' + str(url), punx.INFO)
+    for _retry in range(punx.GITHUB_RETRY_COUNT):
         try:
             r = requests.get(url, verify=False)
         except requests.exceptions.ConnectionError as _exc:
             # see: http://docs.python-requests.org/en/master/user/quickstart/#errors-and-exceptions
             # see: http://docs.python-requests.org/en/master/api/#id1
-            __init__.LOG_MESSAGE('ConnectionError from ' + str(url), __init__.ERROR)
+            punx.LOG_MESSAGE('ConnectionError from ' + str(url), punx.ERROR)
             return None
         else:
             break
-        __init__.LOG_MESSAGE('retry to get repo info: ' + str(url), __init__.WARN)
+        punx.LOG_MESSAGE('retry to get repo info: ' + str(url), punx.WARN)
 
     knowledge = r.json()
     if isinstance(knowledge, dict):     # is GitHub rate-limiting us?  <= 60/hr
@@ -224,15 +228,15 @@ def githubMasterInfo(org, repo):
             X-RateLimit-Remaining: 56
             X-RateLimit-Reset: 1372700873
             '''
-            raise __init__.CannotUpdateFromGithubNow(msg)
+            raise punx.CannotUpdateFromGithubNow(msg)
         
     latest = knowledge[0]
     sha = latest['sha']
     iso8601 = latest['commit']['committer']['date']
     zip_url = 'https://github.com/%s/%s/archive/master.zip' % (org, repo)
     
-    __init__.LOG_MESSAGE('git sha: ' + str(sha), __init__.INFO)
-    __init__.LOG_MESSAGE('git iso8601: ' + str(iso8601), __init__.INFO)
+    punx.LOG_MESSAGE('git sha: ' + str(sha), punx.INFO)
+    punx.LOG_MESSAGE('git iso8601: ' + str(iso8601), punx.INFO)
     
     return dict(git_sha=sha, git_time=iso8601, zip_url=zip_url)
 
@@ -241,8 +245,8 @@ def __get_github_info__():
     '''
     check with GitHub for any updates
     '''
-    return githubMasterInfo(__init__.GITHUB_NXDL_ORGANIZATION, 
-                            __init__.GITHUB_NXDL_REPOSITORY)
+    return githubMasterInfo(punx.GITHUB_NXDL_ORGANIZATION, 
+                            punx.GITHUB_NXDL_REPOSITORY)
 
 
 def update_NXDL_Cache(force_update=False):
@@ -252,10 +256,10 @@ def update_NXDL_Cache(force_update=False):
     :param bool force_update: (optional, default: False) update if GitHub is available
     '''
     msg = 'update_NXDL_Cache(): force_update=' + str(force_update)
-    __init__.LOG_MESSAGE(msg, __init__.DEBUG)
+    punx.LOG_MESSAGE(msg, punx.DEBUG)
     info = __get_github_info__()    # check with GitHub first
     if info is None:
-        __init__.LOG_MESSAGE('GitHub not available', __init__.INFO)
+        punx.LOG_MESSAGE('GitHub not available', punx.INFO)
         return
 
     # proceed only if GitHub info was available
@@ -270,30 +274,30 @@ def update_NXDL_Cache(force_update=False):
     updating = could_update or force_update
     
     if not updating:
-        __init__.LOG_MESSAGE('not updating NeXus definitions files', __init__.INFO)
+        punx.LOG_MESSAGE('not updating NeXus definitions files', punx.INFO)
         return
 
     path = qset.cache_dir()
     msg = 'updating NeXus definitions files in directory: ' + os.path.abspath(path)
-    __init__.LOG_MESSAGE(msg, __init__.INFO)
+    punx.LOG_MESSAGE(msg, punx.INFO)
 
     # download the repository ZIP file 
     url = info['zip_url']
     msg = 'disabling warnings about GitHub self-signed https certificates'
-    __init__.LOG_MESSAGE(msg, __init__.DEBUG)
+    punx.LOG_MESSAGE(msg, punx.DEBUG)
     requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
-    __init__.LOG_MESSAGE('download: ' + str(url), __init__.INFO)
-    for _retry in range(__init__.GITHUB_RETRY_COUNT):
+    punx.LOG_MESSAGE('download: ' + str(url), punx.INFO)
+    for _retry in range(punx.GITHUB_RETRY_COUNT):
         try:
             content = requests.get(url, verify=False).content
         except requests.exceptions.ConnectionError as _exc:
             msg = 'ConnectionError from ' + str(url)
             msg += ', ' + str(_exc)
-            __init__.LOG_MESSAGE(msg, __init__.ERROR)
+            punx.LOG_MESSAGE(msg, punx.ERROR)
             return None
         else:
             break
-        __init__.LOG_MESSAGE('retry download: ' + str(url), __init__.WARN)
+        punx.LOG_MESSAGE('retry download: ' + str(url), punx.WARN)
 
     buf = StringIO.StringIO(content)
     zip_content = zipfile.ZipFile(buf)
@@ -303,7 +307,7 @@ def update_NXDL_Cache(force_update=False):
     
     # extract the NXDL (XML, XSL, & XSD) files to the path
     msg = 'extract ZIP to directory: ' + os.path.abspath(path)
-    __init__.LOG_MESSAGE(msg, __init__.INFO)
+    punx.LOG_MESSAGE(msg, punx.INFO)
     NXDL_categories = 'base_classes applications contributed_definitions'
     for item in zip_content.namelist():
         parts = item.rstrip('/').split('/')
@@ -311,34 +315,34 @@ def update_NXDL_Cache(force_update=False):
             if os.path.splitext(parts[1])[-1] in ('.xsd',):
                 zip_content.extract(item, path)
                 msg = 'extracted: ' + os.path.abspath(item)
-                __init__.LOG_MESSAGE(msg, __init__.DEBUG)
+                punx.LOG_MESSAGE(msg, punx.DEBUG)
         elif len(parts) == 3:         # get the NXDL files
             if parts[1] in NXDL_categories.split():
                 if os.path.splitext(parts[2])[-1] in ('.xml .xsl'.split()):
                     zip_content.extract(item, path)
                     msg = 'extracted: ' + os.path.abspath(item)
-                    __init__.LOG_MESSAGE(msg, __init__.DEBUG)
+                    punx.LOG_MESSAGE(msg, punx.DEBUG)
     
     # optimization: write the parsed NXDL specifications to a file
     if force_update:
         # force the pickle file to be re-written
         pfile = get_pickle_file_name(path, use_fallback=False)
         msg = 'force pickle file update'
-        __init__.LOG_MESSAGE(msg, __init__.DEBUG)
+        punx.LOG_MESSAGE(msg, punx.DEBUG)
         if os.path.exists(pfile):
             os.remove(pfile)
     write_pickle_file(info, path)
 
     if force_update:
         # force the .ini file to be re-written
-        __init__.LOG_MESSAGE('force .ini file update', __init__.DEBUG)
+        punx.LOG_MESSAGE('force .ini file update', punx.DEBUG)
         key = 'pickle_file'
         v =  qset.getKey(key)
         qset.setKey(key, 'update forced')
         qset.setKey(key, v)
         for k in ('git_sha', 'git_time'):
             qset.setKey('___global___/'+k, info[k])
-    __init__.LOG_MESSAGE('update .ini file: ' + str(qset.fileName()), __init__.INFO)
+    punx.LOG_MESSAGE('update .ini file: ' + str(qset.fileName()), punx.INFO)
     qset.updateGroupKeys(info)
 
 
@@ -389,7 +393,7 @@ class SourceCacheSettings(QtCore.QSettings, settings.QSettingsMixin):
         if USE_SOURCE_CACHE and not os.path.exists(SOURCE_CACHE_ROOT):
             os.mkdir(SOURCE_CACHE_ROOT)
         path = os.path.join(SOURCE_CACHE_ROOT, 
-                            __init__.SOURCE_CACHE_SETTINGS_FILENAME)
+                            punx.SOURCE_CACHE_SETTINGS_FILENAME)
         QtCore.QSettings.__init__(self, path, QtCore.QSettings.IniFormat)
         self.init_global_keys()
 
@@ -420,17 +424,17 @@ def abs_NXDL_filename(file_name):
     absolute_name = os.path.abspath(os.path.join(get_nxdl_dir(), file_name))
     msg = 'file does not exist: ' + absolute_name
     if os.path.exists(absolute_name):
-        __init__.LOG_MESSAGE('user cache: ' + absolute_name, __init__.DEBUG)
+        punx.LOG_MESSAGE('user cache: ' + absolute_name, punx.DEBUG)
         return absolute_name
     if not USE_SOURCE_CACHE:
-        __init__.LOG_MESSAGE('try source cache for: ' + file_name, __init__.DEBUG)
-        path = os.path.join(SOURCE_CACHE_ROOT, __init__.NXDL_CACHE_SUBDIR)
+        punx.LOG_MESSAGE('try source cache for: ' + file_name, punx.DEBUG)
+        path = os.path.join(SOURCE_CACHE_ROOT, punx.NXDL_CACHE_SUBDIR)
         absolute_name = os.path.abspath(os.path.join(path, file_name))
         if os.path.exists(absolute_name):
-            __init__.LOG_MESSAGE('source cache: ' + absolute_name, __init__.DEBUG)
+            punx.LOG_MESSAGE('source cache: ' + absolute_name, punx.DEBUG)
             return absolute_name
         msg += '\t AND not found in source cache either!  Report this problem to the developer.'
-    raise __init__.FileNotFound(msg)
+    raise punx.FileNotFound(msg)
 
 
 def get_XML_Schema():
@@ -458,12 +462,12 @@ def get_nxdl_xsd():
     if __singleton_nxdl_xsd__ is None:
         try:
             xsd_file_name = abs_NXDL_filename(NXDL_SCHEMA_FILE)
-        except __init__.FileNotFound as _exc:
-            raise __init__.SchemaNotFound(_exc)
+        except punx.FileNotFound as _exc:
+            raise punx.SchemaNotFound(_exc)
 
         if not os.path.exists(xsd_file_name):
             msg = 'Could not find XML Schema file: ' + xsd_file_name
-            raise __init__.SchemaNotFound(msg)
+            raise punx.SchemaNotFound(msg)
     
         __singleton_nxdl_xsd__ = lxml.etree.parse(xsd_file_name)
 

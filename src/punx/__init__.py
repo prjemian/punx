@@ -23,7 +23,9 @@ Python Utilities for NeXus HDF5 files
 #-----------------------------------------------------------------------------
 
 import os
-from . import _version
+import sys
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from punx import _version
 
 __author__    = 'Pete R. Jemian'
 __email__     = 'prjemian@gmail.com'

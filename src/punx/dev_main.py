@@ -15,6 +15,7 @@
 developer: exercise various aspects of the main user interface file
 '''
 
+import os
 import sys
 
 
@@ -79,9 +80,10 @@ def datafile_prep():
 
 
 if __name__ == '__main__':
-    from . import __init__
-    from . import main
-    __init__.DEFAULT_LOG_LEVEL = __init__.NOISY
+    sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+    import punx
+    from punx import main
+    punx.DEFAULT_LOG_LEVEL = punx.NOISY
     # sys.argv.append('-h')
     # sys.argv.append('--version')
     # sys.argv.append('--release')

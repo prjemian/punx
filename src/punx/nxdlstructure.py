@@ -70,11 +70,16 @@ __url__ = 'http://punx.readthedocs.org/en/latest/nxdlstructure.html'
 import collections
 import lxml.etree
 import os
+import path
+import sys
 
-import __init__
-import cache
-import nxdl_rules
-import validate
+_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+if _path not in sys.path:
+    sys.path.insert(0, _path)
+import punx
+from punx import cache
+from punx import nxdl_rules
+from punx import validate
 
 
 PROGRAM_NAME = 'nxdlstructure'
@@ -556,8 +561,8 @@ def get_NXDL_specifications():
 
 def _developer():
     'working on issue #4'
-    import logs
-    __init__.LOG_MESSAGE = logs.to_console
+    from punx import logs
+    punx.LOG_MESSAGE = logs.to_console
     nxdl_dict = _get_specs_from_NXDL_files()
     print(sorted(nxdl_dict.keys()))
 

@@ -1037,25 +1037,25 @@ class Data_File_Validator(object):
         :param obj obj: instance of h5py.File, h5py.Group, or h5py.Dataset
         :param str attribute: name of requested attribute
         :param obj default: value if attribute not found (usually str)
-        :param bool report: check & report if value is a variable length string (actually an ndarray)
+        :param bool report: check & report if value is an ndarray of variable length string
         '''
         a = obj.attrs.get(attribute, default)
         if isinstance(a, numpy.ndarray):
+            if len(a) > 0:
+                if isinstance(a[0], (bytes, numpy.bytes_)):
+                    a = [str(v.decode()) for v in a]
             if report:
                 gname = obj.name + '@' + attribute
+                msg = 'variable length string'
                 if len(a) > 1:
-                    msg = 'variable length string array: ' + str(a)
-                else:
-                    msg = 'variable length string: ' + str(a)
+                    msg += ' array'
+                msg += ': ' + str(a)
                 self.new_finding('attribute data type', gname, finding.NOTE, msg)
-            if len(a) > 0:
-                if isinstance(a[0], numpy.bytes_):
-                    a = [v.decode() for v in a]
             if len(a) == 1:
                 a = a[0]
         if sys.version_info.major == 3:
             if isinstance(a, bytes):
-                a = a.decode()
+                a = str(a.decode())
         return a
 
     def reconstruct_classpath(self, h5_address, *args, **kwargs):

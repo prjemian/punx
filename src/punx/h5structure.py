@@ -184,7 +184,6 @@ class h5structure(object):
     def _renderDataset(self, dset, name, indentation = "  "):
         '''return a [formatted_string] with the contents and structure of a dataset'''
         shape = dset.shape
-        # dset.dtype.kind == 'S', nchar = dset.dtype.itemsize
         if self.isNeXus:
             if "target" in dset.attrs:
                 if decode_byte_string(dset.attrs['target']) != dset.name:
@@ -194,7 +193,7 @@ class h5structure(object):
         s = []
         if dset.dtype.kind == 'S':
             if isinstance(dset.value, numpy.ndarray):
-                value = " = %s" % dset.value[0]
+                value = " = %s" % decode_byte_string(dset.value[0])
             else:
                 value = " = %s" % str(dset.value)
             try:

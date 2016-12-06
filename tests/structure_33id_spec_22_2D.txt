@@ -46,7 +46,7 @@ C:\Users\Pete\Documents\eclipse\punx\src\punx\data\33id_spec_22_2D.hdf5 : NeXus 
       @NX_class = NXdata
       @description = SPEC scan data
       @signal = I0
-      @axes = ['eta' 'chi']
+      @axes = ['eta', 'chi']
       @eta_indices = [0]
       @chi_indices = [0]
       Epoch:NX_FLOAT64[11,11] = [ ... ]

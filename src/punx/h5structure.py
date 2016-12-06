@@ -48,7 +48,7 @@ def decode_byte_string(text):
     '''
     in python3, HDF5 attributes can be byte strings or numpy.ndarray strings
     '''
-    if isinstance(text, bytes):
+    if isinstance(text, (bytes, numpy.bytes_)):
         text = text.decode()
     return text
 
@@ -104,10 +104,11 @@ class h5structure(object):
     def _renderGroup(self, obj, name, indentation = "  "):
         '''return a [formatted_string] with the contents of the group'''
         s = []
-        nxclass = decode_byte_string(obj.attrs.get('NX_class', ''))
+        nxclass = obj.attrs.get('NX_class', '')
         if len(nxclass) > 0:
             if isinstance(nxclass, numpy.ndarray):      # attribute reported as DATATYPE SIMPLE
                 nxclass = nxclass[0]                    # convert as if DATATYPE SCALAR
+            nxclass = decode_byte_string(nxclass)
             nxclass = ":" + str(nxclass)
         s += [ indentation + name + nxclass ]
         s += self._renderAttributes(obj, indentation)
@@ -158,10 +159,17 @@ class h5structure(object):
         if self.show_attributes:
             for name in obj.attrs:
                 try:
-                    value = decode_byte_string(obj.attrs.get(name, ''))
+                    value = obj.attrs.get(name, '')
+                    if isinstance(value, numpy.ndarray):
+                        if isinstance(value[0], (bytes, numpy.bytes_)):
+                            value = [str(v.decode()) for v in value]
+                        if len(value) == 1 and isinstance(value[0], str):
+                            value = value[0]
+                    value = decode_byte_string(value)
                 except IOError as _exc:
                     value = 'IOError: ' +  str(_exc)
                 try:
+                    #value = str(value) + ' ' + str(type(value))
                     s.append("%s  @%s = %s" % (indentation, name, str(value)))
                 except UnicodeDecodeError as _exc:
                     s.append("%s  @%s = %s" % (indentation, name, 'UnicodeDecodeError: ' + str(_exc)))
@@ -170,7 +178,7 @@ class h5structure(object):
     def _renderLinkedObject(self, obj, name, indentation = "  "):
         '''return a [formatted_string] with the name and target of a NeXus linked object'''
         s = []
-        s.append("%s%s --> %s" % (indentation, name, obj.attrs['target']))
+        s.append("%s%s --> %s" % (indentation, name, decode_byte_string(obj.attrs['target'])))
         return s
 
     def _renderDataset(self, dset, name, indentation = "  "):
@@ -180,7 +188,7 @@ class h5structure(object):
         if self.isNeXus:
             if "target" in dset.attrs:
                 if dset.attrs['target'] != dset.name:
-                    return ["%s%s --> %s" % (indentation, name, dset.attrs['target'])]
+                    return ["%s%s --> %s" % (indentation, name, decode_byte_string(dset.attrs['target']))]
         txType = self._renderDsType(dset)
         txShape = self._renderDsShape(dset)
         s = []

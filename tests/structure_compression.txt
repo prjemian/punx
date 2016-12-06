@@ -1,20 +1,20 @@
 C:\Users\Pete\Documents\eclipse\punx\src\punx\data\compression.h5
   SASentry:NXentry
-    @NX_class = ['NXentry']
+    @NX_class = NXentry
     SASdata:NXdata
-      @NX_class = ['NXdata']
-      @Q_indices = ['0,1']
-      @I_axes = ['Q,Q']
+      @NX_class = NXdata
+      @Q_indices = 0,1
+      @I_axes = Q,Q
       I:float32[400,400] = [ ... ]
         @IGORWaveType = 2
         @IGORWaveNote = DataFileName=eq-sans_corr-1.dat;DataFileType=EQSANS400x400;;DataFilePath=Prg:Users:ilavsky:Desktop:ORNL images:;;Processed on=Sun, May 25, 2014,11:40:04 AM;Units=Arbitrary;SampleThickness=1;SampleTransmission=1;CorrectionFactor=1;SampleMeasurementTime=1;EmptyMeasurementTime=1;BackgroundMeasTime=1;SampleI0=1;EmptyI0=1;CalibrationFormula=1;
-        @signal = ['I']
-        @uncertainity = ['Idev']
-        @axes = ['Q']
+        @signal = I
+        @uncertainity = Idev
+        @axes = Q
       Idev:float32[400,400] = [ ... ]
         @IGORWaveType = 2
         @IGORWaveNote = DataFileName=eq-sans_corr-1.dat;DataFileType=EQSANS400x400;;DataFilePath=Prg:Users:ilavsky:Desktop:ORNL images:;;Processed on=Sun, May 25, 2014,11:40:04 AM;Units=Arbitrary;SampleThickness=1;SampleTransmission=1;CorrectionFactor=1;SampleMeasurementTime=1;EmptyMeasurementTime=1;BackgroundMeasTime=1;SampleI0=1;EmptyI0=1;CalibrationFormula=1;
-        @axes = ['Q']
+        @axes = Q
       Q:float64[400,400] = [ ... ]
         @IGORWaveType = 4
         @IGORWaveNote = Q calibration based on imported 2D data values. Geometry values are fake to make Nika work. Do not trust them.;BeamCenterX=199;BeamCenterY=199;PixelSizeX=1;PixelSizeY=1;HorizontalTilt=0;VerticalTilt=0;SampleToCCDDistance=1850.8;Wavelength=2;

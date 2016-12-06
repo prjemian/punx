@@ -316,7 +316,7 @@ class Data_File_Validator(object):
                     self.new_finding(title, group.name+'/'+child_name, finding.ERROR, msg)
                 continue
             if h5structure.isNeXusLink(child):
-                if nx_class_defaults['ignoreExtraGroups']:
+                if nx_class_defaults['ignoreExtraGroups']:  # TODO: Is this proper for links?
                     title = nx_class_name+'@ignoreExtraGroups'
                     msg = 'link ignored per NXDL specification'
                     self.new_finding(title, child.name, finding.UNUSED, msg)
@@ -449,7 +449,7 @@ class Data_File_Validator(object):
         # group_defaults = nx_class_object.attributes['defaults']
 
         # validate provided, required, and optional fields
-        for field_name, rules in nx_class_object.fields.items():
+        for field_name, rules in sorted(nx_class_object.fields.items()):
             self.validate_NXDL_field_specification(field_name, group, rules)
 
         # validate provided, required, and optional groups (recursive as directed)

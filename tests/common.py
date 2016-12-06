@@ -107,7 +107,8 @@ class BaseHdf5File(unittest.TestCase):
         for item, actual in enumerate(self.report):
             actual = str(actual).rstrip()
             expected = str(self.expected_output[item]).rstrip()
-            msg = '|' + str(expected) + '|'
+            msg = str(item) + ': '
+            msg += '|' + str(expected) + '|'
             msg += ' != '
             msg += '|' + str(actual) + '|'
             self.assertEqual(expected, actual, msg)

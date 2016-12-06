@@ -465,6 +465,8 @@ def isNeXusGroup(obj, NXtype):
         nxclass = obj.attrs.get('NX_class', None)
         if isinstance(nxclass, numpy.ndarray):
             nxclass = nxclass[0]
+        if isinstance(nxclass, bytes):
+            nxclass = nxclass.decode()
     return nxclass == str(NXtype)
 
 

@@ -73,10 +73,7 @@ import os
 import requests.packages.urllib3
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 import sys
-try:
-    import StringIO
-except ImportError:
-    from io import StringIO
+import io
 import zipfile
 from PyQt4 import QtCore
 
@@ -299,7 +296,7 @@ def update_NXDL_Cache(force_update=False):
             break
         punx.LOG_MESSAGE('retry download: ' + str(url), punx.WARN)
 
-    buf = StringIO.StringIO(content)
+    buf = io.BytesIO(content)
     zip_content = zipfile.ZipFile(buf)
     # TODO: How to save this ZIP to disk? not needed when using pickle file
     #local_zip_file_name = os.path.join(path, url.split('/')[-1])

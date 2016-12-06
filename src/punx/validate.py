@@ -236,10 +236,8 @@ class Data_File_Validator(object):
             'NX_BINARY': (None, ),     # #FIXME:
             'NX_BOOLEAN': (None, ),     # FIXME:
         }
-        try:
-            self.data_types['NX_CHAR'].append(unicode)  # python2, not in python3
-        except NameError:
-            pass
+        if sys.version_info.major == 2:                 # python2 only
+            self.data_types['NX_CHAR'].append(unicode)  # not in python3
         # definitions dependent on other definitions
         # (can add the lists together as needed)
         self.data_types['NX_INT']    += self.data_types['NX_UINT']
@@ -468,7 +466,7 @@ class Data_File_Validator(object):
         
         Verify this HDF5 group conforms to the NXDL specification
         '''
-        nx_class_name = self.get_hdf5_attribute(group, 'NX_class')
+        #nx_class_name = self.get_hdf5_attribute(group, 'NX_class')
         defaults = rules.attributes['defaults']
         target_exists = subgroup_name in group
 
@@ -1052,6 +1050,9 @@ class Data_File_Validator(object):
                 self.new_finding('attribute data type', gname, finding.NOTE, msg)
             if len(a) == 1:
                 a = a[0]
+        if sys.version_info.major == 3:
+            if isinstance(a, bytes):
+                a = a.decode()
         return a
 
     def reconstruct_classpath(self, h5_address, *args, **kwargs):

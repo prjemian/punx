@@ -478,6 +478,8 @@ def isNeXusDataset(obj):
 def isNeXusLink(obj):
     '''is `obj` linked to another NeXus item?'''
     target = obj.attrs.get('target', '')
+    if isinstance(target, bytes):
+        target = target.decode()
     return len(target) > 0 and target != obj.name
 
 

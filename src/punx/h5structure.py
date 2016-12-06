@@ -187,7 +187,7 @@ class h5structure(object):
         # dset.dtype.kind == 'S', nchar = dset.dtype.itemsize
         if self.isNeXus:
             if "target" in dset.attrs:
-                if dset.attrs['target'] != dset.name:
+                if decode_byte_string(dset.attrs['target']) != dset.name:
                     return ["%s%s --> %s" % (indentation, name, decode_byte_string(dset.attrs['target']))]
         txType = self._renderDsType(dset)
         txShape = self._renderDsShape(dset)

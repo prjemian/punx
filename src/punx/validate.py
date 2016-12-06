@@ -688,6 +688,8 @@ class Data_File_Validator(object):
             return
         elif self.default_plot_addr_v1(candidates['v1']) is not None:
             return
+        elif self.no_NXdata_children_of_NXentry(candidates['niac2016']):
+            return
         
         m = 'no default plot: not a NeXus file'
         self.new_finding('NeXus default plot', '/NXentry/NXdata/field', finding.ERROR, m)
@@ -709,6 +711,7 @@ class Data_File_Validator(object):
         ===========   =======================================
         version       NeXus classpath signature
         ===========   =======================================
+        niac2016      /NXentry  (no NXdata group)
         v3            /NXentry/NXdata@signal
         v3+niac2014   /@default/NXentry@default/NXdata@signal
         v2            /NXentry/NXdata/field@signal
@@ -723,14 +726,22 @@ class Data_File_Validator(object):
         can fail due to both false negatives and false positives.
         '''
         # prepare dictionaries of candidates for the default plot
-        candidates = dict(v1 = {}, v2 = {}, v3 = {})
+        candidates = dict(v1 = {}, v2 = {}, v3 = {}, niac2016 = {})
         for node_name in self.h5:
             node = self.h5[node_name]
             if h5structure.isNeXusGroup(node, 'NXentry'):
+                candidates['niac2016'][node.name] = '/NXentry'
                 for subnode_name in node:
                     subnode = node[subnode_name]
                     if h5structure.isNeXusGroup(subnode, 'NXdata'):
-                        if subnode.attrs.get('signal') is not None:
+                        if node.name in candidates['niac2016']:
+                            # reject this node from niac2016 since it has NXdata group
+                            del candidates['niac2016'][node.name]
+
+                        signal = subnode.attrs.get('signal')
+                        if isinstance(signal, (bytes, numpy.bytes_)):
+                            signal = signal.decode()
+                        if signal is not None:
                             k = subnode.name + '@signal'
                             candidates['v3'][k] = '/NXentry/NXdata@signal'
                         for ss_node_name in subnode:
@@ -1000,6 +1011,22 @@ class Data_File_Validator(object):
                 if nxentry_default == nxdata_name:
                     unique_list.append(k)
         return unique_list
+    
+    def no_NXdata_children_of_NXentry(self, group_dict):
+        '''
+        As of NIAC2016, it is not required that there be any NXdata as a child of NXentry
+        '''
+        title = 'NXdata optional per NIAC2016'
+        cp = '/NXentry'
+        m = 'NeXus allows NXentry without NXdata subgroup'
+        if len(group_dict) == 1:
+            for h5_addr, nx_classpath in group_dict.items():
+                t = h5_addr in self.h5
+                f = finding.TF_RESULT[t]
+                self.new_finding(title, cp, finding.NOTE, m)
+                return t
+        
+        return False
    
     def validate_numerical_dataset(self, dataset, group):
         '''

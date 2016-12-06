@@ -61,7 +61,7 @@ class Validate_NXdata_is_now_optional_51(unittest.TestCase):
         entry.attrs['NX_class'] = 'NXentry'
         data = entry.create_group("data")
         data.attrs['NX_class'] = 'NXdata'
-        entry.attrs["signal"] = "data"
+        data.attrs["signal"] = "data"
         data.create_dataset("data", data="a string of characters")
 
         hdf5root.close()
@@ -78,7 +78,7 @@ class Validate_NXdata_is_now_optional_51(unittest.TestCase):
         
         report = validator.report_findings_summary().splitlines()[6]
         #print('\n' + report + '\n')
-        msg = 'no ERRORs found'
+        msg = 'no ERRORs should be found'
         self.assertEqual(int(report.split()[1]), 0, msg)
 
     def test_simple_no_NXdata(self):
@@ -103,7 +103,7 @@ class Validate_NXdata_is_now_optional_51(unittest.TestCase):
         
         report = validator.report_findings_summary().splitlines()[6]
         #print('\n' + report + '\n')
-        msg = 'no ERRORs found'
+        msg = 'no ERRORs should be found'
         self.assertEqual(int(report.split()[1]), 0, msg)
 
 

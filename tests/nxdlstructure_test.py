@@ -7,8 +7,8 @@ import lxml.etree
 import os
 import sys
 import unittest
+import tempfile
 
-import common
 
 _path = os.path.join(os.path.dirname(__file__), '..', 'src')
 if _path not in sys.path:
@@ -21,7 +21,6 @@ class Structure__Issue_55(unittest.TestCase):
     
     def setUp(self):
         punx.logs.ignore_logging()
-        self.test_file = common.getTestFileName(suffix='.xml')
         
         ns = dict(
                   xmlns='http://definition.nexusformat.org/nxdl/3.1',
@@ -42,6 +41,10 @@ class Structure__Issue_55(unittest.TestCase):
         node.set('units', 'NX_ANY')
         lxml.etree.SubElement(node, 'doc')
         self.tree = lxml.etree.ElementTree(root)
+        
+        hfile = tempfile.NamedTemporaryFile(suffix='.xml', delete=False)
+        hfile.close()
+        self.test_file = hfile.name
 
     def tearDown(self):
         if os.path.exists(self.test_file):
@@ -52,11 +55,14 @@ class Structure__Issue_55(unittest.TestCase):
         self.assertIsInstance(self.tree, lxml.etree._ElementTree)
         
         # so far, self.test_file is empty
-        self.assertRaises(lxml.etree.XMLSyntaxError, punx.nxdlstructure.NX_definition, self.test_file)
+        self.assertRaises(lxml.etree.XMLSyntaxError, 
+                          punx.nxdlstructure.NX_definition, 
+                          self.test_file)
 
         #self.tree.getroot()
         with open(self.test_file, 'w') as fp:
-            fp.write(lxml.etree.tostring(self.tree))
+            buf = lxml.etree.tostring(self.tree).decode("utf-8") 
+            fp.write(buf)
         nxdl = punx.nxdlstructure.NX_definition(self.test_file)
         self.assertIsInstance(nxdl, punx.nxdlstructure.NX_definition)
         

@@ -1048,6 +1048,9 @@ class Data_File_Validator(object):
                 else:
                     msg = 'variable length string: ' + str(a)
                 self.new_finding('attribute data type', gname, finding.NOTE, msg)
+            if len(a) > 0:
+                if isinstance(a[0], numpy.bytes_):
+                    a = [v.decode() for v in a]
             if len(a) == 1:
                 a = a[0]
         if sys.version_info.major == 3:

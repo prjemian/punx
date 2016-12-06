@@ -44,6 +44,15 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 import punx
 
 
+def decode_byte_string(text):
+    '''
+    in python3, HDF5 attributes can be byte strings or numpy.ndarray strings
+    '''
+    if isinstance(text, bytes):
+        text = text.decode()
+    return text
+
+
 class h5structure(object):
     '''
     show structure of any HDF5 data file
@@ -95,7 +104,7 @@ class h5structure(object):
     def _renderGroup(self, obj, name, indentation = "  "):
         '''return a [formatted_string] with the contents of the group'''
         s = []
-        nxclass = obj.attrs.get('NX_class', '')
+        nxclass = decode_byte_string(obj.attrs.get('NX_class', ''))
         if len(nxclass) > 0:
             if isinstance(nxclass, numpy.ndarray):      # attribute reported as DATATYPE SIMPLE
                 nxclass = nxclass[0]                    # convert as if DATATYPE SCALAR
@@ -149,7 +158,7 @@ class h5structure(object):
         if self.show_attributes:
             for name in obj.attrs:
                 try:
-                    value = obj.attrs.get(name, '')
+                    value = decode_byte_string(obj.attrs.get(name, ''))
                 except IOError as _exc:
                     value = 'IOError: ' +  str(_exc)
                 try:
@@ -335,7 +344,7 @@ def _get_group_niac2014(parent, attribute, nxclass_name):
     groups with the same *nxclass_name*.
     '''
     matches = []
-    group = parent.attrs.get(attribute)
+    group = decode_byte_string(parent.attrs.get(attribute))
     if group is None:
         # Expect that some data files will not write these attributes.
         # Find *any* HDF5 group that has its @NX_class attribute set to ``nxclass_name``.
@@ -391,6 +400,7 @@ def isNeXusFile_ByNXdataAttrs(filename):
             return False        # no signal attribute
         if isinstance(signal, numpy.ndarray):
             signal = signal[0]
+        signal = decode_byte_string(signal)
         if signal not in nxdata:
             return False        # no signal dataset
         ds_signal = nxdata[signal]
@@ -437,8 +447,10 @@ def isNeXusFile_ByAxes(filename):
                     continue
                 signal1_count = 0   # count datasets with signal=1 attribute
                 for node2 in node1.values():
-                    if isNeXusDataset(node2) and node2.attrs.get('signal', None) in (1, '1'):
-                        signal1_count += 1
+                    if isNeXusDataset(node2):
+                        signal = decode_byte_string(node2.attrs.get('signal', None))
+                        if signal in (1, '1'):
+                            signal1_count += 1
                 if signal1_count == 1:  # ensure only 1 is defined
                     return True
         f.close()
@@ -465,8 +477,7 @@ def isNeXusGroup(obj, NXtype):
         nxclass = obj.attrs.get('NX_class', None)
         if isinstance(nxclass, numpy.ndarray):
             nxclass = nxclass[0]
-        if isinstance(nxclass, bytes):
-            nxclass = nxclass.decode()
+        nxclass = decode_byte_string(nxclass)
     return nxclass == str(NXtype)
 
 
@@ -477,9 +488,7 @@ def isNeXusDataset(obj):
 
 def isNeXusLink(obj):
     '''is `obj` linked to another NeXus item?'''
-    target = obj.attrs.get('target', '')
-    if isinstance(target, bytes):
-        target = target.decode()
+    target = decode_byte_string(obj.attrs.get('target', ''))
     return len(target) > 0 and target != obj.name
 
 

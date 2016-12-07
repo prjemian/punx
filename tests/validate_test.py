@@ -48,8 +48,12 @@ class Validate_NXdata_is_now_optional_51(unittest.TestCase):
 
     def setUp(self):
         self.testfile = common.getTestFileName()
+        self.validator = None
 
     def tearDown(self):
+        if self.validator is not None and isinstance(self.validator.h5, h5py.File):
+            self.validator.h5.close()
+            self.validator = None
         common.cleanup()
 
     def test_simple_NXdata(self):
@@ -67,19 +71,20 @@ class Validate_NXdata_is_now_optional_51(unittest.TestCase):
         hdf5root.close()
         
         punx.logs.ignore_logging()
-        validator = punx.validate.Data_File_Validator(self.testfile)
-        validator.validate()
+        self.validator = punx.validate.Data_File_Validator(self.testfile)
+        self.validator.validate()
         self.report = []
         
-        report = validator.report_findings(punx.finding.VALID_STATUS_LIST)
+        report = self.validator.report_findings(punx.finding.VALID_STATUS_LIST)
         #print('\n' + report + '\n')
         msg = 'NeXus default plot: /entry/data/data'
         self.assertFalse(report.find('no default plot: not a NeXus file') >= 0, msg)
         
-        report = validator.report_findings_summary().splitlines()[6]
+        report = self.validator.report_findings_summary().splitlines()[6]
         #print('\n' + report + '\n')
         msg = 'no ERRORs should be found'
         self.assertEqual(int(report.split()[1]), 0, msg)
+        
 
     def test_simple_no_NXdata(self):
         import punx.validate, punx.finding, punx.logs
@@ -92,16 +97,16 @@ class Validate_NXdata_is_now_optional_51(unittest.TestCase):
         hdf5root.close()
         
         punx.logs.ignore_logging()
-        validator = punx.validate.Data_File_Validator(self.testfile)
-        validator.validate()
+        self.validator = punx.validate.Data_File_Validator(self.testfile)
+        self.validator.validate()
         self.report = []
         
-        report = validator.report_findings(punx.finding.VALID_STATUS_LIST)
+        report = self.validator.report_findings(punx.finding.VALID_STATUS_LIST)
         #print('\n' + report + '\n')
         msg = 'no NeXus default plot, no NXdata group, valid NeXus as of NIAC2016'
         self.assertFalse(report.find('no default plot: not a NeXus file') >= 0, msg)
         
-        report = validator.report_findings_summary().splitlines()[6]
+        report = self.validator.report_findings_summary().splitlines()[6]
         #print('\n' + report + '\n')
         msg = 'no ERRORs should be found'
         self.assertEqual(int(report.split()[1]), 0, msg)

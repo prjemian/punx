@@ -12,6 +12,7 @@ Production
 Development
 ***********
 
+:0.1.3: 2016-12-07 -- Py2 & Py3: passes all unit tests
 :0.1.2: 2016-11-21 -- unit tests added for reports
 :0.0.9: 2016-06-29 -- retry failed https requests to GitHub and cleanup a QString
 :0.0.8: 2016-06-29 -- refactor update procedure 

@@ -120,7 +120,7 @@ def func_demo(args):
     del args.report
 
     print('console> punx structure ' + args.infile)
-    import h5structure
+    from punx import h5structure
     mc = h5structure.h5structure(args.infile)
     #    :param bool show_attributes: display attributes in output
     show_attributes=True
@@ -142,11 +142,11 @@ def func_show(args):
 
 def func_structure(args):
     if args.infile.endswith('.nxdl.xml'):
-        import nxdlstructure
+        from punx import nxdlstructure
         nxdl = nxdlstructure.NX_definition(args.infile)
         print(nxdl.render())
     else:
-        import h5structure
+        from punx import h5structure
         
         #    :param int limit: maximum number of array items to be shown (default = 5)
         limit = args.max_array_items
@@ -166,12 +166,12 @@ def func_structure(args):
 
 
 def func_update(args):
-    import cache
+    from punx import cache
     cache.update_NXDL_Cache(force_update=args.force)
 
 
 def func_validate(args):
-    import validate
+    from punx import validate
 
     if args.infile.endswith('.nxdl.xml'):
         result = validate.validate_xml(args.infile)
@@ -206,7 +206,7 @@ def func_validate(args):
         validator.validate()
 
         # report the findings from the validation
-        import cache
+        from punx import cache
         qset = cache.qsettings()
         print(':file: ' + os.path.basename(validator.fname))
         print(':NXDL cache: ' + cache.get_nxdl_dir())

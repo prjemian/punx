@@ -22,10 +22,10 @@ class TestCache(unittest.TestCase):
     logger = None
     
     def setUp(self):
-        self.logger = punx.logs.Logger()
+        punx.logs.ignore_logging()
 
     def tearDown(self):
-        if os.path.exists(self.logger.log_file):
+        if self.logger is not None and os.path.exists(self.logger.log_file):
             os.remove(self.logger.log_file)
         self.logger = None
 
@@ -37,7 +37,7 @@ class TestCache(unittest.TestCase):
         base += '/'
         self.assertTrue(base.startswith(base))
         received = punx.cache.get_nxdl_dir()[len(base):]
-        expected = 'src/punx/cache/definitions-master'
+        expected = os.path.join(*'src/punx/cache/definitions-master'.split('/'))
         self.assertEqual(expected, received)
         self.assertTrue(punx.cache.USE_SOURCE_CACHE)
 
@@ -50,7 +50,7 @@ class TestCache(unittest.TestCase):
     def test_get_pickle_file_name(self):
         path = punx.cache.SOURCE_CACHE_ROOT
         pf = punx.cache.get_pickle_file_name(path)
-        self.assertEqual('/nxdl.p', pf[len(path):])
+        self.assertEqual(os.path.sep +'nxdl.p', pf[len(path):])
     
     def test___get_github_info__(self):
         info = punx.cache.__get_github_info__()

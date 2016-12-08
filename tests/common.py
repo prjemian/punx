@@ -107,6 +107,8 @@ class BaseHdf5File(unittest.TestCase):
         for item, actual in enumerate(self.report):
             actual = str(actual).rstrip()
             expected = str(self.expected_output[item]).rstrip()
+            if actual != expected:
+                _test = True    # for debugging break point
             msg = str(item) + ': '
             msg += '|' + str(expected) + '|'
             msg += ' != '

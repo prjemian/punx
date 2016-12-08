@@ -542,6 +542,14 @@ class Data_File_Validator(object):
                      
                     # check type against NXDL
                     attr_type = attr.type.split(':')[-1]    # strip off XML namespace prefix, if found
+                    if attr_type not in self.data_types:
+                        if attr_type == 'str':
+                            attr_type = 'NX_CHAR'
+                        else:
+                            msg = 'type(' + aname
+                            msg += ') = "' + attr_type
+                            msg += '" not in known data types'
+                            raise KeyError(msg)
                     t = type(v) in self.data_types[attr_type]
                     f = {True: finding.OK, False: finding.WARN}[t]
                     m = str(type(v)) + ' : ' + attr_type
@@ -906,12 +914,12 @@ class Data_File_Validator(object):
                                                      m)
                                     dimension_scales_ok = False
                             else:
-                                if isinstance(indices, tuple):
-                                    indices = numpy.ndarray(indices)
-                                if isinstance(indices, numpy.ndarray) and len(indices) > 1:
-                                    t = numpy.all(indices < len(signal_data.shape))
-                                else:
-                                    t = indices < len(signal_data.shape)
+                                if not isinstance(indices, (tuple, numpy.ndarray)):
+                                    indices = [indices,]
+                                indices = numpy.array([int(v) for v in indices], dtype=int)
+                                t = numpy.all(indices < len(signal_data.shape))
+                                if len(indices) == 1:
+                                    indices = indices[0]
                                 f = finding.TF_RESULT[t]
                                 m = 'value = ' + str(indices)
                                 m += {True:': ok', False:': invalid'}[t]

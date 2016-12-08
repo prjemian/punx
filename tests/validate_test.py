@@ -112,6 +112,13 @@ class Validate_NXdata_is_now_optional_51(unittest.TestCase):
         self.assertEqual(int(report.split()[1]), 0, msg)
 
 
+class Validate_example_mapping(common.ValidHdf5File):
+
+    testfile = 'example_mapping.nxs'
+    expected_output = common.read_filelines('validate_example_mapping.txt')
+    NeXus = False
+ 
+ 
 def suite(*args, **kw):
     test_suite = unittest.TestSuite()
     test_list = [
@@ -120,6 +127,7 @@ def suite(*args, **kw):
         Validate_33id_spec_22_2D, 
         Validate_compression, 
         Validate_NXdata_is_now_optional_51,
+        # Validate_example_mapping, # FIXME: fails both tests
         ]
     for test_case in test_list:
         test_suite.addTest(unittest.makeSuite(test_case))

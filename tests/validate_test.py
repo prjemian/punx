@@ -181,14 +181,14 @@ class Validate_issue_57(unittest.TestCase):
         ds = data.create_dataset("data", data=[[1,2,3], [3,1,2]])
         ds.attrs['target'] = ds.name
         entry['ds_link'] = ds
-        # TODO: may need more items to match error reported in issue #57
-        hdf5root.close()
+        
+        instrument = entry.create_group("instrument")
+        instrument.attrs['NX_class'] = 'NXinstrument'
+        detector = instrument.create_group("detector")
+        detector.attrs['NX_class'] = 'NXdetector'
+        detector['ccd'] = ds
 
-        punx.logs.ignore_logging()
-        validator = punx.validate.Data_File_Validator(fname)
-        validator.validate()
-        # print('\n'.join(sorted(validator.addresses)))
-        self.assertEqual(len(validator.addresses), 9)
+        hdf5root.close()
 
         addresses_to_check_in_this_order = '''
         /
@@ -197,10 +197,23 @@ class Validate_issue_57(unittest.TestCase):
         /entry/ds_link
         /entry/ds_link@target
         /entry/data
-        /entry/data/data
         /entry/data@NX_class
         /entry/data@signal
+        /entry/data/data
+        /entry/instrument
+        /entry/instrument@NX_class
+        /entry/instrument/detector
+        /entry/instrument/detector@NX_class
+        /entry/instrument/detector/ccd
+        /entry/instrument/detector/ccd@target
         '''.split()
+
+        punx.logs.ignore_logging()
+        validator = punx.validate.Data_File_Validator(fname)
+        validator.validate()
+        # print('\n'.join(sorted(validator.addresses)))
+        self.assertEqual(len(validator.addresses), len(addresses_to_check_in_this_order))
+
         addresses = list(validator.addresses.keys())
         for order, addr in enumerate(addresses_to_check_in_this_order):
             msg = 'HDF5 address not found: ' + addr

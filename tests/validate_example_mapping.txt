@@ -1,0 +1,247 @@
+==================================================== =================================================== ====== =====================================================================================
+address                                              validation                                          status comment(s)                                                                           
+==================================================== =================================================== ====== =====================================================================================
+/                                                    @NX_class                                           OK     file root (assumed): NXroot                                                          
+/entry1@NX_class                                     attribute data type                                 NOTE   variable length string: ['NXentry']                                                  
+/entry1                                              validItemName-strict                                OK     strict re: [a-z_][a-z0-9_]*                                                          
+/entry1@NX_class                                     @NX_class                                           OK     known: NXentry                                                                       
+/entry1/data@NX_class                                attribute data type                                 NOTE   variable length string: ['NXdata']                                                   
+/entry1/data                                         validItemName-strict                                OK     strict re: [a-z_][a-z0-9_]*                                                          
+/entry1/data@NX_class                                @NX_class                                           OK     known: NXdata                                                                        
+/entry1/data/data                                    validItemName-strict                                OK     strict re: [a-z_][a-z0-9_]*                                                          
+/entry1/data/data@target                             attribute data type                                 NOTE   variable length string: ['/entry1/instrument/fluo/data']                             
+/entry1/data/data@target                             link target exists                                  OK     /entry1/instrument/fluo/data                                                         
+/entry1/data/energy                                  validItemName-strict                                OK     strict re: [a-z_][a-z0-9_]*                                                          
+/entry1/data/energy@target                           attribute data type                                 NOTE   variable length string: ['/entry1/instrument/fluo/energy']                           
+/entry1/data/energy@target                           link target exists                                  OK     /entry1/instrument/fluo/energy                                                       
+/entry1/data/t_stage                                 validItemName-strict                                OK     strict re: [a-z_][a-z0-9_]*                                                          
+/entry1/data/t_stage@target                          attribute data type                                 NOTE   variable length string: ['/entry1/sample/transformations/t_stage']                   
+/entry1/data/t_stage@target                          link target exists                                  OK     /entry1/sample/transformations/t_stage                                               
+/entry1/data/t_stage_set                             validItemName-strict                                OK     strict re: [a-z_][a-z0-9_]*                                                          
+/entry1/data/t_stage_set@target                      attribute data type                                 NOTE   variable length string: ['/entry1/sample/t_stage_set']                               
+/entry1/data/t_stage_set@target                      link target exists                                  OK     /entry1/sample/t_stage_set                                                           
+/entry1/data/x_stage                                 validItemName-strict                                OK     strict re: [a-z_][a-z0-9_]*                                                          
+/entry1/data/x_stage@target                          attribute data type                                 NOTE   variable length string: ['/entry1/sample/transformations/x_stage']                   
+/entry1/data/x_stage@target                          link target exists                                  OK     /entry1/sample/transformations/x_stage                                               
+/entry1/data/x_stage_set                             validItemName-strict                                OK     strict re: [a-z_][a-z0-9_]*                                                          
+/entry1/data/x_stage_set@target                      attribute data type                                 NOTE   variable length string: ['/entry1/sample/x_stage_set']                               
+/entry1/data/x_stage_set@target                      link target exists                                  OK     /entry1/sample/x_stage_set                                                           
+/entry1/data/y_stage                                 validItemName-strict                                OK     strict re: [a-z_][a-z0-9_]*                                                          
+/entry1/data/y_stage@target                          attribute data type                                 NOTE   variable length string: ['/entry1/sample/transformations/y_stage']                   
+/entry1/data/y_stage@target                          link target exists                                  OK     /entry1/sample/transformations/y_stage                                               
+/entry1/data/y_stage_set                             validItemName-strict                                OK     strict re: [a-z_][a-z0-9_]*                                                          
+/entry1/data/y_stage_set@target                      attribute data type                                 NOTE   variable length string: ['/entry1/sample/y_stage_set']                               
+/entry1/data/y_stage_set@target                      link target exists                                  OK     /entry1/sample/y_stage_set                                                           
+/entry1/data                                         NXDL review                                         TODO   validate with NXdata specification (incomplete)                                      
+/entry1/data/data@interpretation                     NXDL attribute type: NXdata/data@interpretation     OK     <type 'numpy.ndarray'> : NX_CHAR                                                     
+/entry1/data/data@interpretation                     NXDL attribute enum: NXdata/data@interpretation     OK     ['spectrum']: expected                                                               
+/entry1/data/data                                    NXDL data type: NXdata/data                         OK     int16 : NX_NUMBER                                                                    
+/entry1/entry_identifier                             validItemName-strict                                OK     strict re: [a-z_][a-z0-9_]*                                                          
+/entry1/entry_identifier                             @nameType                                           OK     name is specified                                                                    
+/entry1/experiment_identifier                        validItemName-strict                                OK     strict re: [a-z_][a-z0-9_]*                                                          
+/entry1/experiment_identifier@target                 validItemName-strict                                OK     strict re: [a-z_][a-z0-9_]*                                                          
+/entry1/experiment_identifier@target                 attribute data type                                 NOTE   variable length string: ['/entry1/experiment_identifier']                            
+/entry1/experiment_identifier                        @nameType                                           OK     name is specified                                                                    
+/entry1/instrument@NX_class                          attribute data type                                 NOTE   variable length string: ['NXinstrument']                                             
+/entry1/instrument                                   validItemName-strict                                OK     strict re: [a-z_][a-z0-9_]*                                                          
+/entry1/instrument@NX_class                          @NX_class                                           OK     known: NXinstrument                                                                  
+/entry1/instrument/I0@NX_class                       attribute data type                                 NOTE   variable length string: ['NXmonitor']                                                
+/entry1/instrument/I0                                validItemName                                       NOTE   relaxed re: [A-Za-z_][\w_]*                                                          
+/entry1/instrument/I0@NX_class                       @NX_class                                           OK     known: NXmonitor                                                                     
+/entry1/instrument/I0/data                           validItemName-strict                                OK     strict re: [a-z_][a-z0-9_]*                                                          
+/entry1/instrument/I0/data@units                     field@units                                         NOTE   does not exist                                                                       
+/entry1/instrument/I0/data                           @nameType                                           OK     name is specified                                                                    
+/entry1/instrument/I0/transformations                validItemName-strict                                OK     strict re: [a-z_][a-z0-9_]*                                                          
+/entry1/instrument/I0/transformations@target         attribute data type                                 NOTE   variable length string: ['/entry1/instrument/trans/transformations']                 
+/entry1/instrument/I0/transformations@target         link target exists                                  OK     /entry1/instrument/trans/transformations                                             
+/entry1/instrument/I0                                NXDL review                                         TODO   validate with NXmonitor specification (incomplete)                                   
+/entry1/instrument/I0/data                           NXDL data type: NXmonitor/data                      OK     int16 : NX_NUMBER                                                                    
+/entry1/instrument/It@NX_class                       attribute data type                                 NOTE   variable length string: ['NXmonitor']                                                
+/entry1/instrument/It                                validItemName                                       NOTE   relaxed re: [A-Za-z_][\w_]*                                                          
+/entry1/instrument/It@NX_class                       @NX_class                                           OK     known: NXmonitor                                                                     
+/entry1/instrument/It/data                           validItemName-strict                                OK     strict re: [a-z_][a-z0-9_]*                                                          
+/entry1/instrument/It/data@units                     field@units                                         NOTE   does not exist                                                                       
+/entry1/instrument/It/data                           @nameType                                           OK     name is specified                                                                    
+/entry1/instrument/It/transformations                validItemName-strict                                OK     strict re: [a-z_][a-z0-9_]*                                                          
+/entry1/instrument/It/transformations@target         attribute data type                                 NOTE   variable length string: ['/entry1/instrument/trans/transformations']                 
+/entry1/instrument/It/transformations@target         link target exists                                  OK     /entry1/instrument/trans/transformations                                             
+/entry1/instrument/It                                NXDL review                                         TODO   validate with NXmonitor specification (incomplete)                                   
+/entry1/instrument/It/data                           NXDL data type: NXmonitor/data                      OK     int16 : NX_NUMBER                                                                    
+/entry1/instrument/diff@NX_class                     attribute data type                                 NOTE   variable length string: ['NXdetector']                                               
+/entry1/instrument/diff                              validItemName-strict                                OK     strict re: [a-z_][a-z0-9_]*                                                          
+/entry1/instrument/diff@NX_class                     @NX_class                                           OK     known: NXdetector                                                                    
+/entry1/instrument/diff@signal                       validItemName-strict                                OK     strict re: [a-z_][a-z0-9_]*                                                          
+/entry1/instrument/diff/data                         validItemName-strict                                OK     strict re: [a-z_][a-z0-9_]*                                                          
+/entry1/instrument/diff/data@interpretation          validItemName-strict                                OK     strict re: [a-z_][a-z0-9_]*                                                          
+/entry1/instrument/diff/data@interpretation          attribute data type                                 NOTE   variable length string: ['image']                                                    
+/entry1/instrument/diff/data@interpretation          enumeration: @interpretation                        OK     value=image :recognized                                                              
+/entry1/instrument/diff/data@units                   field@units                                         NOTE   does not exist                                                                       
+/entry1/instrument/diff/data                         @nameType                                           OK     name is specified                                                                    
+/entry1/instrument/diff/transformations              validItemName-strict                                OK     strict re: [a-z_][a-z0-9_]*                                                          
+/entry1/instrument/diff/transformations@target       attribute data type                                 NOTE   variable length string: ['/entry1/instrument/fluo/transformations']                  
+/entry1/instrument/diff/transformations@target       link target exists                                  OK     /entry1/instrument/fluo/transformations                                              
+/entry1/instrument/diff/x_pixel_size                 validItemName-strict                                OK     strict re: [a-z_][a-z0-9_]*                                                          
+/entry1/instrument/diff/x_pixel_size@units           validItemName-strict                                OK     strict re: [a-z_][a-z0-9_]*                                                          
+/entry1/instrument/diff/x_pixel_size@units           attribute data type                                 NOTE   variable length string: ['um']                                                       
+/entry1/instrument/diff/x_pixel_size@units           field@units                                         OK     value: um                                                                            
+/entry1/instrument/diff/x_pixel_size                 @nameType                                           OK     name is specified                                                                    
+/entry1/instrument/diff/y_pixel_size                 validItemName-strict                                OK     strict re: [a-z_][a-z0-9_]*                                                          
+/entry1/instrument/diff/y_pixel_size@units           validItemName-strict                                OK     strict re: [a-z_][a-z0-9_]*                                                          
+/entry1/instrument/diff/y_pixel_size@units           attribute data type                                 NOTE   variable length string: ['um']                                                       
+/entry1/instrument/diff/y_pixel_size@units           field@units                                         OK     value: um                                                                            
+/entry1/instrument/diff/y_pixel_size                 @nameType                                           OK     name is specified                                                                    
+/entry1/instrument/diff                              NXDL review                                         TODO   validate with NXdetector specification (incomplete)                                  
+/entry1/instrument/diff/data@interpretation          NXDL attribute type: NXdetector/data@interpretation OK     <type 'numpy.ndarray'> : NX_CHAR                                                     
+/entry1/instrument/diff/data@interpretation          NXDL attribute enum: NXdetector/data@interpretation OK     ['image']: expected                                                                  
+/entry1/instrument/diff/data                         NXDL data type: NXdetector/data                     OK     int16 : NX_NUMBER                                                                    
+/entry1/instrument/diff/x_pixel_size                 NXDL data type: NXdetector/x_pixel_size             OK     float64 : NX_FLOAT                                                                   
+/entry1/instrument/diff/y_pixel_size                 NXDL data type: NXdetector/y_pixel_size             OK     float64 : NX_FLOAT                                                                   
+/entry1/instrument/fluo@NX_class                     attribute data type                                 NOTE   variable length string: ['NXdetector']                                               
+/entry1/instrument/fluo                              validItemName-strict                                OK     strict re: [a-z_][a-z0-9_]*                                                          
+/entry1/instrument/fluo@NX_class                     @NX_class                                           OK     known: NXdetector                                                                    
+/entry1/instrument/fluo@signal                       validItemName-strict                                OK     strict re: [a-z_][a-z0-9_]*                                                          
+/entry1/instrument/fluo@axes                         validItemName-strict                                OK     strict re: [a-z_][a-z0-9_]*                                                          
+/entry1/instrument/fluo@energy_indices               validItemName-strict                                OK     strict re: [a-z_][a-z0-9_]*                                                          
+/entry1/instrument/fluo/data                         validItemName-strict                                OK     strict re: [a-z_][a-z0-9_]*                                                          
+/entry1/instrument/fluo/data@interpretation          validItemName-strict                                OK     strict re: [a-z_][a-z0-9_]*                                                          
+/entry1/instrument/fluo/data@interpretation          attribute data type                                 NOTE   variable length string: ['spectrum']                                                 
+/entry1/instrument/fluo/data@interpretation          enumeration: @interpretation                        OK     value=spectrum :recognized                                                           
+/entry1/instrument/fluo/data@target                  validItemName-strict                                OK     strict re: [a-z_][a-z0-9_]*                                                          
+/entry1/instrument/fluo/data@target                  attribute data type                                 NOTE   variable length string: ['/entry1/instrument/fluo/data']                             
+/entry1/instrument/fluo/data@units                   field@units                                         NOTE   does not exist                                                                       
+/entry1/instrument/fluo/data                         @nameType                                           OK     name is specified                                                                    
+/entry1/instrument/fluo/energy                       validItemName-strict                                OK     strict re: [a-z_][a-z0-9_]*                                                          
+/entry1/instrument/fluo/energy@units                 validItemName-strict                                OK     strict re: [a-z_][a-z0-9_]*                                                          
+/entry1/instrument/fluo/energy@units                 attribute data type                                 NOTE   variable length string: ['keV']                                                      
+/entry1/instrument/fluo/energy@target                validItemName-strict                                OK     strict re: [a-z_][a-z0-9_]*                                                          
+/entry1/instrument/fluo/energy@target                attribute data type                                 NOTE   variable length string: ['/entry1/instrument/fluo/energy']                           
+/entry1/instrument/fluo/energy@units                 field@units                                         OK     value: keV                                                                           
+/entry1/instrument/fluo/transformations@NX_class     attribute data type                                 NOTE   variable length string: ['NXtransformations']                                        
+/entry1/instrument/fluo/transformations              validItemName-strict                                OK     strict re: [a-z_][a-z0-9_]*                                                          
+/entry1/instrument/fluo/transformations@NX_class     @NX_class                                           OK     known: NXtransformations                                                             
+/entry1/instrument/fluo/transformations/detector_arm NXtransformations@ignoreExtraFields                 UNUSED field ignored per NXDL specification                                                 
+/entry1/instrument/fluo/transformations              NXDL review                                         TODO   validate with NXtransformations specification (incomplete)                           
+/entry1/instrument/fluo                              NXDL review                                         TODO   validate with NXdetector specification (incomplete)                                  
+/entry1/instrument/fluo/data@interpretation          NXDL attribute type: NXdetector/data@interpretation OK     <type 'numpy.ndarray'> : NX_CHAR                                                     
+/entry1/instrument/fluo/data@interpretation          NXDL attribute enum: NXdetector/data@interpretation OK     ['spectrum']: expected                                                               
+/entry1/instrument/fluo/data                         NXDL data type: NXdetector/data                     OK     int16 : NX_NUMBER                                                                    
+/entry1/instrument/trans@NX_class                    attribute data type                                 NOTE   variable length string: ['NXmonitor']                                                
+/entry1/instrument/trans                             validItemName-strict                                OK     strict re: [a-z_][a-z0-9_]*                                                          
+/entry1/instrument/trans@NX_class                    @NX_class                                           OK     known: NXmonitor                                                                     
+/entry1/instrument/trans/data                        validItemName-strict                                OK     strict re: [a-z_][a-z0-9_]*                                                          
+/entry1/instrument/trans/data@units                  field@units                                         NOTE   does not exist                                                                       
+/entry1/instrument/trans/data                        @nameType                                           OK     name is specified                                                                    
+/entry1/instrument/trans/transformations@NX_class    attribute data type                                 NOTE   variable length string: ['NXtransformations']                                        
+/entry1/instrument/trans/transformations             validItemName-strict                                OK     strict re: [a-z_][a-z0-9_]*                                                          
+/entry1/instrument/trans/transformations@NX_class    @NX_class                                           OK     known: NXtransformations                                                             
+/entry1/instrument/trans/transformations/monitor_arm NXtransformations@ignoreExtraFields                 UNUSED field ignored per NXDL specification                                                 
+/entry1/instrument/trans/transformations             NXDL review                                         TODO   validate with NXtransformations specification (incomplete)                           
+/entry1/instrument/trans                             NXDL review                                         TODO   validate with NXmonitor specification (incomplete)                                   
+/entry1/instrument/trans/data                        NXDL data type: NXmonitor/data                      OK     int16 : NX_NUMBER                                                                    
+/entry1/instrument                                   NXDL review                                         TODO   validate with NXinstrument specification (incomplete)                                
+/entry1/program_name                                 validItemName-strict                                OK     strict re: [a-z_][a-z0-9_]*                                                          
+/entry1/program_name                                 @nameType                                           OK     name is specified                                                                    
+/entry1/sample@NX_class                              attribute data type                                 NOTE   variable length string: ['NXsample']                                                 
+/entry1/sample                                       validItemName-strict                                OK     strict re: [a-z_][a-z0-9_]*                                                          
+/entry1/sample@NX_class                              @NX_class                                           OK     known: NXsample                                                                      
+/entry1/sample@depends_on                            validItemName-strict                                OK     strict re: [a-z_][a-z0-9_]*                                                          
+/entry1/sample/t_stage_set                           validItemName-strict                                OK     strict re: [a-z_][a-z0-9_]*                                                          
+/entry1/sample/t_stage_set@target                    validItemName-strict                                OK     strict re: [a-z_][a-z0-9_]*                                                          
+/entry1/sample/t_stage_set@target                    attribute data type                                 NOTE   variable length string: ['/entry1/sample/t_stage_set']                               
+/entry1/sample/t_stage_set@units                     field@units                                         NOTE   does not exist                                                                       
+/entry1/sample/transformations@NX_class              attribute data type                                 NOTE   variable length string: ['NXtransformations']                                        
+/entry1/sample/transformations                       validItemName-strict                                OK     strict re: [a-z_][a-z0-9_]*                                                          
+/entry1/sample/transformations@NX_class              @NX_class                                           OK     known: NXtransformations                                                             
+/entry1/sample/transformations/t_stage               NXtransformations@ignoreExtraFields                 UNUSED field ignored per NXDL specification                                                 
+/entry1/sample/transformations/x_stage               NXtransformations@ignoreExtraFields                 UNUSED field ignored per NXDL specification                                                 
+/entry1/sample/transformations/y_stage               NXtransformations@ignoreExtraFields                 UNUSED field ignored per NXDL specification                                                 
+/entry1/sample/transformations                       NXDL review                                         TODO   validate with NXtransformations specification (incomplete)                           
+/entry1/sample/x_stage_set                           validItemName-strict                                OK     strict re: [a-z_][a-z0-9_]*                                                          
+/entry1/sample/x_stage_set@target                    validItemName-strict                                OK     strict re: [a-z_][a-z0-9_]*                                                          
+/entry1/sample/x_stage_set@target                    attribute data type                                 NOTE   variable length string: ['/entry1/sample/x_stage_set']                               
+/entry1/sample/x_stage_set@units                     field@units                                         NOTE   does not exist                                                                       
+/entry1/sample/y_stage_set                           validItemName-strict                                OK     strict re: [a-z_][a-z0-9_]*                                                          
+/entry1/sample/y_stage_set@target                    validItemName-strict                                OK     strict re: [a-z_][a-z0-9_]*                                                          
+/entry1/sample/y_stage_set@target                    attribute data type                                 NOTE   variable length string: ['/entry1/sample/y_stage_set']                               
+/entry1/sample/y_stage_set@units                     field@units                                         NOTE   does not exist                                                                       
+/entry1/sample                                       NXDL review                                         TODO   validate with NXsample specification (incomplete)                                    
+/entry1/scan_command                                 validItemName-strict                                OK     strict re: [a-z_][a-z0-9_]*                                                          
+/entry1/scan_identifier                              validItemName-strict                                OK     strict re: [a-z_][a-z0-9_]*                                                          
+/entry1/title                                        validItemName-strict                                OK     strict re: [a-z_][a-z0-9_]*                                                          
+/entry1/title                                        @nameType                                           OK     name is specified                                                                    
+/entry1/user@NX_class                                attribute data type                                 NOTE   variable length string: ['NXuser']                                                   
+/entry1/user                                         validItemName-strict                                OK     strict re: [a-z_][a-z0-9_]*                                                          
+/entry1/user@NX_class                                @NX_class                                           OK     known: NXuser                                                                        
+/entry1/user@target                                  validItemName-strict                                OK     strict re: [a-z_][a-z0-9_]*                                                          
+/entry1/user/username                                validItemName-strict                                OK     strict re: [a-z_][a-z0-9_]*                                                          
+/entry1/user                                         NXDL review                                         TODO   validate with NXuser specification (incomplete)                                      
+/entry1                                              NXDL review                                         TODO   validate with NXentry specification (incomplete)                                     
+/entry1/entry_identifier                             NXDL data type: NXentry/entry_identifier            OK     object : NX_CHAR                                                                     
+/entry1/experiment_identifier                        NXDL data type: NXentry/experiment_identifier       OK     object : NX_CHAR                                                                     
+/entry1/program_name                                 NXDL data type: NXentry/program_name                OK     object : NX_CHAR                                                                     
+/entry1/title                                        NXDL data type: NXentry/title                       OK     object : NX_CHAR                                                                     
+/entry_micro@NX_class                                attribute data type                                 NOTE   variable length string: ['NXentry']                                                  
+/entry_micro                                         validItemName-strict                                OK     strict re: [a-z_][a-z0-9_]*                                                          
+/entry_micro@NX_class                                @NX_class                                           OK     known: NXentry                                                                       
+/entry_micro/data@NX_class                           attribute data type                                 NOTE   variable length string: ['NXdata']                                                   
+/entry_micro/data                                    validItemName-strict                                OK     strict re: [a-z_][a-z0-9_]*                                                          
+/entry_micro/data@NX_class                           @NX_class                                           OK     known: NXdata                                                                        
+/entry_micro/data/data                               NXdata@ignoreExtraFields                            UNUSED field ignored per NXDL specification                                                 
+/entry_micro/data/image_x                            NXdata@ignoreExtraFields                            UNUSED field ignored per NXDL specification                                                 
+/entry_micro/data/image_y                            NXdata@ignoreExtraFields                            UNUSED field ignored per NXDL specification                                                 
+/entry_micro/data                                    NXDL review                                         TODO   validate with NXdata specification (incomplete)                                      
+/entry_micro/data/data@interpretation                NXDL attribute type: NXdata/data@interpretation     OK     <type 'numpy.ndarray'> : NX_CHAR                                                     
+/entry_micro/data/data@interpretation                NXDL attribute enum: NXdata/data@interpretation     WARN   ['rgba-image']: not in list: scalar,spectrum,image,vertex                            
+/entry_micro/data/data                               NXDL data type: NXdata/data                         OK     int16 : NX_NUMBER                                                                    
+/entry_micro/experiment_identifier                   validItemName-strict                                OK     strict re: [a-z_][a-z0-9_]*                                                          
+/entry_micro/experiment_identifier@target            attribute data type                                 NOTE   variable length string: ['/entry1/experiment_identifier']                            
+/entry_micro/experiment_identifier@target            link target exists                                  OK     /entry1/experiment_identifier                                                        
+/entry_micro/program_name                            validItemName-strict                                OK     strict re: [a-z_][a-z0-9_]*                                                          
+/entry_micro/program_name                            @nameType                                           OK     name is specified                                                                    
+/entry_micro/title                                   validItemName-strict                                OK     strict re: [a-z_][a-z0-9_]*                                                          
+/entry_micro/title                                   @nameType                                           OK     name is specified                                                                    
+/entry_micro/user                                    validItemName-strict                                OK     strict re: [a-z_][a-z0-9_]*                                                          
+/entry_micro/user@target                             attribute data type                                 NOTE   variable length string: ['/entry1/user']                                             
+/entry_micro/user@target                             link target exists                                  OK     /entry1/user                                                                         
+/entry_micro                                         NXDL review                                         TODO   validate with NXentry specification (incomplete)                                     
+/entry_micro/experiment_identifier                   NXDL data type: NXentry/experiment_identifier       OK     object : NX_CHAR                                                                     
+/entry_micro/program_name                            NXDL data type: NXentry/program_name                OK     object : NX_CHAR                                                                     
+/entry_micro/title                                   NXDL data type: NXentry/title                       OK     object : NX_CHAR                                                                     
+/                                                    NXDL review                                         TODO   validate with NXroot specification (incomplete)                                      
+/entry1/data@signal                                  attribute data type                                 NOTE   variable length string: ['data']                                                     
+/entry1/data@signal                                  NXdata group default plot v3                        OK     NXdata@signal = data                                                                 
+/entry1/data@axes                                    attribute data type                                 NOTE   variable length string array: ['x_stage_set', 'y_stage_set', 't_stage_set', 'energy']
+/entry1/data@axes                                    NXdata@axes=x_stage_set                             OK     axes dataset found: x_stage_set                                                      
+/entry1/data@x_stage_set_indices                     NXdata@x_stage_set_indices                          OK     value = 1: ok                                                                      
+/entry1/data@axes                                    NXdata@axes=y_stage_set                             OK     axes dataset found: y_stage_set                                                      
+/entry1/data@y_stage_set_indices                     NXdata@y_stage_set_indices                          OK     value = 0: ok                                                                      
+/entry1/data@axes                                    NXdata@axes=t_stage_set                             OK     axes dataset found: t_stage_set                                                      
+/entry1/data@t_stage_set_indices                     NXdata@t_stage_set_indices                          OK     value = 2: ok                                                                      
+/entry1/data@axes                                    NXdata@axes=energy                                  OK     axes dataset found: energy                                                           
+/entry1/data@energy_indices                          NXdata@energy_indices                               OK     value = 3: ok                                                                      
+/entry1/data                                         NXdata dimension scale(s)                           OK     dimension scale(s) verified                                                          
+/entry_micro/data@signal                             attribute data type                                 NOTE   variable length string: ['data']                                                     
+/entry_micro/data@signal                             NXdata group default plot v3                        OK     NXdata@signal = data                                                                 
+/entry_micro/data@axes                               attribute data type                                 NOTE   variable length string array: ['.', 'image_x', 'image_y']                            
+/entry_micro/data@axes                               NXdata@axes=image_x                                 OK     axes dataset found: image_x                                                          
+/entry_micro/data@image_x_indices                    NXdata@image_x_indices                              OK     value = 1: ok                                                                      
+/entry_micro/data@axes                               NXdata@axes=image_y                                 OK     axes dataset found: image_y                                                          
+/entry_micro/data@image_y_indices                    NXdata@image_y_indices                              OK     value = 2: ok                                                                      
+/entry_micro/data/data                               NXdata@signal rank                                  WARN   rank(data) != number of dimension scales                                             
+/entry_micro/data                                    NXdata dimension scale(s)                           OK     dimension scale(s) verified                                                          
+NXdata@signal                                        NeXus default plot v3                               NOTE   NeXus data file defines more than one default plot                                   
+==================================================== =================================================== ====== =====================================================================================
+
+======= ===== ===========================================================
+status  count description                                                
+======= ===== ===========================================================
+OK      149   meets NeXus specification                                  
+NOTE    54    does not meet NeXus specification, but acceptable          
+WARN    2     does not meet NeXus specification, not generally acceptable
+ERROR   0     violates NeXus specification                               
+TODO    16    validation not implemented yet                             
+UNUSED  8     optional NeXus item not used in data file                  
+COMMENT 0     comment from the punx source code                          
+--      --    --                                                         
+TOTAL   229   --                                                         
+======= ===== ===========================================================

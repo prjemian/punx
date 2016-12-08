@@ -82,6 +82,26 @@ def run_test_cases(list_of_test_classes):
     cleanup()
 
 
+class CustomHdf5File(unittest.TestCase):
+    '''
+    build tests for a custom-built HDF5 file
+    '''
+    
+    def setUp(self):
+        self.testfile = getTestFileName(self.createContent)
+    
+    def tearDown(self):
+        testfile = None
+    
+    def createContent(self, hdf5root):
+        '''
+        override this method in each subclass
+        
+        :param obj hdf5root: instance of h5py.File
+        '''
+        pass
+
+
 class BaseHdf5File(unittest.TestCase):
 
     # testfile = 'writer_1_3.hdf5'

@@ -1152,22 +1152,26 @@ class Data_File_Validator(object):
         make a table of the validation findings
         
         :param statuses: List (or tuple) of finding statuses to be shown.
-            Several lists have been pre-defined for convenience:
+            Use the `finding.VALID_STATUS_LIST` (as shown below)
+            or create your own list:
 
-            :data:`finding.SHOW_ALL`        ``(OK, NOTE, WARN, ERROR, TODO, UNUSED, COMMENT)``
-            :data:`finding.SHOW_NOT_OK`     ``(ERROR, WARN)``
-            :data:`finding.SHOW_ERRORS`     ``(WARN, ERROR, TODO, UNUSED)``
+            :data:`finding.VALID_STATUS_LIST`  ``(OK, NOTE, WARN, ERROR, TODO, UNUSED, COMMENT)``
             
             See :mod:`finding` for details.
 
+        :returns str: table of results or `None` if no results match.
         '''
         import pyRestTable
 
         t = pyRestTable.Table()
         t.labels = 'address validation status comment(s)'.split()
+        if isinstance(statuses, finding.ValidationResultStatus):
+            statuses = [statuses,]
         for f in self.findings:
             if f.status in statuses:
                 t.rows.append((f.h5_address, f.test_name, f.status, f.comment))
+        if len(t.rows) == 0:
+            return 'None'
         return t.reST()
     
     def report_findings_summary(self):

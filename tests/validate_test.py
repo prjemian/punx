@@ -121,6 +121,9 @@ class Validate_example_mapping(common.ValidHdf5File):
 class Validate_example_mapping_issue_53(common.CustomHdf5File):
     
     def createContent(self, hdf5root):
+        '''
+        abbreviated representation of example_mapping.nxs file
+        '''
         import numpy
         entry = hdf5root.create_group("entry")
         entry.attrs['NX_class'] = 'NXentry'
@@ -130,11 +133,12 @@ class Validate_example_mapping_issue_53(common.CustomHdf5File):
         data.attrs["axes"] = ["x", "y"]
         data.attrs["x_indices"] = [0,]
         data.attrs["y_indices"] = [1,]
-        data.create_dataset("data", data=numpy.array([[1,2,3], [3,1,2]], dtype=int))
+        ds = data.create_dataset("data", data=numpy.array([[1,2,3], [3,1,2]], dtype=int))
+        ds.attrs["interpretation"] = "image"
         data.create_dataset("x", data=[1, 1.1, 1.3])
         data.create_dataset("y", data=[2.2, 2.5])
     
-    def test_1(self):
+    def test_indices_attribute_value_as_string_in_HDF5_file(self):
         import punx.validate, punx.finding, punx.logs
         punx.logs.ignore_logging()
         validator = punx.validate.Data_File_Validator(self.testfile)
@@ -144,7 +148,20 @@ class Validate_example_mapping_issue_53(common.CustomHdf5File):
         # print(validator.report_findings(punx.finding.VALID_STATUS_LIST))
         self.assertEqual(validator.report_findings(punx.finding.ERROR), "None")
         validator.h5.close()
- 
+        
+        # re-write the *_indices attributes as str in that HDF5 and re-validate
+        hdf5root = h5py.File(self.testfile, "r+")
+        hdf5root["/entry/data"].attrs["x_indices"] = ["0",]
+        hdf5root["/entry/data"].attrs["y_indices"] = ["1",]
+        hdf5root.close()
+        validator = punx.validate.Data_File_Validator(self.testfile)
+        validator.validate()
+        self.assertGreaterEqual(len(validator.findings), 0)
+        self.assertEqual(validator.findings[0].status, punx.finding.OK)
+        #print(validator.report_findings(punx.finding.VALID_STATUS_LIST))
+        self.assertEqual(validator.report_findings(punx.finding.ERROR), "None")
+        validator.h5.close()
+
  
 def suite(*args, **kw):
     test_suite = unittest.TestSuite()

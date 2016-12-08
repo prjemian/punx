@@ -130,7 +130,7 @@ class Validate_example_mapping_issue_53(common.CustomHdf5File):
         data = entry.create_group("data")
         data.attrs['NX_class'] = 'NXdata'
         data.attrs["signal"] = "data"
-        data.attrs["axes"] = ["x", "y"] # FIXME: py3: TypeError: No conversion path for dtype: dtype('<U1')
+        data.attrs["axes"] = [b"x", b"y"]
         data.attrs["x_indices"] = [0,]
         data.attrs["y_indices"] = [1,]
         ds = data.create_dataset("data", data=numpy.array([[1,2,3], [3,1,2]], dtype=int))
@@ -151,8 +151,8 @@ class Validate_example_mapping_issue_53(common.CustomHdf5File):
         
         # re-write the *_indices attributes as str in that HDF5 and re-validate
         hdf5root = h5py.File(self.testfile, "r+")
-        hdf5root["/entry/data"].attrs["x_indices"] = ["0",]
-        hdf5root["/entry/data"].attrs["y_indices"] = ["1",]
+        hdf5root["/entry/data"].attrs["x_indices"] = [b"0",]
+        hdf5root["/entry/data"].attrs["y_indices"] = [b"1",]
         hdf5root.close()
         validator = punx.validate.Data_File_Validator(self.testfile)
         validator.validate()

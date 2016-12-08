@@ -7,7 +7,6 @@ import h5py
 import os
 import sys
 import unittest
-from test.test_xmlrpc import ADDR
 
 _path = os.path.join(os.path.dirname(__file__), '..', )
 if _path not in sys.path:
@@ -244,12 +243,17 @@ class Validate_issue_57(unittest.TestCase):
         /entry1/sample/y_stage_set@units
         /entry1/user/username
         /entry1/user@NX_class
-        /entry1/instrument/fluo/transformations@target
         '''.split()
         for addr in sorted(addresses_to_check):
             msg = 'HDF5 address not found: ' + addr
             self.assertTrue(addr in validator.addresses, msg)
 
+        addresses_to_fail_check = '''
+        /entry1/instrument/fluo/transformations@target
+        '''.split()
+        for addr in sorted(addresses_to_fail_check):
+            msg = 'HDF5 address not expected: ' + addr
+            self.assertFalse(addr in validator.addresses, msg)
  
 def suite(*args, **kw):
     test_suite = unittest.TestSuite()
@@ -259,7 +263,7 @@ def suite(*args, **kw):
         Validate_33id_spec_22_2D, 
         Validate_compression, 
         Validate_NXdata_is_now_optional_51,
-        Validate_example_mapping, # FIXME: fails both tests
+        Validate_example_mapping, # FIXME: issue #57
         Validate_example_mapping_issue_53,
         Validate_issue_57,
         ]

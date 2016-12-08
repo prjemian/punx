@@ -130,7 +130,7 @@ class Validate_example_mapping_issue_53(common.CustomHdf5File):
         data = entry.create_group("data")
         data.attrs['NX_class'] = 'NXdata'
         data.attrs["signal"] = "data"
-        data.attrs["axes"] = ["x", "y"]
+        data.attrs["axes"] = ["x", "y"] # FIXME: py3: TypeError: No conversion path for dtype: dtype('<U1')
         data.attrs["x_indices"] = [0,]
         data.attrs["y_indices"] = [1,]
         ds = data.create_dataset("data", data=numpy.array([[1,2,3], [3,1,2]], dtype=int))
@@ -158,7 +158,7 @@ class Validate_example_mapping_issue_53(common.CustomHdf5File):
         validator.validate()
         self.assertGreaterEqual(len(validator.findings), 0)
         self.assertEqual(validator.findings[0].status, punx.finding.OK)
-        #print(validator.report_findings(punx.finding.VALID_STATUS_LIST))
+        # print(validator.report_findings(punx.finding.VALID_STATUS_LIST))
         self.assertEqual(validator.report_findings(punx.finding.ERROR), "None")
         validator.h5.close()
 

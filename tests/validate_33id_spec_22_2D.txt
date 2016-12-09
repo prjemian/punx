@@ -791,8 +791,8 @@ address                                  validation                         stat
 /S22/title                               validItemName-strict               OK     strict re: [a-z_][a-z0-9_]*                     
 /S22/title                               @nameType                          OK     name is specified                               
 /S22                                     NXDL review                        TODO   validate with NXentry specification (incomplete)
-/S22/definition                          NXDL data type: NXentry/definition OK     |S10 : NX_CHAR                                  
-/S22/title                               NXDL data type: NXentry/title      OK     |S43 : NX_CHAR                                  
+/S22/definition                          NXDL data type: NXentry/definition OK     str : NX_CHAR                                   
+/S22/title                               NXDL data type: NXentry/title      OK     str : NX_CHAR                                   
 /                                        NXDL review                        TODO   validate with NXroot specification (incomplete) 
 /S22/data@signal                         NXdata group default plot v3       OK     NXdata@signal = I0                              
 /S22/data@axes                           attribute data type                NOTE   variable length string array: ['eta', 'chi']    

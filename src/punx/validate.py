@@ -291,6 +291,7 @@ class Data_File_Validator(object):
         nx_class_defaults = nx_class_object.attributes['defaults']
         
         for k in group.attrs.keys():   # review the group's attributes
+            k = punx.h5structure.decode_byte_string(k)
             if k in ('NX_class', ):
                 pass    # handled elsewhere
             else:
@@ -360,6 +361,7 @@ class Data_File_Validator(object):
         nx_class_object = self.nxdl_dict.get(nx_class_name)
 
         for k in dataset.attrs.keys():   # review the dataset's attributes
+            k = punx.h5structure.decode_byte_string(k)
             aname = dataset.name + '@' + k
             self.validate_item_name(aname)
             v = self.get_hdf5_attribute(dataset, k, report=True)
@@ -538,7 +540,7 @@ class Data_File_Validator(object):
                     ttl = 'NXDL attribute type: '
                     ttl += '/'.join((nx_class_name, field_name))
                     ttl += '@' + k
-                    v = dataset.attrs[k]
+                    v = self.get_hdf5_attribute(dataset, k)
                      
                     # check type against NXDL
                     attr_type = attr.type.split(':')[-1]    # strip off XML namespace prefix, if found
@@ -552,7 +554,13 @@ class Data_File_Validator(object):
                             raise KeyError(msg)
                     t = type(v) in self.data_types[attr_type]
                     f = {True: finding.OK, False: finding.WARN}[t]
-                    m = str(type(v)) + ' : ' + attr_type
+                    if isinstance(v, numpy.ndarray) and isinstance(v[0], numpy.bytes_):
+                        m = 'byte-string'
+                    elif isinstance(v, numpy.ndarray):
+                        m = type(v[0]).__name__
+                    else:
+                        m = type(v).__name__
+                    m += ' : ' + attr_type
                     self.new_finding(ttl, aname, f, m)
                      
                     # check if value matches enumeration
@@ -592,10 +600,19 @@ class Data_File_Validator(object):
         if target_exists:
             if str(dataset.dtype).startswith('|S'):
                 t = type('numpy string array') in nx_type
+                m = 'str'
+            elif str(dataset.dtype).startswith('|O'):
+                t = type(dataset[0]) in nx_type
+                m = 'str'
             else:
                 t = dataset.dtype in nx_type
+                m = type(dataset[0]).__name__
+                if 'ndarray' == m:
+                    m = str(dataset.dtype)
+            if 'unicode' == m:
+                m = 'str'
             f = {True: finding.OK, False: finding.WARN}[t]
-            m = str(dataset.dtype) + {True: ' : ', False: ' not '}[t] + defaults['type']
+            m += {True: ' : ', False: ' not '}[t] + defaults['type']
             nm = group.name + '/' + field_name
             ttl = '/'.join((nx_class_name, field_name))
             self.new_finding('NXDL data type: '+ttl, nm, f, m)
@@ -746,7 +763,7 @@ class Data_File_Validator(object):
                             # reject this node from niac2016 since it has NXdata group
                             del candidates['niac2016'][node.name]
 
-                        signal = subnode.attrs.get('signal')
+                        signal = self.get_hdf5_attribute(subnode, 'signal')
                         if isinstance(signal, (bytes, numpy.bytes_)):
                             signal = signal.decode()
                         if signal is not None:
@@ -759,7 +776,7 @@ class Data_File_Validator(object):
                                 continue
                             if not h5structure.isNeXusDataset(ss_node):
                                 continue
-                            if ss_node.attrs.get('signal') is not None:
+                            if self.get_hdf5_attribute(ss_node, 'signal') is not None:
                                 k = ss_node.name + '@signal'
                                 candidates['v2'][k] = '/NXentry/NXdata/field@signal'
                                 candidates['v1'][k] = '/NXentry/NXdata/field@signal'
@@ -1139,6 +1156,7 @@ class Data_File_Validator(object):
                 should be the same text as other instances of this test
         :param str comment: free-form explanation
         '''
+
         addr = str(h5_address)
         unique_key = addr + ':' + test_name
         if unique_key in self.__unique_findings__:

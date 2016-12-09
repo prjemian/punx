@@ -285,7 +285,7 @@ def suite(*args, **kw):
         Validate_33id_spec_22_2D, 
         Validate_compression, 
         Validate_NXdata_is_now_optional_51,
-        # Validate_example_mapping, # FIXME: issue #57
+        Validate_example_mapping,
         Validate_example_mapping_issue_53,
         Validate_issue_57,
         ]

@@ -33,8 +33,8 @@ address                                              validation                 
 /entry1/data/y_stage_set@target                      attribute data type                                 NOTE   variable length string: ['/entry1/sample/y_stage_set']                               
 /entry1/data/y_stage_set@target                      link target exists                                  OK     /entry1/sample/y_stage_set                                                           
 /entry1/data                                         NXDL review                                         TODO   validate with NXdata specification (incomplete)                                      
-/entry1/data/data@interpretation                     NXDL attribute type: NXdata/data@interpretation     OK     <type 'numpy.ndarray'> : NX_CHAR                                                     
-/entry1/data/data@interpretation                     NXDL attribute enum: NXdata/data@interpretation     OK     ['spectrum']: expected                                                               
+/entry1/data/data@interpretation                     NXDL attribute type: NXdata/data@interpretation     OK     str : NX_CHAR                                                                        
+/entry1/data/data@interpretation                     NXDL attribute enum: NXdata/data@interpretation     OK     spectrum: expected                                                                   
 /entry1/data/data                                    NXDL data type: NXdata/data                         OK     int16 : NX_NUMBER                                                                    
 /entry1/entry_identifier                             validItemName-strict                                OK     strict re: [a-z_][a-z0-9_]*                                                          
 /entry1/entry_identifier                             @nameType                                           OK     name is specified                                                                    
@@ -91,8 +91,8 @@ address                                              validation                 
 /entry1/instrument/diff/y_pixel_size@units           field@units                                         OK     value: um                                                                            
 /entry1/instrument/diff/y_pixel_size                 @nameType                                           OK     name is specified                                                                    
 /entry1/instrument/diff                              NXDL review                                         TODO   validate with NXdetector specification (incomplete)                                  
-/entry1/instrument/diff/data@interpretation          NXDL attribute type: NXdetector/data@interpretation OK     <type 'numpy.ndarray'> : NX_CHAR                                                     
-/entry1/instrument/diff/data@interpretation          NXDL attribute enum: NXdetector/data@interpretation OK     ['image']: expected                                                                  
+/entry1/instrument/diff/data@interpretation          NXDL attribute type: NXdetector/data@interpretation OK     str : NX_CHAR                                                                        
+/entry1/instrument/diff/data@interpretation          NXDL attribute enum: NXdetector/data@interpretation OK     image: expected                                                                      
 /entry1/instrument/diff/data                         NXDL data type: NXdetector/data                     OK     int16 : NX_NUMBER                                                                    
 /entry1/instrument/diff/x_pixel_size                 NXDL data type: NXdetector/x_pixel_size             OK     float64 : NX_FLOAT                                                                   
 /entry1/instrument/diff/y_pixel_size                 NXDL data type: NXdetector/y_pixel_size             OK     float64 : NX_FLOAT                                                                   
@@ -122,8 +122,8 @@ address                                              validation                 
 /entry1/instrument/fluo/transformations/detector_arm NXtransformations@ignoreExtraFields                 UNUSED field ignored per NXDL specification                                                 
 /entry1/instrument/fluo/transformations              NXDL review                                         TODO   validate with NXtransformations specification (incomplete)                           
 /entry1/instrument/fluo                              NXDL review                                         TODO   validate with NXdetector specification (incomplete)                                  
-/entry1/instrument/fluo/data@interpretation          NXDL attribute type: NXdetector/data@interpretation OK     <type 'numpy.ndarray'> : NX_CHAR                                                     
-/entry1/instrument/fluo/data@interpretation          NXDL attribute enum: NXdetector/data@interpretation OK     ['spectrum']: expected                                                               
+/entry1/instrument/fluo/data@interpretation          NXDL attribute type: NXdetector/data@interpretation OK     str : NX_CHAR                                                                        
+/entry1/instrument/fluo/data@interpretation          NXDL attribute enum: NXdetector/data@interpretation OK     spectrum: expected                                                                   
 /entry1/instrument/fluo/data                         NXDL data type: NXdetector/data                     OK     int16 : NX_NUMBER                                                                    
 /entry1/instrument/trans@NX_class                    attribute data type                                 NOTE   variable length string: ['NXmonitor']                                                
 /entry1/instrument/trans                             validItemName-strict                                OK     strict re: [a-z_][a-z0-9_]*                                                          
@@ -176,10 +176,10 @@ address                                              validation                 
 /entry1/user/username                                validItemName-strict                                OK     strict re: [a-z_][a-z0-9_]*                                                          
 /entry1/user                                         NXDL review                                         TODO   validate with NXuser specification (incomplete)                                      
 /entry1                                              NXDL review                                         TODO   validate with NXentry specification (incomplete)                                     
-/entry1/entry_identifier                             NXDL data type: NXentry/entry_identifier            OK     object : NX_CHAR                                                                     
-/entry1/experiment_identifier                        NXDL data type: NXentry/experiment_identifier       OK     object : NX_CHAR                                                                     
-/entry1/program_name                                 NXDL data type: NXentry/program_name                OK     object : NX_CHAR                                                                     
-/entry1/title                                        NXDL data type: NXentry/title                       OK     object : NX_CHAR                                                                     
+/entry1/entry_identifier                             NXDL data type: NXentry/entry_identifier            OK     str : NX_CHAR                                                                        
+/entry1/experiment_identifier                        NXDL data type: NXentry/experiment_identifier       OK     str : NX_CHAR                                                                        
+/entry1/program_name                                 NXDL data type: NXentry/program_name                OK     str : NX_CHAR                                                                        
+/entry1/title                                        NXDL data type: NXentry/title                       OK     str : NX_CHAR                                                                        
 /entry_micro@NX_class                                attribute data type                                 NOTE   variable length string: ['NXentry']                                                  
 /entry_micro                                         validItemName-strict                                OK     strict re: [a-z_][a-z0-9_]*                                                          
 /entry_micro@NX_class                                @NX_class                                           OK     known: NXentry                                                                       
@@ -190,8 +190,8 @@ address                                              validation                 
 /entry_micro/data/image_x                            NXdata@ignoreExtraFields                            UNUSED field ignored per NXDL specification                                                 
 /entry_micro/data/image_y                            NXdata@ignoreExtraFields                            UNUSED field ignored per NXDL specification                                                 
 /entry_micro/data                                    NXDL review                                         TODO   validate with NXdata specification (incomplete)                                      
-/entry_micro/data/data@interpretation                NXDL attribute type: NXdata/data@interpretation     OK     <type 'numpy.ndarray'> : NX_CHAR                                                     
-/entry_micro/data/data@interpretation                NXDL attribute enum: NXdata/data@interpretation     WARN   ['rgba-image']: not in list: scalar,spectrum,image,vertex                            
+/entry_micro/data/data@interpretation                NXDL attribute type: NXdata/data@interpretation     OK     str : NX_CHAR                                                                        
+/entry_micro/data/data@interpretation                NXDL attribute enum: NXdata/data@interpretation     WARN   rgba-image: not in list: scalar,spectrum,image,vertex                                
 /entry_micro/data/data                               NXDL data type: NXdata/data                         OK     int16 : NX_NUMBER                                                                    
 /entry_micro/experiment_identifier                   validItemName-strict                                OK     strict re: [a-z_][a-z0-9_]*                                                          
 /entry_micro/experiment_identifier@target            attribute data type                                 NOTE   variable length string: ['/entry1/experiment_identifier']                            
@@ -204,33 +204,33 @@ address                                              validation                 
 /entry_micro/user@target                             attribute data type                                 NOTE   variable length string: ['/entry1/user']                                             
 /entry_micro/user@target                             link target exists                                  OK     /entry1/user                                                                         
 /entry_micro                                         NXDL review                                         TODO   validate with NXentry specification (incomplete)                                     
-/entry_micro/experiment_identifier                   NXDL data type: NXentry/experiment_identifier       OK     object : NX_CHAR                                                                     
-/entry_micro/program_name                            NXDL data type: NXentry/program_name                OK     object : NX_CHAR                                                                     
-/entry_micro/title                                   NXDL data type: NXentry/title                       OK     object : NX_CHAR                                                                     
+/entry_micro/experiment_identifier                   NXDL data type: NXentry/experiment_identifier       OK     str : NX_CHAR                                                                        
+/entry_micro/program_name                            NXDL data type: NXentry/program_name                OK     str : NX_CHAR                                                                        
+/entry_micro/title                                   NXDL data type: NXentry/title                       OK     str : NX_CHAR                                                                        
 /                                                    NXDL review                                         TODO   validate with NXroot specification (incomplete)                                      
 /entry1/data@signal                                  attribute data type                                 NOTE   variable length string: ['data']                                                     
 /entry1/data@signal                                  NXdata group default plot v3                        OK     NXdata@signal = data                                                                 
 /entry1/data@axes                                    attribute data type                                 NOTE   variable length string array: ['x_stage_set', 'y_stage_set', 't_stage_set', 'energy']
 /entry1/data@axes                                    NXdata@axes=x_stage_set                             OK     axes dataset found: x_stage_set                                                      
-/entry1/data@x_stage_set_indices                     NXdata@x_stage_set_indices                          OK     value = 1: ok                                                                      
+/entry1/data@x_stage_set_indices                     NXdata@x_stage_set_indices                          OK     value = 1: ok                                                                        
 /entry1/data@axes                                    NXdata@axes=y_stage_set                             OK     axes dataset found: y_stage_set                                                      
-/entry1/data@y_stage_set_indices                     NXdata@y_stage_set_indices                          OK     value = 0: ok                                                                      
+/entry1/data@y_stage_set_indices                     NXdata@y_stage_set_indices                          OK     value = 0: ok                                                                        
 /entry1/data@axes                                    NXdata@axes=t_stage_set                             OK     axes dataset found: t_stage_set                                                      
-/entry1/data@t_stage_set_indices                     NXdata@t_stage_set_indices                          OK     value = 2: ok                                                                      
+/entry1/data@t_stage_set_indices                     NXdata@t_stage_set_indices                          OK     value = 2: ok                                                                        
 /entry1/data@axes                                    NXdata@axes=energy                                  OK     axes dataset found: energy                                                           
-/entry1/data@energy_indices                          NXdata@energy_indices                               OK     value = 3: ok                                                                      
+/entry1/data@energy_indices                          NXdata@energy_indices                               OK     value = 3: ok                                                                        
 /entry1/data                                         NXdata dimension scale(s)                           OK     dimension scale(s) verified                                                          
 /entry_micro/data@signal                             attribute data type                                 NOTE   variable length string: ['data']                                                     
 /entry_micro/data@signal                             NXdata group default plot v3                        OK     NXdata@signal = data                                                                 
 /entry_micro/data@axes                               attribute data type                                 NOTE   variable length string array: ['.', 'image_x', 'image_y']                            
 /entry_micro/data@axes                               NXdata@axes=image_x                                 OK     axes dataset found: image_x                                                          
-/entry_micro/data@image_x_indices                    NXdata@image_x_indices                              OK     value = 1: ok                                                                      
+/entry_micro/data@image_x_indices                    NXdata@image_x_indices                              OK     value = 1: ok                                                                        
 /entry_micro/data@axes                               NXdata@axes=image_y                                 OK     axes dataset found: image_y                                                          
-/entry_micro/data@image_y_indices                    NXdata@image_y_indices                              OK     value = 2: ok                                                                      
+/entry_micro/data@image_y_indices                    NXdata@image_y_indices                              OK     value = 2: ok                                                                        
 /entry_micro/data/data                               NXdata@signal rank                                  WARN   rank(data) != number of dimension scales                                             
 /entry_micro/data                                    NXdata dimension scale(s)                           OK     dimension scale(s) verified                                                          
-/entry1/data                                         /NXentry/NXdata@signal=data                         NOTE   NeXus default plot v3
-/entry_micro/data                                    /NXentry/NXdata@signal=data                         NOTE   NeXus default plot v3
+/entry1/data                                         /NXentry/NXdata@signal=data                         NOTE   NeXus default plot v3                                                                
+/entry_micro/data                                    /NXentry/NXdata@signal=data                         NOTE   NeXus default plot v3                                                                
 ==================================================== =================================================== ====== =====================================================================================
 
 ======= ===== ===========================================================

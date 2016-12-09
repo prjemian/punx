@@ -11,16 +11,16 @@ _path = os.path.join(os.path.dirname(__file__), '..',)
 if _path not in sys.path:
     sys.path.insert(0, _path)
 from tests import common
-from tests import common_test
-from tests import cache_test
-from tests import h5structure_test
-from tests import logs_test
-from tests import nxdlstructure_test
-from tests import validate_test
-from tests import _version_test
 
 
 def suite(*args, **kw):
+    from tests import common_test
+    from tests import cache_test
+    from tests import h5structure_test
+    from tests import logs_test
+    from tests import nxdlstructure_test
+    from tests import validate_test
+    from tests import _version_test
     test_suite = unittest.TestSuite()
     test_list = [common_test, cache_test, h5structure_test,
                  logs_test, nxdlstructure_test,

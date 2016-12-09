@@ -118,7 +118,7 @@ class BaseHdf5File(unittest.TestCase):
         msg = "expected != reported"
         self.assertEqual(n_exp, n_act,  msg)
 
-    def test_expected_output(self):
+    def test_expected_output__line_by_line(self):
         '''
         test output of structure analysis on a HDF5 file
         '''

@@ -979,11 +979,13 @@ class Data_File_Validator(object):
                 self.new_finding(title, nx_classpath, finding.ERROR, m)
                 continue
 
-        cp = 'NXdata@signal'
         title = 'NeXus default plot v3'
+        # TODO: report default plot in each NXdata group
+        # TODO: report if file has one clearly designated default plot
+        # TODO: report if file has one default plot
         if len(default_plot_addr) == 1:
             m = 'NeXus data file default plot: /NXentry/NXdata@signal'
-            self.new_finding(title, default_plot_addr[0], finding.OK, m)
+            self.new_finding(nx_classpath, default_plot_addr[0], finding.OK, title)
             return default_plot_addr[0]
         elif len(default_plot_addr) == 0:
             m = 'NeXus data file does not define a default plot using v3'
@@ -991,13 +993,15 @@ class Data_File_Validator(object):
         else:
             # use NIAC2014 terms to find unique address
             unique_list = self.default_plot_addr_v3_niac2014(default_plot_addr)
+            m = title + '+niac2014'
             if len(unique_list) == 1:
-                m = 'NeXus data file default plot defined using v3+niac2014'
-                self.new_finding(title, unique_list[0], finding.OK, m)
+                self.new_finding(nx_classpath, unique_list[0], finding.OK, m)
                 return unique_list[0]
             else:
-                m = 'NeXus data file defines more than one default plot'
-                self.new_finding(title, cp, finding.NOTE, m)
+                for _addr in default_plot_addr:
+                    cp = nx_classpath + '='
+                    cp += self.get_hdf5_attribute(self.h5[_addr], 'signal')
+                    self.new_finding(cp, _addr, finding.NOTE, title)
                 return default_plot_addr
     
     def default_plot_addr_v3_niac2014(self, address_list):

@@ -113,12 +113,10 @@ class BaseHdf5File(unittest.TestCase):
         '''
         test number of lines in the report
         '''
-        msg = str(len(self.expected_output))
-        msg += " != "
-        msg += str(len(self.report))
-        self.assertEqual(len(self.expected_output), 
-                         len(self.report), 
-                         msg)
+        n_exp = len(self.expected_output)
+        n_act = len(self.report)
+        msg = "expected != reported"
+        self.assertEqual(n_exp, n_act,  msg)
 
     def test_expected_output(self):
         '''
@@ -129,10 +127,9 @@ class BaseHdf5File(unittest.TestCase):
             expected = str(self.expected_output[item]).rstrip()
             if actual != expected:
                 _test = True    # for debugging break point
-            msg = str(item) + ': '
-            msg += '|' + str(expected) + '|'
-            msg += ' != '
-            msg += '|' + str(actual) + '|'
+            msg = "validation different on line " + str(item) + ':'
+            msg += '\n expected: ' + str(expected)
+            msg += '\n reported: ' + str(actual)
             self.assertEqual(expected, actual, msg)
 
 

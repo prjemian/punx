@@ -5,7 +5,7 @@ C:\Users\Pete\Documents\eclipse\punx\src\punx\data\writer_2_1.hdf5 : NeXus data 
       @NX_class = NXdata
       @signal = counts
       @axes = two_theta
-      @two_theta_indices = [0]
+      @two_theta_indices = 0
       counts --> /entry/instrument/detector/counts
       two_theta --> /entry/instrument/detector/two_theta
     instrument:NXinstrument

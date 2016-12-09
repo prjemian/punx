@@ -606,9 +606,12 @@ class Data_File_Validator(object):
                 m = 'str'
             else:
                 t = dataset.dtype in nx_type
-                m = type(dataset[0]).__name__
-                if 'ndarray' == m:
-                    m = str(dataset.dtype)
+                m = str(dataset.dtype)
+                if 'object' == m:
+                    if dataset.ndim == 0:
+                        m = type(dataset.value).__name__
+                    else:
+                        m = type(dataset[0]).__name__
             if 'unicode' == m:
                 m = 'str'
             f = {True: finding.OK, False: finding.WARN}[t]

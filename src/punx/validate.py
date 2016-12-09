@@ -985,7 +985,9 @@ class Data_File_Validator(object):
         # TODO: report if file has one default plot
         if len(default_plot_addr) == 1:
             m = 'NeXus data file default plot: /NXentry/NXdata@signal'
-            self.new_finding(nx_classpath, default_plot_addr[0], finding.OK, title)
+            cp = nx_classpath + '='
+            cp += self.get_hdf5_attribute(self.h5[default_plot_addr[0]], 'signal')
+            self.new_finding(cp, default_plot_addr[0], finding.OK, title)
             return default_plot_addr[0]
         elif len(default_plot_addr) == 0:
             m = 'NeXus data file does not define a default plot using v3'

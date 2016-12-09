@@ -1,38 +1,38 @@
-=========================================== ============================ ====== =====================================================
-address                                     validation                   status comment(s)
-=========================================== ============================ ====== =====================================================
-/                                           @NX_class                    OK     file root (assumed): NXroot
-/entry                                      validItemName-strict         OK     strict re: [a-z_][a-z0-9_]*
-/entry@NX_class                             @NX_class                    OK     known: NXentry
-/entry/data                                 validItemName-strict         OK     strict re: [a-z_][a-z0-9_]*
-/entry/data@NX_class                        @NX_class                    OK     known: NXdata
-/entry/data/counts                          validItemName-strict         OK     strict re: [a-z_][a-z0-9_]*
-/entry/data/counts@target                   link target exists           OK     /entry/instrument/detector/counts
-/entry/data/two_theta                       validItemName-strict         OK     strict re: [a-z_][a-z0-9_]*
-/entry/data/two_theta@target                link target exists           OK     /entry/instrument/detector/two_theta
-/entry/data                                 NXDL review                  TODO   validate with NXdata specification (incomplete)
-/entry/instrument                           validItemName-strict         OK     strict re: [a-z_][a-z0-9_]*
-/entry/instrument@NX_class                  @NX_class                    OK     known: NXinstrument
-/entry/instrument/detector                  validItemName-strict         OK     strict re: [a-z_][a-z0-9_]*
-/entry/instrument/detector@NX_class         @NX_class                    OK     known: NXdetector
-/entry/instrument/detector/counts           validItemName-strict         OK     strict re: [a-z_][a-z0-9_]*
-/entry/instrument/detector/counts@units     validItemName-strict         OK     strict re: [a-z_][a-z0-9_]*
-/entry/instrument/detector/counts@target    validItemName-strict         OK     strict re: [a-z_][a-z0-9_]*
-/entry/instrument/detector/counts@units     field@units                  OK     value: counts
-/entry/instrument/detector/two_theta        validItemName-strict         OK     strict re: [a-z_][a-z0-9_]*
-/entry/instrument/detector/two_theta@units  validItemName-strict         OK     strict re: [a-z_][a-z0-9_]*
-/entry/instrument/detector/two_theta@target validItemName-strict         OK     strict re: [a-z_][a-z0-9_]*
-/entry/instrument/detector/two_theta@units  field@units                  OK     value: degrees
-/entry/instrument/detector                  NXDL review                  TODO   validate with NXdetector specification (incomplete)
-/entry/instrument                           NXDL review                  TODO   validate with NXinstrument specification (incomplete)
-/entry                                      NXDL review                  TODO   validate with NXentry specification (incomplete)
-/                                           NXDL review                  TODO   validate with NXroot specification (incomplete)
-/entry/data@signal                          NXdata group default plot v3 OK     NXdata@signal = counts
-/entry/data@axes                            NXdata@axes=two_theta        OK     axes dataset found: two_theta
-/entry/data@two_theta_indices               NXdata@two_theta_indices     OK     value = 0: ok
-/entry/data                                 NXdata dimension scale(s)    OK     dimension scale(s) verified
-/entry/data                                 NeXus default plot v3        OK     NeXus data file default plot: /NXentry/NXdata@signal
-=========================================== ============================ ====== =====================================================
+=========================================== ============================= ====== =====================================================
+address                                     validation                    status comment(s)
+=========================================== ============================= ====== =====================================================
+/                                           @NX_class                     OK     file root (assumed): NXroot
+/entry                                      validItemName-strict          OK     strict re: [a-z_][a-z0-9_]*
+/entry@NX_class                             @NX_class                     OK     known: NXentry
+/entry/data                                 validItemName-strict          OK     strict re: [a-z_][a-z0-9_]*
+/entry/data@NX_class                        @NX_class                     OK     known: NXdata
+/entry/data/counts                          validItemName-strict          OK     strict re: [a-z_][a-z0-9_]*
+/entry/data/counts@target                   link target exists            OK     /entry/instrument/detector/counts
+/entry/data/two_theta                       validItemName-strict          OK     strict re: [a-z_][a-z0-9_]*
+/entry/data/two_theta@target                link target exists            OK     /entry/instrument/detector/two_theta
+/entry/data                                 NXDL review                   TODO   validate with NXdata specification (incomplete)
+/entry/instrument                           validItemName-strict          OK     strict re: [a-z_][a-z0-9_]*
+/entry/instrument@NX_class                  @NX_class                     OK     known: NXinstrument
+/entry/instrument/detector                  validItemName-strict          OK     strict re: [a-z_][a-z0-9_]*
+/entry/instrument/detector@NX_class         @NX_class                     OK     known: NXdetector
+/entry/instrument/detector/counts           validItemName-strict          OK     strict re: [a-z_][a-z0-9_]*
+/entry/instrument/detector/counts@units     validItemName-strict          OK     strict re: [a-z_][a-z0-9_]*
+/entry/instrument/detector/counts@target    validItemName-strict          OK     strict re: [a-z_][a-z0-9_]*
+/entry/instrument/detector/counts@units     field@units                   OK     value: counts
+/entry/instrument/detector/two_theta        validItemName-strict          OK     strict re: [a-z_][a-z0-9_]*
+/entry/instrument/detector/two_theta@units  validItemName-strict          OK     strict re: [a-z_][a-z0-9_]*
+/entry/instrument/detector/two_theta@target validItemName-strict          OK     strict re: [a-z_][a-z0-9_]*
+/entry/instrument/detector/two_theta@units  field@units                   OK     value: degrees
+/entry/instrument/detector                  NXDL review                   TODO   validate with NXdetector specification (incomplete)
+/entry/instrument                           NXDL review                   TODO   validate with NXinstrument specification (incomplete)
+/entry                                      NXDL review                   TODO   validate with NXentry specification (incomplete)
+/                                           NXDL review                   TODO   validate with NXroot specification (incomplete)
+/entry/data@signal                          NXdata group default plot v3  OK     NXdata@signal = counts
+/entry/data@axes                            NXdata@axes=two_theta         OK     axes dataset found: two_theta
+/entry/data@two_theta_indices               NXdata@two_theta_indices      OK     value = 0: ok
+/entry/data                                 NXdata dimension scale(s)     OK     dimension scale(s) verified
+/entry/data                                 /NXentry/NXdata@signal=counts OK     NeXus default plot v3
+=========================================== ============================= ====== =====================================================
 
 ======= ===== ===========================================================
 status  count description

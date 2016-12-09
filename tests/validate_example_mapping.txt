@@ -229,19 +229,20 @@ address                                              validation                 
 /entry_micro/data@image_y_indices                    NXdata@image_y_indices                              OK     value = 2: ok                                                                      
 /entry_micro/data/data                               NXdata@signal rank                                  WARN   rank(data) != number of dimension scales                                             
 /entry_micro/data                                    NXdata dimension scale(s)                           OK     dimension scale(s) verified                                                          
-NXdata@signal                                        NeXus default plot v3                               NOTE   NeXus data file defines more than one default plot                                   
+/entry1/data                                         /NXentry/NXdata@signal=data                         NOTE   NeXus default plot v3
+/entry_micro/data                                    /NXentry/NXdata@signal=data                         NOTE   NeXus default plot v3
 ==================================================== =================================================== ====== =====================================================================================
 
 ======= ===== ===========================================================
 status  count description                                                
 ======= ===== ===========================================================
 OK      149   meets NeXus specification                                  
-NOTE    54    does not meet NeXus specification, but acceptable          
+NOTE    55    does not meet NeXus specification, but acceptable          
 WARN    2     does not meet NeXus specification, not generally acceptable
 ERROR   0     violates NeXus specification                               
 TODO    16    validation not implemented yet                             
 UNUSED  8     optional NeXus item not used in data file                  
 COMMENT 0     comment from the punx source code                          
 --      --    --                                                         
-TOTAL   229   --                                                         
+TOTAL   230   --                                                         
 ======= ===== ===========================================================

@@ -306,7 +306,7 @@ class Data_File_Validator(object):
                 if k == 'default' and nx_class_name in ('NXroot', 'NXentry', 'NXsubentry'):
                     target = self.get_hdf5_attribute(group, 'default')
                     t = target in group
-                    f = finding.TF_RESULT[t]
+                    f = {True: finding.OK, False: finding.NOTE}[t]
                     msg = {True: 'exists: ', False: 'does not exist: '}[t] + target
                     self.new_finding('default plot group', aname, f, msg)
 

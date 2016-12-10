@@ -2,6 +2,7 @@
 address                                  validation                         status comment(s)                                      
 ======================================== ================================== ====== ================================================
 /                                        @NX_class                          OK     file root (assumed): NXroot                     
+/                                        valid NeXus data file              OK
 /                                        NXDL review                        TODO   validate with NXroot specification (incomplete) 
 /@HDF5_Version                           validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*                     
 /@SPEC_comments                          validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*                     
@@ -807,7 +808,7 @@ address                                  validation                         stat
 ======= ===== ===========================================================
 status  count description                                                
 ======= ===== ===========================================================
-OK      263   meets NeXus specification                                  
+OK      264   meets NeXus specification                                  
 NOTE    514   does not meet NeXus specification, but acceptable          
 WARN    0     does not meet NeXus specification, not generally acceptable
 ERROR   0     violates NeXus specification                               
@@ -815,5 +816,5 @@ TODO    7     validation not implemented yet
 UNUSED  17    optional NeXus item not used in data file                  
 COMMENT 0     comment from the punx source code                          
 --      --    --                                                         
-TOTAL   801   --                                                         
+TOTAL   802   --                                                         
 ======= ===== ===========================================================

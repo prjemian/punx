@@ -2,6 +2,7 @@
 address                                              validation                                          status comment(s)                                                                           
 ==================================================== =================================================== ====== =====================================================================================
 /                                                    @NX_class                                           OK     file root (assumed): NXroot                                                          
+/                                                    valid NeXus data file                               OK
 /                                                    NXDL review                                         TODO   validate with NXroot specification (incomplete)                                      
 /entry1                                              validItemName-strict                                OK     strict re: [a-z_][a-z0-9_]*                                                          
 /entry1                                              NXDL review                                         TODO   validate with NXentry specification (incomplete)                                     
@@ -236,7 +237,7 @@ address                                              validation                 
 ======= ===== ===========================================================
 status  count description                                                
 ======= ===== ===========================================================
-OK      149   meets NeXus specification                                  
+OK      150   meets NeXus specification                                  
 NOTE    55    does not meet NeXus specification, but acceptable          
 WARN    2     does not meet NeXus specification, not generally acceptable
 ERROR   0     violates NeXus specification                               
@@ -244,5 +245,5 @@ TODO    16    validation not implemented yet
 UNUSED  8     optional NeXus item not used in data file                  
 COMMENT 0     comment from the punx source code                          
 --      --    --                                                         
-TOTAL   230   --                                                         
+TOTAL   231   --                                                         
 ======= ===== ===========================================================

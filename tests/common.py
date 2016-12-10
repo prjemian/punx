@@ -127,7 +127,7 @@ class BaseHdf5File(unittest.TestCase):
             expected = str(self.expected_output[item]).rstrip()
             if actual != expected:
                 _test = True    # for debugging break point
-            msg = "validation different on line " + str(item) + ':'
+            msg = "validation different on line " + str(item+1) + ':'
             msg += '\n expected: ' + str(expected)
             msg += '\n reported: ' + str(actual)
             self.assertEqual(expected, actual, msg)

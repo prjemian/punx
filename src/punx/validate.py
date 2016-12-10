@@ -251,7 +251,11 @@ class Data_File_Validator(object):
         start the validation process from the file root
         '''
         self.validate_HDF5_group(self.h5)
-        self.validate_default_plot()
+        t = self.validate_default_plot()
+        f = finding.TF_RESULT[t]
+        title = "valid NeXus data file"
+        msg = ''
+        self.new_finding(title, "/", f, msg)
         
     def validate_HDF5_group(self, group):
         '''
@@ -711,16 +715,17 @@ class Data_File_Validator(object):
         '''
         candidates = self.identify_default_plot_candidates()
         if self.default_plot_addr_v3(candidates['v3']) is not None:
-            return
+            return True
         elif self.default_plot_addr_v2(candidates['v2']) is not None:
-            return
+            return True
         elif self.default_plot_addr_v1(candidates['v1']) is not None:
-            return
+            return True
         elif self.no_NXdata_children_of_NXentry(candidates['niac2016']):
-            return
+            return True
         
-        m = 'no default plot: not a NeXus file'
+        m = '/NXentry/NXdata but no default plot: not a NeXus file'
         self.new_finding('NeXus default plot', '/NXentry/NXdata/field', finding.ERROR, m)
+        return False
     
     def identify_default_plot_candidates(self):
         '''
@@ -781,6 +786,7 @@ class Data_File_Validator(object):
                                 continue
                             if self.get_hdf5_attribute(ss_node, 'signal') is not None:
                                 k = ss_node.name + '@signal'
+                                # TODO: verify the value is a number (either as float, int, or str of some sort)
                                 candidates['v2'][k] = '/NXentry/NXdata/field@signal'
                                 candidates['v1'][k] = '/NXentry/NXdata/field@signal'
         return candidates

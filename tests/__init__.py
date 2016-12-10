@@ -16,16 +16,23 @@ from tests import common
 def suite(*args, **kw):
     from tests import common_test
     from tests import cache_test
+    from tests import external_links
     from tests import h5structure_test
     from tests import logs_test
     from tests import nxdlstructure_test
     from tests import validate_test
     from tests import _version_test
     test_suite = unittest.TestSuite()
-    test_list = [common_test, cache_test, h5structure_test,
-                 logs_test, nxdlstructure_test,
-                 validate_test, _version_test,
-                 ]
+    test_list = [
+        common_test, 
+        cache_test, 
+        external_links, 
+        h5structure_test,
+        logs_test, 
+        nxdlstructure_test,
+        validate_test, 
+        _version_test,
+        ]
 
     for test in test_list:
         test_suite.addTest(test.suite())

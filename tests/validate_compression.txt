@@ -1,7 +1,7 @@
 ========================== ============================ ====== =====================================================
 address                    validation                   status comment(s)                                           
 ========================== ============================ ====== =====================================================
-/                          valid NeXus data file        ERROR                                                       
+/                          ! valid NeXus data file      ERROR  This file is not valid by the NeXus standard.
 /                          @NX_class                    OK     file root (assumed): NXroot                          
 /                          NXDL review                  TODO   validate with NXroot specification (incomplete)      
 /NXentry/NXdata/field      NeXus default plot           ERROR  /NXentry/NXdata but no default plot: not a NeXus file

@@ -1,8 +1,8 @@
 ======================================== ================================== ====== ================================================
 address                                  validation                         status comment(s)                                      
 ======================================== ================================== ====== ================================================
+/                                        * valid NeXus data file            OK     This file is valid by the NeXus standard.
 /                                        @NX_class                          OK     file root (assumed): NXroot                     
-/                                        valid NeXus data file              OK
 /                                        NXDL review                        TODO   validate with NXroot specification (incomplete) 
 /@HDF5_Version                           validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*                     
 /@SPEC_comments                          validItemName                      NOTE   relaxed re: [A-Za-z_][\w_]*                     

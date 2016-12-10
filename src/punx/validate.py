@@ -253,8 +253,12 @@ class Data_File_Validator(object):
         self.validate_HDF5_group(self.h5)
         t = self.validate_default_plot()
         f = finding.TF_RESULT[t]
-        title = "valid NeXus data file"
-        msg = ''
+        title = "* valid NeXus data file"
+        msg = 'This file is '
+        if not t:
+            msg += 'not '
+            title = "!" + title[1:]
+        msg += 'valid by the NeXus standard.'
         self.new_finding(title, "/", f, msg)
         
     def validate_HDF5_group(self, group):

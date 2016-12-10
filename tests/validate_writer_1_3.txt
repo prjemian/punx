@@ -1,33 +1,33 @@
 ============================ ============================= ====== ================================================
-address                      validation                    status comment(s)
+address                      validation                    status comment(s)                                      
 ============================ ============================= ====== ================================================
-/                            @NX_class                     OK     file root (assumed): NXroot
-/Scan                        validItemName                 NOTE   relaxed re: [A-Za-z_][\w_]*
-/Scan@NX_class               @NX_class                     OK     known: NXentry
-/Scan/data                   validItemName-strict          OK     strict re: [a-z_][a-z0-9_]*
-/Scan/data@NX_class          @NX_class                     OK     known: NXdata
-/Scan/data/counts            NXdata@ignoreExtraFields      UNUSED field ignored per NXDL specification
-/Scan/data/two_theta         NXdata@ignoreExtraFields      UNUSED field ignored per NXDL specification
-/Scan/data                   NXDL review                   TODO   validate with NXdata specification (incomplete)
+/                            @NX_class                     OK     file root (assumed): NXroot                     
+/                            NXDL review                   TODO   validate with NXroot specification (incomplete) 
+/Scan                        validItemName                 NOTE   relaxed re: [A-Za-z_][\w_]*                     
 /Scan                        NXDL review                   TODO   validate with NXentry specification (incomplete)
-/                            NXDL review                   TODO   validate with NXroot specification (incomplete)
-/Scan/data@signal            NXdata group default plot v3  OK     NXdata@signal = counts
-/Scan/data@axes              NXdata@axes=two_theta         OK     axes dataset found: two_theta
-/Scan/data@two_theta_indices NXdata@two_theta_indices      OK     value = 0: ok
-/Scan/data                   NXdata dimension scale(s)     OK     dimension scale(s) verified
-/Scan/data                   /NXentry/NXdata@signal=counts OK     NeXus default plot v3
+/Scan@NX_class               @NX_class                     OK     known: NXentry                                  
+/Scan/data                   /NXentry/NXdata@signal=counts OK     NeXus default plot v3                           
+/Scan/data                   NXdata dimension scale(s)     OK     dimension scale(s) verified                     
+/Scan/data                   validItemName-strict          OK     strict re: [a-z_][a-z0-9_]*                     
+/Scan/data                   NXDL review                   TODO   validate with NXdata specification (incomplete) 
+/Scan/data@NX_class          @NX_class                     OK     known: NXdata                                   
+/Scan/data@axes              NXdata@axes=two_theta         OK     axes dataset found: two_theta                   
+/Scan/data@signal            NXdata group default plot v3  OK     NXdata@signal = counts                          
+/Scan/data@two_theta_indices NXdata@two_theta_indices      OK     value = 0: ok                                   
+/Scan/data/counts            NXdata@ignoreExtraFields      UNUSED field ignored per NXDL specification            
+/Scan/data/two_theta         NXdata@ignoreExtraFields      UNUSED field ignored per NXDL specification            
 ============================ ============================= ====== ================================================
 
 ======= ===== ===========================================================
-status  count description
+status  count description                                                
 ======= ===== ===========================================================
-OK      9     meets NeXus specification
-NOTE    1     does not meet NeXus specification, but acceptable
+OK      9     meets NeXus specification                                  
+NOTE    1     does not meet NeXus specification, but acceptable          
 WARN    0     does not meet NeXus specification, not generally acceptable
-ERROR   0     violates NeXus specification
-TODO    3     validation not implemented yet
-UNUSED  2     optional NeXus item not used in data file
-COMMENT 0     comment from the punx source code
---      --    --
-TOTAL   15    --
+ERROR   0     violates NeXus specification                               
+TODO    3     validation not implemented yet                             
+UNUSED  2     optional NeXus item not used in data file                  
+COMMENT 0     comment from the punx source code                          
+--      --    --                                                         
+TOTAL   15    --                                                         
 ======= ===== ===========================================================

@@ -1194,13 +1194,42 @@ class Data_File_Validator(object):
         t.labels = 'address validation status comment(s)'.split()
         if isinstance(statuses, finding.ValidationResultStatus):
             statuses = [statuses,]
-        for f in self.findings:
+        for f in sorted(self.findings, key=self.findings_comparator):
             if f.status in statuses:
                 t.rows.append((f.h5_address, f.test_name, f.status, f.comment))
         if len(t.rows) == 0:
             return 'None'
         return t.reST()
     
+    def findings_comparator(self, finding):
+        '''
+        custom sorting key for all HDF5 addresses
+        '''
+        if finding.h5_address.find('@') >= 0:
+            address, attribute = finding.h5_address.split('@')
+        else:
+            address = finding.h5_address
+            attribute = None
+        try:
+            if attribute is not None:
+                k = '!_4_'
+            elif isinstance(self.h5[address], h5py.Dataset):
+                k = '!_3_'
+            elif isinstance(self.h5[address], h5py.Group):
+                k = '!_1_'
+            elif isinstance(self.h5[address], h5py.File):
+                k = '!_0_'
+            else:
+                k = '!_5_'
+        except KeyError as exc:
+                k = '!_6_'
+        key = address + k
+        if attribute is not None:
+            key += '@' + attribute
+        key += '!__status_' + finding.status.key
+        key += '!__title_' + finding.test_name
+        return key
+
     def report_findings_summary(self):
         '''
         make a summary table of the validation findings (count how many of each status)

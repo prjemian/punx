@@ -228,7 +228,8 @@ class Validate_issue_57(unittest.TestCase):
         custom sorting key for all HDF5 addresses
         '''
         addr = a.split('@')
-        if len(addr) == 2:
+        if len(addr) == 2:  # attribute
+            # k = self.key_comparator(addr[0]) + '!_4_'
             k = '!_4_'
         elif isinstance(self.validator.h5[addr[0]], h5py.Dataset):
             k = '!_3_'

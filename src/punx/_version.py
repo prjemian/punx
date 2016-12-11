@@ -8,7 +8,7 @@ https://github.com/prjemian/spec2nexus/issues/61#issuecomment-246021134
 USAGE:
 
     Update the version string in file ``VERSION`` in same directory with
-     package's ``__init__.py`` file.
+    package's ``__init__.py`` file.
     In the ``__init__.py`` file, place these commands
     (substitute "punx" with your package's name)::
 

@@ -7,13 +7,22 @@ https://github.com/prjemian/spec2nexus/issues/61#issuecomment-246021134
 
 USAGE:
 
-    In the package's ``__init__.py`` file, place these commands::
+    Update the version string in file ``VERSION`` in same directory with
+     package's ``__init__.py`` file.
+    In the ``__init__.py`` file, place these commands
+    (substitute "punx" with your package's name)::
 
-        __package_name__ = u'package_name'
+        __package_name__ = 'punx'
         
-        from _version import git_release
-        __version__ = u'1.2.3'
-        __release__ = git_release(__package_name__, __version__)
+        _path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+        if _path not in sys.path:
+            sys.path.insert(0, _path)
+        from punx import _version
+
+        _path = os.path.dirname(__file__)
+        _vfile = os.path.join(_path, 'VERSION')
+        __version__ = open(_vfile, 'r').read()
+        __release__ = _version.git_release(__package_name__, __version__)
 
 '''
 

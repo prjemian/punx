@@ -51,7 +51,7 @@ class Validate_NXdata_is_now_optional_51(unittest.TestCase):
 
     def tearDown(self):
         if self.validator is not None and isinstance(self.validator.h5, h5py.File):
-            self.validator.h5.close()
+            self.validator.close()
             self.validator = None
         common.cleanup()
 
@@ -147,7 +147,7 @@ class Validate_example_mapping_issue_53(common.CustomHdf5File):
         self.assertEqual(validator.findings[0].status, punx.finding.OK)
         # print(validator.report_findings(punx.finding.VALID_STATUS_LIST))
         self.assertEqual(validator.report_findings(punx.finding.ERROR), "None")
-        validator.h5.close()
+        validator.close()
         
         # re-write the *_indices attributes as str in that HDF5 and re-validate
         hdf5root = h5py.File(self.testfile, "r+")
@@ -160,7 +160,7 @@ class Validate_example_mapping_issue_53(common.CustomHdf5File):
         self.assertEqual(validator.findings[0].status, punx.finding.OK)
         # print(validator.report_findings(punx.finding.VALID_STATUS_LIST))
         self.assertEqual(validator.report_findings(punx.finding.ERROR), "None")
-        validator.h5.close()
+        validator.close()
 
 
 class Validate_issue_57(unittest.TestCase):

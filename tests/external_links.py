@@ -64,6 +64,16 @@ class Construct_master_and_external_data(unittest.TestCase):
     Test the construction of a master NeXus file with ExternalLink to data
     '''
     
+    @classmethod
+    def setUpClass(cls):
+        # cls._connection = createExpensiveConnectionObject()
+        pass
+
+    @classmethod
+    def tearDownClass(cls):
+        # cls._connection.destroy()
+        pass
+
     def setUp(self):
         self.hdffiles ={item: makeTemporaryFile() for item in 'master data'.split()}
         makeDataFile(self.hdffiles['data'])

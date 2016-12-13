@@ -221,6 +221,12 @@ class Data_File_Validator(object):
         self.patterns[p.name] = p
         self.__unique_findings__ = {}
     
+    
+    def close(self):
+        if self.h5 is not None:
+            self.h5.close()
+            self.h5 = None
+    
     def get_data_types(self):
         '''
         generate dictionary of acceptable Python data types, based on NeXus data type keys

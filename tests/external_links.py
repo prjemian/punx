@@ -123,14 +123,21 @@ class Construct_master_and_external_data(unittest.TestCase):
 
         self.assertTrue('default' in entry.attrs, '/entry has @default attribute')
         default = entry.attrs['default']
-        self.assertEqual(default, 'data', '/entry@default is "data", as planned')
-        self.assertTrue(default in entry, '/entry@default points to existing group in /entry')
+        self.assertEqual(default,
+                         'data', 
+                         '/entry@default is "data", as planned')
+        self.assertTrue(default in entry, 
+                        '/entry@default points to existing group in /entry')
         data = entry[default]
 
-        self.assertTrue('signal' in data.attrs, '/entry/data has @signal attribute')
+        self.assertTrue('signal' in data.attrs, 
+                        '/entry/data has @signal attribute')
         signal = data.attrs['signal']
-        self.assertEqual(signal, 'positions', '/entry/data/@signal is "data", as planned')
-        self.assertTrue(signal in data, '/entry/data/@signal points to existing dataset in /entry/data')
+        self.assertEqual(signal, 
+                         'positions', 
+                         '/entry/data/@signal is "data", as planned')
+        self.assertTrue(signal in data, 
+                        '/entry/data/@signal points to existing dataset in /entry/data')
         ds = data[signal]
         root.close()
     
@@ -140,10 +147,13 @@ class Construct_master_and_external_data(unittest.TestCase):
         data = entry[entry.attrs['default']]
 
         ds = data.get(data.attrs['signal'], getlink=True)
-        self.assertTrue(isinstance(ds, h5py.ExternalLink), '/entry/data/positions is an external link')
+        self.assertTrue(isinstance(ds, h5py.ExternalLink), 
+                        '/entry/data/positions is an external link')
 
         ds = data[data.attrs['signal']]
-        self.assertEqual(ds.dtype, numpy.float, '/entry/data/positions values are floating point')
+        self.assertEqual(ds.dtype, 
+                         numpy.float, 
+                         '/entry/data/positions values are floating point')
         self.assertEqual(len(ds), 3, '/entry/data/positions has three values')
         self.assertEqual(ds[0], 1.1, '/entry/data/positions[0] = 1.1')
         self.assertEqual(ds[1], 2, '/entry/data/positions[1] = 2')
@@ -166,9 +176,14 @@ class Construct_master_and_external_data(unittest.TestCase):
         self.assertRaises(KeyError, fails)
 
         ds = data.get(signal, getlink=True)
-        self.assertTrue(isinstance(ds, h5py.ExternalLink), '/entry/data/positions is an external link')
-        self.assertEqual(ds.filename, self.hdffiles['data'], '/entry/data/positions/@file is correct')
-        self.assertEqual(ds.path, '/motor', '/entry/data/positions/@path is correct')
+        self.assertTrue(isinstance(ds, h5py.ExternalLink), 
+                        '/entry/data/positions is an external link')
+        self.assertEqual(ds.filename, 
+                         self.hdffiles['data'], 
+                         '/entry/data/positions/@file is correct')
+        self.assertEqual(ds.path, 
+                         '/motor', 
+                         '/entry/data/positions/@path is correct')
         root.close()
     
     def test_basic_master__missing_external_path(self):
@@ -189,9 +204,12 @@ class Construct_master_and_external_data(unittest.TestCase):
         self.assertRaises(KeyError, fails)
 
         ds = data.get(signal, getlink=True)
-        self.assertTrue(isinstance(ds, h5py.ExternalLink), '/entry/data/positions is an external link')
-        self.assertEqual(ds.filename, self.hdffiles['data'], '/entry/data/positions/@file is correct')
-        self.assertEqual(ds.path, '/motor', '/entry/data/positions/@path is correct')
+        self.assertTrue(isinstance(ds, h5py.ExternalLink), 
+                        '/entry/data/positions is an external link')
+        self.assertEqual(ds.filename, self.hdffiles['data'], 
+                         '/entry/data/positions/@file is correct')
+        self.assertEqual(ds.path, '/motor', 
+                         '/entry/data/positions/@path is correct')
         root.close()
 
 
@@ -256,7 +274,9 @@ class Structure_external_master_and_data__issue_18(unittest.TestCase):
         self.assertEqual(len(report), len(expected)-1, 'length of structure report')
         self.assertEqual(report[2], ' '*2 + 'entry:NXentry', 'NXentry name')
         self.assertEqual(report[5], ' '*4 + 'data:NXdata', 'NXdata name')
-        self.assertEqual(report[8].split(':')[0], ' '*6 + 'positions', 'dataset name in master')
+        self.assertEqual(report[8].split(':')[0], 
+                         ' '*6 + 'positions', 
+                         'dataset name in master')
         self.assertEqual(report[9], ' '*8 + '@units = mm', 'dataset units')
         self.assertEqual(report[11], ' '*8 + '@path = /motor', 'dataset path')
 
@@ -290,8 +310,11 @@ class Validate_external_master_and_data__issue_59(unittest.TestCase):
         validator = punx.validate.Data_File_Validator(self.hdffiles['data'])
         validator.validate()
 
-        self.assertEqual(validator.findings[-1].status, punx.finding.ERROR, 'validation ERROR found')
-        self.assertEqual(validator.findings[-1].test_name, '! valid NeXus data file', 'not a valid NeXus data file')
+        self.assertEqual(validator.findings[-1].status, punx.finding.ERROR, 
+                         'validation ERROR found')
+        self.assertEqual(validator.findings[-1].test_name, 
+                         '! valid NeXus data file', 
+                         'not a valid NeXus data file')
         
         validator.close()
     
@@ -302,16 +325,23 @@ class Validate_external_master_and_data__issue_59(unittest.TestCase):
         validator = punx.validate.Data_File_Validator(self.hdffiles['master'])
         validator.validate()
 
-        self.assertEqual(validator.findings[-1].status, punx.finding.OK, 'validation ERROR found')
-        self.assertEqual(validator.findings[-1].test_name, '* valid NeXus data file', 'valid NeXus data file')
+        self.assertEqual(validator.findings[-1].status, punx.finding.OK, 
+                         'validation ERROR found')
+        self.assertEqual(validator.findings[-1].test_name, 
+                         '* valid NeXus data file', 
+                         'valid NeXus data file')
 
-        addrs = validator.addresses
-        # FIXME:
-#         self.assertTrue('/entry/data/@signal' in addrs, 'found desired hdf5 address')
-#         node = addrs['/entry/data/@signal']
-#         self.assertEqual(node.findings.status, 
-#                          punx.finding.OK, 
-#                          'NXdata group default plot v3')
+        a = '/entry/data@signal'
+        self.assertTrue(a in validator.addresses.keys(), 'found hdf5 address: ' + a)
+        # test the validation findings on the default plot description
+        f = validator.addresses[a].findings
+        self.assertEqual(len(f), 1, 'one finding for HDF address: ' + a)
+        self.assertEqual(f[0].test_name, 
+                         'NXdata group default plot v3', 
+                         'tested for default plot scheme: v3')
+        self.assertEqual(f[0].status,
+                         punx.finding.OK, 
+                         'NXdata group default plot v3')
 
         validator.close()
 

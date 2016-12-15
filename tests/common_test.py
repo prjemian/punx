@@ -97,6 +97,5 @@ def suite(*args, **kw):
 
 
 if __name__ == '__main__':
-    test_suite=suite()
     runner=unittest.TextTestRunner()
-    runner.run(test_suite)
+    runner.run(suite())

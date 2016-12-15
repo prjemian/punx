@@ -79,12 +79,12 @@ class Finding(object):
     
     def __str__(self, *args, **kwargs):
         try:
-            s = self.status
-            s += ' ' + self.h5_address 
+            s = self.h5_address 
+            s += ' ' + str(self.status)
             s += ': ' + self.test_name
             s += ': ' + self.comment
             return s
-        except:
+        except Exception as exc:
             return object.__str__(self, *args, **kwargs)
 
 

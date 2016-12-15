@@ -733,9 +733,22 @@ class Data_File_Validator(object):
         elif self.no_NXdata_children_of_NXentry(candidates['niac2016']):
             return True
         
-        m = '/NXentry/NXdata but no default plot: not a NeXus file'
-        self.new_finding('NeXus default plot', '/NXentry/NXdata/field', finding.ERROR, m)
-        return False
+        classpath_dict = collections.OrderedDict()
+        for results in self.addresses.values():
+            cp = results.classpath
+            if cp not in classpath_dict:
+                classpath_dict[cp] = []
+            classpath_dict[cp].append(results.h5_address)
+        
+        k = '/NXentry/NXdata/field'
+        if k in classpath_dict and len(classpath_dict[k]) == 1:
+            m = 'only one /NXentry/NXdata/field exists but no signal indicated'
+            f = finding.WARN
+        else:
+            m = '/NXentry/NXdata/field exists but no signal indicated'
+            f = finding.ERROR
+        self.new_finding('NeXus default plot', k, f, m)
+        return f == finding.WARN
     
     def identify_default_plot_candidates(self):
         '''

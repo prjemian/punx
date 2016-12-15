@@ -291,21 +291,21 @@ class Validate_non_NeXus_files(unittest.TestCase):
     '''
     
     def setUp(self):
-        pass
+        # create the test file
+        tfile = tempfile.NamedTemporaryFile(suffix='.hdf5', delete=False)
+        tfile.close()
+        self.hdffile = tfile.name
     
     def tearDown(self):
-        pass
+        # remove the testfile
+        os.remove(self.hdffile)
+        self.hdffile = None
     
     def test__group_has_no_NX_class__attribute(self):
         import punx.validate, punx.finding, punx.logs
 
-        # create the test file
-        tfile = tempfile.NamedTemporaryFile(suffix='.hdf5', delete=False)
-        tfile.close()
-        hdffile = tfile.name
-
         # create the HDF5 content
-        hdf5root = h5py.File(hdffile, "w")
+        hdf5root = h5py.File(self.hdffile, "w")
         entry = hdf5root.create_group('entry')
         data = entry.create_group('data')
         data['positions'] = range(5)
@@ -321,7 +321,7 @@ class Validate_non_NeXus_files(unittest.TestCase):
 
         # run the validation
         punx.logs.ignore_logging()
-        validator = punx.validate.Data_File_Validator(hdffile)
+        validator = punx.validate.Data_File_Validator(self.hdffile)
         validator.validate()
 
         # print('\n' + '\n'.join([str(f) for f in validator.findings]) + '\n')
@@ -388,8 +388,54 @@ class Validate_non_NeXus_files(unittest.TestCase):
              '/ ERROR: ! valid NeXus data file: This file is not valid by the NeXus standard.', 
              'Not a NeXus HDF5 data file')
 
+
+class Validate_borderline_cases(unittest.TestCase):
+    '''
+    validate: various non-NeXus pathologies as noted
+    '''
+    
+    def setUp(self):
+        # create the test file
+        tfile = tempfile.NamedTemporaryFile(suffix='.hdf5', delete=False)
+        tfile.close()
+        self.hdffile = tfile.name
+    
+    def tearDown(self):
         # remove the testfile
-        os.remove(hdffile)
+        os.remove(self.hdffile)
+        self.hdffile = None
+    
+    def test_no_signal_attribute(self):
+        import punx.validate, punx.finding, punx.logs
+
+        # create the HDF5 content
+        hdf5root = h5py.File(self.hdffile, "w")
+        entry = hdf5root.create_group('entry')
+        entry.attrs['NX_class'] = 'NXentry'
+        data = entry.create_group('data')
+        data.attrs['NX_class'] = 'NXdata'
+        data['positions'] = range(5)
+        hdf5root.close()
+
+        # run the validation
+        punx.logs.ignore_logging()
+        validator = punx.validate.Data_File_Validator(self.hdffile)
+        validator.validate()
+
+        # print('\n' + '\n'.join([str(f) for f in validator.findings]) + '\n')
+
+        # apply tests
+        self.assertEqual(len(validator.addresses), 
+             7, 
+             'number of classpath entries discovered')
+        
+        k = '/NXentry/NXdata/field'
+        self.assertTrue(k in validator.addresses,
+                        'data found')
+        
+        m = k + ' WARN: NeXus default plot: only one /NXentry/NXdata/field exists but no signal indicated'
+        self.assertTrue(m in [str(f) for f in validator.addresses[k].findings],
+                        'data found')
 
  
 def suite(*args, **kw):
@@ -404,6 +450,7 @@ def suite(*args, **kw):
         Validate_example_mapping_issue_53,
         Validate_issue_57,
         Validate_non_NeXus_files,
+        Validate_borderline_cases,
         ]
     for test_case in test_list:
         test_suite.addTest(unittest.makeSuite(test_case))

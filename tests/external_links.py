@@ -80,7 +80,8 @@ class Construct_master_and_external_data(unittest.TestCase):
         makeMasterFile(self.hdffiles['master'], self.hdffiles['data'], '/motor')
     
     def tearDown(self):
-        for k, v in self.hdffiles.items():
+        for k in list(self.hdffiles.keys()):
+            v = self.hdffiles[k]
             if os.path.exists(v):
                 os.remove(v)
                 del self.hdffiles[k]
@@ -214,7 +215,8 @@ class Structure_external_master_and_data__issue_18(unittest.TestCase):
         makeMasterFile(self.hdffiles['master'], self.hdffiles['data'], '/motor')
     
     def tearDown(self):
-        for k, v in self.hdffiles.items():
+        for k in list(self.hdffiles.keys()):
+            v = self.hdffiles[k]
             if os.path.exists(v):
                 os.remove(v)
                 del self.hdffiles[k]
@@ -275,7 +277,8 @@ class Validate_external_master_and_data__issue_59(unittest.TestCase):
         makeMasterFile(self.hdffiles['master'], self.hdffiles['data'], '/motor')
     
     def tearDown(self):
-        for k, v in self.hdffiles.items():
+        for k in list(self.hdffiles.keys()):
+            v = self.hdffiles[k]
             if os.path.exists(v):
                 os.remove(v)
                 del self.hdffiles[k]

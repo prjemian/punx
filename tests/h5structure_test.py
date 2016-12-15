@@ -52,35 +52,45 @@ class Structure_SimpleHdf5File(common.StructureHdf5File):
 class Structure_writer_1_3(common.StructureHdf5File):
 
     testfile = 'writer_1_3.hdf5'
-    expected_output = common.read_filelines('structure_writer_1_3.txt')
+    expected_output = common.read_filelines(os.path.join('.', 'data', 'structures', 'writer_1_3.txt'))
 
 
 class Structure_writer_2_1(common.StructureHdf5File):
 
     testfile = 'writer_2_1.hdf5'
-    expected_output = common.read_filelines('structure_writer_2_1.txt')
+    expected_output = common.read_filelines(os.path.join('.', 'data', 'structures', 'writer_2_1.txt'))
 
 
 class Structure_33id_spec_22_2D(common.StructureHdf5File):
 
     testfile = '33id_spec_22_2D.hdf5'
-    expected_output = common.read_filelines('structure_33id_spec_22_2D.txt')
+    expected_output = common.read_filelines(os.path.join('.', 'data', 'structures', '33id_spec_22_2D.txt'))
 
 
 class Structure_compression(common.StructureHdf5File):
 
     testfile = 'compression.h5'
-    expected_output = common.read_filelines('structure_compression.txt')
+    expected_output = common.read_filelines(os.path.join('.', 'data', 'structures', 'compression.txt'))
     NeXus = False
+
+
+class Structure_example_mapping(common.StructureHdf5File):
+
+    testfile = 'example_mapping.nxs'
+    expected_output = common.read_filelines(os.path.join('.', 'data', 'structures', 'example_mapping.txt'))
      
 
 def suite(*args, **kw):
     test_suite = unittest.TestSuite()
-    test_suite.addTest(unittest.makeSuite(Structure_SimpleHdf5File))
-    test_suite.addTest(unittest.makeSuite(Structure_writer_1_3))
-    test_suite.addTest(unittest.makeSuite(Structure_writer_2_1))
-    test_suite.addTest(unittest.makeSuite(Structure_33id_spec_22_2D))
-    test_suite.addTest(unittest.makeSuite(Structure_compression))
+    test_list = [
+        Structure_SimpleHdf5File, 
+        Structure_writer_1_3, 
+        Structure_writer_2_1, 
+        Structure_33id_spec_22_2D,
+        Structure_compression,
+        ]
+    for test_case in test_list:
+        test_suite.addTest(unittest.makeSuite(test_case))
     return test_suite
 
 

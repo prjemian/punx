@@ -22,25 +22,33 @@ if _path not in sys.path:
 class Validate_writer_1_3(common.ValidHdf5File):
 
     testfile = 'writer_1_3.hdf5'
-    expected_output = common.read_filelines('validate_writer_1_3.txt')
+    # os.path.join('.', 'data', 'validations', self.testfile)
+    expected_output = common.read_filelines(os.path.join('.', 'data', 'validations', 'writer_1_3.txt'))
 
 
 class Validate_writer_2_1(common.ValidHdf5File):
 
     testfile = 'writer_2_1.hdf5'
-    expected_output = common.read_filelines('validate_writer_2_1.txt')
+    expected_output = common.read_filelines(os.path.join('.', 'data', 'validations', 'writer_2_1.txt'))
 
 
 class Validate_33id_spec_22_2D(common.ValidHdf5File):
 
     testfile = '33id_spec_22_2D.hdf5'
-    expected_output = common.read_filelines('validate_33id_spec_22_2D.txt')
+    expected_output = common.read_filelines(os.path.join('.', 'data', 'validations', '33id_spec_22_2D.txt'))
 
 
 class Validate_compression(common.ValidHdf5File):
 
     testfile = 'compression.h5'
-    expected_output = common.read_filelines('validate_compression.txt')
+    expected_output = common.read_filelines(os.path.join('.', 'data', 'validations', 'compression.txt'))
+    NeXus = False
+
+
+class Validate_example_mapping(common.ValidHdf5File):
+
+    testfile = 'example_mapping.nxs'
+    expected_output = common.read_filelines(os.path.join('.', 'data', 'validations', 'example_mapping.txt'))
     NeXus = False
  
  
@@ -110,13 +118,6 @@ class Validate_NXdata_is_now_optional_51(unittest.TestCase):
         #print('\n' + report + '\n')
         msg = 'no ERRORs should be found'
         self.assertEqual(int(report.split()[1]), 0, msg)
-
-
-class Validate_example_mapping(common.ValidHdf5File):
-
-    testfile = 'example_mapping.nxs'
-    expected_output = common.read_filelines('validate_example_mapping.txt')
-    NeXus = False
 
 
 class Validate_example_mapping_issue_53(common.CustomHdf5File):

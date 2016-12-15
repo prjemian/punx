@@ -63,10 +63,8 @@ def read_filelines(fname):
     '''
     read a text file and split into lines
     '''
-    path = os.path.dirname(__file__)
-    fp = open(os.path.join(path, fname), 'r')
-    buf = fp.read()
-    fp.close()
+    with open(fname, 'r') as fp:
+        buf = fp.read()
     return buf.strip().splitlines()
 
 

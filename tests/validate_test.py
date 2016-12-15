@@ -19,36 +19,40 @@ if _path not in sys.path:
     sys.path.insert(0, _path)
 
 
+def reference_file(fname):
+    path = os.path.dirname(__file__)
+    return os.path.abspath(os.path.join(path, 'data', 'validations', fname))
+
+
 class Validate_writer_1_3(common.ValidHdf5File):
 
     testfile = 'writer_1_3.hdf5'
-    # os.path.join('.', 'data', 'validations', self.testfile)
-    expected_output = common.read_filelines(os.path.join('.', 'data', 'validations', 'writer_1_3.txt'))
+    expected_output = common.read_filelines(reference_file('writer_1_3.txt'))
 
 
 class Validate_writer_2_1(common.ValidHdf5File):
 
     testfile = 'writer_2_1.hdf5'
-    expected_output = common.read_filelines(os.path.join('.', 'data', 'validations', 'writer_2_1.txt'))
+    expected_output = common.read_filelines(reference_file('writer_2_1.txt'))
 
 
 class Validate_33id_spec_22_2D(common.ValidHdf5File):
 
     testfile = '33id_spec_22_2D.hdf5'
-    expected_output = common.read_filelines(os.path.join('.', 'data', 'validations', '33id_spec_22_2D.txt'))
+    expected_output = common.read_filelines(reference_file('33id_spec_22_2D.txt'))
 
 
 class Validate_compression(common.ValidHdf5File):
 
     testfile = 'compression.h5'
-    expected_output = common.read_filelines(os.path.join('.', 'data', 'validations', 'compression.txt'))
+    expected_output = common.read_filelines(reference_file('compression.txt'))
     NeXus = False
 
 
 class Validate_example_mapping(common.ValidHdf5File):
 
     testfile = 'example_mapping.nxs'
-    expected_output = common.read_filelines(os.path.join('.', 'data', 'validations', 'example_mapping.txt'))
+    expected_output = common.read_filelines(reference_file('example_mapping.txt'))
     NeXus = False
  
  

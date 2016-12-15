@@ -49,35 +49,40 @@ class Structure_SimpleHdf5File(common.StructureHdf5File):
         self.report = xture.report(show_attributes)
 
 
+def reference_file(fname):
+    path = os.path.dirname(__file__)
+    return os.path.abspath(os.path.join(path, 'data', 'structures', fname))
+
+
 class Structure_writer_1_3(common.StructureHdf5File):
 
     testfile = 'writer_1_3.hdf5'
-    expected_output = common.read_filelines(os.path.join('.', 'data', 'structures', 'writer_1_3.txt'))
+    expected_output = common.read_filelines(reference_file('writer_1_3.txt'))
 
 
 class Structure_writer_2_1(common.StructureHdf5File):
 
     testfile = 'writer_2_1.hdf5'
-    expected_output = common.read_filelines(os.path.join('.', 'data', 'structures', 'writer_2_1.txt'))
+    expected_output = common.read_filelines(reference_file('writer_2_1.txt'))
 
 
 class Structure_33id_spec_22_2D(common.StructureHdf5File):
 
     testfile = '33id_spec_22_2D.hdf5'
-    expected_output = common.read_filelines(os.path.join('.', 'data', 'structures', '33id_spec_22_2D.txt'))
+    expected_output = common.read_filelines(reference_file('33id_spec_22_2D.txt'))
 
 
 class Structure_compression(common.StructureHdf5File):
 
     testfile = 'compression.h5'
-    expected_output = common.read_filelines(os.path.join('.', 'data', 'structures', 'compression.txt'))
+    expected_output = common.read_filelines(reference_file('compression.txt'))
     NeXus = False
 
 
 class Structure_example_mapping(common.StructureHdf5File):
 
     testfile = 'example_mapping.nxs'
-    expected_output = common.read_filelines(os.path.join('.', 'data', 'structures', 'example_mapping.txt'))
+    expected_output = common.read_filelines(reference_file('example_mapping.txt'))
      
 
 def suite(*args, **kw):

@@ -86,7 +86,9 @@ class TestCommon(unittest.TestCase):
         fp.close()
 
     def test_read_filelines(self):
-        lines = common.read_filelines(os.path.join('.', 'data', 'structures', 'writer_1_3.txt'))
+        path = os.path.abspath(os.path.dirname(__file__))
+        fname = os.path.join(path, 'data', 'structures', 'writer_1_3.txt')
+        lines = common.read_filelines(fname)
         self.assertEqual(12, len(lines), 'number of lines in a text file')
 
 

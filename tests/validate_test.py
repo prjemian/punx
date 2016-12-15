@@ -319,7 +319,7 @@ class Validate_non_NeXus_files(unittest.TestCase):
         validator = punx.validate.Data_File_Validator(hdffile)
         validator.validate()
 
-        print('\n' + '\n'.join([str(f) for f in validator.findings]) + '\n')
+        # print('\n' + '\n'.join([str(f) for f in validator.findings]) + '\n')
 
         # apply tests
         self.assertEqual(len(validator.addresses), 

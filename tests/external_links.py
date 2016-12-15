@@ -286,7 +286,9 @@ class Validate_external_master_and_data__issue_59(unittest.TestCase):
     #59: validate: recognize and validate external file links
     
     These links do not have a target attribute. 
-    Instead. they have file and path attributes. 
+    Instead. there is a way in h5py to access the
+    file and path configuration.  These are provided
+    in a data structure, NOT as HDF5 attributes. 
     If the external file is available, the link 
     will provide the linked content, as well.
     '''

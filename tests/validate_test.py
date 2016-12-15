@@ -6,6 +6,7 @@ test the punx validation process
 import h5py
 import os
 import sys
+import tempfile
 import unittest
 
 _path = os.path.join(os.path.dirname(__file__), '..', )
@@ -285,29 +286,53 @@ class Validate_non_NeXus_files(unittest.TestCase):
     '''
     
     def setUp(self):
-        self.hdffile = makeTemporaryFile()
+        pass
     
     def tearDown(self):
-        os.remove(self.hdffile)
-        self.hdffile = None
+        pass
     
     def test__group_has_no_NX_class__attribute(self):
         import punx.validate, punx.finding, punx.logs
-        hdf5root = h5py.File(self.hdffile, "w")
+
+        # create the test file
+        tfile = tempfile.NamedTemporaryFile(suffix='.hdf5', delete=False)
+        tfile.close()
+        hdffile = tfile.name
+
+        # create the HDF5 content
+        hdf5root = h5py.File(hdffile, "w")
         entry = hdf5root.create_group('entry')
         data = entry.create_group('data')
         data['positions'] = range(5)
         hdf5root.close()
 
+        # run the validation
         punx.logs.ignore_logging()
-        validator = punx.validate.Data_File_Validator(self.hdffile)
+        validator = punx.validate.Data_File_Validator(hdffile)
         validator.validate()
 
+        # apply tests
         self.assertEqual(len(validator.addresses), 
-                         3, 
-                         'number of classpath entries discovered')
+             3, 
+             'number of classpath entries discovered')
+        root = validator.addresses['/']
+        self.assertEqual(str(root.findings[0]), 
+             '/ OK: @NX_class: file root (assumed): NXroot', 
+             'assume File root is NXroot')
+        entry = validator.addresses['/entry']
+        self.assertEqual(str(entry.findings[1]), 
+             '/entry NOTE: @NX_class: no @NX_class attribute, not a NeXus group', 
+             '/entry is not NeXus')
+        self.assertFalse('/entry/data' in validator.addresses, 
+                         '/entry/data not inspected since /entry is non-NeXus group')
+        self.assertEqual(str(validator.findings[-1]), 
+             '/ ERROR: ! valid NeXus data file: This file is not valid by the NeXus standard.', 
+             'Not a NeXus HDF5 data file')
 
+        # remove the testfile
+        os.remove(hdffile)
 
+ 
 def suite(*args, **kw):
     test_suite = unittest.TestSuite()
     test_list = [

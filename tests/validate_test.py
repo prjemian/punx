@@ -304,6 +304,14 @@ class Validate_non_NeXus_files(unittest.TestCase):
         entry = hdf5root.create_group('entry')
         data = entry.create_group('data')
         data['positions'] = range(5)
+        group = hdf5root.create_group('NX_class')
+        group.attrs['NX_class'] = 'NXcollection'
+        group = hdf5root.create_group('unknown')
+        group.attrs['NX_class'] = 'NXunknown'
+        group = hdf5root.create_group('NX_class_with_bad_capitalization')
+        group.attrs['NX_class'] = 'nXcapitalization'
+        group = hdf5root.create_group('NX_class_with_wrong_underline')
+        group.attrs['NX_class'] = 'NX_data'
         hdf5root.close()
 
         # run the validation
@@ -311,20 +319,66 @@ class Validate_non_NeXus_files(unittest.TestCase):
         validator = punx.validate.Data_File_Validator(hdffile)
         validator.validate()
 
+        print('\n' + '\n'.join([str(f) for f in validator.findings]) + '\n')
+
         # apply tests
         self.assertEqual(len(validator.addresses), 
-             3, 
+             11, 
              'number of classpath entries discovered')
+
         root = validator.addresses['/']
         self.assertEqual(str(root.findings[0]), 
              '/ OK: @NX_class: file root (assumed): NXroot', 
              'assume File root is NXroot')
+
         entry = validator.addresses['/entry']
         self.assertEqual(str(entry.findings[1]), 
              '/entry NOTE: @NX_class: no @NX_class attribute, not a NeXus group', 
              '/entry is not NeXus')
         self.assertFalse('/entry/data' in validator.addresses, 
                          '/entry/data not inspected since /entry is non-NeXus group')
+
+        k = '/NX_class'
+        self.assertTrue(k in validator.addresses, 'found: '+k)
+        group = validator.addresses[k]
+        self.assertEqual(str(group.findings[0]), # FIXME: should be False
+             '/NX_class OK: NeXus internal attribute: marks this HDF5 group as NeXus group', 
+             'BUT this is a group name, not an attribute')
+        self.assertEqual(str(validator.addresses[k+'@NX_class'].findings[0]), 
+             '/NX_class@NX_class OK: @NX_class: known: NXcollection', 
+             'known base class')
+
+        ignoring = ' UNUSED: not NeXus group: ignoring content in group not defined by NeXus'
+        k = '/unknown'
+        self.assertTrue(k in validator.addresses, 'found: '+k)
+        group = validator.addresses[k]
+        self.assertEqual(str(group.findings[1]), 
+             k + ignoring, 
+             'unknown NeXus class')
+        self.assertEqual(str(validator.addresses[k+'@NX_class'].findings[0]), 
+             '/unknown@NX_class ERROR: @NX_class: unknown: NXunknown', 
+             'unknown NeXus class')
+
+        k = '/NX_class_with_bad_capitalization'
+        self.assertTrue(k in validator.addresses, 'found: '+k)
+        group = validator.addresses[k]
+        self.assertEqual(str(group.findings[1]), 
+             k + ignoring, 
+             'unknown NeXus class')
+        self.assertEqual(str(validator.addresses[k+'@NX_class'].findings[0]), 
+             '/NX_class_with_bad_capitalization@NX_class ERROR: @NX_class: unknown: nXcapitalization', 
+            'should be flagged as bad capitalization')
+
+        k = '/NX_class_with_wrong_underline'
+        self.assertTrue(k in validator.addresses, 'found: '+k)
+        group = validator.addresses[k]
+        self.assertEqual(str(group.findings[1]), 
+             k + ignoring, 
+             'unknown NeXus class')
+        self.assertEqual(str(validator.addresses[k+'@NX_class'].findings[0]), 
+             '/NX_class_with_wrong_underline@NX_class ERROR: @NX_class: unknown: NX_data', 
+            'should be flagged as wrong underline')
+
         self.assertEqual(str(validator.findings[-1]), 
              '/ ERROR: ! valid NeXus data file: This file is not valid by the NeXus standard.', 
              'Not a NeXus HDF5 data file')

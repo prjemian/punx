@@ -277,7 +277,37 @@ class Validate_issue_57(unittest.TestCase):
         for addr in sorted(addresses_to_fail_check):
             msg = 'HDF5 address not expected: ' + addr
             self.assertFalse(addr in validator.addresses, msg)
- 
+
+
+class Validate_non_NeXus_files(unittest.TestCase):
+    '''
+    validate: various non-NeXus pathologies as noted
+    '''
+    
+    def setUp(self):
+        self.hdffile = makeTemporaryFile()
+    
+    def tearDown(self):
+        os.remove(self.hdffile)
+        self.hdffile = None
+    
+    def test__group_has_no_NX_class__attribute(self):
+        import punx.validate, punx.finding, punx.logs
+        hdf5root = h5py.File(self.hdffile, "w")
+        entry = hdf5root.create_group('entry')
+        data = entry.create_group('data')
+        data['positions'] = range(5)
+        hdf5root.close()
+
+        punx.logs.ignore_logging()
+        validator = punx.validate.Data_File_Validator(self.hdffile)
+        validator.validate()
+
+        self.assertEqual(len(validator.addresses), 
+                         3, 
+                         'number of classpath entries discovered')
+
+
 def suite(*args, **kw):
     test_suite = unittest.TestSuite()
     test_list = [
@@ -289,6 +319,7 @@ def suite(*args, **kw):
         Validate_example_mapping,
         Validate_example_mapping_issue_53,
         Validate_issue_57,
+        Validate_non_NeXus_files,
         ]
     for test_case in test_list:
         test_suite.addTest(unittest.makeSuite(test_case))

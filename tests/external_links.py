@@ -347,7 +347,7 @@ class Validate_external_master_and_data__issue_59(unittest.TestCase):
 
         validator.close()
 
- 
+
 def suite(*args, **kw):
     test_suite = unittest.TestSuite()
     test_list = [

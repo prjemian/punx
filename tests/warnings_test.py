@@ -41,6 +41,65 @@ class Warning__1(unittest.TestCase):
         os.remove(self.hdffile)
         self.hdffile = None
     
+    def test_NXcollection_always_generates_a_warning(self):
+        '''
+        For NeXus validation, NXcollection will always generate a 
+        warning since it is always an optional group. 
+        Anything (groups, fields, or attributes) placed in an 
+        NXcollection group will not be validated.
+        '''
+        self.assertTrue(True, 'tba')
+
+    def test_note_items_added_to_base_class_and_not_in_NXDL(self):
+        '''
+        Validation procedures should treat such additional 
+        items (not covered by a base class specification) 
+        as notes or warnings rather than errors.
+        '''
+        self.assertTrue(True, 'tba')
+
+    def test_NXDL_attribute__ignoreExtraAttributes(self):
+        '''
+        Only validate known attributes; do not not warn about unknowns. 
+        
+        The ignoreExtraAttributes attribute is a flag to the process of 
+        validating NeXus data files. By setting ignoreExtraAttributes="true", 
+        presence of any undefined attributes in this class will not generate 
+        warnings during validation. Normally, validation will check all the 
+        attributes against their definition in the NeXus base classes and 
+        application definitions. Any items found that do not match the 
+        definition in the NXDL will generate a warning message.
+        '''
+        self.assertTrue(True, 'tba')
+
+    def test_NXDL_attribute__ignoreExtraFields(self):
+        '''
+        Only validate known fields; do not not warn about unknowns. 
+        
+        The ignoreExtraFields attribute is a flag to the process of 
+        validating NeXus data files. By setting ignoreExtraFields="true", 
+        presence of any undefined fields in this class will not generate 
+        warnings during validation. Normally, validation will check all 
+        the fields against their definition in the NeXus base classes 
+        and application definitions. Any items found that do not match 
+        the definition in the NXDL will generate a warning message.
+        '''
+        self.assertTrue(True, 'tba')
+
+    def test_NXDL_attribute__ignoreExtraGroups(self):
+        '''
+        Only validate known groups; do not not warn about unknowns. 
+        
+        The ignoreExtraGroups attribute is a flag to the process of 
+        validating NeXus data files. By setting ignoreExtraGroups="true", 
+        presence of any undefined groups in this class will not generate 
+        warnings during validation. Normally, validation will check all 
+        the groups against their definition in the NeXus base classes and 
+        application definitions. Any items found that do not match the 
+        definition in the NXDL will generate a warning message.
+        '''
+        self.assertTrue(True, 'tba')
+        
     def test_naming_conventions(self):
         import punx.validate, punx.finding, punx.logs
         punx.logs.ignore_logging()
@@ -84,19 +143,13 @@ class Warning__1(unittest.TestCase):
         /entry/strict OK: validItemName-strict: strict re: [a-z_][a-z0-9_]*
         /entry/strict@units NOTE: field@units: does not exist
         /entry@@@@ WARN: validItemName: valid HDF5 item name, not valid with NeXus
-        /entry@@attribute WARN: validItemName: valid HDF5 item name, not valid with NeXus
         /entry@attribute@ WARN: validItemName: valid HDF5 item name, not valid with NeXus
         '''.splitlines()
+        # /entry@@attribute WARN: validItemName: valid HDF5 item name, not valid with NeXus
         for f in expected_findings:
             if len(f.strip()) > 0:
                 # print('expecting: '+f)
                 self.assertTrue(f.strip() in all_findings, f)
-
-#         #/entry@@attribute OK: validItemName-strict: strict re: [a-z_][a-z0-9_]*
-#         k = '/entry@@attribute'
-#         self.assertTrue(k in validator.addresses, 'found: '+k)
-#         node = validator.addresses[k]
-#         print('\n' + '\n'.join([str(f) for f in node.findings]) + '\n')
 
         validator.close()
 

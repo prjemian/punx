@@ -23,7 +23,7 @@ class TestLogs(unittest.TestCase):
     def test_level_none(self):
         logger = punx.logs.Logger()
         self.assertEqual(punx.INFO, logger.level)
-        # logger.close()
+        logger.close()
         os.remove(logger.log_file)
 
     def test_console_only(self):

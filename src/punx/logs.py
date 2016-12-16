@@ -106,6 +106,14 @@ class Logger(object):
         self.add("program          = " + sys.argv[0])
         self.add("program filename = " + self.filename)
         self.add("PID              = " + str(self.pid))
+    
+    def close(self):
+        '''
+        close the log file
+        '''
+        for h in logging.root.handlers:
+            h.close()
+            logging.root.removeHandler(h)
 
 
 def to_console(message, interest=None):

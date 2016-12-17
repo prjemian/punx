@@ -353,8 +353,7 @@ class Data_File_Validator(object):
                 else:
                     self.validate_HDF5_dataset(child, group)
             else:
-                msg = 'unexpected: ' + child.name
-                # TODO: raise _exc(msg)
+                msg = str(_exc) + '\n' + 'unexpected: ' + child.name
                 raise ValueError(msg)
         
         self.validate_NXDL_specification(group, nx_class_name)

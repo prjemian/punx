@@ -324,11 +324,12 @@ class Data_File_Validator(object):
             try:
                 child = group[child_name]
             except KeyError as _exc:
-                filename = self.missing_file_link(_exc.message)
-                if filename is not None:
-                    title = 'external file link'
-                    msg = 'missing file: ' + filename
-                    self.new_finding(title, group.name+'/'+child_name, finding.ERROR, msg)
+                if True:
+                    filename = self.missing_file_link(str(_exc))
+                    if filename is not None:
+                        title = 'external file link'
+                        msg = 'missing file: ' + filename
+                        self.new_finding(title, group.name+'/'+child_name, finding.ERROR, msg)
                 continue
             if h5structure.isNeXusLink(child):
                 if nx_class_defaults['ignoreExtraGroups']:  # TODO: Is this proper for links?
@@ -353,6 +354,7 @@ class Data_File_Validator(object):
                     self.validate_HDF5_dataset(child, group)
             else:
                 msg = 'unexpected: ' + child.name
+                # TODO: raise _exc(msg)
                 raise ValueError(msg)
         
         self.validate_NXDL_specification(group, nx_class_name)
@@ -530,7 +532,7 @@ class Data_File_Validator(object):
             try:
                 dataset = group[field_name]
             except KeyError as _exc:
-                filename = self.missing_file_link(_exc.message)
+                filename = self.missing_file_link(str(_exc))
                 if filename is not None:
                     title = 'external file link'
                     msg = 'missing file: ' + filename

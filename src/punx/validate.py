@@ -316,7 +316,7 @@ class Data_File_Validator(object):
                 if k == 'default' and nx_class_name in ('NXroot', 'NXentry', 'NXsubentry'):
                     target = self.get_hdf5_attribute(group, 'default')
                     t = target in group
-                    f = {True: finding.OK, False: finding.NOTE}[t]
+                    f = {True: finding.OK, False: finding.ERROR}[t]
                     msg = {True: 'exists: ', False: 'does not exist: '}[t] + target
                     self.new_finding('default plot group', aname, f, msg)
 
@@ -920,7 +920,11 @@ class Data_File_Validator(object):
             title = 'NXdata group default plot v3'
             nxdata = self.h5[h5_addr.split('@')[0]]
             signal_name = self.get_hdf5_attribute(nxdata, 'signal', report=True)
-            if signal_name in nxdata:
+            if signal_name not in nxdata:
+                m = nx_classpath + ' field not found: ' + signal_name
+                self.new_finding(title, nxdata.name + '@signal', finding.ERROR, m)
+                continue
+            else:
                 signal_data = nxdata[signal_name]
                 m = 'NXdata@signal = ' + signal_name
                 addr = nxdata.name
@@ -1023,10 +1027,6 @@ class Data_File_Validator(object):
                 if dimension_scales_ok:
                     m = 'dimension scale(s) verified'
                     self.new_finding('NXdata dimension scale(s)', nxdata.name, finding.OK, m)
-            else:
-                m = 'signal field not found: ' + signal_name
-                self.new_finding(title, nx_classpath, finding.ERROR, m)
-                continue
 
         title = 'NeXus default plot v3'
         # TODO: report default plot in each NXdata group

@@ -437,6 +437,93 @@ class Validate_borderline_cases(unittest.TestCase):
         self.assertTrue(m in [str(f) for f in validator.addresses[k].findings],
                         'data found')
 
+
+class Validate_error_with_default_attribute(unittest.TestCase):
+    '''
+    validate: when default attribute is incorrect
+    '''
+    
+    def setUp(self):
+        # create the test file
+        tfile = tempfile.NamedTemporaryFile(suffix='.hdf5', delete=False)
+        tfile.close()
+        self.hdffile = tfile.name
+    
+    def tearDown(self):
+        # remove the testfile
+        os.remove(self.hdffile)
+        self.hdffile = None
+    
+    def test_default_attribute_value_is_wrong(self):
+        import punx.validate, punx.finding, punx.logs
+
+        # create the HDF5 content
+        hdf5root = h5py.File(self.hdffile, "w")
+        hdf5root.attrs['default'] = 'entry'
+        entry = hdf5root.create_group('entry')
+        entry.attrs['NX_class'] = 'NXentry'
+        entry.attrs['default'] = 'entry'    # this is the error, should be 'data'
+        data = entry.create_group('data')
+        data.attrs['NX_class'] = 'NXdata'
+        data.attrs['signal'] = 'positions'
+        data['positions'] = range(5)
+        data = entry.create_group('other')
+        data.attrs['NX_class'] = 'NXdata'
+        data.attrs['signal'] = 'x'
+        data['positions'] = range(5)
+        data['other'] = range(5)
+        hdf5root.close()
+
+        # run the validation
+        punx.logs.ignore_logging()
+        validator = punx.validate.Data_File_Validator(self.hdffile)
+        validator.validate()
+
+        # print('\n' + '\n'.join([str(f) for f in validator.findings]) + '\n')
+        
+        reported_findings = [str(f).strip() for f in validator.findings]
+        expected_findings = '''\
+        / OK: @NX_class: file root (assumed): NXroot
+        /@default OK: validItemName-strict: strict re: [a-z_][a-z0-9_]*
+        /@default OK: default plot group: exists: entry
+        /entry OK: validItemName-strict: strict re: [a-z_][a-z0-9_]*
+        /entry@NX_class OK: @NX_class: known: NXentry
+        /entry@default OK: validItemName-strict: strict re: [a-z_][a-z0-9_]*
+        /entry@default ERROR: default plot group: does not exist: entry
+        /entry/data OK: validItemName-strict: strict re: [a-z_][a-z0-9_]*
+        /entry/data@NX_class OK: @NX_class: known: NXdata
+        /entry/data/positions UNUSED: NXdata@ignoreExtraFields: field ignored per NXDL specification
+        /entry/data TODO: NXDL review: validate with NXdata specification (incomplete)
+        /entry/other OK: validItemName-strict: strict re: [a-z_][a-z0-9_]*
+        /entry/other@NX_class OK: @NX_class: known: NXdata
+        /entry/other/other UNUSED: NXdata@ignoreExtraFields: field ignored per NXDL specification
+        /entry/other/positions UNUSED: NXdata@ignoreExtraFields: field ignored per NXDL specification
+        /entry/other TODO: NXDL review: validate with NXdata specification (incomplete)
+        /entry TODO: NXDL review: validate with NXentry specification (incomplete)
+        / TODO: NXDL review: validate with NXroot specification (incomplete)
+        /entry/data@signal OK: NXdata group default plot v3: NXdata@signal = positions
+        /entry/data OK: NXdata dimension scale(s): dimension scale(s) verified
+        /entry/other@signal ERROR: NXdata group default plot v3: /NXentry/NXdata@signal field not found: x
+        /entry/data OK: /NXentry/NXdata@signal=positions: NeXus default plot v3
+        / OK: * valid NeXus data file: This file is valid by the NeXus standard.
+        '''
+        
+        expect = '/entry@default ERROR: default plot group: does not exist: entry'
+        self.assertTrue(expect in reported_findings, 
+                        'identified incorrect default attribute')
+        
+        expect = '/@default OK: default plot group: exists: entry'
+        self.assertTrue(expect in reported_findings, 
+                        'identified correct default attribute')
+        
+        expect = '/entry/data@signal OK: NXdata group default plot v3: NXdata@signal = positions'
+        self.assertTrue(expect in reported_findings, 
+                        'identified correct signal attribute')
+        
+        expect = '/entry/other@signal ERROR: NXdata group default plot v3: /NXentry/NXdata@signal field not found: x'
+        self.assertTrue(expect in reported_findings, 
+                        'identified incorrect signal attribute')
+
  
 def suite(*args, **kw):
     test_suite = unittest.TestSuite()
@@ -451,6 +538,7 @@ def suite(*args, **kw):
         Validate_issue_57,
         Validate_non_NeXus_files,
         Validate_borderline_cases,
+        Validate_error_with_default_attribute,
         ]
     for test_case in test_list:
         test_suite.addTest(unittest.makeSuite(test_case))
@@ -458,5 +546,5 @@ def suite(*args, **kw):
 
 
 if __name__ == '__main__':
-    runner=unittest.TextTestRunner()
+    runner=unittest.TextTestRunner(verbosity=2)
     runner.run(suite())

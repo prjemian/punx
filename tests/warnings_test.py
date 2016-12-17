@@ -19,12 +19,6 @@ if _path not in sys.path:
     sys.path.insert(0, _path)
 
 
-def makeTemporaryFile(ext='.hdf5'):
-        hfile = tempfile.NamedTemporaryFile(suffix=ext, delete=False)
-        hfile.close()
-        return hfile.name
-
-
 class Warning__1(unittest.TestCase):
     '''
     whatever

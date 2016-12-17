@@ -22,6 +22,7 @@ def suite(*args, **kw):
     from tests import nxdlstructure_test
     from tests import validate_test
     from tests import _version_test
+    from tests import warnings_test
     test_suite = unittest.TestSuite()
     test_list = [
         common_test, 
@@ -32,6 +33,7 @@ def suite(*args, **kw):
         nxdlstructure_test,
         validate_test, 
         _version_test,
+        warnings_test,
         ]
 
     for test in test_list:

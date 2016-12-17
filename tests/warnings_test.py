@@ -100,7 +100,7 @@ class Warning__1(unittest.TestCase):
         '''
         self.assertTrue(True, 'tba')
         
-    def test_naming_conventions(self):
+    def test_naming_conventions__issue_65(self):
         import punx.validate, punx.finding, punx.logs
         punx.logs.ignore_logging()
 
@@ -145,11 +145,16 @@ class Warning__1(unittest.TestCase):
         /entry@@@@ WARN: validItemName: valid HDF5 item name, not valid with NeXus
         /entry@attribute@ WARN: validItemName: valid HDF5 item name, not valid with NeXus
         '''.splitlines()
-        # /entry@@attribute WARN: validItemName: valid HDF5 item name, not valid with NeXus
+        
         for f in expected_findings:
             if len(f.strip()) > 0:
                 # print('expecting: '+f)
                 self.assertTrue(f.strip() in all_findings, f)
+
+        # /entry@@attribute WARN: validItemName: valid HDF5 item name, not valid with NeXus
+        # FIXME: this should trigger an error (issue 65)
+        #        instead, the leading @@ is stripped
+        #        and the remaining name passes validItemName-strict
 
         validator.close()
 

@@ -405,6 +405,16 @@ class Validate_borderline_cases(unittest.TestCase):
         os.remove(self.hdffile)
         self.hdffile = None
     
+    def test_raises___punx_HDF5_Open_Error_exception___if_not_an_HDF5_file(self):
+        import punx.validate, punx.finding, punx.logs
+        
+        with open(self.hdffile, 'w') as fp:
+            fp.write('text')
+        
+        punx.logs.ignore_logging()
+        self.assertRaises(punx.HDF5_Open_Error, 
+                          punx.validate.Data_File_Validator, self.hdffile)
+    
     def test_no_signal_attribute(self):
         import punx.validate, punx.finding, punx.logs
 

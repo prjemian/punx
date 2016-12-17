@@ -125,7 +125,7 @@ def validate_xml(xml_file_name):
         msg = 'DocumentInvalid:\n'
         msg += 'file: ' + xml_file_name + '\n'
         msg += str(exc)
-        raise Exception(msg)
+        raise punx.InvalidNxdlFile(msg)
     return result
 
 

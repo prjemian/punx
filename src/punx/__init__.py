@@ -119,5 +119,8 @@ class HDF5_Open_Error(Exception):
 class SchemaNotFound(Exception): 
     'custom exception'
 
+class InvalidNxdlFile(Exception): 
+    'custom exception'
+
 class CannotUpdateFromGithubNow(Exception): 
     'custom exception'

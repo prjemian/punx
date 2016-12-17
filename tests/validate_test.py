@@ -533,6 +533,48 @@ class Validate_error_with_default_attribute(unittest.TestCase):
         expect = '/entry/other@signal ERROR: NXdata group default plot v3: /NXentry/NXdata@signal field not found: x'
         self.assertTrue(expect in reported_findings, 
                         'identified incorrect signal attribute')
+ 
+ 
+class Validate_NXDL__issue_63(unittest.TestCase):
+    '''
+    issue #63: validate: build test for ``lxml.etree.DocumentInvalid``
+    '''
+    
+    def setUp(self):
+        # create the test file
+        tfile = tempfile.NamedTemporaryFile(suffix='.xml', delete=False)
+        tfile.close()
+        self.test_file = tfile.name
+    
+    def tearDown(self):
+        # remove the testfile
+        os.remove(self.test_file)
+        self.test_file = None
+    
+    def test_validate_xml___with_invalid_xml_file(self):
+        import lxml.etree
+        import punx.validate, punx.finding, punx.logs
+
+        with open(self.test_file, 'w') as fp:
+            fp.write('not XML file')
+
+        punx.logs.ignore_logging()
+        self.assertRaises(lxml.etree.XMLSyntaxError,
+                          punx.validate.validate_xml, self.test_file)
+    
+    def test_validate_xml___with_invalid_NXDL_file(self):
+        import lxml.etree
+        import punx.validate, punx.finding, punx.logs
+
+        with open(self.test_file, 'w') as fp:
+            fp.write('<?xml version="1.0" encoding="UTF-8"?>\n')
+            fp.write('<empty_root_node />\n')
+
+        punx.logs.ignore_logging()
+        self.assertRaises(punx.InvalidNxdlFile,
+                          punx.validate.validate_xml, self.test_file)
+        
+        
 
  
 def suite(*args, **kw):
@@ -549,6 +591,7 @@ def suite(*args, **kw):
         Validate_non_NeXus_files,
         Validate_borderline_cases,
         Validate_error_with_default_attribute,
+        Validate_NXDL__issue_63,
         ]
     for test_case in test_list:
         test_suite.addTest(unittest.makeSuite(test_case))

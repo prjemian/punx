@@ -744,10 +744,9 @@ class Data_File_Validator(object):
         k = '/NXentry/NXdata/field'
         if k in classpath_dict and len(classpath_dict[k]) == 1:
             m = 'only one /NXentry/NXdata/field exists but no signal indicated'
-            f = finding.WARN
         else:
             m = '/NXentry/NXdata/field exists but no signal indicated'
-            f = finding.ERROR
+        f = finding.WARN
         self.new_finding('NeXus default plot', k, f, m)
         return f == finding.WARN
     

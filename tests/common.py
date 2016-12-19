@@ -68,18 +68,6 @@ def read_filelines(fname):
     return buf.strip().splitlines()
 
 
-def suite_handler(list_of_test_classes):
-    test_suite = unittest.TestSuite()
-    test_suite.addTest(unittest.makeSuite(list_of_test_classes))
-    return test_suite
-
-
-def run_test_cases(list_of_test_classes):
-    runner=unittest.TextTestRunner(verbosity=2)
-    runner.run(suite_handler(list_of_test_classes))
-    cleanup()
-
-
 class CustomHdf5File(unittest.TestCase):
     '''
     build tests for a custom-built HDF5 file

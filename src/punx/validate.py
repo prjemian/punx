@@ -724,8 +724,15 @@ class Data_File_Validator(object):
         
         :see: http://download.nexusformat.org/doc/html/datarules.html#find-the-plottable-data
         '''
+        classpath_dict = collections.OrderedDict()
+        for results in self.addresses.values():
+            cp = results.classpath
+            if cp not in classpath_dict:
+                classpath_dict[cp] = []
+            classpath_dict[cp].append(results.h5_address)
         candidates = self.identify_default_plot_candidates()
-        if self.default_plot_addr_v3(candidates['v3']) is not None:
+        
+        if self.default_plot_addr_v3(candidates['v3'], classpath_dict) is not None:
             return True
         elif self.default_plot_addr_v2(candidates['v2']) is not None:
             return True
@@ -734,13 +741,6 @@ class Data_File_Validator(object):
         elif self.no_NXdata_children_of_NXentry(candidates['niac2016']):
             return True
         
-        classpath_dict = collections.OrderedDict()
-        for results in self.addresses.values():
-            cp = results.classpath
-            if cp not in classpath_dict:
-                classpath_dict[cp] = []
-            classpath_dict[cp].append(results.h5_address)
-        
         k = '/NXentry/NXdata/field'
         if k in classpath_dict and len(classpath_dict[k]) == 1:
             m = 'only one /NXentry/NXdata/field exists but no signal indicated'
@@ -748,6 +748,8 @@ class Data_File_Validator(object):
             m = '/NXentry/NXdata/field exists but no signal indicated'
         f = finding.WARN
         self.new_finding('NeXus default plot', k, f, m)
+
+        f = finding.TF_RESULT['/NXentry/NXdata/field' in classpath_dict]
         return f == finding.WARN
     
     def identify_default_plot_candidates(self):
@@ -907,12 +909,21 @@ class Data_File_Validator(object):
             self.new_finding(title, cp, finding.NOTE, m)
             return default_plot_addr
     
-    def default_plot_addr_v3(self, group_dict):
+    def default_plot_addr_v3(self, group_dict, classpath_dict):
         '''
         return the HDF5 address of the v3 default plottable data or None
         
         :see: http://download.nexusformat.org/doc/html/datarules.html#version-3
         '''
+        # TODO: this is change will be disruptive, better in a branch
+#         if '/NXentry/NXdata/field@signal' in classpath_dict:
+#             pass
+#         elif '/NXentry/NXdata/field' in classpath_dict:
+#             field_list = classpath_dict['/NXentry/NXdata/field']
+#             for entry in classpath_dict['/NXentry']:
+#                 count = len([i for i in field_list if i.startswith(entry)])
+#                 pass
+        
         default_plot_addr = []
         for h5_addr, nx_classpath in group_dict.items():
             dimension_scales = []

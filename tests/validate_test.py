@@ -301,14 +301,14 @@ class Validate_non_NeXus_files(unittest.TestCase):
         os.remove(self.hdffile)
         self.hdffile = None
     
-    def test__group_has_no_NX_class__attribute(self):
+    def test__entry_and_data_groups_have_no_NX_class__attribute(self):
         import punx.validate, punx.finding, punx.logs
 
         # create the HDF5 content
         hdf5root = h5py.File(self.hdffile, "w")
         entry = hdf5root.create_group('entry')
         data = entry.create_group('data')
-        data['positions'] = range(5)
+        data.create_dataset("positions", data=range(5), dtype=int)
         group = hdf5root.create_group('NX_class')
         group.attrs['NX_class'] = 'NXcollection'
         group = hdf5root.create_group('unknown')
@@ -387,6 +387,26 @@ class Validate_non_NeXus_files(unittest.TestCase):
         self.assertEqual(str(validator.findings[-1]), 
              '/ ERROR: ! valid NeXus data file: This file is not valid by the NeXus standard.', 
              'Not a NeXus HDF5 data file')
+    
+    def test__no_groups__only_data(self):
+        import punx.validate, punx.finding, punx.logs
+        import numpy
+
+        # create the HDF5 content
+        hdf5root = h5py.File(self.hdffile, "w")
+        hdf5root.create_dataset("x", data=numpy.array([[1,2,3], [3,1,2]], dtype=int))
+        hdf5root.close()
+
+        # run the validation
+        punx.logs.ignore_logging()
+        validator = punx.validate.Data_File_Validator(self.hdffile)
+        validator.validate()
+
+        print('\n' + '\n'.join([str(f) for f in validator.findings]) + '\n')
+
+        self.assertEqual(str(validator.findings[-1]), 
+             '/ ERROR: ! valid NeXus data file: This file is not valid by the NeXus standard.', 
+             'Not a NeXus HDF5 data file')
 
 
 class Validate_borderline_cases(unittest.TestCase):
@@ -415,8 +435,17 @@ class Validate_borderline_cases(unittest.TestCase):
         self.assertRaises(punx.HDF5_Open_Error, 
                           punx.validate.Data_File_Validator, self.hdffile)
     
+    def test_hdf5_data_file_not_found(self):
+        import punx.validate, punx.finding, punx.logs
+
+        # run the validation
+        punx.logs.ignore_logging()
+        self.assertRaises(punx.FileNotFound, 
+                          punx.validate.Data_File_Validator, 'NO_File_By_This.Name')
+    
     def test_no_signal_attribute(self):
         import punx.validate, punx.finding, punx.logs
+        import numpy
 
         # create the HDF5 content
         hdf5root = h5py.File(self.hdffile, "w")
@@ -424,7 +453,7 @@ class Validate_borderline_cases(unittest.TestCase):
         entry.attrs['NX_class'] = 'NXentry'
         data = entry.create_group('data')
         data.attrs['NX_class'] = 'NXdata'
-        data['positions'] = range(5)
+        data.create_dataset("x", data=numpy.array([[1,2,3], [3,1,2]], dtype=int))
         hdf5root.close()
 
         # run the validation
@@ -476,12 +505,12 @@ class Validate_error_with_default_attribute(unittest.TestCase):
         data = entry.create_group('data')
         data.attrs['NX_class'] = 'NXdata'
         data.attrs['signal'] = 'positions'
-        data['positions'] = range(5)
+        data.create_dataset("positions", data=range(5), dtype=int)
         data = entry.create_group('other')
         data.attrs['NX_class'] = 'NXdata'
         data.attrs['signal'] = 'x'
-        data['positions'] = range(5)
-        data['other'] = range(5)
+        data.create_dataset("positions", data=range(5), dtype=int)
+        data.create_dataset("other", data=range(5), dtype=int)
         hdf5root.close()
 
         # run the validation

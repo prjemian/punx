@@ -29,9 +29,12 @@ class Default_Plot_Detection(unittest.TestCase):
         tfile = tempfile.NamedTemporaryFile(suffix='.hdf5', delete=False)
         tfile.close()
         self.hdffile = tfile.name
+        self.validator = None
     
     def tearDown(self):
-        # remove the testfile
+        if self.validator is not None:
+            self.validator.close()
+            self.validator = None
         os.remove(self.hdffile)
         self.hdffile = None
         
@@ -52,25 +55,20 @@ class Default_Plot_Detection(unittest.TestCase):
         ds.attrs['units'] = 'mm'
         hdf5root.close()
 
-        validator = punx.validate.Data_File_Validator(self.hdffile)
-        validator.validate()
-        # print('\n' + '\n'.join([str(f) for f in validator.findings]) + '\n')
+        self.validator = punx.validate.Data_File_Validator(self.hdffile)
+        self.validator.validate()
+        # print('\n' + '\n'.join([str(f) for f in self.validator.findings]) + '\n')
         
-        findings_list = [str(f) for f in validator.findings]
+        findings_list = [str(f) for f in self.validator.findings]
         
         expected = '/entry/data@signal OK: NXdata group default plot v3: NXdata@signal = x'
-        self.assertTrue(expected in findings_list,
-                        expected)
+        self.assertTrue(expected in findings_list, expected)
         
         expected = '/entry/data OK: /NXentry/NXdata@signal=x: NeXus default plot v3'
-        self.assertTrue(expected in findings_list,
-                        expected)
+        self.assertTrue(expected in findings_list, expected)
         
         expected = '/ OK: * valid NeXus data file: This file is valid by the NeXus standard.'
-        self.assertTrue(expected in findings_list,
-                        expected)
-
-        validator.close()
+        self.assertTrue(expected in findings_list, expected)
         
     def test_no_default_or_signal_attributes__issue_62(self):
         import punx.validate, punx.finding, punx.logs
@@ -89,26 +87,50 @@ class Default_Plot_Detection(unittest.TestCase):
         #ds.attrs['units'] = 'mm'
         hdf5root.close()
 
-        validator = punx.validate.Data_File_Validator(self.hdffile)
-        validator.validate()
-        # print('\n' + '\n'.join([str(f) for f in validator.findings]) + '\n')
+        self.validator = punx.validate.Data_File_Validator(self.hdffile)
+        self.validator.validate()
+        #print('\n' + '\n'.join([str(f) for f in self.validator.findings]) + '\n')
         
-        findings_list = [str(f) for f in validator.findings]
+        findings_list = [str(f) for f in self.validator.findings]
         
         expected = '/entry/data@signal OK: NXdata group default plot v3: NXdata@signal = x'
-        self.assertFalse(expected in findings_list,
-                        expected)
+        expected = '/entry/data@signal'
+        self.assertFalse(expected in self.validator.addresses, expected + ' found')
         
         expected = '/NXentry/NXdata/field WARN: NeXus default plot: only one /NXentry/NXdata/field exists but no signal indicated'
-        self.assertTrue(expected in findings_list,
-                        expected)
+        self.assertTrue(expected in findings_list, expected)
         
-        # FIXME: should not be an error : this is issue #62
         expected = '/ OK: * valid NeXus data file: This file is valid by the NeXus standard.'
-        self.assertTrue(expected in findings_list,
-                        expected)
+        self.assertTrue(expected in findings_list, expected)
+        
+    def test_bad_signal_attribute__issue_62(self):
+        import punx.validate, punx.finding, punx.logs
+        punx.logs.ignore_logging()
 
-        validator.close()
+        # create the HDF5 content
+        hdf5root = h5py.File(self.hdffile, "w")
+        #hdf5root.attrs['default'] = 'entry'
+        entry = hdf5root.create_group('entry')
+        entry.attrs['NX_class'] = 'NXentry'
+        #entry.attrs['default'] = 'data'
+        data = entry.create_group('data')
+        data.attrs['NX_class'] = 'NXdata'
+        data.attrs['signal'] = '1'
+        ds = data.create_dataset('x', data=range(5))
+        #ds.attrs['units'] = 'mm'
+        hdf5root.close()
+
+        self.validator = punx.validate.Data_File_Validator(self.hdffile)
+        self.validator.validate()
+        # print('\n' + '\n'.join([str(f) for f in self.validator.findings]) + '\n')
+        
+        findings_list = [str(f) for f in self.validator.findings]
+        
+        expected = '/entry/data@signal ERROR: NXdata group default plot v3: /NXentry/NXdata@signal field not found: 1'
+        self.assertTrue(expected in findings_list, expected)
+
+        expected = '/ OK: * valid NeXus data file: This file is valid by the NeXus standard.'
+        self.assertTrue(expected in findings_list, expected)
 
 
 def suite(*args, **kw):

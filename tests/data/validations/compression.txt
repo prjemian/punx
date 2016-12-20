@@ -1,7 +1,7 @@
 ========================== ============================ ====== ====================================================
 address                    validation                   status comment(s)                                          
 ========================== ============================ ====== ====================================================
-/                          ! valid NeXus data file      ERROR  This file is not valid by the NeXus standard.       
+/                          * valid NeXus data file      OK     This file is valid by the NeXus standard.       
 /                          @NX_class                    OK     file root (assumed): NXroot                         
 /                          NXDL review                  TODO   validate with NXroot specification (incomplete)     
 /NXentry/NXdata/field      NeXus default plot           WARN   /NXentry/NXdata/field exists but no signal indicated
@@ -25,10 +25,10 @@ address                    validation                   status comment(s)
 ======= ===== ===========================================================
 status  count description                                                
 ======= ===== ===========================================================
-OK      3     meets NeXus specification                                  
+OK      4     meets NeXus specification                                  
 NOTE    5     does not meet NeXus specification, but acceptable          
 WARN    2     does not meet NeXus specification, not generally acceptable
-ERROR   3     violates NeXus specification                               
+ERROR   2     violates NeXus specification                               
 TODO    3     validation not implemented yet                             
 UNUSED  3     optional NeXus item not used in data file                  
 COMMENT 0     comment from the punx source code                          

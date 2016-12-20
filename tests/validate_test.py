@@ -612,7 +612,7 @@ def suite(*args, **kw):
         Validate_writer_1_3, 
         Validate_writer_2_1, 
         Validate_33id_spec_22_2D, 
-        # Validate_compression, 
+        Validate_compression, 
         Validate_NXdata_is_now_optional_51,
         Validate_example_mapping,
         Validate_example_mapping_issue_53,

@@ -750,7 +750,7 @@ class Data_File_Validator(object):
         self.new_finding('NeXus default plot', k, f, m)
 
         f = finding.TF_RESULT['/NXentry/NXdata/field' in classpath_dict]
-        return f == finding.WARN
+        return f != finding.ERROR
     
     def identify_default_plot_candidates(self):
         '''

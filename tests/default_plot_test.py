@@ -72,7 +72,7 @@ class Default_Plot_Detection(unittest.TestCase):
 
         validator.close()
         
-    def test_none_of_the_recommended_attributes__issue_62(self):
+    def test_no_default_or_signal_attributes__issue_62(self):
         import punx.validate, punx.finding, punx.logs
         punx.logs.ignore_logging()
 
@@ -91,7 +91,7 @@ class Default_Plot_Detection(unittest.TestCase):
 
         validator = punx.validate.Data_File_Validator(self.hdffile)
         validator.validate()
-        print('\n' + '\n'.join([str(f) for f in validator.findings]) + '\n')
+        # print('\n' + '\n'.join([str(f) for f in validator.findings]) + '\n')
         
         findings_list = [str(f) for f in validator.findings]
         
@@ -104,7 +104,7 @@ class Default_Plot_Detection(unittest.TestCase):
                         expected)
         
         # FIXME: should not be an error : this is issue #62
-        expected = '/ ERROR: ! valid NeXus data file: This file is not valid by the NeXus standard.'
+        expected = '/ OK: * valid NeXus data file: This file is valid by the NeXus standard.'
         self.assertTrue(expected in findings_list,
                         expected)
 

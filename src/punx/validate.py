@@ -915,7 +915,7 @@ class Data_File_Validator(object):
         
         :see: http://download.nexusformat.org/doc/html/datarules.html#version-3
         '''
-        # TODO: this is change will be disruptive, better in a branch
+        # TODO: this change will be disruptive, better in a branch
 #         if '/NXentry/NXdata/field@signal' in classpath_dict:
 #             pass
 #         elif '/NXentry/NXdata/field' in classpath_dict:
@@ -1154,6 +1154,8 @@ class Data_File_Validator(object):
                 self.new_finding('attribute data type', gname, finding.NOTE, msg)
             if len(a) == 1:
                 a = a[0]
+        elif isinstance(a, (int, numpy.int16, numpy.int32, numpy.int64)):
+            a = str(a)
         if sys.version_info.major == 3:
             if isinstance(a, bytes):
                 a = str(a.decode())

@@ -671,14 +671,13 @@ class Data_File_Validator(object):
         
         :see: http://download.nexusformat.org/doc/html/datarules.html?highlight=regular%20expression
         '''
+        full_name = h5_addr
         if key is None:
             key_relaxed = 'validItemName'
             key_strict = 'validItemName-strict'
 
             short_name = h5_addr.split('/')[-1]
-            if parent is None:
-                full_name = h5_addr
-            else:
+            if parent is not None:
                 full_name = parent.name + '@' + h5_addr
 
             if short_name == 'NX_class':
@@ -722,6 +721,8 @@ class Data_File_Validator(object):
             # TODO: validate full_name against other keys
             # validNXClassName
             # validTargetName
+            f = finding.TODO
+            msg = 'TODO: validate full_name against ' + key
             pass
 
         self.new_finding(key, full_name, f, msg)

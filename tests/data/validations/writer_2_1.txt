@@ -15,9 +15,9 @@ address                                     validation                    status
 /entry/data@axes                            NXdata@axes=two_theta         OK     axes dataset found: two_theta                        
 /entry/data@signal                          NXdata group default plot v3  OK     NXdata@signal = counts                               
 /entry/data@two_theta_indices               NXdata@two_theta_indices      OK     value = 0: ok                                        
-/entry/data/counts                          validItemName-strict          OK     strict re: [a-z_][a-z0-9_]*                          
+/entry/data/counts                          validTargetName               TODO   TODO: validate full_name against validTargetName                          
 /entry/data/counts@target                   link target exists            OK     /entry/instrument/detector/counts                    
-/entry/data/two_theta                       validItemName-strict          OK     strict re: [a-z_][a-z0-9_]*                          
+/entry/data/two_theta                       validTargetName               TODO   TODO: validate full_name against validTargetName                          
 /entry/data/two_theta@target                link target exists            OK     /entry/instrument/detector/two_theta                 
 /entry/instrument                           validItemName-strict          OK     strict re: [a-z_][a-z0-9_]*                          
 /entry/instrument                           NXDL review                   TODO   validate with NXinstrument specification (incomplete)
@@ -38,11 +38,11 @@ address                                     validation                    status
 ======= ===== ===========================================================
 status  count description                                                
 ======= ===== ===========================================================
-OK      27    meets NeXus specification                                  
+OK      25    meets NeXus specification                                  
 NOTE    0     does not meet NeXus specification, but acceptable          
 WARN    0     does not meet NeXus specification, not generally acceptable
 ERROR   0     violates NeXus specification                               
-TODO    5     validation not implemented yet                             
+TODO    7     validation not implemented yet                             
 UNUSED  0     optional NeXus item not used in data file                  
 COMMENT 0     comment from the punx source code                          
 --      --    --                                                         

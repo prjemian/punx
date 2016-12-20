@@ -1,7 +1,7 @@
 ==================================================== =================================================== ====== =====================================================================================
 address                                              validation                                          status comment(s)                                                                           
 ==================================================== =================================================== ====== =====================================================================================
-/                                                    * valid NeXus data file                             OK     This file is valid by the NeXus standard.
+/                                                    * valid NeXus data file                             OK     This file is valid by the NeXus standard.                                            
 /                                                    @NX_class                                           OK     file root (assumed): NXroot                                                          
 /                                                    NXDL review                                         TODO   validate with NXroot specification (incomplete)                                      
 /entry1                                              validItemName-strict                                OK     strict re: [a-z_][a-z0-9_]*                                                          
@@ -26,30 +26,30 @@ address                                              validation                 
 /entry1/data@x_stage_set_indices                     NXdata@x_stage_set_indices                          OK     value = 1: ok                                                                        
 /entry1/data@y_stage_set_indices                     NXdata@y_stage_set_indices                          OK     value = 0: ok                                                                        
 /entry1/data/data                                    NXDL data type: NXdata/data                         OK     int16 : NX_NUMBER                                                                    
-/entry1/data/data                                    validItemName-strict                                OK     strict re: [a-z_][a-z0-9_]*                                                          
+/entry1/data/data                                    validTargetName                                     TODO   TODO: validate full_name against validTargetName                                     
 /entry1/data/data@interpretation                     NXDL attribute enum: NXdata/data@interpretation     OK     spectrum: expected                                                                   
 /entry1/data/data@interpretation                     NXDL attribute type: NXdata/data@interpretation     OK     str : NX_CHAR                                                                        
 /entry1/data/data@target                             attribute data type                                 NOTE   variable length string: ['/entry1/instrument/fluo/data']                             
 /entry1/data/data@target                             link target exists                                  OK     /entry1/instrument/fluo/data                                                         
-/entry1/data/energy                                  validItemName-strict                                OK     strict re: [a-z_][a-z0-9_]*                                                          
+/entry1/data/energy                                  validTargetName                                     TODO   TODO: validate full_name against validTargetName                                     
 /entry1/data/energy@target                           attribute data type                                 NOTE   variable length string: ['/entry1/instrument/fluo/energy']                           
 /entry1/data/energy@target                           link target exists                                  OK     /entry1/instrument/fluo/energy                                                       
-/entry1/data/t_stage                                 validItemName-strict                                OK     strict re: [a-z_][a-z0-9_]*                                                          
+/entry1/data/t_stage                                 validTargetName                                     TODO   TODO: validate full_name against validTargetName                                     
 /entry1/data/t_stage@target                          attribute data type                                 NOTE   variable length string: ['/entry1/sample/transformations/t_stage']                   
 /entry1/data/t_stage@target                          link target exists                                  OK     /entry1/sample/transformations/t_stage                                               
-/entry1/data/t_stage_set                             validItemName-strict                                OK     strict re: [a-z_][a-z0-9_]*                                                          
+/entry1/data/t_stage_set                             validTargetName                                     TODO   TODO: validate full_name against validTargetName                                     
 /entry1/data/t_stage_set@target                      attribute data type                                 NOTE   variable length string: ['/entry1/sample/t_stage_set']                               
 /entry1/data/t_stage_set@target                      link target exists                                  OK     /entry1/sample/t_stage_set                                                           
-/entry1/data/x_stage                                 validItemName-strict                                OK     strict re: [a-z_][a-z0-9_]*                                                          
+/entry1/data/x_stage                                 validTargetName                                     TODO   TODO: validate full_name against validTargetName                                     
 /entry1/data/x_stage@target                          attribute data type                                 NOTE   variable length string: ['/entry1/sample/transformations/x_stage']                   
 /entry1/data/x_stage@target                          link target exists                                  OK     /entry1/sample/transformations/x_stage                                               
-/entry1/data/x_stage_set                             validItemName-strict                                OK     strict re: [a-z_][a-z0-9_]*                                                          
+/entry1/data/x_stage_set                             validTargetName                                     TODO   TODO: validate full_name against validTargetName                                     
 /entry1/data/x_stage_set@target                      attribute data type                                 NOTE   variable length string: ['/entry1/sample/x_stage_set']                               
 /entry1/data/x_stage_set@target                      link target exists                                  OK     /entry1/sample/x_stage_set                                                           
-/entry1/data/y_stage                                 validItemName-strict                                OK     strict re: [a-z_][a-z0-9_]*                                                          
+/entry1/data/y_stage                                 validTargetName                                     TODO   TODO: validate full_name against validTargetName                                     
 /entry1/data/y_stage@target                          attribute data type                                 NOTE   variable length string: ['/entry1/sample/transformations/y_stage']                   
 /entry1/data/y_stage@target                          link target exists                                  OK     /entry1/sample/transformations/y_stage                                               
-/entry1/data/y_stage_set                             validItemName-strict                                OK     strict re: [a-z_][a-z0-9_]*                                                          
+/entry1/data/y_stage_set                             validTargetName                                     TODO   TODO: validate full_name against validTargetName                                     
 /entry1/data/y_stage_set@target                      attribute data type                                 NOTE   variable length string: ['/entry1/sample/y_stage_set']                               
 /entry1/data/y_stage_set@target                      link target exists                                  OK     /entry1/sample/y_stage_set                                                           
 /entry1/entry_identifier                             @nameType                                           OK     name is specified                                                                    
@@ -72,7 +72,7 @@ address                                              validation                 
 /entry1/instrument/I0/data                           NXDL data type: NXmonitor/data                      OK     int16 : NX_NUMBER                                                                    
 /entry1/instrument/I0/data                           validItemName-strict                                OK     strict re: [a-z_][a-z0-9_]*                                                          
 /entry1/instrument/I0/data@units                     field@units                                         NOTE   does not exist                                                                       
-/entry1/instrument/I0/transformations                validItemName-strict                                OK     strict re: [a-z_][a-z0-9_]*                                                          
+/entry1/instrument/I0/transformations                validTargetName                                     TODO   TODO: validate full_name against validTargetName                                     
 /entry1/instrument/I0/transformations@target         attribute data type                                 NOTE   variable length string: ['/entry1/instrument/trans/transformations']                 
 /entry1/instrument/I0/transformations@target         link target exists                                  OK     /entry1/instrument/trans/transformations                                             
 /entry1/instrument/It                                validItemName                                       NOTE   relaxed re: [A-Za-z_][\w_]*                                                          
@@ -83,7 +83,7 @@ address                                              validation                 
 /entry1/instrument/It/data                           NXDL data type: NXmonitor/data                      OK     int16 : NX_NUMBER                                                                    
 /entry1/instrument/It/data                           validItemName-strict                                OK     strict re: [a-z_][a-z0-9_]*                                                          
 /entry1/instrument/It/data@units                     field@units                                         NOTE   does not exist                                                                       
-/entry1/instrument/It/transformations                validItemName-strict                                OK     strict re: [a-z_][a-z0-9_]*                                                          
+/entry1/instrument/It/transformations                validTargetName                                     TODO   TODO: validate full_name against validTargetName                                     
 /entry1/instrument/It/transformations@target         attribute data type                                 NOTE   variable length string: ['/entry1/instrument/trans/transformations']                 
 /entry1/instrument/It/transformations@target         link target exists                                  OK     /entry1/instrument/trans/transformations                                             
 /entry1/instrument/diff                              validItemName-strict                                OK     strict re: [a-z_][a-z0-9_]*                                                          
@@ -100,7 +100,7 @@ address                                              validation                 
 /entry1/instrument/diff/data@interpretation          enumeration: @interpretation                        OK     value=image :recognized                                                              
 /entry1/instrument/diff/data@interpretation          validItemName-strict                                OK     strict re: [a-z_][a-z0-9_]*                                                          
 /entry1/instrument/diff/data@units                   field@units                                         NOTE   does not exist                                                                       
-/entry1/instrument/diff/transformations              validItemName-strict                                OK     strict re: [a-z_][a-z0-9_]*                                                          
+/entry1/instrument/diff/transformations              validTargetName                                     TODO   TODO: validate full_name against validTargetName                                     
 /entry1/instrument/diff/transformations@target       attribute data type                                 NOTE   variable length string: ['/entry1/instrument/fluo/transformations']                  
 /entry1/instrument/diff/transformations@target       link target exists                                  OK     /entry1/instrument/fluo/transformations                                              
 /entry1/instrument/diff/x_pixel_size                 @nameType                                           OK     name is specified                                                                    
@@ -220,7 +220,7 @@ address                                              validation                 
 /entry_micro/data/image_x                            NXdata@ignoreExtraFields                            UNUSED field ignored per NXDL specification                                                 
 /entry_micro/data/image_y                            NXdata@ignoreExtraFields                            UNUSED field ignored per NXDL specification                                                 
 /entry_micro/experiment_identifier                   NXDL data type: NXentry/experiment_identifier       OK     str : NX_CHAR                                                                        
-/entry_micro/experiment_identifier                   validItemName-strict                                OK     strict re: [a-z_][a-z0-9_]*                                                          
+/entry_micro/experiment_identifier                   validTargetName                                     TODO   TODO: validate full_name against validTargetName                                     
 /entry_micro/experiment_identifier@target            attribute data type                                 NOTE   variable length string: ['/entry1/experiment_identifier']                            
 /entry_micro/experiment_identifier@target            link target exists                                  OK     /entry1/experiment_identifier                                                        
 /entry_micro/program_name                            @nameType                                           OK     name is specified                                                                    
@@ -229,7 +229,7 @@ address                                              validation                 
 /entry_micro/title                                   @nameType                                           OK     name is specified                                                                    
 /entry_micro/title                                   NXDL data type: NXentry/title                       OK     str : NX_CHAR                                                                        
 /entry_micro/title                                   validItemName-strict                                OK     strict re: [a-z_][a-z0-9_]*                                                          
-/entry_micro/user                                    validItemName-strict                                OK     strict re: [a-z_][a-z0-9_]*                                                          
+/entry_micro/user                                    validTargetName                                     TODO   TODO: validate full_name against validTargetName                                     
 /entry_micro/user@target                             attribute data type                                 NOTE   variable length string: ['/entry1/user']                                             
 /entry_micro/user@target                             link target exists                                  OK     /entry1/user                                                                         
 ==================================================== =================================================== ====== =====================================================================================
@@ -237,13 +237,14 @@ address                                              validation                 
 ======= ===== ===========================================================
 status  count description                                                
 ======= ===== ===========================================================
-OK      150   meets NeXus specification                                  
+OK      137   meets NeXus specification                                  
 NOTE    55    does not meet NeXus specification, but acceptable          
 WARN    2     does not meet NeXus specification, not generally acceptable
 ERROR   0     violates NeXus specification                               
-TODO    16    validation not implemented yet                             
+TODO    29    validation not implemented yet                             
 UNUSED  8     optional NeXus item not used in data file                  
 COMMENT 0     comment from the punx source code                          
 --      --    --                                                         
 TOTAL   231   --                                                         
 ======= ===== ===========================================================
+

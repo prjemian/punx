@@ -54,24 +54,32 @@ class Validate_example_mapping(common.ValidHdf5File):
     testfile = 'example_mapping.nxs'
     expected_output = common.read_filelines(reference_file('example_mapping.txt'))
     NeXus = False
- 
- 
-class Validate_NXdata_is_now_optional_51(unittest.TestCase):
+
+
+class CustomValidatorBase(unittest.TestCase):
 
     def setUp(self):
-        self.testfile = common.getTestFileName()
+        # create the test file
+        tfile = tempfile.NamedTemporaryFile(suffix='.hdf5', delete=False)
+        tfile.close()
+        self.hdffile = tfile.name
         self.validator = None
-
+    
     def tearDown(self):
-        if self.validator is not None and isinstance(self.validator.h5, h5py.File):
+        # remove the testfile
+        if self.validator is not None:
             self.validator.close()
             self.validator = None
-        common.cleanup()
+        os.remove(self.hdffile)
+        self.hdffile = None
+
+
+class Validate_NXdata_is_now_optional_51(CustomValidatorBase):
 
     def test_simple_NXdata(self):
         import punx.validate, punx.finding, punx.logs
 
-        hdf5root = h5py.File(self.testfile, "w")
+        hdf5root = h5py.File(self.hdffile, "w")
 
         entry = hdf5root.create_group("entry")
         entry.attrs['NX_class'] = 'NXentry'
@@ -83,7 +91,7 @@ class Validate_NXdata_is_now_optional_51(unittest.TestCase):
         hdf5root.close()
         
         punx.logs.ignore_logging()
-        self.validator = punx.validate.Data_File_Validator(self.testfile)
+        self.validator = punx.validate.Data_File_Validator(self.hdffile)
         self.validator.validate()
         self.report = []
         
@@ -101,7 +109,7 @@ class Validate_NXdata_is_now_optional_51(unittest.TestCase):
     def test_simple_no_NXdata(self):
         import punx.validate, punx.finding, punx.logs
 
-        hdf5root = h5py.File(self.testfile, "w")
+        hdf5root = h5py.File(self.hdffile, "w")
 
         entry = hdf5root.create_group("entry")
         entry.attrs['NX_class'] = 'NXentry'
@@ -109,7 +117,7 @@ class Validate_NXdata_is_now_optional_51(unittest.TestCase):
         hdf5root.close()
         
         punx.logs.ignore_logging()
-        self.validator = punx.validate.Data_File_Validator(self.testfile)
+        self.validator = punx.validate.Data_File_Validator(self.hdffile)
         self.validator.validate()
         self.report = []
         
@@ -124,7 +132,7 @@ class Validate_NXdata_is_now_optional_51(unittest.TestCase):
         self.assertEqual(int(report.split()[1]), 0, msg)
 
 
-class Validate_example_mapping_issue_53(common.CustomHdf5File):
+class Validate_example_mapping_issue_53(CustomValidatorBase):
     
     def createContent(self, hdf5root):
         '''
@@ -146,21 +154,34 @@ class Validate_example_mapping_issue_53(common.CustomHdf5File):
     
     def test_indices_attribute_value_as_string_in_HDF5_file(self):
         import punx.validate, punx.finding, punx.logs
+
+        # create the HDF5 content
+        hdf5root = h5py.File(self.hdffile, "w")
+        self.createContent(hdf5root)
+        hdf5root.close()
+
         punx.logs.ignore_logging()
-        validator = punx.validate.Data_File_Validator(self.testfile)
+        validator = punx.validate.Data_File_Validator(self.hdffile)
         validator.validate()
+        findings_list = [str(f) for f in validator.findings]
+        # print('\n' + '\n'.join(findings_list) + '\n')
+
         self.assertGreaterEqual(len(validator.findings), 0)
         self.assertEqual(validator.findings[0].status, punx.finding.OK)
         # print(validator.report_findings(punx.finding.VALID_STATUS_LIST))
         self.assertEqual(validator.report_findings(punx.finding.ERROR), "None")
+
+        expected = '/ OK: * valid NeXus data file: This file is valid by the NeXus standard.'
+        self.assertTrue(expected in findings_list, expected)
+
         validator.close()
         
         # re-write the *_indices attributes as str in that HDF5 and re-validate
-        hdf5root = h5py.File(self.testfile, "r+")
+        hdf5root = h5py.File(self.hdffile, "r+")
         hdf5root["/entry/data"].attrs["x_indices"] = [b"0",]
         hdf5root["/entry/data"].attrs["y_indices"] = [b"1",]
         hdf5root.close()
-        validator = punx.validate.Data_File_Validator(self.testfile)
+        validator = punx.validate.Data_File_Validator(self.hdffile)
         validator.validate()
         self.assertGreaterEqual(len(validator.findings), 0)
         self.assertEqual(validator.findings[0].status, punx.finding.OK)
@@ -285,22 +306,11 @@ class Validate_issue_57(unittest.TestCase):
             self.assertFalse(addr in validator.addresses, msg)
 
 
-class Validate_non_NeXus_files(unittest.TestCase):
+class Validate_non_NeXus_files(CustomValidatorBase):
     '''
     validate: various non-NeXus pathologies as noted
     '''
-    
-    def setUp(self):
-        # create the test file
-        tfile = tempfile.NamedTemporaryFile(suffix='.hdf5', delete=False)
-        tfile.close()
-        self.hdffile = tfile.name
-    
-    def tearDown(self):
-        # remove the testfile
-        os.remove(self.hdffile)
-        self.hdffile = None
-    
+        
     def test__entry_and_data_groups_have_no_NX_class__attribute(self):
         import punx.validate, punx.finding, punx.logs
 
@@ -402,28 +412,17 @@ class Validate_non_NeXus_files(unittest.TestCase):
         validator = punx.validate.Data_File_Validator(self.hdffile)
         validator.validate()
 
-        print('\n' + '\n'.join([str(f) for f in validator.findings]) + '\n')
+        #print('\n' + '\n'.join([str(f) for f in validator.findings]) + '\n')
 
         self.assertEqual(str(validator.findings[-1]), 
              '/ ERROR: ! valid NeXus data file: This file is not valid by the NeXus standard.', 
              'Not a NeXus HDF5 data file')
 
 
-class Validate_borderline_cases(unittest.TestCase):
+class Validate_borderline_cases(CustomValidatorBase):
     '''
     validate: various non-NeXus pathologies as noted
     '''
-    
-    def setUp(self):
-        # create the test file
-        tfile = tempfile.NamedTemporaryFile(suffix='.hdf5', delete=False)
-        tfile.close()
-        self.hdffile = tfile.name
-    
-    def tearDown(self):
-        # remove the testfile
-        os.remove(self.hdffile)
-        self.hdffile = None
     
     def test_raises___punx_HDF5_Open_Error_exception___if_not_an_HDF5_file(self):
         import punx.validate, punx.finding, punx.logs
@@ -477,21 +476,10 @@ class Validate_borderline_cases(unittest.TestCase):
                         'data found')
 
 
-class Validate_error_with_default_attribute(unittest.TestCase):
+class Validate_error_with_default_attribute(CustomValidatorBase):
     '''
     validate: when default attribute is incorrect
     '''
-    
-    def setUp(self):
-        # create the test file
-        tfile = tempfile.NamedTemporaryFile(suffix='.hdf5', delete=False)
-        tfile.close()
-        self.hdffile = tfile.name
-    
-    def tearDown(self):
-        # remove the testfile
-        os.remove(self.hdffile)
-        self.hdffile = None
     
     def test_default_attribute_value_is_wrong(self):
         import punx.validate, punx.finding, punx.logs

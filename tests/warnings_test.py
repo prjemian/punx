@@ -29,9 +29,12 @@ class Warning__1(unittest.TestCase):
         tfile = tempfile.NamedTemporaryFile(suffix='.hdf5', delete=False)
         tfile.close()
         self.hdffile = tfile.name
+        self.validator = None
     
     def tearDown(self):
-        # remove the testfile
+        if self.validator is not None:
+            self.validator.close()
+            self.validator = None
         os.remove(self.hdffile)
         self.hdffile = None
     
@@ -112,17 +115,17 @@ class Warning__1(unittest.TestCase):
         entry.create_dataset('also not allowed', data=range(5))
         entry.create_dataset('_starts_with_underscore', data=range(5))
         entry.create_dataset('0_starts_with_number', data=range(5))
+        entry.create_dataset('dataset_name_has@symbol', data=range(5))
         entry.attrs['@@@'] = 'invalid'
         entry.attrs['@attribute'] = 'invalid'
         entry.attrs['attribute@'] = 'invalid'
         hdf5root.close()
 
-        validator = punx.validate.Data_File_Validator(self.hdffile)
-        validator.validate()
-        # print('\n' + '\n'.join([str(f) for f in validator.findings]) + '\n')
+        self.validator = punx.validate.Data_File_Validator(self.hdffile)
+        self.validator.validate()
+        all_findings = [str(f) for f in self.validator.findings]
+        # print('\n' + '\n'.join(all_findings) + '\n')
         
-        self.assertTrue(True, 'tba')
-        all_findings = [str(f) for f in validator.findings]
         expected_findings = '''\
         /entry/0_starts_with_number WARN: validItemName: valid HDF5 item name, not valid with NeXus
         /entry/0_starts_with_number@units NOTE: field@units: does not exist
@@ -132,25 +135,20 @@ class Warning__1(unittest.TestCase):
         /entry/Relaxed@units NOTE: field@units: does not exist
         /entry/also not allowed WARN: validItemName: valid HDF5 item name, not valid with NeXus
         /entry/also not allowed@units NOTE: field@units: does not exist
+        /entry/dataset_name_has@symbol WARN: validItemName: valid HDF5 item name, not valid with NeXus
         /entry/not.allowed WARN: validItemName: valid HDF5 item name, not valid with NeXus
         /entry/not.allowed@units NOTE: field@units: does not exist
         /entry/strict OK: validItemName-strict: strict re: [a-z_][a-z0-9_]*
         /entry/strict@units NOTE: field@units: does not exist
-        /entry@@@@ WARN: validItemName: valid HDF5 item name, not valid with NeXus
-        /entry@attribute@ WARN: validItemName: valid HDF5 item name, not valid with NeXus
+        /entry@@@@ WARN: validItemName: valid HDF5 attribute name, not valid with NeXus
+        /entry@@attribute WARN: validItemName: valid HDF5 attribute name, not valid with NeXus
+        /entry@attribute@ WARN: validItemName: valid HDF5 attribute name, not valid with NeXus
         '''.splitlines()
         
         for f in expected_findings:
             if len(f.strip()) > 0:
                 # print('expecting: '+f)
                 self.assertTrue(f.strip() in all_findings, f)
-
-        # /entry@@attribute WARN: validItemName: valid HDF5 item name, not valid with NeXus
-        # FIXME: this should trigger an error (issue 65)
-        #        instead, the leading @@ is stripped
-        #        and the remaining name passes validItemName-strict
-
-        validator.close()
 
 
 def suite(*args, **kw):

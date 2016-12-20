@@ -282,8 +282,7 @@ class Data_File_Validator(object):
                 msg = 'file root (assumed): NXroot'
                 self.new_finding('@NX_class', group.name, finding.OK, msg)
             else:
-                # TODO: validNXClassName - use this instead
-                self.validate_item_name(group.name)
+                self.validate_item_name(group.name, 'validNXClassName')
                 msg = 'no @NX_class attribute, not a NeXus group'
                 self.new_finding('@NX_class', group.name, finding.NOTE, msg)
                 return  # evaluate any further?
@@ -312,7 +311,7 @@ class Data_File_Validator(object):
                 aname = group.name + '@' + k
                 if not nx_class_defaults['ignoreExtraAttributes']:
                     # TODO: don't validate attribute names defined in NXDL rules!
-                    self.validate_item_name(aname)
+                    self.validate_item_name(k, parent=group)
                 if k == 'default' and nx_class_name in ('NXroot', 'NXentry', 'NXsubentry'):
                     target = self.get_hdf5_attribute(group, 'default')
                     t = target in group
@@ -378,7 +377,7 @@ class Data_File_Validator(object):
         for k in dataset.attrs.keys():   # review the dataset's attributes
             k = punx.h5structure.decode_byte_string(k)
             aname = dataset.name + '@' + k
-            self.validate_item_name(aname)
+            self.validate_item_name(k, parent=dataset)
             v = self.get_hdf5_attribute(dataset, k, report=True)
             if k in field_rules.attrs:
                 rules = field_rules.attrs[k]
@@ -433,8 +432,7 @@ class Data_File_Validator(object):
         :param obj link: instance of h5py.Group or h5py.Dataset
         :param obj group: instance of h5py.Group, needed to check against NXDL
         '''
-        #: TODO: validTargetName  - use this instead
-        self.validate_item_name(link.name)
+        self.validate_item_name(link.name, 'validTargetName')
 
         target = self.get_hdf5_attribute(link, 'target', report=True)
         if target is not None:
@@ -637,7 +635,7 @@ class Data_File_Validator(object):
         
         # TODO: #16 check if unknown names are allowed to be flexible 
 
-    def validate_item_name(self, h5_addr, key=None):
+    def validate_item_name(self, h5_addr, key=None, parent=None):
         '''
         validate *h5_addr* using *validItemName* regular expression
         
@@ -655,6 +653,7 @@ class Data_File_Validator(object):
             =============================    ============
 
         :param str key: named key to search, default: None (``validItemName``)
+        :param obj parent: HDF5 parent object, default: None
 
         This method will separate out the last part of the name for validation.  
         Then, it is tested against the strict or relaxed regular expressions for 
@@ -676,12 +675,16 @@ class Data_File_Validator(object):
             key_relaxed = 'validItemName'
             key_strict = 'validItemName-strict'
 
-            # h5_addr = obj.name
-            short_name = h5_addr.split('/')[-1].split('@')[-1]
+            short_name = h5_addr.split('/')[-1]
+            if parent is None:
+                full_name = h5_addr
+            else:
+                full_name = parent.name + '@' + h5_addr
+
             if short_name == 'NX_class':
                 # special case
                 self.new_finding('NeXus internal attribute', 
-                                 h5_addr, 
+                                 full_name, 
                                  finding.OK, 
                                  'marks this HDF5 group as NeXus group')
                 return
@@ -705,7 +708,10 @@ class Data_File_Validator(object):
                 else:
                     # test if string rendering raises UnicodeDecodeError
                     key = 'validItemName'
-                    msg = 'valid HDF5 item name, not valid with NeXus'
+                    if parent is None:
+                        msg = 'valid HDF5 item name, not valid with NeXus'
+                    else:
+                        msg = 'valid HDF5 attribute name, not valid with NeXus'
                     try:    # to raise the exception
                         _test = '%s' % str(m)
                         f = finding.WARN
@@ -713,10 +719,12 @@ class Data_File_Validator(object):
                         f = finding.ERROR
                         msg += ', UnicodeDecodeError'
         else:
-            # TODO: validate h5_addr against other keys
+            # TODO: validate full_name against other keys
+            # validNXClassName
+            # validTargetName
             pass
 
-        self.new_finding(key, h5_addr, f, msg)
+        self.new_finding(key, full_name, f, msg)
     
     def validate_default_plot(self):
         '''

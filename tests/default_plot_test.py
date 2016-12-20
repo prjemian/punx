@@ -151,10 +151,10 @@ class Default_Plot_Detection(unittest.TestCase):
 
         self.validator = punx.validate.Data_File_Validator(self.hdffile)
         self.validator.validate()
-        # print('\n' + '\n'.join([str(f) for f in self.validator.findings]) + '\n')
-        
         findings_list = [str(f) for f in self.validator.findings]
+        # print('\n' + '\n'.join(findings_list) + '\n')
         
+       
         expected = '/entry/data@signal ERROR: NXdata group default plot v3: /NXentry/NXdata@signal field not found: 1'
         self.assertTrue(expected in findings_list, expected)
 

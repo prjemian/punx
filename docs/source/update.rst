@@ -48,6 +48,64 @@ when the source cache needed to be updated:
 
 
 Examples
-++++++++
+********
 
 --tba--
+
+
+Problems
+********
+
+GitHub API rate limit exceeded
+==============================
+
+A common problem happens when updating the NXDL definitions from GitHub.
+Here's what it looks like::
+
+   $ python ./src/punx/main.py update --force
+   
+   ('INFO:', 'get repo info: https://api.github.com/repos/nexusformat/definitions/commits')
+   
+   Traceback (most recent call last):
+   
+     File "./src/punx/main.py", line 416, in <module>
+   
+       main()
+   
+     File "./src/punx/main.py", line 412, in main
+   
+       args.func(args)
+   
+     File "./src/punx/main.py", line 170, in func_update
+   
+       cache.update_NXDL_Cache(force_update=args.force)
+   
+     File "/home/travis/build/prjemian/punx/src/punx/cache.py", line 257, in update_NXDL_Cache
+   
+       info = __get_github_info__()    # check with GitHub first
+   
+     File "/home/travis/build/prjemian/punx/src/punx/cache.py", line 246, in __get_github_info__
+   
+       punx.GITHUB_NXDL_REPOSITORY)
+   
+     File "/home/travis/build/prjemian/punx/src/punx/cache.py", line 228, in githubMasterInfo
+   
+       raise punx.CannotUpdateFromGithubNow(msg)
+   
+   punx.CannotUpdateFromGithubNow: API rate limit exceeded for nn.nn.nn.nn. 
+   (But here's the good news: Authenticated requests get a higher rate limit. 
+   Check out the documentation for more details.)
+
+GitHub imposes a limit on the number of unauthenticated downloads per hour [#]_.
+You can check your rate limit status [#]_.  Mostly, this means try again later.
+
+
+.. [#] "The rate limit allows you to make up to 60 requests per hour,
+    associated with your IP address",
+    https://developer.github.com/v3/#rate-limiting
+.. [#] Status of GitHub API Rate Limit: https://developer.github.com/v3/rate_limit/
+
+A GitHub issue has been raised to resolve this for the **punx** project. [#]_
+
+.. [#] *update: cannot download NXDL files from GitHub #64,*
+   https://github.com/prjemian/punx/issues/64

@@ -51,6 +51,7 @@ DEFAULT_BRANCH_NAME = u'master'
 DEFAULT_RELEASE_NAME = u'v3.2'
 DEFAULT_TAG_NAME = u'NXroot-1.0'
 DEFAULT_HASH_NAME = u'a4fd52d'
+CREDS_FILE_NAME = '__github_creds__.txt'
 
 
 class GitHub_Repository_Reference(object):
@@ -70,7 +71,13 @@ class GitHub_Repository_Reference(object):
     def set_repo(self, repo_name=None):
         repo_name = repo_name or self.appName
         
-        gh = github.Github()
+        path = os.path.dirname(__file__)
+        creds_file_name = os.path.join(path, CREDS_FILE_NAME)
+        if os.path.exists(creds_file_name):
+            uname, pwd = open(CREDS_FILE_NAME, 'r').read().split()
+            gh = github.Github(uname, pwd)
+        else:
+            gh = github.Github()
         user = gh.get_user(self.orgName)
         self.repo = user.get_repo(repo_name)
     

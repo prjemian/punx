@@ -57,48 +57,52 @@ class TestCacheManager(unittest.TestCase):
                          'grr.repo.name = ' + punx.GITHUB_NXDL_REPOSITORY)
         
         node = grr.get_branch()
-        self.assertTrue(isinstance(node, github.Branch.Branch), 
+        self.assertTrue(isinstance(node, (type(None), github.Branch.Branch)), 
                         'grr.get_branch() returns ' + str(type(node)))
         node = grr.request(u'master')
-        self.assertTrue(isinstance(node, github.Branch.Branch), 
+        self.assertTrue(isinstance(node, (type(None), github.Branch.Branch)), 
                         'grr.request("master") returns ' + str(type(node)))
-        self.assertEqual(grr.ref, u'master', 'ref: ' + grr.ref)
-        self.assertNotEqual(grr.sha, None, 'sha: ' + grr.sha)
-        self.assertNotEqual(grr.zip_url, None, 'zip_url: ' + grr.zip_url)
+        if node is not None:
+            self.assertEqual(grr.ref, u'master', 'ref: ' + grr.ref)
+            self.assertNotEqual(grr.sha, None, 'sha: ' + grr.sha)
+            self.assertNotEqual(grr.zip_url, None, 'zip_url: ' + grr.zip_url)
         
         node = grr.get_release()
-        self.assertTrue(isinstance(node, github.GitRelease.GitRelease), 
+        self.assertTrue(isinstance(node, (type(None), github.GitRelease.GitRelease)), 
                         'grr.get_release() returns ' + str(type(node)))
         node = grr.request(u'v3.2')
-        self.assertTrue(isinstance(node, github.GitRelease.GitRelease), 
+        self.assertTrue(isinstance(node, (type(None), github.GitRelease.GitRelease)), 
                         'grr.request("v3.2") returns a Release()')
-        self.assertEqual(grr.ref, u'v3.2', 'ref: ' + grr.ref)
-        self.assertNotEqual(grr.sha, None, 'sha: ' + grr.sha)
-        self.assertNotEqual(grr.zip_url, None, 'zip_url: ' + grr.zip_url)
+        if node is not None:
+            self.assertEqual(grr.ref, u'v3.2', 'ref: ' + grr.ref)
+            self.assertNotEqual(grr.sha, None, 'sha: ' + grr.sha)
+            self.assertNotEqual(grr.zip_url, None, 'zip_url: ' + grr.zip_url)
         
         node = grr.get_tag()
-        self.assertTrue(isinstance(node, github.Tag.Tag), 
+        self.assertTrue(isinstance(node, (type(None), github.Tag.Tag)), 
                         'grr.get_tag() returns ' + str(type(node)))
         node = grr.request(u'NXentry-1.0')
-        self.assertTrue(isinstance(node, github.Tag.Tag), 
+        self.assertTrue(isinstance(node, (type(None), github.Tag.Tag)), 
                         'grr.request("NXentry-1.0") returns ' + str(type(node)))
-        self.assertEqual(grr.ref, u'NXentry-1.0', 'ref: ' + grr.ref)
-        self.assertNotEqual(grr.sha, None, 'sha: ' + grr.sha)
-        self.assertNotEqual(grr.zip_url, None, 'zip_url: ' + grr.zip_url)
-        node = grr.get_tag('not_a_tag')
-        self.assertEqual(node, None, 'search for tag that does not exist')
+        if node is not None:
+            self.assertEqual(grr.ref, u'NXentry-1.0', 'ref: ' + grr.ref)
+            self.assertNotEqual(grr.sha, None, 'sha: ' + grr.sha)
+            self.assertNotEqual(grr.zip_url, None, 'zip_url: ' + grr.zip_url)
+            node = grr.get_tag('not_a_tag')
+            self.assertEqual(node, None, 'search for tag that does not exist')
         
         node = grr.get_hash()
-        self.assertTrue(isinstance(node, github.Commit.Commit), 
+        self.assertTrue(isinstance(node, (type(None), github.Commit.Commit)), 
                         'grr.get_hash() returns ' + str(type(node)))
         node = grr.request(u'227bdce')
-        self.assertTrue(isinstance(node, github.Commit.Commit), 
+        self.assertTrue(isinstance(node, (type(None), github.Commit.Commit)), 
                         'grr.request("227bdce") returns ' + str(type(node)))
-        self.assertEqual(grr.ref, u'227bdce', 'ref: ' + grr.ref)
-        self.assertNotEqual(grr.sha, None, 'sha: ' + grr.sha)
-        self.assertNotEqual(grr.zip_url, None, 'zip_url: ' + grr.zip_url)
-        node = grr.get_hash('abcd123')
-        self.assertEqual(node, None, 'search for hash that does not exist')
+        if node is not None:
+            self.assertEqual(grr.ref, u'227bdce', 'ref: ' + grr.ref)
+            self.assertNotEqual(grr.sha, None, 'sha: ' + grr.sha)
+            self.assertNotEqual(grr.zip_url, None, 'zip_url: ' + grr.zip_url)
+            node = grr.get_hash('abcd123')
+            self.assertEqual(node, None, 'search for hash that does not exist')
 
 
 def suite(*args, **kw):

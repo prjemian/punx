@@ -12,7 +12,9 @@
 #-----------------------------------------------------------------------------
 
 '''
-manages the local cache directories containing NeXus definitions files
+manages the communications with GitHub
+
+TODO: these comments go with the new cache code
 
 There are two cache directories:
 
@@ -25,16 +27,6 @@ directory.  Also, there are a number of subdirectories, each
 containing the NeXus definitions subdirectories and files (*.xml, 
 *.xsl, & *.xsd) of a specific branch, release, or commit hash
 from the NeXus definitions repository.
-
-download URLs
-
-* base:  https://github.com
-* master: /nexusformat/definitions/archive/master.zip
-* branch (www_page_486): /nexusformat/definitions/archive/www_page_486.zip
-* hash (83ce630): /nexusformat/definitions/archive/83ce630.zip
-* release (v3.2): see hash c0b9500
-* tag (NXcanSAS-1.0): see hash 83ce630
-
 '''
 
 import os
@@ -56,6 +48,15 @@ CREDS_FILE_NAME = '__github_creds__.txt'
 
 class GitHub_Repository_Reference(object):
     '''
+    all information necessary to describe and download a repository branch, release, tag, or SHA hash
+    
+    ROUTINES
+
+    .. autosummary::
+    
+        ~set_repo
+        ~request_info
+    
     :see: https://github.com/PyGithub/PyGithub/tree/master/github
     '''
     
@@ -69,6 +70,11 @@ class GitHub_Repository_Reference(object):
         self.last_modified = None
     
     def set_repo(self, repo_name=None):
+        '''
+        connect with the repository (default: *nexusformat/definitions*)
+        
+        :param str repo_name: name of repository in https://github.com/nexusformat (default: *definitions*)
+        '''
         repo_name = repo_name or self.appName
         
         path = os.path.dirname(__file__)
@@ -81,7 +87,21 @@ class GitHub_Repository_Reference(object):
         user = gh.get_user(self.orgName)
         self.repo = user.get_repo(repo_name)
     
-    def request(self, ref=DEFAULT_BRANCH_NAME):
+    def request_info(self, ref=DEFAULT_BRANCH_NAME):
+        '''
+        request download information about ``ref``
+        
+        :param str ref: name of branch, release, tag, or SHA hash (default: *master*)
+        
+        download URLs
+        
+        * base:  https://github.com
+        * master: https://github.com/nexusformat/definitions/archive/master.zip
+        * branch (www_page_486): https://github.com/nexusformat/definitions/archive/www_page_486.zip
+        * hash (83ce630): https://github.com/nexusformat/definitions/archive/83ce630.zip
+        * release (v3.2): see hash c0b9500
+        * tag (NXcanSAS-1.0): see hash 83ce630
+        '''
         if self.repo is None:
             raise ValueError('call set_repo() first')
         
@@ -94,12 +114,16 @@ class GitHub_Repository_Reference(object):
         return node
 
     def _make_zip_url(self, ref=DEFAULT_BRANCH_NAME):
+        'create the download URL for the ``ref``'
         url = u'https://github.com/'
         url += u'/'.join([self.orgName, self.appName, u'archive', ref])
         url += u'.zip'
         return url
     
     def _get_last_modified(self):
+        '''
+        get the ``last_modified`` date from the SHA's commit
+        '''
         if self.sha is not None:
             commit = self.repo.get_commit(self.sha)
             mod_date_time = commit.last_modified
@@ -107,6 +131,11 @@ class GitHub_Repository_Reference(object):
             self.last_modified = mod_date_time
 
     def get_branch(self, ref=DEFAULT_BRANCH_NAME):
+        '''
+        learn the download information about the named branch
+        
+        :param str ref: name of branch in repository
+        '''
         try:
             node = self.repo.get_branch(ref)
             self.ref = ref
@@ -118,6 +147,11 @@ class GitHub_Repository_Reference(object):
             return None
             
     def get_release(self, ref=DEFAULT_RELEASE_NAME):
+        '''
+        learn the download information about the named release
+        
+        :param str ref: name of release in repository
+        '''
         try:
             node = self.repo.get_release(ref)
             self.get_tag(node.tag_name)
@@ -127,6 +161,11 @@ class GitHub_Repository_Reference(object):
             return None
     
     def get_tag(self, ref=DEFAULT_TAG_NAME):
+        '''
+        learn the download information about the named tag
+        
+        :param str ref: name of tag in repository
+        '''
         try:
             for tag in self.repo.get_tags():
                 if tag.name == ref:
@@ -140,6 +179,11 @@ class GitHub_Repository_Reference(object):
             return None
     
     def get_hash(self, ref=DEFAULT_HASH_NAME):
+        '''
+        learn the download information about the named SHA hash
+        
+        :param str ref: name of SHA hash, first unique characters are sufficient, usually 7 or less
+        '''
         try:
             node = self.repo.get_commit(ref)
             self.ref = ref

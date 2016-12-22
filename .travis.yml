@@ -24,6 +24,7 @@ before_script:
   - conda install --yes numpy h5py lxml requests pyqt=4 coverage docopt
   - pip install pyRestTable
   - pip install coveralls
+  - pip install PyGitHub
   - which coveralls
 
 # command to run tests

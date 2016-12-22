@@ -74,7 +74,7 @@ class GitHub_Repository_Reference(object):
         path = os.path.dirname(__file__)
         creds_file_name = os.path.join(path, CREDS_FILE_NAME)
         if os.path.exists(creds_file_name):
-            uname, pwd = open(CREDS_FILE_NAME, 'r').read().split()
+            uname, pwd = open(creds_file_name, 'r').read().split()
             gh = github.Github(uname, pwd)
         else:
             gh = github.Github()

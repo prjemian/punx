@@ -85,6 +85,8 @@ class TestCacheManager(unittest.TestCase):
         self.assertEqual(grr.ref, u'NXentry-1.0', 'ref: ' + grr.ref)
         self.assertNotEqual(grr.sha, None, 'sha: ' + grr.sha)
         self.assertNotEqual(grr.zip_url, None, 'zip_url: ' + grr.zip_url)
+        node = grr.get_tag('not_a_tag')
+        self.assertEqual(node, None, 'search for tag that does not exist')
         
         node = grr.get_hash()
         self.assertTrue(isinstance(node, github.Commit.Commit), 
@@ -95,6 +97,8 @@ class TestCacheManager(unittest.TestCase):
         self.assertEqual(grr.ref, u'227bdce', 'ref: ' + grr.ref)
         self.assertNotEqual(grr.sha, None, 'sha: ' + grr.sha)
         self.assertNotEqual(grr.zip_url, None, 'zip_url: ' + grr.zip_url)
+        node = grr.get_hash('abcd123')
+        self.assertEqual(node, None, 'search for hash that does not exist')
 
 
 def suite(*args, **kw):

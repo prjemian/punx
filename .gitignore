@@ -38,5 +38,8 @@ tests/__pycache__
 # Mr Developer
 .mr.developer.cfg
 /.settings
+
 /.idea
 /src/punx/data/local
+
+src/punx/__github_creds__.txt

@@ -78,12 +78,13 @@ class GitHub_Repository_Reference(object):
         if self.repo is None:
             raise ValueError('call set_repo() first')
         
-        self.get_branch(ref) \
+        node = self.get_branch(ref) \
             or self.get_release(ref) \
             or self.get_tag(ref) \
             or self.get_hash(ref)
         
         # TODO: now what?
+        return node
 
     def _make_zip_url(self, ref=DEFAULT_BRANCH_NAME):
         url = u'https://github.com/'

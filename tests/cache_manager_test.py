@@ -9,10 +9,7 @@ import unittest
 
 import github
 
-_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src'))
-if _path not in sys.path:
-    sys.path.insert(0, _path)
-
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src')))
 import punx, punx.cache_manager
 
 
@@ -61,17 +58,17 @@ class TestCacheManager(unittest.TestCase):
         
         node = grr.get_branch()
         self.assertTrue(isinstance(node, github.Branch.Branch), 
-                        'grr.get_branch() returns ' + type(node))
+                        'grr.get_branch() returns ' + str(type(node)))
         node = grr.request(u'master')
         self.assertTrue(isinstance(node, github.Branch.Branch), 
-                        'grr.request("master") returns ' + type(node))
+                        'grr.request("master") returns ' + str(type(node)))
         self.assertEqual(grr.ref, u'master', 'ref: ' + grr.ref)
         self.assertNotEqual(grr.sha, None, 'sha: ' + grr.sha)
         self.assertNotEqual(grr.zip_url, None, 'zip_url: ' + grr.zip_url)
         
         node = grr.get_release()
         self.assertTrue(isinstance(node, github.GitRelease.GitRelease), 
-                        'grr.get_release() returns ' + type(node))
+                        'grr.get_release() returns ' + str(type(node)))
         node = grr.request(u'v3.2')
         self.assertTrue(isinstance(node, github.GitRelease.GitRelease), 
                         'grr.request("v3.2") returns a Release()')
@@ -81,20 +78,20 @@ class TestCacheManager(unittest.TestCase):
         
         node = grr.get_tag()
         self.assertTrue(isinstance(node, github.Tag.Tag), 
-                        'grr.get_tag() returns ' + type(node))
+                        'grr.get_tag() returns ' + str(type(node)))
         node = grr.request(u'NXentry-1.0')
         self.assertTrue(isinstance(node, github.Tag.Tag), 
-                        'grr.request("NXentry-1.0") returns ' + type(node))
+                        'grr.request("NXentry-1.0") returns ' + str(type(node)))
         self.assertEqual(grr.ref, u'NXentry-1.0', 'ref: ' + grr.ref)
         self.assertNotEqual(grr.sha, None, 'sha: ' + grr.sha)
         self.assertNotEqual(grr.zip_url, None, 'zip_url: ' + grr.zip_url)
         
         node = grr.get_hash()
         self.assertTrue(isinstance(node, github.Commit.Commit), 
-                        'grr.get_hash() returns ' + type(node))
+                        'grr.get_hash() returns ' + str(type(node)))
         node = grr.request(u'227bdce')
         self.assertTrue(isinstance(node, github.Commit.Commit), 
-                        'grr.request("227bdce") returns ' + type(node))
+                        'grr.request("227bdce") returns ' + str(type(node)))
         self.assertEqual(grr.ref, u'227bdce', 'ref: ' + grr.ref)
         self.assertNotEqual(grr.sha, None, 'sha: ' + grr.sha)
         self.assertNotEqual(grr.zip_url, None, 'zip_url: ' + grr.zip_url)

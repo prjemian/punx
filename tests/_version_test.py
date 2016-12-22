@@ -39,16 +39,16 @@ class TestGitRelease(unittest.TestCase):
 
         release = git_release(pkg.__package_name__)
         self.assertTrue(release.startswith(version_str), 
-                        'release starts with implied version')
+                        'found release: ' + release)
 
         release = git_release(pkg.__package_name__, version=version_str)
         self.assertTrue(release.startswith(version_str), 
-                        'release starts with specified version')
+                        'found release: ' + release)
 
         version_str = 'not_a_known_version'
         release = git_release(pkg.__package_name__, version=version_str)
         self.assertFalse(release.startswith(version_str), 
-                        'release does not match with ' + version_str)
+                        'found release: ' + release)
 
     def test_versioneer_fail(self):
         release = git_release(pkg.__package_name__, pkg.__version__)

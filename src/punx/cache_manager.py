@@ -67,6 +67,7 @@ class GitHub_Repository_Reference(object):
         self.ref = None
         self.sha = None
         self.zip_url = None
+        self.last_modified = None
     
     def set_repo(self, repo_name=None):
         repo_name = repo_name or self.appName
@@ -83,35 +84,41 @@ class GitHub_Repository_Reference(object):
             or self.get_release(ref) \
             or self.get_tag(ref) \
             or self.get_hash(ref)
+        
+        # TODO: now what?
 
     def _make_zip_url(self, ref=DEFAULT_BRANCH_NAME):
         url = u'https://github.com/'
         url += u'/'.join([self.orgName, self.appName, u'archive', ref])
         url += u'.zip'
         return url
+    
+    def _get_last_modified(self):
+        if self.sha is not None:
+            commit = self.repo.get_commit(self.sha)
+            mod_date_time = commit.last_modified
+            # TODO: convert to iso8601 format
+            self.last_modified = mod_date_time
 
     def get_branch(self, ref=DEFAULT_BRANCH_NAME):
         try:
             node = self.repo.get_branch(ref)
+            self.ref = ref
+            self.sha = node.commit.sha
+            self.zip_url = self._make_zip_url(self.sha[:7])
+            self._get_last_modified()
+            return node
         except github.GithubException:
             return None
-        
-        self.ref = ref
-        self.sha = node.commit.sha
-        self.zip_url = self._make_zip_url(self.sha[:7])
-
-        return node
-    
+            
     def get_release(self, ref=DEFAULT_RELEASE_NAME):
         try:
             node = self.repo.get_release(ref)
+            self.get_tag(node.tag_name)
+            self.ref = ref
+            return node
         except github.GithubException:
             return None
-        
-        self.get_tag(node.tag_name)
-        self.ref = ref
-
-        return node
     
     def get_tag(self, ref=DEFAULT_TAG_NAME):
         try:
@@ -121,7 +128,7 @@ class GitHub_Repository_Reference(object):
                     self.sha = tag.commit.sha
                     # self.zip_url = self._make_zip_url(self.sha[:7])
                     self.zip_url = tag.zipball_url
-            
+                    self._get_last_modified()
                     return tag
         except github.GithubException:
             return None
@@ -129,13 +136,10 @@ class GitHub_Repository_Reference(object):
     def get_hash(self, ref=DEFAULT_HASH_NAME):
         try:
             node = self.repo.get_commit(ref)
+            self.ref = ref
+            self.sha = node.commit.sha
+            self.zip_url = self._make_zip_url(self.sha[:7])
+            self._get_last_modified()
+            return node
         except github.GithubException:
             return None
-        
-        self.ref = ref
-        self.sha = node.commit.sha
-        self.zip_url = self._make_zip_url(self.sha[:7])
-
-        return node
-
-_t = True

@@ -16,6 +16,7 @@ from tests import common
 def suite(*args, **kw):
     from tests import common_test
     from tests import cache_test
+    from tests import cache_manager_test
     from tests import default_plot_test
     from tests import external_links
     from tests import h5structure_test
@@ -36,6 +37,7 @@ def suite(*args, **kw):
         validate_test, 
         _version_test,
         warnings_test,
+        cache_manager_test,
         ]
 
     for test in test_list:

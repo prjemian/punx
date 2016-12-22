@@ -48,6 +48,7 @@ class TestCacheManager(unittest.TestCase):
         self.assertEqual(grr._make_zip_url('testing'), 
                          u'https://github.com/nexusformat/definitions/archive/testing.zip', 
                          '"testing" download URL')
+        self.assertRaises(ValueError, grr.request)
     
     def test_connected_GitHub_Repository_Reference(self):
         grr = punx.cache_manager.GitHub_Repository_Reference()
@@ -61,9 +62,9 @@ class TestCacheManager(unittest.TestCase):
         node = grr.get_branch()
         self.assertTrue(isinstance(node, github.Branch.Branch), 
                         'grr.get_branch() returns ' + type(node))
-        node = grr.get_branch(u'master')
+        node = grr.request(u'master')
         self.assertTrue(isinstance(node, github.Branch.Branch), 
-                        'grr.get_branch("master") returns ' + type(node))
+                        'grr.request("master") returns ' + type(node))
         self.assertEqual(grr.ref, u'master', 'ref: ' + grr.ref)
         self.assertNotEqual(grr.sha, None, 'sha: ' + grr.sha)
         self.assertNotEqual(grr.zip_url, None, 'zip_url: ' + grr.zip_url)
@@ -71,9 +72,9 @@ class TestCacheManager(unittest.TestCase):
         node = grr.get_release()
         self.assertTrue(isinstance(node, github.GitRelease.GitRelease), 
                         'grr.get_release() returns ' + type(node))
-        node = grr.get_release(u'v3.2')
+        node = grr.request(u'v3.2')
         self.assertTrue(isinstance(node, github.GitRelease.GitRelease), 
-                        'grr.get_release("v3.2") returns a Release()')
+                        'grr.request("v3.2") returns a Release()')
         self.assertEqual(grr.ref, u'v3.2', 'ref: ' + grr.ref)
         self.assertNotEqual(grr.sha, None, 'sha: ' + grr.sha)
         self.assertNotEqual(grr.zip_url, None, 'zip_url: ' + grr.zip_url)
@@ -81,9 +82,9 @@ class TestCacheManager(unittest.TestCase):
         node = grr.get_tag()
         self.assertTrue(isinstance(node, github.Tag.Tag), 
                         'grr.get_tag() returns ' + type(node))
-        node = grr.get_tag(u'NXentry-1.0')
+        node = grr.request(u'NXentry-1.0')
         self.assertTrue(isinstance(node, github.Tag.Tag), 
-                        'grr.get_tag("NXentry-1.0") returns ' + type(node))
+                        'grr.request("NXentry-1.0") returns ' + type(node))
         self.assertEqual(grr.ref, u'NXentry-1.0', 'ref: ' + grr.ref)
         self.assertNotEqual(grr.sha, None, 'sha: ' + grr.sha)
         self.assertNotEqual(grr.zip_url, None, 'zip_url: ' + grr.zip_url)
@@ -91,9 +92,9 @@ class TestCacheManager(unittest.TestCase):
         node = grr.get_hash()
         self.assertTrue(isinstance(node, github.Commit.Commit), 
                         'grr.get_hash() returns ' + type(node))
-        node = grr.get_hash(u'227bdce')
+        node = grr.request(u'227bdce')
         self.assertTrue(isinstance(node, github.Commit.Commit), 
-                        'grr.get_hash("227bdce") returns ' + type(node))
+                        'grr.request("227bdce") returns ' + type(node))
         self.assertEqual(grr.ref, u'227bdce', 'ref: ' + grr.ref)
         self.assertNotEqual(grr.sha, None, 'sha: ' + grr.sha)
         self.assertNotEqual(grr.zip_url, None, 'zip_url: ' + grr.zip_url)

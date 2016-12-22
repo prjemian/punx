@@ -42,9 +42,7 @@ import sys
 
 import github
 
-_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-if _path not in sys.path:
-    sys.path.insert(0, _path)
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import punx
 #from punx import settings
 

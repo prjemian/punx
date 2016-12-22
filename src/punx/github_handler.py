@@ -23,41 +23,55 @@ USAGE::
 
     ghh = punx.github_handler.GitHub_Repository_Reference()
     ghh.connect_repo()
-    ghh.request_info(u'v3.2')
-    ghh.download(_string_location_of_download_dir_)
+    node = ghh.request_info(u'v3.2')
+    if node is not None:
+        d = ghh.download()
 
-----
-
-.. TODO: these comments go with the new cache code
-
-There are two cache directories:
-
-* the source cache
-* the user cache
-
-Within each of these cache directories, there is a settings file
-(such as *punx.ini*) that stores the configuration of that cache 
-directory.  Also, there are a number of subdirectories, each
-containing the NeXus definitions subdirectories and files (*.xml, 
-*.xsl, & *.xsd) of a specific branch, release, or commit hash
-from the NeXus definitions repository.
 '''
 
 import os
 import sys
 
+import datetime
 import github
+import requests.packages.urllib3
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import punx
 #from punx import settings
 
 
+CREDS_FILE_NAME = u'__github_creds__.txt'
 DEFAULT_BRANCH_NAME = u'master'
 DEFAULT_RELEASE_NAME = u'v3.2'
 DEFAULT_TAG_NAME = u'NXroot-1.0'
 DEFAULT_HASH_NAME = u'a4fd52d'
-CREDS_FILE_NAME = '__github_creds__.txt'
+GITHUB_RETRY_COUNT = 3
+
+
+def get_BasicAuth_credentials(creds_file_name = None):
+    '''
+    get the Github Basic Authentication credentials from a local file
+        
+    GitHub requests can use *Basic Authentication* if the 
+    credentials (username and password) are provided in the 
+    local file ``__github_creds__.txt`` which is placed
+    in the same directory as this file.  
+    The credentials file is not placed under version control 
+    since it has GitHub credentials.  
+    If found, the file is parsed for ``username password`` 
+    as shown below.  Be sure to make the file
+    readable only by the user and not others.
+    '''
+    if creds_file_name is None:
+        path = os.path.dirname(__file__)
+        creds_file_name = os.path.join(path, CREDS_FILE_NAME)
+    if not os.path.exists(creds_file_name):
+        return
+
+    uname, pwd = open(creds_file_name, 'r').read().split()
+    return dict(user=uname, password=pwd)
 
 
 class GitHub_Repository_Reference(object):
@@ -70,6 +84,7 @@ class GitHub_Repository_Reference(object):
     
         ~connect_repo
         ~request_info
+        ~download
     
     :see: https://github.com/PyGithub/PyGithub/tree/master/github
     '''
@@ -85,26 +100,17 @@ class GitHub_Repository_Reference(object):
     
     def connect_repo(self, repo_name=None):
         '''
-        connect with the repository (default: *nexusformat/definitions*)
+        connect with the GitHub repository
         
         :param str repo_name: name of repository in https://github.com/nexusformat (default: *definitions*)
-        
-        GitHub requests can use *Basic Authentication* if the username and password
-        are provided in the local file ``__github_creds__.txt`` which is placed
-        in the same directory as this file.  That file does not go into
-        version control since it has GitHub credentials.  If found, the file is 
-        parsed for ``username password`` as shown below.  Be sure to make the file
-        readable only by the user and not others.
         '''
         repo_name = repo_name or self.appName
         
-        path = os.path.dirname(__file__)
-        creds_file_name = os.path.join(path, CREDS_FILE_NAME)
-        if os.path.exists(creds_file_name):
-            uname, pwd = open(creds_file_name, 'r').read().split()
-            gh = github.Github(uname, pwd)
-        else:
+        creds = get_BasicAuth_credentials()
+        if creds is None:
             gh = github.Github()
+        else:
+            gh = github.Github(creds['user'], creds['password'])
         user = gh.get_user(self.orgName)
         self.repo = user.get_repo(repo_name)
     
@@ -129,8 +135,35 @@ class GitHub_Repository_Reference(object):
         node = self.get_branch(ref) \
             or self.get_release(ref) \
             or self.get_tag(ref) \
-            or self.get_hash(ref)
+            or self.get_commit(ref)
         return node
+    
+    def download(self):
+        '''
+        download the NXDL definitions described by ``ref``
+        '''
+        _msg = u'disabling warnings about GitHub self-signed https certificates'
+        requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+
+        creds = get_BasicAuth_credentials()
+        content = None
+        for _retry in range(punx.GITHUB_RETRY_COUNT):
+            try:
+                if creds is None:
+                    content = requests.get(self.zip_url, verify=False)
+                else:
+                    content = requests.get(self.zip_url, 
+                                     auth=(creds['user'], creds['password']),
+                                     verify=False,
+                                     )
+            except requests.exceptions.ConnectionError as _exc:
+                _msg = 'ConnectionError from ' + self.zip_url
+                _msg += '\n' + str(_exc)
+                raise IOError(_msg)
+            else:
+                break
+
+        return content
 
     def _make_zip_url(self, ref=DEFAULT_BRANCH_NAME):
         'create the download URL for the ``ref``'
@@ -145,9 +178,10 @@ class GitHub_Repository_Reference(object):
         '''
         if self.sha is not None:
             commit = self.repo.get_commit(self.sha)
-            mod_date_time = commit.last_modified
-            # TODO: convert to iso8601 format
-            self.last_modified = mod_date_time
+            mod_date_time = commit.last_modified    # Tue, 20 Dec 2016 18:30:29 GMT
+            fmt = '%a, %d %b %Y %H:%M:%S %Z'        # --> 2016-11-19 01:04:28
+            mod_date_time = datetime.datetime.strptime(commit.last_modified, fmt)
+            self.last_modified = str(mod_date_time)
 
     def get_branch(self, ref=DEFAULT_BRANCH_NAME):
         '''
@@ -197,9 +231,9 @@ class GitHub_Repository_Reference(object):
         except github.GithubException:
             return None
     
-    def get_hash(self, ref=DEFAULT_HASH_NAME):
+    def get_commit(self, ref=DEFAULT_HASH_NAME):
         '''
-        learn the download information about the named SHA hash
+        learn the download information about the referenced commit
         
         :param str ref: name of SHA hash, first unique characters are sufficient, usually 7 or less
         '''

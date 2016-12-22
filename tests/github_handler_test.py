@@ -49,7 +49,7 @@ class TestCacheManager(unittest.TestCase):
     
     def test_connected_GitHub_Repository_Reference(self):
         grr = punx.github_handler.GitHub_Repository_Reference()
-        grr.set_repo()
+        grr.connect_repo()
         self.assertNotEqual(grr.repo, None, 'grr.repo is not None')
         self.assertTrue(isinstance(grr.repo, github.Repository.Repository), 
                         'grr.repo is a Repository()')

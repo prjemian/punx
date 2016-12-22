@@ -14,7 +14,21 @@
 '''
 manages the communications with GitHub
 
-TODO: these comments go with the new cache code
+
+.. autosummary::
+
+    ~GitHub_Repository_Reference
+
+USAGE::
+
+    ghh = punx.github_handler.GitHub_Repository_Reference()
+    ghh.connect_repo()
+    ghh.request_info(u'v3.2')
+    ghh.download(_string_location_of_download_dir_)
+
+----
+
+.. TODO: these comments go with the new cache code
 
 There are two cache directories:
 
@@ -54,7 +68,7 @@ class GitHub_Repository_Reference(object):
 
     .. autosummary::
     
-        ~set_repo
+        ~connect_repo
         ~request_info
     
     :see: https://github.com/PyGithub/PyGithub/tree/master/github
@@ -69,11 +83,18 @@ class GitHub_Repository_Reference(object):
         self.zip_url = None
         self.last_modified = None
     
-    def set_repo(self, repo_name=None):
+    def connect_repo(self, repo_name=None):
         '''
         connect with the repository (default: *nexusformat/definitions*)
         
         :param str repo_name: name of repository in https://github.com/nexusformat (default: *definitions*)
+        
+        GitHub requests can use *Basic Authentication* if the username and password
+        are provided in the local file ``__github_creds__.txt`` which is placed
+        in the same directory as this file.  That file does not go into
+        version control since it has GitHub credentials.  If found, the file is 
+        parsed for ``username password`` as shown below.  Be sure to make the file
+        readable only by the user and not others.
         '''
         repo_name = repo_name or self.appName
         
@@ -103,14 +124,12 @@ class GitHub_Repository_Reference(object):
         * tag (NXcanSAS-1.0): see hash 83ce630
         '''
         if self.repo is None:
-            raise ValueError('call set_repo() first')
+            raise ValueError('call connect_repo() first')
         
         node = self.get_branch(ref) \
             or self.get_release(ref) \
             or self.get_tag(ref) \
             or self.get_hash(ref)
-        
-        # TODO: now what?
         return node
 
     def _make_zip_url(self, ref=DEFAULT_BRANCH_NAME):

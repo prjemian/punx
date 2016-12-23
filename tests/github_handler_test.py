@@ -1,6 +1,6 @@
 
 '''
-test punx tests/common module (supports unit testing)
+test punx tests/github_handler module
 '''
 
 import io

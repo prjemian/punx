@@ -21,11 +21,10 @@ manages the communications with GitHub
 
 USAGE::
 
-    ghh = punx.github_handler.GitHub_Repository_Reference()
-    ghh.connect_repo()
-    node = ghh.request_info(u'v3.2')
-    if node is not None:
-        d = ghh.download()
+    grr = punx.github_handler.GitHub_Repository_Reference()
+    grr.connect_repo()
+    if grr.request_info(u'v3.2') is not None:
+        d = grr.download()
 
 '''
 

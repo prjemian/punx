@@ -46,6 +46,7 @@ DEFAULT_BRANCH_NAME = u'master'
 DEFAULT_RELEASE_NAME = u'v3.2'
 DEFAULT_TAG_NAME = u'NXroot-1.0'
 DEFAULT_HASH_NAME = u'a4fd52d'
+DEFAULT_NXDL_SET = DEFAULT_RELEASE_NAME
 GITHUB_RETRY_COUNT = 3
 
 
@@ -114,11 +115,11 @@ class GitHub_Repository_Reference(object):
         user = gh.get_user(self.orgName)
         self.repo = user.get_repo(repo_name)
     
-    def request_info(self, ref=DEFAULT_BRANCH_NAME):
+    def request_info(self, ref=None):
         '''
         request download information about ``ref``
         
-        :param str ref: name of branch, release, tag, or SHA hash (default: *master*)
+        :param str ref: name of branch, release, tag, or SHA hash (default: *v3.2*)
         
         download URLs
         
@@ -129,6 +130,7 @@ class GitHub_Repository_Reference(object):
         * release (v3.2): see hash c0b9500
         * tag (NXcanSAS-1.0): see hash 83ce630
         '''
+        ref = ref or DEFAULT_NXDL_SET
         if self.repo is None:
             raise ValueError('call connect_repo() first')
         

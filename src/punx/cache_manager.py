@@ -34,7 +34,8 @@ from the NeXus definitions repository.
 
 .. autosummary::
    
-   ~extract_from_zip
+   ~get_cache_manager
+   ~extract_from_download
 
 '''
 
@@ -50,49 +51,41 @@ import punx
 
 SOURCE_CACHE_SUBDIR = u'cache'
 __singleton_cache_manager__ = None
-# __singleton_settings__ = None
 
 
-# def qsettings():
-#     '''
-#     return the QSettings instance, chosen from user or source cache
-#     '''
-#     global __singleton_settings__
-#     if __singleton_settings__ is None:
-#         __singleton_settings__ = None       # TO DO:
-#     return __singleton_settings__
-
-
-def extract_from_zip(grr, zip_content, path):
+def extract_from_download(grr, path):
     '''
-    extract downloaded NXDL files from ``zip_content`` into a subdirectory of ``path``
+    extract downloaded NXDL files from ``grr`` into a subdirectory of ``path``
     
     USAGE::
 
         grr = punx.github_handler.GitHub_Repository_Reference()
         grr.connect_repo()
-        node = grr.request_info()
-        if node is not None:
-            r = grr.download()
-            extract_from_zip(grr, zipfile.ZipFile(io.BytesIO(r.content)), cache_directory)
+        if grr.request_info() is not None:
+            extract_from_download(grr, cache_directory)
     
     '''
+    import io, zipfile
     NXDL_categories = 'base_classes applications contributed_definitions'.split()
 
+    parts = None
+    msg_list = []
+    zip_content = zipfile.ZipFile(io.BytesIO(grr.download().content))
     for item in zip_content.namelist():
         parts = item.rstrip('/').split('/')
         if len(parts) == 2:             # get the XML Schema files
             if os.path.splitext(parts[1])[-1] in ('.xsd',):
                 zip_content.extract(item, path)
-                msg = 'extracted: ' + os.path.abspath(item)
+                msg_list.append( 'extracted: ' + item )
         elif len(parts) == 3:         # get the NXDL files
             if parts[1] in NXDL_categories:
                 if os.path.splitext(parts[2])[-1] in ('.xml .xsl'.split()):
                     zip_content.extract(item, path)
-                    msg = 'extracted: ' + os.path.abspath(item)
+                    msg_list.append( 'extracted: ' + item )
 
-    defs_dir = grr.appName + '-' + grr.sha
-    infofile = os.path.join(path, defs_dir, '__info__.txt')
+    if parts is None:
+        raise ValueError('no NXDL content downloaded')
+    infofile = os.path.join(path, parts[0], '__info__.txt')
     with open(infofile, 'w') as fp:
         fp.write('# ' + 'NeXus definitions for punx' + '\n')
         fp.write('ref=' + grr.ref + '\n')
@@ -100,14 +93,43 @@ def extract_from_zip(grr, zip_content, path):
         fp.write('sha=' + grr.sha + '\n')
         fp.write('zip_url=' + grr.zip_url + '\n')
         fp.write('last_modified=' + grr.last_modified + '\n')
+        msg_list.append( 'created: ' + '__info__.txt' )
     
-    # last, rename the directory from "definitions-<full SHA>" to grr.ref
-    shutil.move(os.path.join(path, defs_dir), os.path.join(path, grr.ref))
+    # last, rename the installed directory (``parts[0]``) to`` grr.ref``
+    old_name = os.path.join(path, parts[0])
+    new_name = os.path.join(path, grr.ref)
+    shutil.move(old_name, new_name)
+    msg_list.append( 'installed in: ' + os.path.abspath(new_name) )
+    return msg_list
+
+
+def _download_(path, ref=None):
+    '''
+    (internal) download a set of NXDL files into directory ``path``
+    '''
+    import punx.github_handler
+    _msgs = []
+    grr = punx.github_handler.GitHub_Repository_Reference()
+    grr.connect_repo()
+    if grr.request_info(ref) is not None:
+        _msgs = extract_from_download(grr, path)
+    return _msgs
 
 
 def get_cache_manager():
     '''
     return the CacheManager instance, enforce that it **is** a singleton
+    
+    USAGE::
+    
+        cm = get_cache_manager()
+        ...
+        user_fn = cm.user().fileName()
+        ...
+        source_path = cm.source().path()
+        ...
+        qset = cm.source().qsettings
+
     '''
     global __singleton_cache_manager__
     if __singleton_cache_manager__ is None:
@@ -118,6 +140,14 @@ def get_cache_manager():
 class CacheManager(object):
     '''
     manager both source and user caches
+    
+    note:  Do not call this class directly, use ``get_cache_manager()`` instead
+    
+    .. autosummary::
+    
+        ~source
+        ~user
+    
     '''
     
     def __init__(self):
@@ -136,7 +166,7 @@ class CacheManager(object):
         returns the user cache QSettings instance
         '''
         return self.cache_dict['user']
-    
+   
     class BaseMixin_Cache(object):
         '''
         provides comon methods to get the QSettings path and file name
@@ -147,9 +177,12 @@ class CacheManager(object):
            ~path
         
         '''
+        qsettings = None
+
         def path(self):
             'directory containing the QSettings file'
             return os.path.dirname(self.fileName())
+
         def fileName(self):
             'full path of  the QSettings file'
             return str(self.qsettings.fileName())
@@ -161,8 +194,9 @@ class CacheManager(object):
                     os.path.dirname(__file__), 
                     SOURCE_CACHE_SUBDIR))
             if not os.path.exists(path):
-                # TODO: instead of raising an exception, install the default NXDL files
-                raise FileNotFoundError('source cache: ' + path)
+                # make the directory and load the default set of NXDL files
+                os.mkdir(path)
+                _msgs = _download_(path)
             
             self.qsettings = QtCore.QSettings(path, QtCore.QSettings.IniFormat)
     

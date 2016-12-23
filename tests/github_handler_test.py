@@ -22,22 +22,26 @@ class Test_Github_Handler_Module(unittest.TestCase):
     def test_basic_setup(self):
         self.assertEqual(punx.github_handler.CREDS_FILE_NAME,
                          u'__github_creds__.txt', 
-                         u'creds file: __github_creds__.txt')
+                         u'creds file: ' + punx.github_handler.CREDS_FILE_NAME)
         self.assertEqual(punx.github_handler.DEFAULT_BRANCH_NAME, 
                          u'master', 
-                         u'default branch: master')
+                         u'default branch: ' + punx.github_handler.DEFAULT_BRANCH_NAME)
         self.assertEqual(punx.github_handler.DEFAULT_RELEASE_NAME, 
                          u'v3.2', 
-                         u'default release: v3.2')
+                         u'default release: ' + punx.github_handler.DEFAULT_RELEASE_NAME)
         self.assertEqual(punx.github_handler.DEFAULT_TAG_NAME, 
                          u'NXroot-1.0', 
-                         u'default tag: NXroot-1.0')
+                         u'default tag: ' + punx.github_handler.DEFAULT_TAG_NAME)
         self.assertEqual(punx.github_handler.DEFAULT_HASH_NAME, 
                          u'a4fd52d', 
-                         u'default hash: a4fd52d')
+                         u'default hash: ' + punx.github_handler.DEFAULT_HASH_NAME)
+        self.assertEqual(punx.github_handler.DEFAULT_NXDL_SET, 
+                         punx.github_handler.DEFAULT_RELEASE_NAME, 
+                         u'default NXDL file set: ' + punx.github_handler.DEFAULT_NXDL_SET)
         self.assertEqual(punx.github_handler.GITHUB_RETRY_COUNT, 
                          3, 
                          u'GitHub retry count: 3')
+
     
     def test_class_GitHub_Repository_Reference(self):
         grr = punx.github_handler.GitHub_Repository_Reference()
@@ -119,8 +123,6 @@ class Test_Github_Handler_Module(unittest.TestCase):
             self.assertNotEqual(grr.zip_url, None, u'zip_url: ' + grr.zip_url)
             node = grr.get_commit(u'abcd123')
             self.assertEqual(node, None, u'search for hash that does not exist')
-            #r = grr.download('path')
-            #_t = True
     
     def test_GitHub_BasicAuth_credentials(self):
         creds = punx.github_handler.get_BasicAuth_credentials()
@@ -138,13 +140,9 @@ class Test_Github_Handler_Module(unittest.TestCase):
         grr.connect_repo()
         node = grr.request_info()
         if node is not None:
-            r = grr.download()
-            
             path = tempfile.mkdtemp()
             self.assertTrue(os.path.exists(path))
-            punx.cache_manager.extract_from_zip(grr, 
-                    zipfile.ZipFile(io.BytesIO(r.content)), 
-                    path)
+            _msgs = punx.cache_manager.extract_from_download(grr, path)
             self.assertTrue(os.path.exists(os.path.join(path, grr.ref)), 
                             'installed in: ' + os.path.join(path, grr.ref))
             shutil.rmtree(path, True)

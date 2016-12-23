@@ -15,6 +15,7 @@ from tests import common
 
 def suite(*args, **kw):
     from tests import common_test
+    from tests import cache_manager_test
     from tests import cache_test
     from tests import github_handler_test
     from tests import default_plot_test
@@ -28,6 +29,7 @@ def suite(*args, **kw):
     test_suite = unittest.TestSuite()
     test_list = [
         common_test,
+        cache_manager_test,
         cache_test,
         default_plot_test,
         external_links,

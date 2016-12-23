@@ -181,6 +181,7 @@ class CacheManager(object):
         index all NXDL file sets in both source and user caches, return a dictionary
         '''
         fs = {}
+        # TODO: instead, learn this from each cache's .ini file
         for k, v in self.source.file_sets().items():
             fs[k] = v
         for k, v in self.user.file_sets().items():

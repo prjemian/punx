@@ -94,6 +94,7 @@ class GitHub_Repository_Reference(object):
         self.appName = punx.GITHUB_NXDL_REPOSITORY
         self.repo = None
         self.ref = None
+        self.ref_type = None
         self.sha = None
         self.zip_url = None
         self.last_modified = None
@@ -192,6 +193,7 @@ class GitHub_Repository_Reference(object):
         try:
             node = self.repo.get_branch(ref)
             self.ref = ref
+            self.ref_type = u'branch'
             self.sha = node.commit.sha
             self.zip_url = self._make_zip_url(self.sha[:7])
             self._get_last_modified()
@@ -209,6 +211,7 @@ class GitHub_Repository_Reference(object):
             node = self.repo.get_release(ref)
             self.get_tag(node.tag_name)
             self.ref = ref
+            self.ref_type = u'release'
             return node
         except github.GithubException:
             return None
@@ -223,6 +226,7 @@ class GitHub_Repository_Reference(object):
             for tag in self.repo.get_tags():
                 if tag.name == ref:
                     self.ref = ref
+                    self.ref_type = u'tag'
                     self.sha = tag.commit.sha
                     # self.zip_url = self._make_zip_url(self.sha[:7])
                     self.zip_url = tag.zipball_url
@@ -240,6 +244,7 @@ class GitHub_Repository_Reference(object):
         try:
             node = self.repo.get_commit(ref)
             self.ref = ref
+            self.ref_type = u'commit'
             self.sha = node.commit.sha
             self.zip_url = self._make_zip_url(self.sha[:7])
             self._get_last_modified()

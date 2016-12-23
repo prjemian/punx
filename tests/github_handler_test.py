@@ -17,48 +17,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..',
 import punx, punx.github_handler
 
 
-def extract_from_zip(grr, zip_content, path):
-    '''
-    extract downloaded NXDL files from ``zip_content`` into a subdirectory of ``path``
-    
-    USAGE::
-
-        grr = punx.github_handler.GitHub_Repository_Reference()
-        grr.connect_repo()
-        node = grr.request_info()
-        if node is not None:
-            r = grr.download()
-            extract_from_zip(grr, zipfile.ZipFile(io.BytesIO(r.content)), cache_directory)
-    
-    '''
-    NXDL_categories = 'base_classes applications contributed_definitions'.split()
-
-    for item in zip_content.namelist():
-        parts = item.rstrip('/').split('/')
-        if len(parts) == 2:             # get the XML Schema files
-            if os.path.splitext(parts[1])[-1] in ('.xsd',):
-                zip_content.extract(item, path)
-                msg = 'extracted: ' + os.path.abspath(item)
-        elif len(parts) == 3:         # get the NXDL files
-            if parts[1] in NXDL_categories:
-                if os.path.splitext(parts[2])[-1] in ('.xml .xsl'.split()):
-                    zip_content.extract(item, path)
-                    msg = 'extracted: ' + os.path.abspath(item)
-
-    defs_dir = grr.appName + '-' + grr.sha
-    infofile = os.path.join(path, defs_dir, '__info__.txt')
-    with open(infofile, 'w') as fp:
-        fp.write('title=' + 'NeXus definitions for punx' + '\n')
-        fp.write('ref=' + grr.ref + '\n')
-        fp.write('sha=' + grr.sha + '\n')
-        fp.write('zip_url=' + grr.zip_url + '\n')
-        fp.write('last_modified=' + grr.last_modified + '\n')
-    
-    # last, rename the directory from "definitions-<full SHA>" to grr.ref
-    shutil.move(os.path.join(path, defs_dir), os.path.join(path, grr.ref))
-
-
-class TestCacheManager(unittest.TestCase):
+class Test_Github_Handler_Module(unittest.TestCase):
     
     def test_basic_setup(self):
         self.assertEqual(punx.github_handler.CREDS_FILE_NAME,
@@ -115,6 +74,7 @@ class TestCacheManager(unittest.TestCase):
                         u'grr.request_info("master") returns ' + str(type(node)))
         if node is not None:
             self.assertEqual(grr.ref, u'master', u'ref: ' + grr.ref)
+            self.assertEqual(grr.ref_type, u'branch', u'ref_type: ' + grr.ref_type)
             self.assertNotEqual(grr.sha, None, u'sha: ' + grr.sha)
             self.assertNotEqual(grr.zip_url, None, u'zip_url: ' + grr.zip_url)
         
@@ -126,6 +86,7 @@ class TestCacheManager(unittest.TestCase):
                         u'grr.request_info("v3.2") returns a Release()')
         if node is not None:
             self.assertEqual(grr.ref, u'v3.2', u'ref: ' + grr.ref)
+            self.assertEqual(grr.ref_type, u'release', u'ref_type: ' + grr.ref_type)
             self.assertNotEqual(grr.sha, None, u'sha: ' + grr.sha)
             self.assertNotEqual(grr.zip_url, None, u'zip_url: ' + grr.zip_url)
         
@@ -137,6 +98,7 @@ class TestCacheManager(unittest.TestCase):
                         u'grr.request_info("NXentry-1.0") returns ' + str(type(node)))
         if node is not None:
             self.assertEqual(grr.ref, u'NXentry-1.0', u'ref: ' + grr.ref)
+            self.assertEqual(grr.ref_type, u'tag', u'ref_type: ' + grr.ref_type)
             self.assertNotEqual(grr.sha, None, u'sha: ' + grr.sha)
             self.assertNotEqual(grr.zip_url, None, u'zip_url: ' + grr.zip_url)
             node = grr.get_tag(u'not_a_tag')
@@ -150,6 +112,7 @@ class TestCacheManager(unittest.TestCase):
                         u'grr.request_info("227bdce") returns ' + str(type(node)))
         if node is not None:
             self.assertEqual(grr.ref, u'227bdce', u'ref: ' + grr.ref)
+            self.assertEqual(grr.ref_type, u'commit', u'ref_type: ' + grr.ref_type)
             # next test is specific to 1 time zone
             #self.assertEqual(grr.last_modified, u'2016-11-19 01:04:28', u'datetime: ' + grr.last_modified)
             self.assertNotEqual(grr.sha, None, u'sha: ' + grr.sha)
@@ -170,6 +133,7 @@ class TestCacheManager(unittest.TestCase):
                              u'credentials dict has these keys: ')
     
     def test_Github_download_default(self):
+        import punx.cache_manager
         grr = punx.github_handler.GitHub_Repository_Reference()
         grr.connect_repo()
         node = grr.request_info()
@@ -178,7 +142,9 @@ class TestCacheManager(unittest.TestCase):
             
             path = tempfile.mkdtemp()
             self.assertTrue(os.path.exists(path))
-            extract_from_zip(grr, zipfile.ZipFile(io.BytesIO(r.content)), path)
+            punx.cache_manager.extract_from_zip(grr, 
+                    zipfile.ZipFile(io.BytesIO(r.content)), 
+                    path)
             self.assertTrue(os.path.exists(os.path.join(path, grr.ref)), 
                             'installed in: ' + os.path.join(path, grr.ref))
             shutil.rmtree(path, True)
@@ -187,7 +153,7 @@ class TestCacheManager(unittest.TestCase):
 def suite(*args, **kw):
     test_suite = unittest.TestSuite()
     test_list = [
-        TestCacheManager,
+        Test_Github_Handler_Module,
         ]
     for test_case in test_list:
         test_suite.addTest(unittest.makeSuite(test_case))

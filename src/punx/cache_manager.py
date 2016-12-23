@@ -55,7 +55,7 @@ INFO_FILE_NAME = u'__info__.txt'
 __singleton_cache_manager__ = None
 
 
-def extract_from_download(grr, path):
+def extract_from_download(grr, path):       # TODO refactor into NXDL_File_Set
     '''
     extract downloaded NXDL files from ``grr`` into a subdirectory of ``path``
     
@@ -106,7 +106,7 @@ def extract_from_download(grr, path):
     return msg_list
 
 
-def _download_(path, ref=None):
+def _download_(path, ref=None):       # TODO refactor into NXDL_File_Set
     '''
     (internal) download a set of NXDL files into directory ``path``
     '''
@@ -228,20 +228,8 @@ class CacheManager(object):
                 if os.path.isdir(os.path.join(cache_path, item)):
                     info_file = os.path.join(cache_path, item, INFO_FILE_NAME)
                     if os.path.exists(info_file):
-                        nxdl_fs = NXDL_File_Set()
-                        nxdl_fs.info = info_file
-                        nxdl_fs.path = os.path.dirname(info_file)
-                        if cache_path.find(os.path.join('punx', 'cache')) > 0:
-                            nxdl_fs.cache = u'source'
-                        else:
-                            nxdl_fs.cache = u'user'
-                        
-                        # read the NXDL file set's info file for GitHub information
-                        for line in open(info_file, 'r').readlines():
-                            if line.strip()[0] != '#':
-                                k, v = line.strip().split('=')
-                                nxdl_fs.__setattr__(k, v)
-                        fs[item] = nxdl_fs
+                        fs[item] = NXDL_File_Set()
+                        fs[item].read_info_file(info_file)
             return fs
         
     class SourceCache(BaseMixin_Cache):
@@ -299,3 +287,23 @@ class NXDL_File_Set(object):
         s += ', path=' + str(self.path)
         s += ')'
         return s
+    
+    def read_info_file(self, file_name=None):
+        file_name = file_name or self.info
+        if file_name is None:
+            return
+        if not os.path.exists(file_name):
+            raise FileNotFoundError('info file not found: ' + file_name)
+
+        self.info = file_name
+        self.path = os.path.abspath(os.path.dirname(file_name))
+        if self.path.find(os.path.join('punx', 'cache')) > 0:
+            self.cache = u'source'
+        else:
+            self.cache = u'user'
+        
+        # read the NXDL file set's info file for GitHub information
+        for line in open(file_name, 'r').readlines():
+            if line.strip()[0] != '#':
+                k, v = line.strip().split('=')
+                self.__setattr__(k, v)

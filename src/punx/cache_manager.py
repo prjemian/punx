@@ -50,6 +50,8 @@ import punx
 
 
 SOURCE_CACHE_SUBDIR = u'cache'
+SOURCE_CACHE_SETTINGS_FILENAME = u'punx.ini'
+INFO_FILE_NAME = u'__info__.txt'
 __singleton_cache_manager__ = None
 
 
@@ -85,7 +87,8 @@ def extract_from_download(grr, path):
 
     if parts is None:
         raise ValueError('no NXDL content downloaded')
-    infofile = os.path.join(path, parts[0], '__info__.txt')
+
+    infofile = os.path.join(path, parts[0], INFO_FILE_NAME)
     with open(infofile, 'w') as fp:
         fp.write('# ' + 'NeXus definitions for punx' + '\n')
         fp.write('ref=' + grr.ref + '\n')
@@ -145,27 +148,33 @@ class CacheManager(object):
     
     .. autosummary::
     
-        ~source
-        ~user
+        ~file_sets
     
     '''
     
     def __init__(self):
-        self.cache_dict = dict(
-            source = self.SourceCache(), 
-            user = self.UserCache())
+        self.source = self.SourceCache()
+        self.user = self.UserCache()
     
-    def source(self):
-        '''
-        returns the source cache QSettings instance
-        '''
-        return self.cache_dict['source']
+    # - - - - - - - - - - - - - -
+    # public
     
-    def user(self):
+    def file_sets(self):
         '''
-        returns the user cache QSettings instance
+        index all NXDL file sets in both source and user caches, return a dictionary
         '''
-        return self.cache_dict['user']
+        fs = {}
+        for k, v in self.source.file_sets().items():
+            fs[k] = v
+        for k, v in self.user.file_sets().items():
+            if k in fs:
+                raise ValueError('user cache file set already known: ' + k)
+            else:
+                fs[k] = v
+        return fs
+    
+    # - - - - - - - - - - - - - -
+    # private
    
     class BaseMixin_Cache(object):
         '''
@@ -173,6 +182,7 @@ class CacheManager(object):
         
         .. autosummary::
            
+           ~discover
            ~fileName
            ~path
         
@@ -181,12 +191,43 @@ class CacheManager(object):
 
         def path(self):
             'directory containing the QSettings file'
+            if self.qsettings is None:
+                raise RuntimeError('cache qsettings not defined!')
             return os.path.dirname(self.fileName())
 
         def fileName(self):
             'full path of  the QSettings file'
-            return str(self.qsettings.fileName())
-    
+            if self.qsettings is None:
+                raise RuntimeError('cache qsettings not defined!')
+            fn = str(self.qsettings.fileName())
+            return fn
+        
+        def file_sets(self):
+            '''
+            index all NXDL file sets in this cache
+            '''
+            fs = {}
+            if self.qsettings is None:
+                raise RuntimeError('cache qsettings not defined!')
+            cache_path = self.path()
+            for item in os.listdir(cache_path):
+                if os.path.isdir(os.path.join(cache_path, item)):
+                    info_file = os.path.join(cache_path, item, INFO_FILE_NAME)
+                    if os.path.exists(info_file):
+                        nxdl_fs = NXDL_File_Set()
+                        nxdl_fs.info = info_file
+                        nxdl_fs.path = os.path.dirname(info_file)
+                        if cache_path.find(os.path.join('punx', 'cache')) > 0:
+                            nxdl_fs.cache = u'source'
+                        else:
+                            nxdl_fs.cache = u'user'
+                        for line in open(info_file, 'r').readlines():
+                            if line.strip()[0] != '#':
+                                k, v = line.strip().split('=')
+                                nxdl_fs.__setattr__(k, v)
+                        fs[item] = nxdl_fs
+            return fs
+        
     class SourceCache(BaseMixin_Cache):
         def __init__(self):
             path = os.path.abspath(
@@ -198,7 +239,10 @@ class CacheManager(object):
                 os.mkdir(path)
                 _msgs = _download_(path)
             
-            self.qsettings = QtCore.QSettings(path, QtCore.QSettings.IniFormat)
+            ini_file = os.path.abspath(os.path.join(path, SOURCE_CACHE_SETTINGS_FILENAME))
+            self.qsettings = QtCore.QSettings(ini_file, QtCore.QSettings.IniFormat)
+            
+            # TODO: index the cache and update the .ini file as needed
     
     class UserCache(BaseMixin_Cache):
         def __init__(self):
@@ -210,3 +254,32 @@ class CacheManager(object):
             path = self.path()
             if not os.path.exists(path):
                 os.mkdir(path)
+            
+            # TODO: index the cache and update the .ini file as needed
+
+
+class NXDL_File_Set(object):
+    '''
+    describe a single set of NXDL files
+    '''
+    
+    path = None
+    cache = None
+    info = None
+    ref = None
+    ref_type = None
+    sha = None
+    zip_url = None
+    last_modified = None
+    
+    def __str__(self):
+        s = 'NXDL_File_Set('
+        s += 'ref_type=' + str(self.ref_type)
+        s += ', ref=' + str(self.ref)
+        s += ', last_modified=' + str(self.last_modified)
+        s += ', cache=' + str(self.cache)
+        #s += ', sha=' + str(self.sha,)
+        s += ', short_sha=' + str(self.sha[:7])
+        s += ', path=' + str(self.path)
+        s += ')'
+        return s

@@ -148,16 +148,33 @@ class CacheManager(object):
     
     .. autosummary::
     
-        ~file_sets
+        ~select_NXDL_file_set
     
     '''
     
     def __init__(self):
+        self.default_file_set = None
         self.source = self.SourceCache()
         self.user = self.UserCache()
+        
+        self.NXDL_file_sets = self.file_sets()
+        self.select_NXDL_file_set()
     
     # - - - - - - - - - - - - - -
     # public
+    
+    def select_NXDL_file_set(self, ref=None):
+        '''
+        return the named self.default_file_set instance or raise KeyError exception if unknown
+        '''
+        ref = ref or punx.github_handler.DEFAULT_NXDL_SET
+        if ref not in self.NXDL_file_sets:
+            raise KeyError('unknown NXDL file set: ' + str(ref))
+        self.default_file_set = self.NXDL_file_sets[ref]
+        return self.default_file_set
+    
+    # - - - - - - - - - - - - - -
+    # private
     
     def file_sets(self):
         '''
@@ -172,9 +189,6 @@ class CacheManager(object):
             else:
                 fs[k] = v
         return fs
-    
-    # - - - - - - - - - - - - - -
-    # private
    
     class BaseMixin_Cache(object):
         '''
@@ -221,6 +235,8 @@ class CacheManager(object):
                             nxdl_fs.cache = u'source'
                         else:
                             nxdl_fs.cache = u'user'
+                        
+                        # read the NXDL file set's info file for GitHub information
                         for line in open(info_file, 'r').readlines():
                             if line.strip()[0] != '#':
                                 k, v = line.strip().split('=')

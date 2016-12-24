@@ -46,7 +46,7 @@ import sys
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import punx
-from punx.singletons import Singleton
+import punx.singletons
 #from punx import settings
 
 
@@ -119,7 +119,7 @@ def _download_(path, ref=None):       # TODO refactor into NXDL_File_Set
     return _msgs
 
 
-class CacheManager(Singleton):
+class CacheManager(punx.singletons.Singleton):
     '''
     manager both source and user caches
     
@@ -178,6 +178,7 @@ class CacheManager(Singleton):
            ~path
         
         '''
+        
         qsettings = None
 
         def path(self):
@@ -210,6 +211,7 @@ class CacheManager(Singleton):
             return fs
         
     class SourceCache(BaseMixin_Cache):
+        ' '
         def __init__(self):
             path = os.path.abspath(
                 os.path.join(
@@ -226,6 +228,7 @@ class CacheManager(Singleton):
             # TODO: index the cache and update the .ini file as needed
     
     class UserCache(BaseMixin_Cache):
+        ' '
         def __init__(self):
             self.qsettings = QtCore.QSettings(
                 QtCore.QSettings.IniFormat, 

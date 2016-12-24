@@ -46,13 +46,13 @@ import sys
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import punx
+from punx.singletons import Singleton
 #from punx import settings
 
 
 SOURCE_CACHE_SUBDIR = u'cache'
 SOURCE_CACHE_SETTINGS_FILENAME = u'punx.ini'
 INFO_FILE_NAME = u'__info__.txt'
-__singleton_cache_manager__ = None
 
 
 def extract_from_download(grr, path):       # TODO refactor into NXDL_File_Set
@@ -119,32 +119,9 @@ def _download_(path, ref=None):       # TODO refactor into NXDL_File_Set
     return _msgs
 
 
-def get_cache_manager():
-    '''
-    return the CacheManager instance, enforce that it **is** a singleton
-    
-    USAGE::
-    
-        cm = get_cache_manager()
-        ...
-        user_fn = cm.user().fileName()
-        ...
-        source_path = cm.source().path()
-        ...
-        qset = cm.source().qsettings
-
-    '''
-    global __singleton_cache_manager__
-    if __singleton_cache_manager__ is None:
-        __singleton_cache_manager__ = CacheManager()
-    return __singleton_cache_manager__
-
-
-class CacheManager(object):
+class CacheManager(Singleton):
     '''
     manager both source and user caches
-    
-    note:  Do not call this class directly, use ``get_cache_manager()`` instead
     
     .. autosummary::
     
@@ -181,7 +158,6 @@ class CacheManager(object):
         index all NXDL file sets in both source and user caches, return a dictionary
         '''
         fs = {}
-        # TODO: instead, learn this from each cache's .ini file
         for k, v in self.source.file_sets().items():
             fs[k] = v
         for k, v in self.user.file_sets().items():

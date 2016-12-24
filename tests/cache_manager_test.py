@@ -32,21 +32,13 @@ class Test_CacheManager_Module(unittest.TestCase):
             punx.cache_manager.SOURCE_CACHE_SETTINGS_FILENAME,
             u'punx.ini', 
             u'source cache directory: ' + punx.cache_manager.SOURCE_CACHE_SETTINGS_FILENAME)
-        self.assertEqual(
-            punx.cache_manager.__singleton_cache_manager__, 
-            None,
-            u'__singleton_cache_manager__: ' + str(punx.cache_manager.__singleton_cache_manager__))
     
     def test_instance(self):
         import punx.github_handler
-        cm = punx.cache_manager.get_cache_manager()
+        cm = punx.cache_manager.CacheManager()
         self.assertTrue(
             isinstance(cm, (type(None),punx.cache_manager.CacheManager)),
             u'instance: ' + str(type(cm)))
-        self.assertEqual(
-            punx.cache_manager.__singleton_cache_manager__, 
-            cm, 
-            u'__singleton_cache_manager__ defined: ' + str(punx.cache_manager.__singleton_cache_manager__))
         if cm is not None:
             self.assertTrue(
                 isinstance(cm, punx.cache_manager.CacheManager), 
@@ -63,7 +55,7 @@ class Test_CacheManager_Module(unittest.TestCase):
     
     def test_default_file_set(self):
         import punx.github_handler
-        cm = punx.cache_manager.get_cache_manager()
+        cm = punx.cache_manager.CacheManager()
         if cm is not None:
             fs = cm.select_NXDL_file_set()
             self.assertEqual(fs.ref, punx.github_handler.DEFAULT_NXDL_SET, u'ref: ' + fs.ref)

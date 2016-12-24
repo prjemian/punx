@@ -57,7 +57,7 @@ INFO_FILE_NAME = u'__info__.txt'
 
 def extract_from_download(grr, path):       # TODO refactor into NXDL_File_Set
     '''
-    extract downloaded NXDL files from ``grr`` into a subdirectory of ``path``
+    download & extract NXDL files from ``grr`` into a subdirectory of ``path``
     
     USAGE::
 
@@ -69,26 +69,44 @@ def extract_from_download(grr, path):       # TODO refactor into NXDL_File_Set
     '''
     import io, zipfile
     NXDL_categories = 'base_classes applications contributed_definitions'.split()
+    NXDL_file_endings_list = '.xsd .xml .xsl'.split()
 
-    parts = None
     msg_list = []
-    zip_content = zipfile.ZipFile(io.BytesIO(grr.download().content))
-    for item in zip_content.namelist():
-        parts = item.rstrip('/').split('/')
-        if len(parts) == 2:             # get the XML Schema files
-            if os.path.splitext(parts[1])[-1] in ('.xsd',):
-                zip_content.extract(item, path)
-                msg_list.append( 'extracted: ' + item )
-        elif len(parts) == 3:         # get the NXDL files
-            if parts[1] in NXDL_categories:
-                if os.path.splitext(parts[2])[-1] in ('.xml .xsl'.split()):
-                    zip_content.extract(item, path)
-                    msg_list.append( 'extracted: ' + item )
+    
+    download_dir_name = None     # to be learned en route
+    NXDL_refs_dir_name = os.path.join(path, grr.ref)
+    
+    def should_avoid_download():
+        '''
+        decide if the download should be avoided (True: avoid, False: download)
+        '''
+        return False        # TODO:
 
-    if parts is None:
+    if should_avoid_download():
+        return
+    zip_content = zipfile.ZipFile(io.BytesIO(grr.download().content))
+
+    def should_extract_this(item):
+        '''
+        decide if this item should be extracted from the ZIP download
+        '''
+        for ending in NXDL_file_endings_list:
+            if item.endswith(ending):
+                if item.split('/')[-2] in NXDL_categories:
+                    return True
+        return False
+
+    for item in zip_content.namelist():
+        if download_dir_name is None:
+            download_dir_name = os.path.join(path, item.split('/')[0])
+        if should_extract_this(item):
+            zip_content.extract(item, path)
+            msg_list.append( 'extracted: ' + item )
+
+    if len(msg_list) == 0:
         raise ValueError('no NXDL content downloaded')
 
-    infofile = os.path.join(path, parts[0], INFO_FILE_NAME)
+    infofile = os.path.join(download_dir_name, INFO_FILE_NAME)
     with open(infofile, 'w') as fp:
         fp.write('# ' + 'NeXus definitions for punx' + '\n')
         fp.write('ref=' + grr.ref + '\n')
@@ -99,10 +117,8 @@ def extract_from_download(grr, path):       # TODO refactor into NXDL_File_Set
         msg_list.append( 'created: ' + '__info__.txt' )
     
     # last, rename the installed directory (``parts[0]``) to`` grr.ref``
-    old_name = os.path.join(path, parts[0])
-    new_name = os.path.join(path, grr.ref)
-    shutil.move(old_name, new_name)
-    msg_list.append( 'installed in: ' + os.path.abspath(new_name) )
+    shutil.move(download_dir_name, NXDL_refs_dir_name)
+    msg_list.append( 'installed in: ' + os.path.abspath(NXDL_refs_dir_name) )
     return msg_list
 
 
@@ -135,7 +151,7 @@ class CacheManager(punx.singletons.Singleton):
         self.user = self.UserCache()
         
         self.NXDL_file_sets = self.file_sets()
-        self.select_NXDL_file_set()
+        # self.select_NXDL_file_set()
     
     # - - - - - - - - - - - - - -
     # public
@@ -165,6 +181,8 @@ class CacheManager(punx.singletons.Singleton):
                 raise ValueError('user cache file set already known: ' + k)
             else:
                 fs[k] = v
+                
+        self.NXDL_file_sets = fs    # remember
         return fs
    
     class BaseMixin_Cache(object):

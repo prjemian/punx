@@ -32,9 +32,9 @@ class Test_Github_Handler_Module(unittest.TestCase):
         self.assertEqual(punx.github_handler.DEFAULT_TAG_NAME, 
                          u'NXroot-1.0', 
                          u'default tag: ' + punx.github_handler.DEFAULT_TAG_NAME)
-        self.assertEqual(punx.github_handler.DEFAULT_HASH_NAME, 
+        self.assertEqual(punx.github_handler.DEFAULT_COMMIT_NAME, 
                          u'a4fd52d', 
-                         u'default hash: ' + punx.github_handler.DEFAULT_HASH_NAME)
+                         u'default hash: ' + punx.github_handler.DEFAULT_COMMIT_NAME)
         self.assertEqual(punx.github_handler.DEFAULT_NXDL_SET, 
                          punx.github_handler.DEFAULT_RELEASE_NAME, 
                          u'default NXDL file set: ' + punx.github_handler.DEFAULT_NXDL_SET)

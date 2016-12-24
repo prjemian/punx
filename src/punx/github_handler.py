@@ -45,7 +45,7 @@ CREDS_FILE_NAME = u'__github_creds__.txt'
 DEFAULT_BRANCH_NAME = u'master'
 DEFAULT_RELEASE_NAME = u'v3.2'
 DEFAULT_TAG_NAME = u'NXroot-1.0'
-DEFAULT_HASH_NAME = u'a4fd52d'
+DEFAULT_COMMIT_NAME = u'a4fd52d'
 DEFAULT_NXDL_SET = DEFAULT_RELEASE_NAME
 GITHUB_RETRY_COUNT = 3
 
@@ -236,7 +236,7 @@ class GitHub_Repository_Reference(object):
         except github.GithubException:
             return None
     
-    def get_commit(self, ref=DEFAULT_HASH_NAME):
+    def get_commit(self, ref=DEFAULT_COMMIT_NAME):
         '''
         learn the download information about the referenced commit
         

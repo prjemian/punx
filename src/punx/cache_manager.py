@@ -52,7 +52,7 @@ import punx.singletons
 
 SOURCE_CACHE_SUBDIR = u'cache'
 SOURCE_CACHE_SETTINGS_FILENAME = u'punx.ini'
-INFO_FILE_NAME = u'__info__.txt'
+INFO_FILE_NAME = u'__github_info__.txt'
 
 
 def extract_from_download(grr, path):       # TODO refactor into NXDL_File_Set
@@ -76,14 +76,27 @@ def extract_from_download(grr, path):       # TODO refactor into NXDL_File_Set
     download_dir_name = None     # to be learned en route
     NXDL_refs_dir_name = os.path.join(path, grr.ref)
     
-    def should_avoid_download():
+    def should_avoid_download(grr, path):
         '''
         decide if the download should be avoided (True: avoid, False: download)
         '''
-        return False        # TODO:
+        names = []
+        names.append(grr.appName + '-' + grr.sha)
+        names.append(grr.orgName + '-' + grr.appName + '-' + grr.sha)
+        short_sha = str(grr.sha[:7])
+        names.append(grr.appName + '-' + short_sha)
+        names.append(grr.orgName + '-' + short_sha + '-' + grr.sha)
+        names.append(grr.ref)
+        for subdir in names:
+            if subdir in os.listdir(path):
+                if os.path.exists(os.path.join(path, subdir, INFO_FILE_NAME)):
+                    # TODO: could compare SHA from info file
+                    return True
+        return False
 
-    if should_avoid_download():
+    if should_avoid_download(grr, path):
         return
+    msg_list.append('downloading: ' + grr.zip_url)
     zip_content = zipfile.ZipFile(io.BytesIO(grr.download().content))
 
     def should_extract_this(item):
@@ -103,7 +116,7 @@ def extract_from_download(grr, path):       # TODO refactor into NXDL_File_Set
             zip_content.extract(item, path)
             msg_list.append( 'extracted: ' + item )
 
-    if len(msg_list) == 0:
+    if len(msg_list) < 2:
         raise ValueError('no NXDL content downloaded')
 
     infofile = os.path.join(download_dir_name, INFO_FILE_NAME)
@@ -117,6 +130,8 @@ def extract_from_download(grr, path):       # TODO refactor into NXDL_File_Set
         msg_list.append( 'created: ' + '__info__.txt' )
     
     # last, rename the installed directory (``parts[0]``) to`` grr.ref``
+    if os.path.exists(NXDL_refs_dir_name):
+        shutil.rmtree(NXDL_refs_dir_name, ignore_errors=True)
     shutil.move(download_dir_name, NXDL_refs_dir_name)
     msg_list.append( 'installed in: ' + os.path.abspath(NXDL_refs_dir_name) )
     return msg_list
@@ -141,6 +156,7 @@ class CacheManager(punx.singletons.Singleton):
     
     .. autosummary::
     
+        ~install_NXDL_files
         ~select_NXDL_file_set
     
     '''
@@ -155,6 +171,14 @@ class CacheManager(punx.singletons.Singleton):
     
     # - - - - - - - - - - - - - -
     # public
+    
+    def install_NXDL_files(self, grr, user_cache=True, ref=None):
+        ref = ref or punx.github_handler.DEFAULT_NXDL_SET
+        cache_obj = {True: self.user, False: self.source}[user_cache]
+        if ref not in cache_obj.file_sets():
+            if grr.request_info(ref) is not None:
+                m = punx.cache_manager.extract_from_download(grr, cache_obj.path())
+                return m
     
     def select_NXDL_file_set(self, ref=None):
         '''

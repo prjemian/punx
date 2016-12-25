@@ -26,12 +26,16 @@ class Test_CacheManager_Module(unittest.TestCase):
             u'source cache directory: <SRC>/cache')
         self.assertEqual(
             punx.cache_manager.INFO_FILE_NAME,
-             u'__info__.txt', 
+             u'__github_info__.txt', 
              u'source cache directory: ' + punx.cache_manager.INFO_FILE_NAME)
         self.assertEqual(
             punx.cache_manager.SOURCE_CACHE_SETTINGS_FILENAME,
             u'punx.ini', 
             u'source cache directory: ' + punx.cache_manager.SOURCE_CACHE_SETTINGS_FILENAME)
+        self.assertEqual(
+            punx.cache_manager.SHORT_SHA_LENGTH,
+            7, 
+            u'source cache directory: ' + str(punx.cache_manager.SHORT_SHA_LENGTH))
     
     def test_instance(self):
         import punx.github_handler

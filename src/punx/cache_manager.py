@@ -53,6 +53,11 @@ import punx.singletons
 SOURCE_CACHE_SUBDIR = u'cache'
 SOURCE_CACHE_SETTINGS_FILENAME = u'punx.ini'
 INFO_FILE_NAME = u'__github_info__.txt'
+SHORT_SHA_LENGTH = 7
+
+
+def get_short_sha(full_sha):
+    return full_sha[:min(SHORT_SHA_LENGTH, len(full_sha))]
 
 
 def extract_from_download(grr, path):       # TODO refactor into NXDL_File_Set
@@ -83,7 +88,7 @@ def extract_from_download(grr, path):       # TODO refactor into NXDL_File_Set
         names = []
         names.append(grr.appName + '-' + grr.sha)
         names.append(grr.orgName + '-' + grr.appName + '-' + grr.sha)
-        short_sha = str(grr.sha[:7])
+        short_sha = get_short_sha(grr.sha)
         names.append(grr.appName + '-' + short_sha)
         names.append(grr.orgName + '-' + short_sha + '-' + grr.sha)
         names.append(grr.ref)
@@ -105,13 +110,16 @@ def extract_from_download(grr, path):       # TODO refactor into NXDL_File_Set
         '''
         for ending in NXDL_file_endings_list:
             if item.endswith(ending):
-                if item.split('/')[-2] in NXDL_categories:
+                if item.split('/')[-2] in allowed_parent_directories:
                     return True
         return False
 
+    allowed_parent_directories = NXDL_categories
     for item in zip_content.namelist():
         if download_dir_name is None:
-            download_dir_name = os.path.join(path, item.split('/')[0])
+            root_name = item.split('/')[0]
+            download_dir_name = os.path.join(path, root_name)
+            allowed_parent_directories.append(root_name)
         if should_extract_this(item):
             zip_content.extract(item, path)
             msg_list.append( 'extracted: ' + item )
@@ -305,7 +313,7 @@ class NXDL_File_Set(object):
         s += ', last_modified=' + str(self.last_modified)
         s += ', cache=' + str(self.cache)
         #s += ', sha=' + str(self.sha,)
-        s += ', short_sha=' + str(self.sha[:7])
+        s += ', short_sha=' + get_short_sha(self.sha)
         s += ', path=' + str(self.path)
         s += ')'
         return s

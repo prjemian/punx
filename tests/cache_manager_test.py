@@ -26,7 +26,7 @@ class Test_CacheManager_Module(unittest.TestCase):
             u'source cache directory: <SRC>/cache')
         self.assertEqual(
             punx.cache_manager.INFO_FILE_NAME,
-             u'__github_info__.txt', 
+             u'__github_info__.json', 
              u'source cache directory: ' + punx.cache_manager.INFO_FILE_NAME)
         self.assertEqual(
             punx.cache_manager.SOURCE_CACHE_SETTINGS_FILENAME,

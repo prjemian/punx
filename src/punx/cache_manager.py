@@ -39,6 +39,8 @@ from the NeXus definitions repository.
 
 '''
 
+import datetime
+import json
 import os
 from PyQt4 import QtCore
 import shutil
@@ -52,12 +54,32 @@ import punx.singletons
 
 SOURCE_CACHE_SUBDIR = u'cache'
 SOURCE_CACHE_SETTINGS_FILENAME = u'punx.ini'
-INFO_FILE_NAME = u'__github_info__.txt'
+INFO_FILE_NAME = u'__github_info__.json'
 SHORT_SHA_LENGTH = 7
 
 
 def get_short_sha(full_sha):
+    '''
+    '''
     return full_sha[:min(SHORT_SHA_LENGTH, len(full_sha))]
+
+
+def write_json_file(filename, obj):
+    '''
+    write the structured ``obj`` to the JSON file ``file_name``
+    
+    :see: https://docs.python.org/3.5/library/json.html#json.dumps
+    '''
+    open(filename, 'w').write(json.dumps(obj, indent=2))
+
+
+def read_json_file(filename):
+    '''
+    read a structured object from the JSON file ``file_name``
+    
+    :see: https://docs.python.org/3.5/library/json.html#json.loads
+    '''
+    return json.loads(open(filename, 'r').read())
 
 
 def extract_from_download(grr, path):       # TODO refactor into NXDL_File_Set
@@ -128,14 +150,13 @@ def extract_from_download(grr, path):       # TODO refactor into NXDL_File_Set
         raise ValueError('no NXDL content downloaded')
 
     infofile = os.path.join(download_dir_name, INFO_FILE_NAME)
-    with open(infofile, 'w') as fp:
-        fp.write('# ' + 'NeXus definitions for punx' + '\n')
-        fp.write('ref=' + grr.ref + '\n')
-        fp.write('ref_type=' + grr.ref_type + '\n')
-        fp.write('sha=' + grr.sha + '\n')
-        fp.write('zip_url=' + grr.zip_url + '\n')
-        fp.write('last_modified=' + grr.last_modified + '\n')
-        msg_list.append( 'created: ' + '__info__.txt' )
+    nfs = NXDL_File_Set()
+    obj = {k: grr.__getattribute__(k) for k in nfs.json_file_keys}
+    obj['# description'] = 'NXDL files downloaded from GitHub repository'
+    obj['# written'] = str(datetime.datetime.now())
+    # TODO: move this code into the NXDL_File_Set class
+    write_json_file(infofile, obj)
+    msg_list.append( 'created: ' + INFO_FILE_NAME )
     
     # last, rename the installed directory (``parts[0]``) to`` grr.ref``
     if os.path.exists(NXDL_refs_dir_name):
@@ -306,6 +327,8 @@ class NXDL_File_Set(object):
     zip_url = None
     last_modified = None
     
+    json_file_keys = 'ref ref_type sha zip_url last_modified'.split()
+    
     def __str__(self):
         s = 'NXDL_File_Set('
         s += 'ref_type=' + str(self.ref_type)
@@ -331,9 +354,8 @@ class NXDL_File_Set(object):
             self.cache = u'source'
         else:
             self.cache = u'user'
-        
+
         # read the NXDL file set's info file for GitHub information
-        for line in open(file_name, 'r').readlines():
-            if line.strip()[0] != '#':
-                k, v = line.strip().split('=')
-                self.__setattr__(k, v)
+        obj = read_json_file(file_name)
+        for k in self.json_file_keys:
+            self.__setattr__(k, obj.get(k))

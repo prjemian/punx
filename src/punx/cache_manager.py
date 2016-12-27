@@ -116,9 +116,11 @@ def extract_from_download(grr, path):       # TODO refactor into NXDL_File_Set
         names.append(grr.ref)
         for subdir in names:
             if subdir in os.listdir(path):
-                if os.path.exists(os.path.join(path, subdir, INFO_FILE_NAME)):
-                    # TODO: could compare SHA from info file
-                    return True
+                info_file_name = os.path.join(path, subdir, INFO_FILE_NAME)
+                if os.path.exists(info_file_name):
+                    info = read_json_file(info_file_name)
+                    if info.sha != grr.sha:
+                        return True
         return False
 
     if should_avoid_download(grr, path):
@@ -166,26 +168,13 @@ def extract_from_download(grr, path):       # TODO refactor into NXDL_File_Set
     return msg_list
 
 
-def _download_(path, ref=None):       # TODO refactor into NXDL_File_Set
-    '''
-    (internal) download a set of NXDL files into directory ``path``
-    '''
-    import punx.github_handler
-    _msgs = []
-    grr = punx.github_handler.GitHub_Repository_Reference()
-    grr.connect_repo()
-    if grr.request_info(ref) is not None:
-        _msgs = extract_from_download(grr, path)
-    return _msgs
-
-
 class CacheManager(punx.singletons.Singleton):
     '''
     manager both source and user caches
     
     .. autosummary::
     
-        ~install_NXDL_files
+        ~install_NXDL_file_set
         ~select_NXDL_file_set
     
     '''
@@ -197,11 +186,13 @@ class CacheManager(punx.singletons.Singleton):
         
         self.NXDL_file_sets = self.file_sets()
         # self.select_NXDL_file_set()
+            
+        # TODO: index the cache and update the .ini file as needed
     
     # - - - - - - - - - - - - - -
     # public
     
-    def install_NXDL_files(self, grr, user_cache=True, ref=None):
+    def install_NXDL_file_set(self, grr, user_cache=True, ref=None):
         ref = ref or punx.github_handler.DEFAULT_NXDL_SET
         cache_obj = {True: self.user, False: self.source}[user_cache]
         if ref not in cache_obj.file_sets():
@@ -291,13 +282,15 @@ class CacheManager(punx.singletons.Singleton):
             if not os.path.exists(path):
                 # make the directory and load the default set of NXDL files
                 os.mkdir(path)
-                _msgs = _download_(path)
+                _msgs = []
+                grr = punx.github_handler.GitHub_Repository_Reference()
+                grr.connect_repo()
+                if grr.request_info() is not None:
+                    _msgs = extract_from_download(grr, path)
             
             ini_file = os.path.abspath(os.path.join(path, SOURCE_CACHE_SETTINGS_FILENAME))
             self.qsettings = QtCore.QSettings(ini_file, QtCore.QSettings.IniFormat)
-            
-            # TODO: index the cache and update the .ini file as needed
-    
+
     class UserCache(BaseMixin_Cache):
         ' '
         def __init__(self):
@@ -309,8 +302,6 @@ class CacheManager(punx.singletons.Singleton):
             path = self.path()
             if not os.path.exists(path):
                 os.mkdir(path)
-            
-            # TODO: index the cache and update the .ini file as needed
 
 
 class NXDL_File_Set(object):

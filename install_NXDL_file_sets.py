@@ -10,14 +10,14 @@ grr.connect_repo()
 cm.file_sets()
 
 for ref in [punx.github_handler.DEFAULT_RELEASE_NAME,]:
-    m = cm.install_NXDL_files(grr, user_cache=False, ref=ref)
+    m = cm.install_NXDL_file_set(grr, user_cache=False, ref=ref)
     if isinstance(m, list):
         print(str(m[-1]))
 
 for ref in [punx.github_handler.DEFAULT_BRANCH_NAME,
             punx.github_handler.DEFAULT_TAG_NAME,
             punx.github_handler.DEFAULT_COMMIT_NAME,]:
-    m = cm.install_NXDL_files(grr, ref=ref)
+    m = cm.install_NXDL_file_set(grr, ref=ref)
     if isinstance(m, list):
         print(str(m[-1]))
 

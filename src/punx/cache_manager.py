@@ -316,6 +316,14 @@ class UserCache(Base_Cache):
         path = self.path()
         if not os.path.exists(path):
             os.mkdir(path)
+            if not os.path.exists(path):
+                import tempfile
+                # could not create directory: path
+                # last ditch effort here (*probably for travis-ci)
+                path = tempfile.mkdtemp()
+                ini_file = os.path.abspath(os.path.join(path, SOURCE_CACHE_SETTINGS_FILENAME))
+                self.qsettings = QtCore.QSettings(ini_file, QtCore.QSettings.IniFormat)
+                # TODO: we *should* delete this temporary directory when completely done
 
 
 class NXDL_File_Set(object):

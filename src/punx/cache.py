@@ -18,7 +18,6 @@ maintain the local cache of NeXus NXDL and XML Schema files
    
    ~NoCacheDirectory
    ~get_nxdl_dir
-   ~githubMasterInfo
    ~update_NXDL_Cache
    ~qsettings
    ~user_cache_settings
@@ -115,154 +114,25 @@ def get_nxdl_dir():
     return os.path.abspath(path)
 
 
-def githubMasterInfo(org, repo):
-    '''
-    get information about the repository master branch
-    
-    :returns: dict (as below) or None if could not get info
-    
-    ========  ================================================
-    key       meaning
-    ========  ================================================
-    git_time  ISO-8601-compatible timestamp from GitHub
-    git_sha   hash tag of latest GitHub commit
-    zip_url   URL of downloadable ZIP file
-    ========  ================================================
-    '''
-    # get repository information via GitHub API
-    url = 'https://api.github.com/repos/%s/%s/commits' % (org, repo)
-    
-    msg = 'disabling warnings about GitHub self-signed https certificates'
-    punx.LOG_MESSAGE(msg, punx.DEBUG)
-    requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
-    punx.LOG_MESSAGE('get repo info: ' + str(url), punx.INFO)
-    for _retry in range(punx.GITHUB_RETRY_COUNT):
-        try:
-            r = requests.get(url, verify=False)
-        except requests.exceptions.ConnectionError as _exc:
-            # see: http://docs.python-requests.org/en/master/user/quickstart/#errors-and-exceptions
-            # see: http://docs.python-requests.org/en/master/api/#id1
-            punx.LOG_MESSAGE('ConnectionError from ' + str(url), punx.ERROR)
-            return None
-        else:
-            break
-        punx.LOG_MESSAGE('retry to get repo info: ' + str(url), punx.WARN)
-
-    knowledge = r.json()
-    if isinstance(knowledge, dict):     # is GitHub rate-limiting us?  <= 60/hr
-        if 'message' in knowledge:
-            msg = knowledge['message']
-            # TODO: could improve this
-            # - remove parenthetical expression from sg
-            # - follow advice in knowledge['docummentation_url']
-            #   - identify time when limit will be removed
-            #   - or how long until that happens (about an hour)
-            '''
-            curl -i https://api.github.com/nexusformat/definitions
-            HTTP/1.1 200 OK
-            Date: Mon, 01 Jul 2013 17:27:06 GMT
-            Status: 200 OK
-            X-RateLimit-Limit: 60
-            X-RateLimit-Remaining: 56
-            X-RateLimit-Reset: 1372700873
-            '''
-            raise punx.CannotUpdateFromGithubNow(msg)
-        
-    latest = knowledge[0]
-    sha = latest['sha']
-    iso8601 = latest['commit']['committer']['date']
-    zip_url = 'https://github.com/%s/%s/archive/master.zip' % (org, repo)
-    
-    punx.LOG_MESSAGE('git sha: ' + str(sha), punx.INFO)
-    punx.LOG_MESSAGE('git iso8601: ' + str(iso8601), punx.INFO)
-    
-    return dict(git_sha=sha, git_time=iso8601, zip_url=zip_url)
-
-
-def __get_github_info__():
-    '''
-    check with GitHub for any updates
-    '''
-    return githubMasterInfo(punx.GITHUB_NXDL_ORGANIZATION, 
-                            punx.GITHUB_NXDL_REPOSITORY)
-
-
 def update_NXDL_Cache(force_update=False):
     '''
     update the cache of NeXus NXDL files
     
     :param bool force_update: (optional, default: False) update if GitHub is available
     '''
-    msg = 'update_NXDL_Cache(): force_update=' + str(force_update)
-    punx.LOG_MESSAGE(msg, punx.DEBUG)
-    info = __get_github_info__()    # check with GitHub first
-    if info is None:
-        punx.LOG_MESSAGE('GitHub not available', punx.INFO)
-        return
+    import punx.cache_manager, punx.github_handler
 
-    # proceed only if GitHub info was available
+    punx.LOG_MESSAGE('update_NXDL_Cache(force_update=%s)' % str(force_update))
+
+    cm = punx.cache_manager.CacheManager()
+    grr = punx.github_handler.GitHub_Repository_Reference()
+    grr.connect_repo()
+    cm.install_NXDL_file_set(grr, user_cache=True, ref='master')
+
     qset = qsettings()
+    info = dict(git_sha=grr.sha, git_time=grr.last_modified, zip_url=grr.zip_url)
     info['file'] = str(qset.fileName())
 
-    different_sha = str(info['git_sha']) != str(qset.getKey('git_sha'))
-    different_git_time = str(info['git_time']) != str(qset.getKey('git_time'))
-    nxdl_subdir_exists = os.path.exists(get_nxdl_dir())
-
-    could_update = different_sha or different_git_time or not nxdl_subdir_exists
-    updating = could_update or force_update
-    
-    if not updating:
-        punx.LOG_MESSAGE('not updating NeXus definitions files', punx.INFO)
-        return
-
-    path = qset.cache_dir()
-    msg = 'updating NeXus definitions files in directory: ' + os.path.abspath(path)
-    punx.LOG_MESSAGE(msg, punx.INFO)
-
-    # download the repository ZIP file 
-    url = info['zip_url']
-    msg = 'disabling warnings about GitHub self-signed https certificates'
-    punx.LOG_MESSAGE(msg, punx.DEBUG)
-    requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
-    punx.LOG_MESSAGE('download: ' + str(url), punx.INFO)
-    for _retry in range(punx.GITHUB_RETRY_COUNT):
-        try:
-            content = requests.get(url, verify=False).content
-        except requests.exceptions.ConnectionError as _exc:
-            msg = 'ConnectionError from ' + str(url)
-            msg += ', ' + str(_exc)
-            punx.LOG_MESSAGE(msg, punx.ERROR)
-            return None
-        else:
-            break
-        punx.LOG_MESSAGE('retry download: ' + str(url), punx.WARN)
-
-    buf = io.BytesIO(content)
-    zip_content = zipfile.ZipFile(buf)
-    
-    # extract the NXDL (XML, XSL, & XSD) files to the path
-    msg = 'extract ZIP to directory: ' + os.path.abspath(path)
-    punx.LOG_MESSAGE(msg, punx.INFO)
-    NXDL_categories = 'base_classes applications contributed_definitions'
-    for item in zip_content.namelist():
-        parts = item.rstrip('/').split('/')
-        if len(parts) == 2:             # get the XML Schema files
-            if os.path.splitext(parts[1])[-1] in ('.xsd',):
-                zip_content.extract(item, path)
-                msg = 'extracted: ' + os.path.abspath(item)
-                punx.LOG_MESSAGE(msg, punx.DEBUG)
-        elif len(parts) == 3:         # get the NXDL files
-            if parts[1] in NXDL_categories.split():
-                if os.path.splitext(parts[2])[-1] in ('.xml .xsl'.split()):
-                    zip_content.extract(item, path)
-                    msg = 'extracted: ' + os.path.abspath(item)
-                    punx.LOG_MESSAGE(msg, punx.DEBUG)
-
-    if force_update:
-        # force the .ini file to be re-written
-        punx.LOG_MESSAGE('force .ini file update', punx.DEBUG)
-        for k in ('git_sha', 'git_time'):
-            qset.setKey('___global___/'+k, info[k])
     punx.LOG_MESSAGE('update .ini file: ' + str(qset.fileName()), punx.INFO)
     qset.updateGroupKeys(info)
 

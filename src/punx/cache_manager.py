@@ -315,8 +315,9 @@ class UserCache(Base_Cache):
             punx.__settings_package__)
         path = self.path()
         if not os.path.exists(path):
-            os.mkdir(path)
-            if not os.path.exists(path):
+            try:
+                os.mkdir(path)
+            except OSError:
                 import tempfile
                 # could not create directory: path
                 # last ditch effort here (*probably for travis-ci)

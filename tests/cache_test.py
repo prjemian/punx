@@ -46,12 +46,12 @@ class TestCache(unittest.TestCase):
         self.assertIsInstance(nxdl_xsd.docinfo, lxml.etree.DocInfo)
         self.assertIsInstance(nxdl_xsd.parser, lxml.etree.XMLParser)
     
-    def test___get_github_info__(self):
-        info = punx.cache.__get_github_info__()
-        self.assertIsInstance(info, dict)
-        self.assertEqual(3, len(info))
-        expected_url = 'https://github.com/nexusformat/definitions/archive/master.zip'
-        self.assertEqual(expected_url, info['zip_url'])
+#     def test___get_github_info__(self):
+#         info = punx.cache.__get_github_info__()
+#         self.assertIsInstance(info, dict)
+#         self.assertEqual(3, len(info))
+#         expected_url = 'https://github.com/nexusformat/definitions/archive/master.zip'
+#         self.assertEqual(expected_url, info['zip_url'])
 
 
 # class TestCacheExceptions(unittest.TestCase):

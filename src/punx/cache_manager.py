@@ -185,7 +185,10 @@ class CacheManager(punx.singletons.Singleton):
         self.user = UserCache()
         
         self.NXDL_file_sets = self.file_sets()
-        # self.select_NXDL_file_set()
+        try:
+            self.select_NXDL_file_set()
+        except KeyError:
+            pass
             
         # TODO: index the cache and update the .ini file as needed
     
@@ -204,9 +207,13 @@ class CacheManager(punx.singletons.Singleton):
         '''
         return the named self.default_file_set instance or raise KeyError exception if unknown
         '''
+        import punx.github_handler
         ref = ref or punx.github_handler.DEFAULT_NXDL_SET
         if ref not in self.NXDL_file_sets:
-            raise KeyError('unknown NXDL file set: ' + str(ref))
+            #msg = 'unknown NXDL file set: ' + str(ref)
+            msg = 'expected one of ' + ' '.join(sorted(self.NXDL_file_sets.keys()))
+            msg += ', received: ' + str(ref)
+            raise KeyError(msg)
         self.default_file_set = self.NXDL_file_sets[ref]
         return self.default_file_set
     

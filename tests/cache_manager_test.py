@@ -64,6 +64,12 @@ class Test_CacheManager_Module(unittest.TestCase):
             fs = cm.select_NXDL_file_set()
             self.assertEqual(fs.ref, punx.github_handler.DEFAULT_NXDL_SET, u'ref: ' + fs.ref)
             self.assertEqual(fs.cache, u'source', u'in source cache: ' + fs.cache)
+    
+    def test_missing_file_set(self):
+        import punx.github_handler
+        cm = punx.cache_manager.CacheManager()
+        if cm is not None:
+            self.assertRaises(KeyError, cm.select_NXDL_file_set, '**missing**')
 
 
 def suite(*args, **kw):

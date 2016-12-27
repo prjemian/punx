@@ -35,11 +35,10 @@ class TestCache(unittest.TestCase):
     def test_get_nxdl_dir(self):
         base = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
         base += '/'
+        received = punx.cache.get_nxdl_dir()
         self.assertTrue(base.startswith(base))
-        received = punx.cache.get_nxdl_dir()[len(base):]
-        expected = os.path.join(*'src/punx/cache/definitions-master'.split('/'))
-        self.assertEqual(expected, received)
-        self.assertTrue(punx.cache.USE_SOURCE_CACHE)
+        self.assertTrue(received.startswith(base))
+        self.assertTrue(os.path.exists(received))
 
     def test_get_nxdl_xsd(self):
         nxdl_xsd = punx.cache.get_nxdl_xsd()

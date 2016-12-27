@@ -110,6 +110,11 @@ class NoCacheDirectory(Exception):
     pass
 
 
+class No_NXDL_files_available(Exception): 
+    'custom exception: no NXDL files are available'
+    pass
+
+
 def get_nxdl_dir():
     '''
     the path of the directory with the files containing NeXus definitions
@@ -117,12 +122,17 @@ def get_nxdl_dir():
     Note:  This directory, and the files it contains, are **only** used during
     the process of updating the cache.
     '''
-    if USE_SOURCE_CACHE:
-        cache_dir = SOURCE_CACHE_ROOT
-    else:
-        cache_dir = qsettings().cache_dir()
-    path = os.path.abspath(os.path.join(cache_dir, punx.NXDL_CACHE_SUBDIR))
-    return path
+    import punx.cache_manager
+#     if USE_SOURCE_CACHE:
+#         cache_dir = SOURCE_CACHE_ROOT
+#     else:
+#         cache_dir = qsettings().cache_dir()
+#     path = os.path.abspath(os.path.join(cache_dir, punx.NXDL_CACHE_SUBDIR))
+    cm = punx.cache_manager.CacheManager()
+    if cm.default_file_set is None:
+        raise No_NXDL_files_available()
+    path = cm.default_file_set.path
+    return os.path.abspath(path)
 
 
 def githubMasterInfo(org, repo):

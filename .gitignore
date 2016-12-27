@@ -1,7 +1,7 @@
 *.py[cod]
 
 # local NXDL source cache (to be packaged with sdist)
-src/punx/cache/*
+src/punx/cache/*.ini
 
 # C extensions
 *.so

@@ -43,6 +43,7 @@ setup (
     #packages=find_packages(),
     package_data     = {
         'punx': [
+            'cache/*/*.json',
             'cache/*/*.xsd',
             'cache/*/*/*.xml',
             'cache/*/*/*.xsl',

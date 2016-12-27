@@ -58,7 +58,7 @@ __install_requires__ = ['h5py', 'lxml', 'numpy',
                         'requests',
                         # 'PyQt4',  
     # see: http://stackoverflow.com/questions/4628519/is-it-possible-to-require-pyqt-from-setuptools-setup-py
-                        'PyGithub'
+                        'PyGithub',
                         ]
 __sphinx_mock_list__ = __install_requires__ + ['lxml.etree', ]
 __classifiers__ = [

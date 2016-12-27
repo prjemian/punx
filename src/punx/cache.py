@@ -22,8 +22,6 @@ maintain the local cache of NeXus NXDL and XML Schema files
    ~update_NXDL_Cache
    ~qsettings
    ~user_cache_settings
-   ~source_cache_settings
-   ~SourceCacheSettings
    ~UserCacheSettings
    ~abs_NXDL_filename
    ~get_XML_Schema
@@ -49,14 +47,6 @@ the user.  This set is updated on demand by the user and only
 when a network connection allows the code to contact the GitHub
 source code repository.  The update process will update content 
 from the repository.
-
-This code chooses which set of definitions to use, based on the
-presence of the *__use_source_cache__ file*.  This file is part
-of the source code repository and will be available to 
-developers using code from the source code repository.  This file
-will not be packaged with the source distribution, thus not present
-when users run from a copy of the *punx* package installed from PyPI
-(or other).
 
 .. rubric:: Public Interface
 
@@ -84,10 +74,6 @@ orgName = punx.__settings_organization__
 appName = punx.__settings_package__
 
 PKG_DIR = os.path.abspath(os.path.dirname(__file__))
-SOURCE_CACHE_ROOT = os.path.join(PKG_DIR, punx.CACHE_SUBDIR)
-
-SOURCE_CACHE_KEY_FILE = '__use_source_cache__'
-USE_SOURCE_CACHE = os.path.exists(os.path.join(PKG_DIR, SOURCE_CACHE_KEY_FILE))
 
 NXDL_SCHEMA_FILE = 'nxdl.xsd'
 NXDL_TYPES_SCHEMA_FILE = 'nxdlTypes.xsd'
@@ -97,7 +83,6 @@ XSD_NAMESPACE = 'http://www.w3.org/2001/XMLSchema'
 NX_DICT = dict(xs=XSD_NAMESPACE, nx=NXDL_NAMESPACE)
 
 
-__singleton_cache_settings_source__ = None
 __singleton_cache_settings_user__ = None
 __singleton_settings__ = None
 __singleton_xml_schema__ = None
@@ -123,11 +108,6 @@ def get_nxdl_dir():
     the process of updating the cache.
     '''
     import punx.cache_manager
-#     if USE_SOURCE_CACHE:
-#         cache_dir = SOURCE_CACHE_ROOT
-#     else:
-#         cache_dir = qsettings().cache_dir()
-#     path = os.path.abspath(os.path.join(cache_dir, punx.NXDL_CACHE_SUBDIR))
     cm = punx.cache_manager.CacheManager()
     if cm.default_file_set is None:
         raise No_NXDL_files_available()
@@ -289,15 +269,11 @@ def update_NXDL_Cache(force_update=False):
 
 def qsettings():
     '''
-    return the QSettings instance, chosen from user or source cache
+    return the QSettings instance, chosen from user cache
     '''
     global __singleton_settings__
     if __singleton_settings__ is None:
-        if USE_SOURCE_CACHE:
-            qset = source_cache_settings()
-        else:
-            qset = user_cache_settings()
-        __singleton_settings__ = qset
+        __singleton_settings__ = user_cache_settings()
     if not os.path.exists(__singleton_settings__.cache_dir()):
         raise NoCacheDirectory('no cache found')
     return __singleton_settings__
@@ -307,36 +283,8 @@ def user_cache_settings():
     '''manage the user cache info file as an .ini file'''
     global __singleton_cache_settings_user__
     if __singleton_cache_settings_user__ is None:
-        try:
-            qset = UserCacheSettings()
-        except:
-            # fall back to source cache if cannot access user cache 
-            qset = SourceCacheSettings()
-        __singleton_cache_settings_user__ = qset
+        __singleton_cache_settings_user__ = UserCacheSettings()
     return __singleton_cache_settings_user__
-
-
-def source_cache_settings():
-    '''manage the source cache info file as an .ini file'''
-    global __singleton_cache_settings_source__
-    if __singleton_cache_settings_source__ is None:
-        qset = SourceCacheSettings()
-        __singleton_cache_settings_source__ = qset
-    return __singleton_cache_settings_source__
-
-
-class SourceCacheSettings(QtCore.QSettings, settings.QSettingsMixin):
-    '''
-    manage the source cache settings file as an .ini file using QSettings
-    '''
-    
-    def __init__(self):
-        if USE_SOURCE_CACHE and not os.path.exists(SOURCE_CACHE_ROOT):
-            os.mkdir(SOURCE_CACHE_ROOT)
-        path = os.path.join(SOURCE_CACHE_ROOT, 
-                            punx.SOURCE_CACHE_SETTINGS_FILENAME)
-        QtCore.QSettings.__init__(self, path, QtCore.QSettings.IniFormat)
-        self.init_global_keys()
 
 
 class UserCacheSettings(QtCore.QSettings, settings.QSettingsMixin):
@@ -355,7 +303,7 @@ class UserCacheSettings(QtCore.QSettings, settings.QSettingsMixin):
                                   orgName, 
                                   appName)
         path = self.cache_dir()
-        if not USE_SOURCE_CACHE and not os.path.exists(path):
+        if not os.path.exists(path):
             os.mkdir(path)
         self.init_global_keys()
 
@@ -367,14 +315,6 @@ def abs_NXDL_filename(file_name):
     if os.path.exists(absolute_name):
         punx.LOG_MESSAGE('user cache: ' + absolute_name, punx.DEBUG)
         return absolute_name
-    if not USE_SOURCE_CACHE:
-        punx.LOG_MESSAGE('try source cache for: ' + file_name, punx.DEBUG)
-        path = os.path.join(SOURCE_CACHE_ROOT, punx.NXDL_CACHE_SUBDIR)
-        absolute_name = os.path.abspath(os.path.join(path, file_name))
-        if os.path.exists(absolute_name):
-            punx.LOG_MESSAGE('source cache: ' + absolute_name, punx.DEBUG)
-            return absolute_name
-        msg += '\t AND not found in source cache either!  Report this problem to the developer.'
     raise punx.FileNotFound(msg)
 
 
@@ -431,11 +371,3 @@ def get_nxdlTypes_xsd():
         __singleton_nxdlTypes_xsd__ = lxml.etree.parse(xsd_file_name)
 
     return __singleton_nxdlTypes_xsd__
-
-
-if __name__ == '__main__':
-#     update_NXDL_Cache(True)
-# #     # print user_cache_settings().fileName()
-# #     # print source_cache_settings().fileName()
-    print("Start this module using:  python main.py update ...")
-    exit(0)

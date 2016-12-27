@@ -29,8 +29,8 @@ class TestCache(unittest.TestCase):
             os.remove(self.logger.log_file)
         self.logger = None
 
-    def test_use_source_cache(self):
-        self.assertTrue(punx.cache.USE_SOURCE_CACHE)
+#     def test_use_source_cache(self):
+#         self.assertTrue(punx.cache.USE_SOURCE_CACHE)
 
     def test_get_nxdl_dir(self):
         base = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))

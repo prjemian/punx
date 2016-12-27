@@ -32,9 +32,10 @@ import os
 import sys
 
 import datetime
-import github
-import requests.packages.urllib3
+import requests
+from requests.packages.urllib3 import disable_warnings
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
+import github
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import punx
@@ -145,7 +146,8 @@ class GitHub_Repository_Reference(object):
         download the NXDL definitions described by ``ref``
         '''
         _msg = u'disabling warnings about GitHub self-signed https certificates'
-        requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+        #requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+        disable_warnings(InsecureRequestWarning)
 
         creds = get_BasicAuth_credentials()
         content = None

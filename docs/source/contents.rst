@@ -26,7 +26,9 @@ Source Code
    ~punx.main
    ~punx.analyze
    ~punx.cache
+   ~punx.cache_manager
    ~punx.finding
+   ~punx.github_handler
    ~punx.h5structure
    ~punx.logs
    ~punx.nxdl_rules

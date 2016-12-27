@@ -1,5 +1,5 @@
 Cache : :mod:`cache`
-###########################
+####################
 
 .. index:: NeXus definitions
 
@@ -14,12 +14,6 @@ documents the current cached version of the definitions, and other
 useful information.  This file is maintained using the
 ``PyQt4.QtCore.QSettings`` class.  [#]_
 
-.. index: pickle file
-
-Additionally, the cache parses the definitions and maintains a 
-ready-to-use version in a *pickle* [#]_ file.  This optimization
-steps saves significant repetition when validating many files.
-
 There are two distinct cache directories:
 
 .. index: source cache
@@ -27,24 +21,13 @@ There are two distinct cache directories:
 :source cache:
    The *source  cache* is provided from the installation
    source of the **punx** package.  It is stored in a subdirectory
-   of the Python source code.  It is provided as a minimum version
-   of the NXDL files, in case it is not possible to establish a 
-   *user cache* with a more up-to-date version of the NeXus definitions.
+   of the Python source code.  It is provided as a the latest released version
+   of the NXDL files.
+   The user may install additional sets of the NeXus definitions (NXDL files)
+   in the *user cache* and select from any of these for use by punx.
    
-   This cache is only updated by the developer, in preparation
-   of a source code release.  It is not stored in the GitHub repository,
-   to avoid duplication of the NeXus definitions sources.
-   
-   .. turns out the pickle file in the source cache is not
-      available to the user due to an Import Error.  When reading the
-      pickle file, this exception is reported:
-      
-         ImportError: cannot import nxdlstructure
-
-      So, the code parses the NXDL and creates the dictionary each time
-      the code is called.  Once the user updates the user cache (the user
-      cannot update the source cache), a new pickle file is written in the
-      user cache.  This file does not create the same exception.
+   The *source cache* is updated only by the developer, in preparation
+   of a source code release.
 
 .. index: user cache
 
@@ -60,7 +43,6 @@ There are two distinct cache directories:
       date/time stamp with the *user cache*.
 
 .. [#] QtCore.QSettings: http://doc.qt.io/qt-4.8/qsettings.html
-.. [#] Python pickle file: https://docs.python.org/2/library/pickle.html
 
 source code documentation
 *************************

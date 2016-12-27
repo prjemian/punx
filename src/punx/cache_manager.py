@@ -25,17 +25,33 @@ There are two cache directories:
 Within each of these cache directories, there is a settings file
 (such as *punx.ini*) that stores the configuration of that cache 
 directory.  Also, there are a number of subdirectories, each
-containing the NeXus definitions subdirectories and files (*.xml, 
-*.xsl, & *.xsd) of a specific branch, release, or commit hash
+containing the NeXus definitions subdirectories and files (``*.xml``, 
+``*.xsl``, & ``*.xsd``) of a specific branch, release, or commit hash
 from the NeXus definitions repository.
 
 :source cache: contains default set of NeXus NXDL files
 :user cache: contains additional set(s) of NeXus NXDL files, installed by user
 
+
+.. rubric:: Public interface
+
 .. autosummary::
    
-   ~get_cache_manager
+   ~CacheManager
+
+
+.. rubric:: Internal interface
+
+.. autosummary::
+   
+   ~get_short_sha
+   ~read_json_file
+   ~write_json_file
    ~extract_from_download
+   ~Base_Cache
+   ~Source_Cache
+   ~User_Cache
+   ~NXDL_File_Set
 
 '''
 
@@ -60,6 +76,7 @@ SHORT_SHA_LENGTH = 7
 
 def get_short_sha(full_sha):
     '''
+    return the first few unique characters of the git commit hash (SHA)
     '''
     return full_sha[:min(SHORT_SHA_LENGTH, len(full_sha))]
 
@@ -91,7 +108,7 @@ def extract_from_download(grr, path):       # TODO refactor into NXDL_File_Set
         grr = punx.github_handler.GitHub_Repository_Reference()
         grr.connect_repo()
         if grr.request_info() is not None:
-            extract_from_download(grr, cache_directory)
+            punx.cache_manager.extract_from_download(grr, cache_directory)
     
     '''
     import io, zipfile
@@ -176,6 +193,8 @@ class CacheManager(punx.singletons.Singleton):
     
         ~install_NXDL_file_set
         ~select_NXDL_file_set
+        ~file_sets
+        ~cleanup
     
     '''
     
@@ -250,9 +269,10 @@ class Base_Cache(object):
     
     .. autosummary::
        
-       ~discover
+       ~file_sets
        ~fileName
        ~path
+       ~cleanup
     
     '''
     

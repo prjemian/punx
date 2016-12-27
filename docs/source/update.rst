@@ -31,7 +31,6 @@ when the source cache needed to be updated:
    INFO: updating NeXus definitions files
    INFO: download: https://github.com/nexusformat/definitions/archive/master.zip
    INFO: extract ZIP to: C:/Users/Pete/Documents/eclipse/punx/src/punx/cache
-   INFO: update pickle file
 
 
 .. rubric:: command line help

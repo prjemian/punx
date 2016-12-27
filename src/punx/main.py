@@ -208,9 +208,12 @@ def func_validate(args):
         # report the findings from the validation
         from punx import cache_manager
         cm = cache_manager.CacheManager()
-        qset = cm.user.qsettings
         print(':file: ' + os.path.basename(validator.fname))
-        print(':NXDL cache info: ' + str(cm.default_file_set))
+        msg = cm.default_file_set.ref_type
+        msg += ' ' + cm.default_file_set.ref
+        msg += ', ' + cache_manager.get_short_sha(cm.default_file_set.sha)
+        msg += ', ' + cm.default_file_set.cache + ' cache'
+        print(':NXDL cache info: ' + msg)
         print(':NXDL GIT sha: ' + cm.default_file_set.sha)
         print(':NXDL GIT date/time: ' + cm.default_file_set.last_modified)
         print(':validation results shown: ' + ' '.join(sorted(map(str, report_choices))))

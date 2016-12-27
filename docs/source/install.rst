@@ -52,10 +52,12 @@ Required Packages
 ============  ===================================
 Package       URL
 ============  ===================================
-PyQt4         https://riverbankcomputing.com/software/pyqt/intro
 h5py          http://www.h5py.org
 lxml          http://lxml.de
 numpy         http://numpy.scipy.org
+PyGithub      https://github.com/PyGithub/PyGithub
+PyQt4         https://riverbankcomputing.com/software/pyqt/intro
+requests      http://docs.python-requests.org
 ============  ===================================
 
 Optional Packages

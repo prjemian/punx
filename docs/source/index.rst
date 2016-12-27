@@ -10,7 +10,6 @@ Use these three steps to :ref:`install <install>` and try the :ref:`demo <demo>`
    :linenos:
 
     pip install punx
-    punx update
     punx demo
 
 

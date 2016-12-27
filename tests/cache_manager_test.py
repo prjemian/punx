@@ -54,8 +54,7 @@ class Test_CacheManager_Module(unittest.TestCase):
             self.assertTrue(
                 punx.github_handler.DEFAULT_NXDL_SET in cm.NXDL_file_sets, 
                 u'the default NXDL file set is in the cache')
-            # for k, v in cm.NXDL_file_sets.items():
-            #     print(k, str(v))
+            cm.cleanup()
     
     def test_default_file_set(self):
         import punx.github_handler
@@ -64,12 +63,14 @@ class Test_CacheManager_Module(unittest.TestCase):
             fs = cm.select_NXDL_file_set()
             self.assertEqual(fs.ref, punx.github_handler.DEFAULT_NXDL_SET, u'ref: ' + fs.ref)
             self.assertEqual(fs.cache, u'source', u'in source cache: ' + fs.cache)
+            cm.cleanup()
     
     def test_missing_file_set(self):
         import punx.github_handler
         cm = punx.cache_manager.CacheManager()
         if cm is not None:
             self.assertRaises(KeyError, cm.select_NXDL_file_set, '**missing**')
+            cm.cleanup()
 
 
 def suite(*args, **kw):

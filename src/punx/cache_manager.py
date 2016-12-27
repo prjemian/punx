@@ -190,7 +190,7 @@ class CacheManager(punx.singletons.Singleton):
         except KeyError:
             pass
             
-        # TODO: index the cache and update the .ini file as needed
+        # TODO: update the .ini file as needed
     
     # - - - - - - - - - - - - - -
     # public
@@ -235,6 +235,13 @@ class CacheManager(punx.singletons.Singleton):
                 
         self.NXDL_file_sets = fs    # remember
         return fs
+    
+    def cleanup(self):
+        '''
+        removes any temporary directories
+        '''
+        self.source.cleanup()
+        self.user.cleanup()
    
 
 class Base_Cache(object):
@@ -250,6 +257,7 @@ class Base_Cache(object):
     '''
     
     qsettings = None
+    is_temporary_directory = False
 
     def path(self):
         'directory containing the QSettings file'
@@ -279,6 +287,15 @@ class Base_Cache(object):
                     fs[item] = NXDL_File_Set()
                     fs[item].read_info_file(info_file)
         return fs
+    
+    def cleanup(self):
+        '''
+        removes any temporary directories
+        '''
+        if self.is_temporary_directory:
+            os.removedirs(self.path())
+            self.is_temporary_directory = False
+
     
 class SourceCache(Base_Cache):
     '''
@@ -313,18 +330,20 @@ class UserCache(Base_Cache):
             QtCore.QSettings.UserScope, 
             punx.__settings_organization__, 
             punx.__settings_package__)
+
         path = self.path()
         if not os.path.exists(path):
             try:
                 os.mkdir(path)
             except OSError:
                 import tempfile
-                # could not create directory: path
-                # last ditch effort here (*probably for travis-ci)
+                # travis-ci raises this exception
+                # apparently cannot create /home/travis/.config/punx
+                # last ditch effort here, make a temp dir for 1-time use
                 path = tempfile.mkdtemp()
                 ini_file = os.path.abspath(os.path.join(path, SOURCE_CACHE_SETTINGS_FILENAME))
                 self.qsettings = QtCore.QSettings(ini_file, QtCore.QSettings.IniFormat)
-                # TODO: we *should* delete this temporary directory when completely done
+                self.is_temporary_directory = True
 
 
 class NXDL_File_Set(object):

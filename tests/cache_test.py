@@ -45,33 +45,6 @@ class TestCache(unittest.TestCase):
         self.assertIsInstance(nxdl_xsd, lxml.etree._ElementTree)
         self.assertIsInstance(nxdl_xsd.docinfo, lxml.etree.DocInfo)
         self.assertIsInstance(nxdl_xsd.parser, lxml.etree.XMLParser)
-    
-#     def test___get_github_info__(self):
-#         info = punx.cache.__get_github_info__()
-#         self.assertIsInstance(info, dict)
-#         self.assertEqual(3, len(info))
-#         expected_url = 'https://github.com/nexusformat/definitions/archive/master.zip'
-#         self.assertEqual(expected_url, info['zip_url'])
-
-
-# class TestCacheExceptions(unittest.TestCase):
-#  
-#     def setUp(self):
-#         punx.cache.__singleton_nxdl_xsd__ = None
-#         self.xsd_file = punx.cache.abs_NXDL_filename(punx.cache.NXDL_SCHEMA_FILE)
-#         self.tname = self.xsd_file + '.ignore'
-#         os.rename(self.xsd_file, self.tname)
-#  
-#     def tearDown(self):
-#         os.rename(self.tname, self.xsd_file)
-#  
-#     def test_get_nxdl_xsd_exceptions(self):
-#         # FIXME: not working
-#         with self.assertRaises((punx.FileNotFound,
-#                                 punx.SchemaNotFound,
-#                                 punx.CannotUpdateFromGithubNow)):
-#             punx.cache.get_nxdl_xsd()
-#         pass
      
 
 def suite(*args, **kw):

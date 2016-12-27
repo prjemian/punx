@@ -55,11 +55,7 @@ from the repository.
 
 import lxml.etree
 import os
-import requests.packages.urllib3
-from requests.packages.urllib3.exceptions import InsecureRequestWarning
 import sys
-import io
-import zipfile
 from PyQt4 import QtCore
 
 _path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))

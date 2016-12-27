@@ -18,9 +18,6 @@ maintain the local cache of NeXus NXDL and XML Schema files
    
    ~NoCacheDirectory
    ~get_nxdl_dir
-   ~get_pickle_file_name
-   ~write_pickle_file
-   ~read_pickle_file
    ~githubMasterInfo
    ~update_NXDL_Cache
    ~qsettings
@@ -67,7 +64,6 @@ when users run from a copy of the *punx* package installed from PyPI
 :get new NXDL definitions from GitHub:     :meth:`~punx.cache.update_NXDL_Cache`
 '''
 
-import pickle
 import lxml.etree
 import os
 import requests.packages.urllib3
@@ -119,7 +115,7 @@ def get_nxdl_dir():
     the path of the directory with the files containing NeXus definitions
     
     Note:  This directory, and the files it contains, are **only** used during
-    the process of updating the cache and then writing the pickle file.
+    the process of updating the cache.
     '''
     if USE_SOURCE_CACHE:
         cache_dir = SOURCE_CACHE_ROOT
@@ -127,51 +123,6 @@ def get_nxdl_dir():
         cache_dir = qsettings().cache_dir()
     path = os.path.abspath(os.path.join(cache_dir, punx.NXDL_CACHE_SUBDIR))
     return path
-
-
-def get_pickle_file_name(path, use_fallback=True):
-    '''
-    The pickle file holds all known NXDL classes, parsed into Python data structures
-    '''
-    pfile = os.path.join(path, punx.PICKLE_FILE)
-    if use_fallback and not USE_SOURCE_CACHE and not os.path.exists(pfile):
-        # user cache has no pickle file, fall back to source cache
-        punx.LOG_MESSAGE('using source cache pickle file', punx.DEBUG)
-        pfile = os.path.join(SOURCE_CACHE_ROOT, punx.PICKLE_FILE)
-    return os.path.abspath(pfile)
-
-
-def write_pickle_file(info, path):
-    '''
-    write the parsed nxdl_dict and info to a Python pickle file
-    '''
-    from punx import nxdlstructure
-    info['pickle_file'] = get_pickle_file_name(path, use_fallback=False)
-    for k, v in info.items():
-        msg = 'info[%s] = %s' % (k, str(v))
-        punx.LOG_MESSAGE(msg, punx.DEBUG)
-    msg = 'update pickle file: ' + os.path.abspath(info['pickle_file'])
-    punx.LOG_MESSAGE(msg, punx.INFO)
-
-    nxdl_dict = nxdlstructure.get_NXDL_specifications()
-    pickle_data = dict(nxdl_dict=nxdl_dict, info=info)
-    pickle.dump(pickle_data, open(info['pickle_file'], 'wb'))
-
-
-def read_pickle_file(pfile, sha):
-    '''
-    read the parsed nxdl_dict and info from a Python pickle file
-    '''
-    punx.LOG_MESSAGE('read pickle file', punx.DEBUG)
-    pickle_data = pickle.load(open(pfile, 'rb'))
-    if 'info' in pickle_data:
-        # any other tests to qualify this?
-        if sha == pickle_data['info']['git_sha']:   # declare victory!
-            # do not need to return ``info`` since it matches
-            punx.LOG_MESSAGE('matching SHA', punx.DEBUG)
-            return pickle_data['nxdl_dict']
-    punx.LOG_MESSAGE('SHA does not match', punx.DEBUG)
-    return None
 
 
 def githubMasterInfo(org, repo):
@@ -298,9 +249,6 @@ def update_NXDL_Cache(force_update=False):
 
     buf = io.BytesIO(content)
     zip_content = zipfile.ZipFile(buf)
-    # TODO: How to save this ZIP to disk? not needed when using pickle file
-    #local_zip_file_name = os.path.join(path, url.split('/')[-1])
-    #open(local_zip_file_name, 'w').write(content)
     
     # extract the NXDL (XML, XSL, & XSD) files to the path
     msg = 'extract ZIP to directory: ' + os.path.abspath(path)
@@ -319,24 +267,10 @@ def update_NXDL_Cache(force_update=False):
                     zip_content.extract(item, path)
                     msg = 'extracted: ' + os.path.abspath(item)
                     punx.LOG_MESSAGE(msg, punx.DEBUG)
-    
-    # optimization: write the parsed NXDL specifications to a file
-    if force_update:
-        # force the pickle file to be re-written
-        pfile = get_pickle_file_name(path, use_fallback=False)
-        msg = 'force pickle file update'
-        punx.LOG_MESSAGE(msg, punx.DEBUG)
-        if os.path.exists(pfile):
-            os.remove(pfile)
-    write_pickle_file(info, path)
 
     if force_update:
         # force the .ini file to be re-written
         punx.LOG_MESSAGE('force .ini file update', punx.DEBUG)
-        key = 'pickle_file'
-        v =  qset.getKey(key)
-        qset.setKey(key, 'update forced')
-        qset.setKey(key, v)
         for k in ('git_sha', 'git_time'):
             qset.setKey('___global___/'+k, info[k])
     punx.LOG_MESSAGE('update .ini file: ' + str(qset.fileName()), punx.INFO)

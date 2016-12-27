@@ -181,8 +181,8 @@ class CacheManager(punx.singletons.Singleton):
     
     def __init__(self):
         self.default_file_set = None
-        self.source = self.SourceCache()
-        self.user = self.UserCache()
+        self.source = SourceCache()
+        self.user = UserCache()
         
         self.NXDL_file_sets = self.file_sets()
         # self.select_NXDL_file_set()
@@ -229,79 +229,86 @@ class CacheManager(punx.singletons.Singleton):
         self.NXDL_file_sets = fs    # remember
         return fs
    
-    class BaseMixin_Cache(object):
+
+class Base_Cache(object):
+    '''
+    provides comon methods to get the QSettings path and file name
+    
+    .. autosummary::
+       
+       ~discover
+       ~fileName
+       ~path
+    
+    '''
+    
+    qsettings = None
+
+    def path(self):
+        'directory containing the QSettings file'
+        if self.qsettings is None:
+            raise RuntimeError('cache qsettings not defined!')
+        return os.path.dirname(self.fileName())
+
+    def fileName(self):
+        'full path of  the QSettings file'
+        if self.qsettings is None:
+            raise RuntimeError('cache qsettings not defined!')
+        fn = str(self.qsettings.fileName())
+        return fn
+    
+    def file_sets(self):
         '''
-        provides comon methods to get the QSettings path and file name
-        
-        .. autosummary::
-           
-           ~discover
-           ~fileName
-           ~path
-        
+        index all NXDL file sets in this cache
         '''
-        
-        qsettings = None
+        fs = {}
+        if self.qsettings is None:
+            raise RuntimeError('cache qsettings not defined!')
+        cache_path = self.path()
+        for item in os.listdir(cache_path):
+            if os.path.isdir(os.path.join(cache_path, item)):
+                info_file = os.path.join(cache_path, item, INFO_FILE_NAME)
+                if os.path.exists(info_file):
+                    fs[item] = NXDL_File_Set()
+                    fs[item].read_info_file(info_file)
+        return fs
+    
+class SourceCache(Base_Cache):
+    '''
+    manage the source directory cache of NXDL files
+    '''
 
-        def path(self):
-            'directory containing the QSettings file'
-            if self.qsettings is None:
-                raise RuntimeError('cache qsettings not defined!')
-            return os.path.dirname(self.fileName())
-
-        def fileName(self):
-            'full path of  the QSettings file'
-            if self.qsettings is None:
-                raise RuntimeError('cache qsettings not defined!')
-            fn = str(self.qsettings.fileName())
-            return fn
+    def __init__(self):
+        path = os.path.abspath(
+            os.path.join(
+                os.path.dirname(__file__), 
+                SOURCE_CACHE_SUBDIR))
+        if not os.path.exists(path):
+            # make the directory and load the default set of NXDL files
+            os.mkdir(path)
+            _msgs = []
+            grr = punx.github_handler.GitHub_Repository_Reference()
+            grr.connect_repo()
+            if grr.request_info() is not None:
+                _msgs = extract_from_download(grr, path)
         
-        def file_sets(self):
-            '''
-            index all NXDL file sets in this cache
-            '''
-            fs = {}
-            if self.qsettings is None:
-                raise RuntimeError('cache qsettings not defined!')
-            cache_path = self.path()
-            for item in os.listdir(cache_path):
-                if os.path.isdir(os.path.join(cache_path, item)):
-                    info_file = os.path.join(cache_path, item, INFO_FILE_NAME)
-                    if os.path.exists(info_file):
-                        fs[item] = NXDL_File_Set()
-                        fs[item].read_info_file(info_file)
-            return fs
-        
-    class SourceCache(BaseMixin_Cache):
-        ' '
-        def __init__(self):
-            path = os.path.abspath(
-                os.path.join(
-                    os.path.dirname(__file__), 
-                    SOURCE_CACHE_SUBDIR))
-            if not os.path.exists(path):
-                # make the directory and load the default set of NXDL files
-                os.mkdir(path)
-                _msgs = []
-                grr = punx.github_handler.GitHub_Repository_Reference()
-                grr.connect_repo()
-                if grr.request_info() is not None:
-                    _msgs = extract_from_download(grr, path)
-            
-            ini_file = os.path.abspath(os.path.join(path, SOURCE_CACHE_SETTINGS_FILENAME))
-            self.qsettings = QtCore.QSettings(ini_file, QtCore.QSettings.IniFormat)
+        ini_file = os.path.abspath(os.path.join(path, SOURCE_CACHE_SETTINGS_FILENAME))
+        self.qsettings = QtCore.QSettings(ini_file, QtCore.QSettings.IniFormat)
 
-    class UserCache(BaseMixin_Cache):
-        ' '
-        def __init__(self):
-            self.qsettings = QtCore.QSettings(
-                QtCore.QSettings.IniFormat, 
-                QtCore.QSettings.UserScope, 
-                punx.__settings_organization__, 
-                punx.__settings_package__)
-            path = self.path()
-            if not os.path.exists(path):
-                os.mkdir(path)
+class UserCache(Base_Cache):
+    '''
+    manage the user directory cache of NXDL files
+    '''
+
+    def __init__(self):
+        self.qsettings = QtCore.QSettings(
+            QtCore.QSettings.IniFormat, 
+            QtCore.QSettings.UserScope, 
+            punx.__settings_organization__, 
+            punx.__settings_package__)
+        path = self.path()
+        if not os.path.exists(path):
+            os.mkdir(path)
 
 
 class NXDL_File_Set(object):
@@ -318,6 +325,7 @@ class NXDL_File_Set(object):
     zip_url = None
     last_modified = None
     
+    # these keys are written and read to the JSON info files in each downloaded file set
     json_file_keys = 'ref ref_type sha zip_url last_modified'.split()
     
     def __str__(self):

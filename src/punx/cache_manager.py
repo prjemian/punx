@@ -400,7 +400,7 @@ class NXDL_File_Set(object):
         if file_name is None:
             return
         if not os.path.exists(file_name):
-            raise FileNotFoundError('info file not found: ' + file_name)
+            raise punx.FileNotFound('info file not found: ' + file_name)
 
         self.info = file_name
         self.path = os.path.abspath(os.path.dirname(file_name))

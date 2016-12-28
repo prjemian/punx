@@ -176,7 +176,9 @@ class UserCacheSettings(QtCore.QSettings, settings.QSettingsMixin):
 
 def abs_NXDL_filename(file_name):
     '''return absolute path to file_name, within NXDL directory'''
-    absolute_name = os.path.abspath(os.path.join(get_nxdl_dir(), file_name))
+    import punx.cache_manager
+    cm = punx.cache_manager.CacheManager()
+    absolute_name = os.path.abspath(os.path.join(cm.default_file_set.path, file_name))
     msg = 'file does not exist: ' + absolute_name
     if not os.path.exists(absolute_name):
         raise punx.FileNotFound(msg)

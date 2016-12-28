@@ -453,4 +453,6 @@ def main():
 
 
 if __name__ == '__main__':  # remove for production
+    import punx.logs
+    logger = punx.logs.Logger(level=punx.CONSOLE_ONLY)
     main()

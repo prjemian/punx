@@ -28,12 +28,6 @@ import punx
 import punx.singletons
 
 
-NXDL_XML_NAMESPACE = 'http://definition.nexusformat.org/nxdl/3.1'
-XMLSCHEMA_NAMESPACE = 'http://www.w3.org/2001/XMLSchema'
-NAMESPACE_DICT = {'nx': NXDL_XML_NAMESPACE, 
-                  'xs': XMLSCHEMA_NAMESPACE}
-
-
 def get_NXDL_definitions(nxdl_dir):
     '''
     return a dictionary of the NXDL classes found in ``nxdl_dir``
@@ -75,38 +69,13 @@ def validate_xml_tree(xml_tree):
 
     :param str xml_file_name: name of XML file
     '''
-    schema = NXDL_Schema().schema
+    import punx.schema_manager
+    schema = punx.schema_manager.NXDL_Schema().schema
     try:
         result = schema.assertValid(xml_tree)
     except lxml.etree.DocumentInvalid as exc:
         raise punx.InvalidNxdlFile(str(exc))
     return result
-
-
-class NXDL_Schema(punx.singletons.Singleton):
-    '''
-    describes the XML Schema for the NeXus NXDL definitions files
-    '''
-    
-    ns = NAMESPACE_DICT
-    
-    def __init__(self):
-        import punx.nxdl_rules
-        cm = punx.cache_manager.CacheManager()
-        if cm is None or cm.default_file_set is None:
-            raise ValueError('Could not get NXDL file set from the cache')
-        
-        self.schema_file = os.path.join(cm.default_file_set.path, 'nxdl.xsd')
-        if not os.path.exists(self.schema_file):
-            raise punx.FileNotFound('XML Schema file: ' + self.schema_file)
-        
-        self.tree = lxml.etree.parse(self.schema_file)
-        self.schema = lxml.etree.XMLSchema(self.tree)
-        
-        root = self.tree.getroot()
-        nodes = root.xpath('xs:element', namespaces=self.ns)
-        self.rules = punx.nxdl_rules.NXDL_Root(nodes[0], ns_dict=self.ns)
-        _t = True
 
 
 class NX_class_definition(object):
@@ -138,6 +107,7 @@ class NX_class_definition(object):
         since only a small subset of the NXDL files are typically
         referenced in a single data file.
         '''
+        import punx.schema_manager
         if not os.path.exists(self.file_name):
             raise punx.FileNotFound('NXDL file: ' + self.file_name)
 
@@ -149,7 +119,7 @@ class NX_class_definition(object):
             msg += '\n' + str(exc)
 
         # TODO: get the defaults from the XML Schema
-        schema = NXDL_Schema().schema
+        schema = punx.schema_manager.NXDL_Schema().schema
 
         # parse the XML content
         tree = lxml.etree.parse(self.file_name)

@@ -111,10 +111,11 @@ class GitHub_Repository_Reference(object):
         creds = get_BasicAuth_credentials()
         if creds is None:
             gh = github.Github()
+            self.repo = gh.get_repo(repo_name)
         else:
             gh = github.Github(creds['user'], creds['password'])
-        user = gh.get_user(self.orgName)
-        self.repo = user.get_repo(repo_name)
+            user = gh.get_user(self.orgName)
+            self.repo = user.get_repo(repo_name)
     
     def request_info(self, ref=None):
         '''

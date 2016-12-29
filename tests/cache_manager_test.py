@@ -17,7 +17,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..',
 import punx, punx.cache_manager
 
 
-class Test_CacheManager_Module(unittest.TestCase):
+class Test_CacheManager_class(unittest.TestCase):
     
     def test_basic_setup(self):
         self.assertEqual(
@@ -73,10 +73,35 @@ class Test_CacheManager_Module(unittest.TestCase):
             cm.cleanup()
 
 
+class Test_NXDL_File_Set_class(unittest.TestCase):
+    
+    def test_class_raw(self):
+        fs = punx.cache_manager.NXDL_File_Set()
+        self.assertTrue(isinstance(fs, punx.cache_manager.NXDL_File_Set))
+        self.assertRaises(
+            ValueError, 
+            fs.read_info_file)
+        self.assertRaises(
+            punx.FileNotFound, 
+            fs.read_info_file, '! this file does not exist')
+        self.assertTrue(
+            str(fs).startswith('<punx.cache_manager.NXDL_File_Set'))
+    
+    def test_class(self):
+        cm = punx.cache_manager.CacheManager()
+        assert(cm is not None and cm.default_file_set is not None)
+        fs = cm.default_file_set
+        self.assertTrue(
+            str(fs).startswith('NXDL_File_Set('))
+
+        # TODO: more
+
+
 def suite(*args, **kw):
     test_suite = unittest.TestSuite()
     test_list = [
-        Test_CacheManager_Module,
+        Test_CacheManager_class,
+        Test_NXDL_File_Set_class,
         ]
     for test_case in test_list:
         test_suite.addTest(unittest.makeSuite(test_case))

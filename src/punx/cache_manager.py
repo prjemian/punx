@@ -400,7 +400,10 @@ class NXDL_File_Set(object):
             self.__schema_manager_loaded__ = True
         return object.__getattribute__(self, *args, **kwargs)
     
-    def __str__(self):
+    def __str__(self, *args, **kwargs):
+        if self.ref is None:
+            return object.__str__(self, *args, **kwargs)
+
         s = 'NXDL_File_Set('
         s += 'ref_type=' + str(self.ref_type)
         s += ', ref=' + str(self.ref)
@@ -413,9 +416,10 @@ class NXDL_File_Set(object):
         return s
     
     def read_info_file(self, file_name=None):
+        if file_name is None and self.ref is None:
+            raise ValueError('NXDL_File_Set() does not refer to any files')
+
         file_name = file_name or self.info
-        if file_name is None:
-            return
         if not os.path.exists(file_name):
             raise punx.FileNotFound('info file not found: ' + file_name)
 

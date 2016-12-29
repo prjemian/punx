@@ -94,12 +94,12 @@ class Test_get_NXDL_file_list(unittest.TestCase):
             'NXDL files found: ' + str(len(nxdl_files)))
 
 
-class Test_get_NXDL_definitions(unittest.TestCase):
+class Test_NXDL_Manager(unittest.TestCase):
 
     def test__FileNotFound(self):
         self.assertRaises(
             punx.FileNotFound, 
-            punx.nxdl_manager.get_NXDL_definitions,
+            punx.nxdl_manager.NXDL_Manager,
             '!this directory does not exist')
     
     def test__function(self):
@@ -111,7 +111,8 @@ class Test_get_NXDL_definitions(unittest.TestCase):
             os.path.exists(fs.path),
             'cache path defined as: ' + str(fs.path)
             )
-        nxdl_defs = punx.nxdl_manager.get_NXDL_definitions(fs.path)
+
+        nxdl_defs = punx.nxdl_manager.NXDL_Manager(fs.path).classes
         self.assertTrue(
             isinstance(nxdl_defs, dict),
             'NXDL definitions dict type: ' + str(type(nxdl_defs)))
@@ -130,7 +131,7 @@ def suite(*args, **kw):
     test_list = [
         Test_XML_functions,
         Test_get_NXDL_file_list,
-        Test_get_NXDL_definitions,
+        Test_NXDL_Manager,
         ]
     for test_case in test_list:
         test_suite.addTest(unittest.makeSuite(test_case))

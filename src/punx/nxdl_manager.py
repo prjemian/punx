@@ -28,20 +28,20 @@ import punx
 import punx.singletons
 
 
-def get_NXDL_definitions(nxdl_dir):
+class NXDL_Manager(object):
     '''
-    return a dictionary of the NXDL classes found in ``nxdl_dir``
+    the NXDL classes found in ``nxdl_dir``
     '''
-    if not os.path.exists(nxdl_dir):
-        raise punx.FileNotFound('NXDL directory: ' + nxdl_dir)
-
-    nxdl_dict = collections.OrderedDict()
-
-    for nxdl_file_name in get_NXDL_file_list(nxdl_dir):
-        obj = NXDL_definition(nxdl_file_name)
-        nxdl_dict[obj.title] = obj
-
-    return nxdl_dict
+    
+    def __init__(self, nxdl_dir):
+        if not os.path.exists(nxdl_dir):
+            raise punx.FileNotFound('NXDL directory: ' + nxdl_dir)
+    
+        self.classes = collections.OrderedDict()
+    
+        for nxdl_file_name in get_NXDL_file_list(nxdl_dir):
+            obj = NXDL_definition(nxdl_file_name)
+            self.classes[obj.title] = obj
 
 
 def get_NXDL_file_list(nxdl_dir):
@@ -196,7 +196,7 @@ if __name__ == '__main__':
     if cm is not None and cm.default_file_set is not None:
         fs = cm.default_file_set
 
-        nxdl_dict = get_NXDL_definitions(fs.path)
+        nxdl_dict = NXDL_Manager(fs.path).classes
 
         _t = True
         for k, v in nxdl_dict.items():

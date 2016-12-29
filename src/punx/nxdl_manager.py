@@ -37,10 +37,9 @@ def get_NXDL_definitions(nxdl_dir):
 
     nxdl_dict = collections.OrderedDict()
 
-    for nxdl_file_name in get_NXDL_file_list(fs.path):
-        obj = NX_class_definition(nxdl_file_name)
+    for nxdl_file_name in get_NXDL_file_list(nxdl_dir):
+        obj = NXDL_definition(nxdl_file_name)
         nxdl_dict[obj.title] = obj
-        obj.parse()
 
     return nxdl_dict
 
@@ -70,7 +69,7 @@ def validate_xml_tree(xml_tree):
     :param str xml_file_name: name of XML file
     '''
     import punx.schema_manager
-    schema = punx.schema_manager.NXDL_Schema().schema
+    schema = punx.schema_manager.SchemaManager().lxml_schema
     try:
         result = schema.assertValid(xml_tree)
     except lxml.etree.DocumentInvalid as exc:
@@ -78,7 +77,7 @@ def validate_xml_tree(xml_tree):
     return result
 
 
-class NX_class_definition(object):
+class NXDL_definition(object):
     '''
     a complete description of a specific NXDL definition
     '''
@@ -92,40 +91,104 @@ class NX_class_definition(object):
     attributes = collections.OrderedDict()
     groups = collections.OrderedDict()
     fields = collections.OrderedDict()
-    symbols = collections.OrderedDict()    
+    symbols = collections.OrderedDict()
+    
+    __parsed__ = False
     
     def __init__(self, fname):
         self.file_name = fname
         self.title = os.path.split(fname)[-1].split('.')[0]
         self.category = os.path.split(os.path.dirname(fname))[-1]
+        self.set_defaults()
     
+    def __getattribute__(self, *args, **kwargs):
+        '''
+        implement lazy load of definition content
+        '''
+        _breakpoint = True
+        if len(args) == 1 and args[0] == 'lxml_tree' and not self.__parsed__:
+            self.parse()  # only parse this file once content is requested
+        _breakpoint = True
+        return object.__getattribute__(self, *args, **kwargs)
+
+    def set_defaults(self):
+        '''
+        use the NXDL Schema to set defaults
+        '''
+        import punx.schema_manager
+        sm = punx.schema_manager.SchemaManager()
+        _breakpoint = True
+
     def parse(self):
         '''
         parse the XML content
         
-        This could be deferred until self.nxdl is requested
+        This step is deferred until self.lxml_tree is requested
         since only a small subset of the NXDL files are typically
         referenced in a single data file.
         '''
         import punx.schema_manager
+        
+        if self.__parsed__:
+            return  # only parse this file when content is requested
+
         if not os.path.exists(self.file_name):
             raise punx.FileNotFound('NXDL file: ' + self.file_name)
 
-        self.tree = lxml.etree.parse(self.file_name)
+        self.lxml_tree = lxml.etree.parse(self.file_name)
+        self.__parsed__ = True  # NOW, the file has been parsed
+        
         try:
-            validate_xml_tree(self.tree)
+            validate_xml_tree(self.lxml_tree)
         except punx.InvalidNxdlFile as exc:
             msg = 'NXDL file is nto valid: ' + self.file_name
             msg += '\n' + str(exc)
 
         # TODO: get the defaults from the XML Schema
-        schema = punx.schema_manager.NXDL_Schema().schema
+        schema = punx.schema_manager.SchemaManager()
 
         # parse the XML content
-        tree = lxml.etree.parse(self.file_name)
-        root = tree.getroot()
+        root = self.lxml_tree.getroot()
         # TODO: get the specifications from the NXDL file
-        _t = True
+        _breakpoint = True
+
+
+class NXDL_attribute(object):
+    '''
+    a complete description of a specific NXDL attribute
+    '''
+    
+    optional = True
+
+
+class NXDL_field(object):
+    '''
+    a complete description of a specific NXDL field
+    '''
+    
+    optional = True
+    
+    attributes = collections.OrderedDict()
+
+
+class NXDL_group(object):
+    '''
+    a complete description of a specific NXDL group
+    '''
+    
+    optional = True
+    
+    attributes = collections.OrderedDict()
+    groups = collections.OrderedDict()
+    fields = collections.OrderedDict()
+
+
+class NXDL_symbol(object):
+    '''
+    a complete description of a specific NXDL symbol
+    '''
+    
+    optional = True
 
 
 if __name__ == '__main__':

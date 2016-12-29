@@ -94,7 +94,7 @@ class SchemaManager(punx.singletons.Singleton):
         
         # cleanup these internal structures
         del self.lxml_root
-        del self.lxml_schema
+        #del self.lxml_schema    # needed for XML file validation
         del self.lxml_tree
 
     def parse_nxdlTypes(self):

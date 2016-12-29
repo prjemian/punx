@@ -28,6 +28,9 @@ import punx
 import punx.singletons
 
 
+class Invalid_XSD_Schema(Exception): pass
+
+
 class NXDL_Schema(punx.singletons.Singleton):
     '''
     describes the XML Schema for the NeXus NXDL definitions files
@@ -36,7 +39,7 @@ class NXDL_Schema(punx.singletons.Singleton):
     ns = punx.NAMESPACE_DICT
     
     def __init__(self):
-        import punx.nxdl_rules
+        import punx.nxdl_rules, punx.cache_manager
         cm = punx.cache_manager.CacheManager()
         if cm is None or cm.default_file_set is None:
             raise ValueError('Could not get NXDL file set from the cache')
@@ -45,10 +48,19 @@ class NXDL_Schema(punx.singletons.Singleton):
         if not os.path.exists(self.schema_file):
             raise punx.FileNotFound('XML Schema file: ' + self.schema_file)
         
-        self.tree = lxml.etree.parse(self.schema_file)
-        self.schema = lxml.etree.XMLSchema(self.tree)
+        self.lxml_tree = lxml.etree.parse(self.schema_file)
+        self.lxml_schema = lxml.etree.XMLSchema(self.lxml_tree)
         
-        root = self.tree.getroot()
+        root = self.lxml_tree.getroot()
         nodes = root.xpath('xs:element', namespaces=self.ns)
-        self.rules = punx.nxdl_rules.NXDL_Root(nodes[0], ns_dict=self.ns)
-        _t = True
+        if len(nodes) != 1:
+            raise Invalid_XSD_Schema(self.schema_file)
+        self.nxdl = punx.nxdl_rules.NXDL_Root(nodes[0], ns_dict=self.ns)
+        _breakpoint = True
+
+
+if __name__ == '__main__':
+    import punx.logs
+    logger = punx.logs.Logger(level=punx.CONSOLE_ONLY)
+    schema = NXDL_Schema()
+    _breakpoint = True

@@ -63,7 +63,7 @@ def raise_error(node, text, obj):
     raise ValueError(msg)
 
 
-class SchemaManager(punx.singletons.Singleton):
+class SchemaManager(punx.singletons.Singleton):     # TODO: *Should* this be a singleton or known by CacheManager?
     '''
     describes the XML Schema for the NeXus NXDL definitions files
     '''

@@ -209,7 +209,7 @@ class CacheManager(punx.singletons.Singleton):
         except KeyError:
             pass
             
-        # TODO: update the .ini file as needed
+        # TODO: update the .ini file as needed (remember the default_file_set value
     
     # - - - - - - - - - - - - - -
     # public
@@ -382,6 +382,9 @@ class NXDL_File_Set(object):
     
     # these keys are written and read to the JSON info files in each downloaded file set
     json_file_keys = 'ref ref_type sha zip_url last_modified'.split()
+    
+    # TODO: consider defining the SchemaManager here (perhaps lazy load)?  see nxdl_manager for example code:  __getattribute__()
+    schema_manager = None
     
     def __str__(self):
         s = 'NXDL_File_Set('

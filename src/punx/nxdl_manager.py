@@ -25,22 +25,27 @@ import sys
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import punx
-import punx.singletons
 
 
 class NXDL_Manager(object):
     '''
     the NXDL classes found in ``nxdl_dir``
     '''
+
+    nxdl_file_set = None
     
-    def __init__(self, nxdl_dir):
-        if not os.path.exists(nxdl_dir):
-            raise punx.FileNotFound('NXDL directory: ' + nxdl_dir)
+    def __init__(self, file_set):
+        import punx.cache_manager
+        assert(isinstance(file_set, punx.cache_manager.NXDL_File_Set))
+        self.nxdl_file_set = file_set
+        
+        if file_set.path is None or not os.path.exists(file_set.path):
+            raise punx.FileNotFound('NXDL directory: ' + str(file_set.path))
     
         self.classes = collections.OrderedDict()
     
-        for nxdl_file_name in get_NXDL_file_list(nxdl_dir):
-            obj = NXDL_definition(nxdl_file_name)
+        for nxdl_file_name in get_NXDL_file_list(file_set.path):
+            obj = NXDL_definition(nxdl_file_name, file_set)
             self.classes[obj.title] = obj
 
 
@@ -87,6 +92,7 @@ class NXDL_definition(object):
     file_name = None
     nxdl = None
     tree = None
+    nxdl_file_set = None
     
     attributes = collections.OrderedDict()
     groups = collections.OrderedDict()
@@ -95,10 +101,12 @@ class NXDL_definition(object):
     
     __parsed__ = False
     
-    def __init__(self, fname):
+    def __init__(self, fname, file_set):
         self.file_name = fname
         self.title = os.path.split(fname)[-1].split('.')[0]
         self.category = os.path.split(os.path.dirname(fname))[-1]
+        self.nxdl_file_set = file_set
+
         self.set_defaults()
     
     def __getattribute__(self, *args, **kwargs):
@@ -115,8 +123,8 @@ class NXDL_definition(object):
         '''
         use the NXDL Schema to set defaults
         '''
-        import punx.schema_manager
-        sm = punx.schema_manager.get_default_schema_manager()
+        assert(self.nxdl_file_set is not None)
+        sm = self.nxdl_file_set.schema_manager
         _breakpoint = True      # TODO:
 
     def parse(self):
@@ -196,7 +204,7 @@ if __name__ == '__main__':
     if cm is not None and cm.default_file_set is not None:
         fs = cm.default_file_set
 
-        nxdl_dict = NXDL_Manager(fs.path).classes
+        nxdl_dict = NXDL_Manager(fs).classes
 
         _t = True
         for k, v in nxdl_dict.items():

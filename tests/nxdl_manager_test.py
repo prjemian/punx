@@ -97,10 +97,11 @@ class Test_get_NXDL_file_list(unittest.TestCase):
 class Test_NXDL_Manager(unittest.TestCase):
 
     def test__FileNotFound(self):
+        import punx.cache_manager
+        fs = punx.cache_manager.NXDL_File_Set()
         self.assertRaises(
             punx.FileNotFound, 
-            punx.nxdl_manager.NXDL_Manager,
-            '!this directory does not exist')
+            punx.nxdl_manager.NXDL_Manager, fs)
     
     def test__function(self):
         import punx.cache_manager
@@ -112,7 +113,7 @@ class Test_NXDL_Manager(unittest.TestCase):
             'cache path defined as: ' + str(fs.path)
             )
 
-        nxdl_defs = punx.nxdl_manager.NXDL_Manager(fs.path).classes
+        nxdl_defs = punx.nxdl_manager.NXDL_Manager(fs).classes
         self.assertTrue(
             isinstance(nxdl_defs, dict),
             'NXDL definitions dict type: ' + str(type(nxdl_defs)))

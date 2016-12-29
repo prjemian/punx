@@ -19,10 +19,10 @@ Public
 .. autosummary::
    
    ~SchemaManager
-   ~NXDL_Schema_Root
-   ~NXDL_Schema_Attribute 
-   ~NXDL_Schema_Element 
-   ~NXDL_Schema_Type 
+   ~Schema_Root
+   ~Schema_Attribute 
+   ~Schema_Element 
+   ~Schema_Type 
 
 Internal
 
@@ -90,7 +90,7 @@ class SchemaManager(punx.singletons.Singleton):
 
         self.types, self.units = self.parse_nxdlTypes()
 
-        self.nxdl = NXDL_Schema_Root(nodes[0], ns_dict=self.ns, schema_root=self.lxml_root)
+        self.nxdl = Schema_Root(nodes[0], ns_dict=self.ns, schema_root=self.lxml_root)
         
         # cleanup these internal structures
         del self.lxml_root
@@ -116,7 +116,7 @@ class SchemaManager(punx.singletons.Singleton):
             elif node.tag.endswith('}annotation'):
                 pass
             else:
-                obj = NXDL_nxdlType(node, ns_dict=self.ns, schema_root=root)
+                obj = Schema_nxdlType(node, ns_dict=self.ns, schema_root=root)
                 if obj.name is not None:
                     db[obj.name] = obj
 
@@ -128,7 +128,7 @@ class SchemaManager(punx.singletons.Singleton):
         return db, units
 
 
-class NXDL_nxdlType(object):
+class Schema_nxdlType(object):
     '''
     one of the types defined in the file *nxdlTypes.xsd*
     '''
@@ -202,7 +202,7 @@ class _Mixin(object):
         '''
         copy results into target object
         
-        :param obj target: instance of _Mixin, such as NXDL_Schema_Element
+        :param obj target: instance of _Mixin, such as Schema_Element
         '''
         for k, v in self.attrs.items():
             target.attrs[k] = v
@@ -211,12 +211,12 @@ class _Mixin(object):
 
     def parse_attribute(self, node):
         ''' '''
-        obj = NXDL_Schema_Attribute(node, schema_root=self.lxml_root)
+        obj = Schema_Attribute(node, schema_root=self.lxml_root)
         self.attrs[obj.name] = obj
 
     def parse_attributeGroup(self, node):
         ''' '''
-        obj = NXDL_Schema_Type(node.attrib.get('ref'), schema_root=self.lxml_root)
+        obj = Schema_Type(node.attrib.get('ref'), schema_root=self.lxml_root)
         obj.copy_to(self)
 
     def parse_complexContent(self, node):
@@ -226,7 +226,7 @@ class _Mixin(object):
                 ref = subnode.attrib.get('base')
                 if ref not in ('nx:basicComponent'):
                     raise_error(subnode, 'unexpected base=', ref)
-                obj = NXDL_Schema_Type(ref, schema_root=self.lxml_root)
+                obj = Schema_Type(ref, schema_root=self.lxml_root)
                 obj.copy_to(self)
 
                 # parse children of extension node
@@ -245,13 +245,13 @@ class _Mixin(object):
 
     def parse_group(self, node):
         ''' '''
-        obj = NXDL_Schema_Type(node.attrib.get('ref'), schema_root=self.lxml_root)
+        obj = Schema_Type(node.attrib.get('ref'), schema_root=self.lxml_root)
         obj.copy_to(self)
 
 
-class NXDL_Schema_Root(_Mixin):
+class Schema_Root(_Mixin):
     '''
-    root of the nxdl.xsd file
+    root element of the nxdl.xsd file
     
     :param lxml.etree.Element xml_obj: XML element
     :param str obj_name: optional, default taken from ``xml_obj``
@@ -279,7 +279,7 @@ class NXDL_Schema_Root(_Mixin):
         
         for node in type_node:
             if node.tag.endswith('}attribute'):
-                obj = NXDL_Schema_Attribute(node, schema_root=self.lxml_root)
+                obj = Schema_Attribute(node, schema_root=self.lxml_root)
                 self.attrs[obj.name] = obj
             elif node.tag.endswith('}attributeGroup'):
                 self.parse_attributeGroup(node)
@@ -296,19 +296,18 @@ class NXDL_Schema_Root(_Mixin):
         '''
         for node in seq_node:
             if node.tag.endswith('}element'):
-                obj = NXDL_Schema_Element(node, schema_root=self.lxml_root)
+                obj = Schema_Element(node, schema_root=self.lxml_root)
                 self.children[obj.name] = obj
             elif node.tag.endswith('}group'):
-                obj = NXDL_Schema_Type(node.attrib.get('ref'), schema_root=self.lxml_root)
+                obj = Schema_Type(node.attrib.get('ref'), schema_root=self.lxml_root)
                 obj.copy_to(self)
             else:
                 msg = 'unhandled tag in ``definitionType``: '
                 raise_error(node, msg, node.tag)
 
-# TODO: confirm whether this is nx:attribute or xs:attribute
-class NXDL_Schema_Attribute(_Mixin): 
+class Schema_Attribute(_Mixin): 
     '''
-    nx:attribute element
+    xs:attribute element
     
     :param lxml.etree.Element xml_obj: XML element
     :param str obj_name: optional, default taken from ``xml_obj``
@@ -317,6 +316,9 @@ class NXDL_Schema_Attribute(_Mixin):
     '''
     
     def __init__(self, xml_obj, obj_name=None, ns_dict=None, schema_root=None):
+        # TODO: confirm this is xs:attribute, not nx:attribute
+        assert(xml_obj is not None)
+        assert(xml_obj.tag == '{'+xml_obj.nsmap['xs']+'}attribute')
         _Mixin.__init__(
             self, 
             xml_obj, 
@@ -360,9 +362,9 @@ class NXDL_Schema_Attribute(_Mixin):
             return _Mixin.__str__(self, *args, **kwargs)
 
 
-class NXDL_Schema_Element(_Mixin): 
+class Schema_Element(_Mixin): 
     '''
-    an element
+    xs:element
     
     :param lxml.etree.Element xml_obj: XML element
     :param str obj_name: optional, default taken from ``xml_obj``
@@ -388,7 +390,7 @@ class NXDL_Schema_Element(_Mixin):
         if ref is None:
             for node in xml_obj:
                 if node.tag.endswith('}complexType'):
-                    a = NXDL_Schema_Attribute(node.find('xs:attribute', self.ns), schema_root=self.lxml_root)
+                    a = Schema_Attribute(node.find('xs:attribute', self.ns), schema_root=self.lxml_root)
                     self.attrs[a.name] = a
                 elif node.tag.endswith('}annotation'):
                     pass
@@ -405,11 +407,11 @@ class NXDL_Schema_Element(_Mixin):
                     self.children['group'] = _Recursion('group')
                 _GroupParsing().started = True
             if ok_to_parse:
-                type_obj = NXDL_Schema_Type(ref, schema_root=self.lxml_root)
+                type_obj = Schema_Type(ref, schema_root=self.lxml_root)
                 type_obj.copy_to(self)
 
 
-class NXDL_Schema_Type(_Mixin): 
+class Schema_Type(_Mixin): 
     '''
     a named NXDL structure type (such as groupGroup)
     
@@ -455,10 +457,10 @@ class NXDL_Schema_Type(_Mixin):
         ''' '''
         for subnode in node:
             if subnode.tag.endswith('}element'):
-                obj = NXDL_Schema_Element(subnode, schema_root=self.lxml_root)
+                obj = Schema_Element(subnode, schema_root=self.lxml_root)
                 self.children[obj.name] = obj
             elif subnode.tag.endswith('}group'):
-                obj = NXDL_Schema_Element(subnode, schema_root=self.lxml_root)
+                obj = Schema_Element(subnode, schema_root=self.lxml_root)
                 self.children[obj.name] = obj
             elif subnode.tag.endswith('}any'):
                 # do not process this one, only used for documentation

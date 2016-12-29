@@ -24,7 +24,7 @@ class Test_SchemaManager_Module(unittest.TestCase):
         self.assertTrue(os.path.exists(sm.schema_file))
         self.assertTrue(isinstance(sm.ns, dict))
         self.assertGreater(len(sm.ns), 0)
-        self.assertTrue(isinstance(sm.nxdl, punx.schema_manager.NXDL_Schema_Root))
+        self.assertTrue(isinstance(sm.nxdl, punx.schema_manager.Schema_Root))
 
 
 def suite(*args, **kw):

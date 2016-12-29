@@ -13,12 +13,31 @@
 
 '''
 manages the XML Schema of this project
+
+Public
+
+.. autosummary::
+   
+   ~Invalid_XSD_Schema
+   ~NXDL_Schema
+   ~NXDL_Schema_Root
+   ~NXDL_Schema_Attribute 
+   ~NXDL_Schema_Element 
+   ~NXDL_Schema_Type 
+
+Internal
+
+.. autosummary::
+   
+   ~_Mixin
+   ~_GroupParsing
+   ~_Recursion 
+
 '''
 
 
 from __future__ import print_function
 
-import collections
 import lxml.etree
 import os
 import sys
@@ -26,9 +45,6 @@ import sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import punx
 import punx.singletons
-
-
-__group_parsing_started__ = False   # avoid a known recursion of group in a group
 
 
 def strip_ns(ref):
@@ -69,7 +85,7 @@ class NXDL_Schema(punx.singletons.Singleton):
         if len(nodes) != 1:
             raise Invalid_XSD_Schema(self.schema_file)
 
-        self.nxdl = NXDL_Root(nodes[0], ns_dict=self.ns, schema_root=self.lxml_root)
+        self.nxdl = NXDL_Schema_Root(nodes[0], ns_dict=self.ns, schema_root=self.lxml_root)
         
         # cleanup these internal structures
         del self.lxml_root
@@ -77,7 +93,7 @@ class NXDL_Schema(punx.singletons.Singleton):
         del self.lxml_tree
 
 
-class Mixin(object):
+class _Mixin(object):
     '''
     common code for NXDL Rules classes below
     
@@ -123,7 +139,7 @@ class Mixin(object):
         '''
         copy results into target object
         
-        :param obj target: instance of Mixin, such as NXDL_Element
+        :param obj target: instance of _Mixin, such as NXDL_Schema_Element
         '''
         for k, v in self.attrs.items():
             target.attrs[k] = v
@@ -132,12 +148,12 @@ class Mixin(object):
 
     def parse_attribute(self, node):
         ''' '''
-        obj = NXDL_Attribute(node, schema_root=self.lxml_root)
+        obj = NXDL_Schema_Attribute(node, schema_root=self.lxml_root)
         self.attrs[obj.name] = obj
 
     def parse_attributeGroup(self, node):
         ''' '''
-        obj = NXDL_Type(node.attrib.get('ref'), schema_root=self.lxml_root)
+        obj = NXDL_Schema_Type(node.attrib.get('ref'), schema_root=self.lxml_root)
         obj.copy_to(self)
 
     def parse_complexContent(self, node):
@@ -147,7 +163,7 @@ class Mixin(object):
                 ref = subnode.attrib.get('base')
                 if ref not in ('nx:basicComponent'):
                     self.raise_error(subnode, 'unexpected base=', ref)
-                obj = NXDL_Type(ref, schema_root=self.lxml_root)
+                obj = NXDL_Schema_Type(ref, schema_root=self.lxml_root)
                 obj.copy_to(self)
 
                 # parse children of extension node
@@ -166,11 +182,11 @@ class Mixin(object):
 
     def parse_group(self, node):
         ''' '''
-        obj = NXDL_Type(node.attrib.get('ref'), schema_root=self.lxml_root)
+        obj = NXDL_Schema_Type(node.attrib.get('ref'), schema_root=self.lxml_root)
         obj.copy_to(self)
 
 
-class NXDL_Root(Mixin):
+class NXDL_Schema_Root(_Mixin):
     '''
     root of the nxdl.xsd file
     
@@ -181,7 +197,7 @@ class NXDL_Root(Mixin):
     '''
     
     def __init__(self, xml_obj, obj_name=None, ns_dict=None, schema_root=None):
-        Mixin.__init__(
+        _Mixin.__init__(
             self, 
             xml_obj, 
             obj_name=obj_name, 
@@ -200,7 +216,7 @@ class NXDL_Root(Mixin):
         
         for node in type_node:
             if node.tag.endswith('}attribute'):
-                obj = NXDL_Attribute(node, schema_root=self.lxml_root)
+                obj = NXDL_Schema_Attribute(node, schema_root=self.lxml_root)
                 self.attrs[obj.name] = obj
             elif node.tag.endswith('}attributeGroup'):
                 self.parse_attributeGroup(node)
@@ -217,17 +233,17 @@ class NXDL_Root(Mixin):
         '''
         for node in seq_node:
             if node.tag.endswith('}element'):
-                obj = NXDL_Element(node, schema_root=self.lxml_root)
+                obj = NXDL_Schema_Element(node, schema_root=self.lxml_root)
                 self.children[obj.name] = obj
             elif node.tag.endswith('}group'):
-                obj = NXDL_Type(node.attrib.get('ref'), schema_root=self.lxml_root)
+                obj = NXDL_Schema_Type(node.attrib.get('ref'), schema_root=self.lxml_root)
                 obj.copy_to(self)
             else:
                 msg = 'unhandled tag in ``definitionType``: '
                 self.raise_error(node, msg, node.tag)
 
 # TODO: confirm whether this is nx:attribute or xs:attribute
-class NXDL_Attribute(Mixin): 
+class NXDL_Schema_Attribute(_Mixin): 
     '''
     nx:attribute element
     
@@ -238,7 +254,7 @@ class NXDL_Attribute(Mixin):
     '''
     
     def __init__(self, xml_obj, obj_name=None, ns_dict=None, schema_root=None):
-        Mixin.__init__(
+        _Mixin.__init__(
             self, 
             xml_obj, 
             obj_name=obj_name, 
@@ -278,10 +294,10 @@ class NXDL_Attribute(Mixin):
                 s += ' | '.join(self.enum)
             return s
         except:
-            return Mixin.__str__(self, *args, **kwargs)
+            return _Mixin.__str__(self, *args, **kwargs)
 
 
-class NXDL_Element(Mixin): 
+class NXDL_Schema_Element(_Mixin): 
     '''
     an element
     
@@ -295,8 +311,7 @@ class NXDL_Element(Mixin):
     '''
     
     def __init__(self, xml_obj, obj_name=None, ns_dict=None, schema_root=None):
-        global __group_parsing_started__
-        Mixin.__init__(
+        _Mixin.__init__(
             self, 
             xml_obj, 
             obj_name=obj_name, 
@@ -310,7 +325,7 @@ class NXDL_Element(Mixin):
         if ref is None:
             for node in xml_obj:
                 if node.tag.endswith('}complexType'):
-                    a = NXDL_Attribute(node.find('xs:attribute', self.ns), schema_root=self.lxml_root)
+                    a = NXDL_Schema_Attribute(node.find('xs:attribute', self.ns), schema_root=self.lxml_root)
                     self.attrs[a.name] = a
                 elif node.tag.endswith('}annotation'):
                     pass
@@ -320,18 +335,18 @@ class NXDL_Element(Mixin):
             # avoid known infinite recursion: group may contain group(s)
             ok_to_parse = True
             if xml_obj.attrib['name'] == 'group' and xml_obj.attrib['type'] == 'nx:groupType':
-                if __group_parsing_started__:
+                if _GroupParsing().started:
                     ok_to_parse = False
                     # needs a special code to apply this rule
-                    #     isinstance(obj, Recursion)
-                    self.children['group'] = Recursion('group')
-                __group_parsing_started__ = True
+                    #     isinstance(obj, _Recursion)
+                    self.children['group'] = _Recursion('group')
+                _GroupParsing().started = True
             if ok_to_parse:
-                type_obj = NXDL_Type(ref, schema_root=self.lxml_root)
+                type_obj = NXDL_Schema_Type(ref, schema_root=self.lxml_root)
                 type_obj.copy_to(self)
 
 
-class NXDL_Type(Mixin): 
+class NXDL_Schema_Type(_Mixin): 
     '''
     a named NXDL structure type (such as groupGroup)
     
@@ -344,8 +359,8 @@ class NXDL_Type(Mixin):
     '''
     
     def __init__(self, ref, tag = '*', schema_root=None):
-        # Mixin.__init__(self, xml_obj)
-        # do the Mixin.__init__ directly here
+        # _Mixin.__init__(self, xml_obj)
+        # do the _Mixin.__init__ directly here
         self.ns = punx.NAMESPACE_DICT
         self.lxml_root = schema_root
 
@@ -377,10 +392,10 @@ class NXDL_Type(Mixin):
         ''' '''
         for subnode in node:
             if subnode.tag.endswith('}element'):
-                obj = NXDL_Element(subnode, schema_root=self.lxml_root)
+                obj = NXDL_Schema_Element(subnode, schema_root=self.lxml_root)
                 self.children[obj.name] = obj
             elif subnode.tag.endswith('}group'):
-                obj = NXDL_Element(subnode, schema_root=self.lxml_root)
+                obj = NXDL_Schema_Element(subnode, schema_root=self.lxml_root)
                 self.children[obj.name] = obj
             elif subnode.tag.endswith('}any'):
                 # do not process this one, only used for documentation
@@ -389,20 +404,28 @@ class NXDL_Type(Mixin):
                 self.raise_error(subnode, 'unexpected tag=', subnode.tag)
 
 
-class Recursion(Mixin): 
+class _GroupParsing(punx.singletons.Singleton):
     '''
-    an element used in recursion, such as child group of group
+    internal: avoid a known recursion of group in a group
+    '''
+    
+    started = False
+
+
+class _Recursion(_Mixin): 
+    '''
+    internal: an element used in recursion, such as child group of group
     
     :param str obj_name: optional, default taken from ``xml_obj``
     '''
     
     def __init__(self, obj_name):
-        Mixin.__init__(self, None, obj_name=obj_name, ns_dict=None)
+        _Mixin.__init__(self, None, obj_name=obj_name, ns_dict=None)
 
 
 if __name__ == '__main__':
     #     import punx.logs
     #     logger = punx.logs.Logger(level=punx.CONSOLE_ONLY)
 
-    schema = NXDL_Schema()
+    _____schema = NXDL_Schema()
     _breakpoint = True

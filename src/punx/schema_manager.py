@@ -88,10 +88,7 @@ class SchemaManager(punx.singletons.Singleton):
         if len(nodes) != 1:
             raise punx.InvalidNxdlFile(self.schema_file)
 
-        self.types = self.parse_nxdlTypes()
-        self.units = list(self.types['anyUnitsAttr'].values)
-        del self.types['anyUnitsAttr']
-        del self.types['primitiveType']
+        self.types, self.units = self.parse_nxdlTypes()
 
         self.nxdl = NXDL_Schema_Root(nodes[0], ns_dict=self.ns, schema_root=self.lxml_root)
         
@@ -122,7 +119,13 @@ class SchemaManager(punx.singletons.Singleton):
                 obj = NXDL_nxdlType(node, ns_dict=self.ns, schema_root=root)
                 if obj.name is not None:
                     db[obj.name] = obj
-        return db
+
+        # re-arrange
+        units = list(db['anyUnitsAttr'].values)
+        del db['anyUnitsAttr']
+        del db['primitiveType']
+        
+        return db, units
 
 
 class NXDL_nxdlType(object):

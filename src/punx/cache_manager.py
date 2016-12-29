@@ -379,6 +379,7 @@ class NXDL_File_Set(object):
     sha = None
     zip_url = None
     last_modified = None
+    nxdl_element_factory = None
     
     # these keys are written and read to the JSON info files in each downloaded file set
     json_file_keys = 'ref ref_type sha zip_url last_modified'.split()
@@ -386,6 +387,10 @@ class NXDL_File_Set(object):
     # TODO: consider defining the SchemaManager here (perhaps lazy load)?  see nxdl_manager for example code:  __getattribute__()
     schema_manager = None
     __schema_manager_loaded__ = False
+    
+    def __init__(self):
+        import punx.nxdl_manager
+        self.nxdl_element_factory = punx.nxdl_manager.NXDL_ElementFactory(self)
     
     def __getattribute__(self, *args, **kwargs):
         '''

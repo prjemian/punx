@@ -113,7 +113,8 @@ class SchemaManager(object):
         if len(nodes) != 1:
             raise punx.InvalidNxdlFile(self.schema_file)
 
-        self.types, self.units = self.parse_nxdlTypes()
+        self.types, self.units = self.parse_nxdlTypes() # TODO: put into .nxdl
+        # TODO: where are patterns such as "validItemName"?
 
         self.nxdl = Schema_Root(nodes[0], ns_dict=self.ns, schema_root=self.lxml_root)
         

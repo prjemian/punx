@@ -45,7 +45,9 @@ class NXDL_Manager(object):
         self.classes = collections.OrderedDict()
     
         for nxdl_file_name in get_NXDL_file_list(file_set.path):
-            obj = NXDL_definition(nxdl_file_name, file_set)
+            #obj = NXDL_definition(nxdl_file_name, file_set)
+            obj = file_set.nxdl_element_factory.get_element('definition')
+            obj.set_file(nxdl_file_name)
             self.classes[obj.title] = obj
 
 
@@ -82,7 +84,71 @@ def validate_xml_tree(xml_tree):
     return result
 
 
-class NXDL_definition(object):
+class NXDL_ElementFactory(object):
+    '''
+    creates and serves new classes with proper default values from the NXDL rules
+    '''
+    
+    db = {}         # internal set of known elements
+    file_set = None
+    
+    def __init__(self, file_set):
+        self.file_set = file_set
+    
+    def get_element(self, element_name, category=None):
+        '''
+        create a new element or get one already built
+        '''
+        import copy
+        category = category or 'base_classes'
+        if element_name not in self.db:
+            if element_name == 'definition':
+                self.db[element_name] = NXDL_definition(None, self.file_set)
+            else:
+                creator = {
+                    'definition': NXDL_definition,
+                    'group':      NXDL_group,
+                    'field':      NXDL_field,
+                    'link':       NXDL_link,
+                    'attribute':  NXDL_attribute,
+                    'symbol':     NXDL_symbol,
+                }[element_name]
+                self.db[element_name] = creator(self.file_set)
+
+            element = self.db[element_name]
+            element.nxdl = self.file_set.schema_manager.nxdl
+            # TODO: where are file types - expecting them in .nxdl
+            element.set_defaults()
+
+        element = copy.deepcopy(self.db[element_name])
+
+        if category == 'applications':
+            pass    # TODO set the defaults accordingly
+
+        return element
+
+
+class NXDL_Base(object):
+    '''
+    a complete description of a specific NXDL definition
+    '''
+
+    parent = None
+    
+    def __init__(self, parent):
+        self.parent = parent
+
+    def set_defaults(self):
+        '''
+        use the NXDL Schema to set defaults
+        '''
+        assert(self.nxdl_file_set is not None)
+        sm = self.nxdl_file_set.schema_manager
+
+        raise RuntimeWarning('NXDL defaults not assigned')
+
+
+class NXDL_definition(NXDL_Base):
     '''
     a complete description of a specific NXDL definition
     '''
@@ -91,7 +157,7 @@ class NXDL_definition(object):
     category = None
     file_name = None
     nxdl = None
-    tree = None
+    lxml_tree = None
     nxdl_file_set = None
     
     attributes = collections.OrderedDict()
@@ -102,12 +168,11 @@ class NXDL_definition(object):
     __parsed__ = False
     
     def __init__(self, fname, file_set):
-        self.file_name = fname
-        self.title = os.path.split(fname)[-1].split('.')[0]
-        self.category = os.path.split(os.path.dirname(fname))[-1]
-        self.nxdl_file_set = file_set
+        NXDL_Base.__init__(self, None)
 
-        self.set_defaults()
+        self.nxdl_file_set = file_set
+        if fname is not None:
+            self.set_file(fname)
     
     def __getattribute__(self, *args, **kwargs):
         '''
@@ -125,7 +190,16 @@ class NXDL_definition(object):
         '''
         assert(self.nxdl_file_set is not None)
         sm = self.nxdl_file_set.schema_manager
+        
+        for k, v in sm.nxdl.attrs.items():
+            self.attributes[k] = NXDL_attribute(self, v)
+
         _breakpoint = True      # TODO:
+    
+    def set_file(self, fname):
+        self.file_name = fname
+        self.title = os.path.split(fname)[-1].split('.')[0]
+        self.category = os.path.split(os.path.dirname(fname))[-1]
 
     def parse(self):
         '''
@@ -140,8 +214,8 @@ class NXDL_definition(object):
         if self.__parsed__:
             return  # only parse this file when content is requested
 
-        if not os.path.exists(self.file_name):
-            raise punx.FileNotFound('NXDL file: ' + self.file_name)
+        if self.file_name is None or not os.path.exists(self.file_name):
+            raise punx.FileNotFound('NXDL file: ' + str(self.file_name))
 
         self.lxml_tree = lxml.etree.parse(self.file_name)
         self.__parsed__ = True  # NOW, the file has been parsed
@@ -160,15 +234,29 @@ class NXDL_definition(object):
         _breakpoint = True  # TODO: get the specifications from the NXDL file
 
 
-class NXDL_attribute(object):
+class NXDL_attribute(NXDL_Base):
     '''
     a complete description of a specific NXDL attribute
     '''
     
-    optional = True
+    nxdl_name = None
+    nxdl_type = 'str'
+    required = False
+    default_value = None
+    enum = None
+    patterns = None
+    
+    def __init__(self, parent, rules):
+        NXDL_Base.__init__(self, parent)
+        
+        for k in 'required default_value enum patterns'.split():
+            self.__setattr__(k, rules.__getattribute__(k))
+        for k in 'name type'.split():
+            self.__setattr__('nxdl_'+k, rules.__getattribute__(k))
+        # TODO: convert type (such as nx:validItemName into pattern
 
 
-class NXDL_field(object):
+class NXDL_field(NXDL_Base):    # TODO:
     '''
     a complete description of a specific NXDL field
     '''
@@ -178,7 +266,7 @@ class NXDL_field(object):
     attributes = collections.OrderedDict()
 
 
-class NXDL_group(object):
+class NXDL_group(NXDL_Base):    # TODO:
     '''
     a complete description of a specific NXDL group
     '''
@@ -190,7 +278,15 @@ class NXDL_group(object):
     fields = collections.OrderedDict()
 
 
-class NXDL_symbol(object):
+class NXDL_link(NXDL_Base):    # TODO:
+    '''
+    a complete description of a specific NXDL link
+    '''
+    
+    optional = True
+
+
+class NXDL_symbol(NXDL_Base):    # TODO:
     '''
     a complete description of a specific NXDL symbol
     '''

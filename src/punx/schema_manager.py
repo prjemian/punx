@@ -18,8 +18,7 @@ Public
 
 .. autosummary::
    
-   ~Invalid_XSD_Schema
-   ~NXDL_Schema
+   ~SchemaManager
    ~NXDL_Schema_Root
    ~NXDL_Schema_Attribute 
    ~NXDL_Schema_Element 
@@ -57,10 +56,14 @@ def strip_ns(ref):
     return ref.split(':')[-1]
 
 
-class Invalid_XSD_Schema(Exception): pass
+def raise_error(node, text, obj):
+    '''standard *ValueError* exception handling'''
+    msg = 'line ' + str(node.sourceline)
+    msg += ': ' + text + str(obj)
+    raise ValueError(msg)
 
 
-class NXDL_Schema(punx.singletons.Singleton):
+class SchemaManager(punx.singletons.Singleton):
     '''
     describes the XML Schema for the NeXus NXDL definitions files
     '''
@@ -83,7 +86,12 @@ class NXDL_Schema(punx.singletons.Singleton):
         self.lxml_root = self.lxml_tree.getroot()
         nodes = self.lxml_root.xpath('xs:element', namespaces=self.ns)
         if len(nodes) != 1:
-            raise Invalid_XSD_Schema(self.schema_file)
+            raise punx.InvalidNxdlFile(self.schema_file)
+
+        self.types = self.parse_nxdlTypes()
+        self.units = list(self.types['anyUnitsAttr'].values)
+        del self.types['anyUnitsAttr']
+        del self.types['primitiveType']
 
         self.nxdl = NXDL_Schema_Root(nodes[0], ns_dict=self.ns, schema_root=self.lxml_root)
         
@@ -91,6 +99,64 @@ class NXDL_Schema(punx.singletons.Singleton):
         del self.lxml_root
         del self.lxml_schema
         del self.lxml_tree
+
+    def parse_nxdlTypes(self):
+        import punx.cache_manager
+        cm = punx.cache_manager.CacheManager()
+        if cm is None or cm.default_file_set is None:
+            raise ValueError('Could not get NXDL file set from the cache')
+
+        self.types_file = os.path.join(cm.default_file_set.path, 'nxdlTypes.xsd')
+        if not os.path.exists(self.types_file):
+            raise punx.FileNotFound(self.types_file)
+        lxml_types_tree = lxml.etree.parse(self.types_file)
+
+        db = {}
+        root = lxml_types_tree.getroot()
+        for node in root:
+            if isinstance(node, lxml.etree._Comment):
+                pass
+            elif node.tag.endswith('}annotation'):
+                pass
+            else:
+                obj = NXDL_nxdlType(node, ns_dict=self.ns, schema_root=root)
+                if obj.name is not None:
+                    db[obj.name] = obj
+        return db
+
+
+class NXDL_nxdlType(object):
+    '''
+    one of the types defined in the file *nxdlTypes.xsd*
+    '''
+    
+    def __init__(self, xml_obj, ns_dict=None, schema_root=None):
+        self.name = xml_obj.attrib.get('name')
+        self.restriction = None
+        self.union = None
+        self.values = None
+        self.schema_root = schema_root
+        self.attrs = {}
+        
+        for node in xml_obj:
+            if isinstance(node, lxml.etree._Comment):
+                pass
+            elif node.tag.endswith('}annotation'):
+                pass
+            elif node.tag.endswith('}list'):
+                self.values = map(strip_ns, [node.attrib['itemType'],])
+            elif node.tag.endswith('}restriction'):
+                self.restriction = strip_ns(node.attrib['base'])
+                self.values = []
+                for subnode in node:
+                    if isinstance(subnode, lxml.etree._Comment):
+                        pass
+                    elif subnode.tag.endswith('}enumeration'):
+                        self.values.append(subnode.attrib['value'])
+            elif node.tag.endswith('}union'):
+                self.union = map(strip_ns, node.attrib['memberTypes'].split())
+            else:
+                raise_error(node, 'unhandled tag=', node.tag)
 
 
 class _Mixin(object):
@@ -107,12 +173,6 @@ class _Mixin(object):
         self.name = obj_name or xml_obj.attrib.get('name')
         self.ns = ns_dict or punx.NAMESPACE_DICT
         self.lxml_root = schema_root
-    
-    def raise_error(self, node, text, obj):
-        '''standard *ValueError* exception handling'''
-        msg = 'line ' + str(node.sourceline)
-        msg += ': ' + text + str(obj)
-        raise ValueError(msg)
     
     def get_named_node(self, tag, attribute, value):
         '''
@@ -162,7 +222,7 @@ class _Mixin(object):
             if subnode.tag.endswith('}extension'):
                 ref = subnode.attrib.get('base')
                 if ref not in ('nx:basicComponent'):
-                    self.raise_error(subnode, 'unexpected base=', ref)
+                    raise_error(subnode, 'unexpected base=', ref)
                 obj = NXDL_Schema_Type(ref, schema_root=self.lxml_root)
                 obj.copy_to(self)
 
@@ -175,10 +235,10 @@ class _Mixin(object):
                     elif obj_node.tag.endswith('}sequence'):
                         self.parse_sequence(obj_node)
                     else:
-                        self.raise_error(obj_node, 'unexpected base=', obj_node.tag)
+                        raise_error(obj_node, 'unexpected base=', obj_node.tag)
 
             else:
-                self.raise_error(subnode, 'unexpected tag=', subnode.tag)
+                raise_error(subnode, 'unexpected tag=', subnode.tag)
 
     def parse_group(self, node):
         ''' '''
@@ -209,7 +269,7 @@ class NXDL_Schema_Root(_Mixin):
         element_type = xml_obj.attrib.get('type')
         if element_type is None:
             element_name = xml_obj.attrib.get('name')
-            self.raise_error(xml_obj, 'no @type for element node: ', element_name)
+            raise_error(xml_obj, 'no @type for element node: ', element_name)
         
         ref = strip_ns(element_type)
         type_node = self.get_named_node('complexType', 'name', ref)
@@ -225,7 +285,7 @@ class NXDL_Schema_Root(_Mixin):
             elif node.tag.endswith('}annotation'):
                 pass
             else:
-                self.raise_error(node, 'unhandled tag=', node.tag)
+                raise_error(node, 'unhandled tag=', node.tag)
 
     def parse_sequence(self, seq_node):
         '''
@@ -240,7 +300,7 @@ class NXDL_Schema_Root(_Mixin):
                 obj.copy_to(self)
             else:
                 msg = 'unhandled tag in ``definitionType``: '
-                self.raise_error(node, msg, node.tag)
+                raise_error(node, msg, node.tag)
 
 # TODO: confirm whether this is nx:attribute or xs:attribute
 class NXDL_Schema_Attribute(_Mixin): 
@@ -330,7 +390,7 @@ class NXDL_Schema_Element(_Mixin):
                 elif node.tag.endswith('}annotation'):
                     pass
                 else:
-                    self.raise_error(node, 'unhandled tag=', node.tag)
+                    raise_error(node, 'unhandled tag=', node.tag)
         else:
             # avoid known infinite recursion: group may contain group(s)
             ok_to_parse = True
@@ -386,7 +446,7 @@ class NXDL_Schema_Type(_Mixin):
             elif node.tag.endswith('}sequence'):
                 self.parse_sequence(node)
             else:
-                self.raise_error(node, 'unexpected tag=', node.tag)
+                raise_error(node, 'unexpected tag=', node.tag)
 
     def parse_sequence(self, node):
         ''' '''
@@ -401,7 +461,7 @@ class NXDL_Schema_Type(_Mixin):
                 # do not process this one, only used for documentation
                 pass
             else:
-                self.raise_error(subnode, 'unexpected tag=', subnode.tag)
+                raise_error(subnode, 'unexpected tag=', subnode.tag)
 
 
 class _GroupParsing(punx.singletons.Singleton):
@@ -424,8 +484,5 @@ class _Recursion(_Mixin):
 
 
 if __name__ == '__main__':
-    #     import punx.logs
-    #     logger = punx.logs.Logger(level=punx.CONSOLE_ONLY)
-
-    _____schema = NXDL_Schema()
+    sm = SchemaManager()
     _breakpoint = True

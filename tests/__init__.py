@@ -23,6 +23,7 @@ def suite(*args, **kw):
     from tests import h5structure_test
     from tests import logs_test
     from tests import nxdlstructure_test
+    from tests import schema_manager_test
     from tests import validate_test
     from tests import _version_test
     from tests import warnings_test
@@ -37,6 +38,7 @@ def suite(*args, **kw):
         h5structure_test,
         logs_test,
         nxdlstructure_test,
+        schema_manager_test,
         validate_test,
         _version_test,
         warnings_test,

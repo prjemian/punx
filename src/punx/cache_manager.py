@@ -385,6 +385,20 @@ class NXDL_File_Set(object):
     
     # TODO: consider defining the SchemaManager here (perhaps lazy load)?  see nxdl_manager for example code:  __getattribute__()
     schema_manager = None
+    __schema_manager_loaded__ = False
+    
+    def __getattribute__(self, *args, **kwargs):
+        '''
+        implement lazy load of definition content
+        '''
+        if len(args) == 1 \
+        and args[0] == 'schema_manager' \
+        and os.path.exists(self.path) \
+        and not self.__schema_manager_loaded__:
+            import punx.schema_manager
+            self.schema_manager = punx.schema_manager.SchemaManager(self.path)
+            self.__schema_manager_loaded__ = True
+        return object.__getattribute__(self, *args, **kwargs)
     
     def __str__(self):
         s = 'NXDL_File_Set('

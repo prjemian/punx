@@ -69,7 +69,7 @@ def validate_xml_tree(xml_tree):
     :param str xml_file_name: name of XML file
     '''
     import punx.schema_manager
-    schema = punx.schema_manager.SchemaManager().lxml_schema
+    schema = punx.schema_manager.get_default_schema_manager().lxml_schema
     try:
         result = schema.assertValid(xml_tree)
     except lxml.etree.DocumentInvalid as exc:
@@ -116,8 +116,8 @@ class NXDL_definition(object):
         use the NXDL Schema to set defaults
         '''
         import punx.schema_manager
-        sm = punx.schema_manager.SchemaManager()
-        _breakpoint = True
+        sm = punx.schema_manager.get_default_schema_manager()
+        _breakpoint = True      # TODO:
 
     def parse(self):
         '''
@@ -149,8 +149,7 @@ class NXDL_definition(object):
 
         # parse the XML content
         root = self.lxml_tree.getroot()
-        # TODO: get the specifications from the NXDL file
-        _breakpoint = True
+        _breakpoint = True  # TODO: get the specifications from the NXDL file
 
 
 class NXDL_attribute(object):

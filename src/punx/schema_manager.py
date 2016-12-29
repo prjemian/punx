@@ -23,6 +23,9 @@ Public
    ~Schema_Attribute 
    ~Schema_Element 
    ~Schema_Type 
+   ~get_default_schema_manager
+   ~raise_error
+   ~strip_ns
 
 Internal
 
@@ -30,7 +33,7 @@ Internal
    
    ~_Mixin
    ~_GroupParsing
-   ~_Recursion 
+   ~_Recursion
 
 '''
 
@@ -57,26 +60,48 @@ def strip_ns(ref):
 
 
 def raise_error(node, text, obj):
-    '''standard *ValueError* exception handling'''
+    '''
+    standard *ValueError* exception handling
+    
+    :param obj node: instance of 
+    :param str text: label for ``obj``
+    :param str obj: value
+    '''
     msg = 'line ' + str(node.sourceline)
     msg += ': ' + text + str(obj)
     raise ValueError(msg)
 
 
-class SchemaManager(punx.singletons.Singleton):     # TODO: *Should* this be a singleton or known by CacheManager?
+def get_default_schema_manager():
+    '''
+    internal: convenience function
+    '''
+    import punx.cache_manager
+    cm = punx.cache_manager.CacheManager()
+    assert(cm is not None)
+    assert(cm.default_file_set is not None)
+    return cm.default_file_set.schema_manager
+
+
+class SchemaManager(object):
     '''
     describes the XML Schema for the NeXus NXDL definitions files
     '''
     
     ns = punx.NAMESPACE_DICT
     
-    def __init__(self):
+    def __init__(self, path=None):
         import punx.cache_manager
-        cm = punx.cache_manager.CacheManager()
-        if cm is None or cm.default_file_set is None:
-            raise ValueError('Could not get NXDL file set from the cache')
+        if path is None:
+            cm = punx.cache_manager.CacheManager()
+            if cm is None or cm.default_file_set is None:
+                raise ValueError('Could not get NXDL file set from the cache')
+            path = cm.default_file_set.path
+        schema_file = os.path.join(path, 'nxdl.xsd')
+        if not os.path.exists(schema_file):
+            raise punx.FileNotFound(schema_file)
         
-        self.schema_file = os.path.join(cm.default_file_set.path, 'nxdl.xsd')
+        self.schema_file = schema_file
         if not os.path.exists(self.schema_file):
             raise punx.FileNotFound('XML Schema file: ' + self.schema_file)
         
@@ -98,12 +123,16 @@ class SchemaManager(punx.singletons.Singleton):     # TODO: *Should* this be a s
         del self.lxml_tree
 
     def parse_nxdlTypes(self):
-        import punx.cache_manager
-        cm = punx.cache_manager.CacheManager()
-        if cm is None or cm.default_file_set is None:
-            raise ValueError('Could not get NXDL file set from the cache')
+        if os.path.exists(self.schema_file):
+            path = os.path.dirname(self.schema_file)
+        else:
+            import punx.cache_manager
+            cm = punx.cache_manager.CacheManager()
+            if cm is None or cm.default_file_set is None:
+                raise ValueError('Could not get NXDL file set from the cache')
+            path = cm.default_file_set.path
 
-        self.types_file = os.path.join(cm.default_file_set.path, 'nxdlTypes.xsd')
+        self.types_file = os.path.join(path, 'nxdlTypes.xsd')
         if not os.path.exists(self.types_file):
             raise punx.FileNotFound(self.types_file)
         lxml_types_tree = lxml.etree.parse(self.types_file)

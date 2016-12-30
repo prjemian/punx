@@ -147,7 +147,8 @@ class NXDL_Base(object):
         # sm = self.nxdl_file_set.schema_manager
 
         # raise RuntimeWarning('NXDL defaults not assigned')
-        print("raise RuntimeWarning('NXDL defaults not assigned')" + str(self.__class__))
+        # print("raise RuntimeWarning('NXDL defaults not assigned')" + str(self.__class__))
+        pass
 
 
 class NXDL_definition(NXDL_Base):

@@ -45,12 +45,11 @@ class NXDL_Manager(object):
         self.classes = collections.OrderedDict()
     
         for nxdl_file_name in get_NXDL_file_list(file_set.path):
-            #obj = NXDL_definition(nxdl_file_name, file_set)
             obj = file_set.nxdl_element_factory.get_element('definition')
             obj.set_file(nxdl_file_name)
+            obj.parse()
             self.classes[obj.title] = obj
             
-            obj.lxml_tree
             _break = True
 
 
@@ -98,25 +97,26 @@ class NXDL_ElementFactory(object):
     def __init__(self, file_set):
         self.file_set = file_set
     
-    def get_element(self, element_name, category=None):
+    def get_element(self, element_name, parent=None, rules=None):
         '''
         create a new element or get one already built
         '''
         import copy
-        category = category or 'base_classes'
         if element_name not in self.db:
             if element_name == 'definition':
                 self.db[element_name] = NXDL_definition(None, self.file_set)
+            elif element_name == 'attribute':
+                self.db[element_name] = NXDL_attribute(parent, rules)
+            elif element_name == 'field':
+                self.db[element_name] = NXDL_field(parent)
+            elif element_name == 'group':
+                self.db[element_name] = NXDL_group(parent)
+            elif element_name == 'link':
+                self.db[element_name] = NXDL_link(parent)
+            elif element_name == 'symbols':
+                self.db[element_name] = NXDL_symbols(parent)
             else:
-                creator = {
-                    'definition': NXDL_definition,
-                    'group':      NXDL_group,
-                    'field':      NXDL_field,
-                    'link':       NXDL_link,
-                    'attribute':  NXDL_attribute,
-                    'symbol':     NXDL_symbol,
-                }[element_name]
-                self.db[element_name] = creator(self.file_set)
+                raise KeyError('unhandled NXDL element: ' + element_name)
 
             element = self.db[element_name]
             element.nxdl = self.file_set.schema_manager.nxdl
@@ -124,8 +124,7 @@ class NXDL_ElementFactory(object):
 
         element = copy.deepcopy(self.db[element_name])
 
-        if category == 'applications':
-            pass    # TODO set the defaults accordingly
+        # TODO set the defaults accordingly for application definitions
 
         return element
 
@@ -147,7 +146,8 @@ class NXDL_Base(object):
         # assert(self.nxdl_file_set is not None)
         # sm = self.nxdl_file_set.schema_manager
 
-        raise RuntimeWarning('NXDL defaults not assigned')
+        # raise RuntimeWarning('NXDL defaults not assigned')
+        print("raise RuntimeWarning('NXDL defaults not assigned')" + str(self.__class__))
 
 
 class NXDL_definition(NXDL_Base):
@@ -180,10 +180,8 @@ class NXDL_definition(NXDL_Base):
         '''
         implement lazy load of definition content
         '''
-        _breakpoint = True
         if len(args) == 1 and args[0] == 'lxml_tree' and not self.__parsed__:
             self.parse()  # only parse this file once content is requested
-        _breakpoint = True
         return object.__getattribute__(self, *args, **kwargs)
 
     def set_defaults(self):
@@ -194,7 +192,10 @@ class NXDL_definition(NXDL_Base):
         sm = self.nxdl_file_set.schema_manager
         
         for k, v in sm.nxdl.attrs.items():
+            #self.attributes[k] = NXDL_attribute(self, v)
+            obj = self.nxdl_file_set.nxdl_element_factory.get_element('attribute', parent=self, rules=v)
             self.attributes[k] = NXDL_attribute(self, v)
+            
 
         _breakpoint = True      # TODO:
     
@@ -211,8 +212,6 @@ class NXDL_definition(NXDL_Base):
         since only a small subset of the NXDL files are typically
         referenced in a single data file.
         '''
-        import punx.schema_manager
-        
         if self.__parsed__:
             return  # only parse this file when content is requested
 
@@ -229,13 +228,23 @@ class NXDL_definition(NXDL_Base):
             msg += '\n' + str(exc)
 
         # parse the XML content of this NXDL definition element
-        root = self.lxml_tree.getroot()
-        _breakpoint = True  # TODO: get the specifications from the NXDL file
+        root = self.lxml_tree.getroot()    # TODO:
+        for node in root:
+            if isinstance(node, lxml.etree._Comment):
+                continue
+
+            element_type = node.tag.split('}')[-1]
+            if element_type not in ('doc',):
+                obj = self.nxdl_file_set.nxdl_element_factory.get_element(element_type)
+            _break = True
 
 
 class NXDL_attribute(NXDL_Base):
     '''
     a complete description of a specific NXDL attribute
+    
+    :param obj parent: instance of NXDL_Base
+    :param obj rules: instance of Schema_Attribute
     '''
     
     nxdl_name = None
@@ -253,6 +262,7 @@ class NXDL_attribute(NXDL_Base):
         for k in 'name type'.split():
             self.__setattr__('nxdl_'+k, rules.__getattribute__(k))
         # TODO: convert type (such as nx:validItemName into pattern
+        # self.parent.nxdl.children['attribute']
 
 
 class NXDL_field(NXDL_Base):    # TODO:
@@ -285,7 +295,7 @@ class NXDL_link(NXDL_Base):    # TODO:
     optional = True
 
 
-class NXDL_symbol(NXDL_Base):    # TODO:
+class NXDL_symbols(NXDL_Base):    # TODO:
     '''
     a complete description of a specific NXDL symbol
     '''

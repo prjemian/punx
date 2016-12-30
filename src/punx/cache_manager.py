@@ -397,9 +397,9 @@ class NXDL_File_Set(object):
         implement lazy load of definition content
         '''
         if len(args) == 1 \
-        and args[0] == 'schema_manager' \
-        and os.path.exists(self.path) \
-        and not self.__schema_manager_loaded__:
+                and args[0] == 'schema_manager' \
+                and os.path.exists(self.path) \
+                and not self.__schema_manager_loaded__:
             import punx.schema_manager
             self.schema_manager = punx.schema_manager.SchemaManager(self.path)
             self.__schema_manager_loaded__ = True

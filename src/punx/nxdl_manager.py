@@ -49,6 +49,9 @@ class NXDL_Manager(object):
             obj = file_set.nxdl_element_factory.get_element('definition')
             obj.set_file(nxdl_file_name)
             self.classes[obj.title] = obj
+            
+            obj.lxml_tree
+            _break = True
 
 
 def get_NXDL_file_list(nxdl_dir):
@@ -89,7 +92,7 @@ class NXDL_ElementFactory(object):
     creates and serves new classes with proper default values from the NXDL rules
     '''
     
-    db = {}         # internal set of known elements
+    db = collections.OrderedDict()         # internal set of known elements
     file_set = None
     
     def __init__(self, file_set):
@@ -117,7 +120,6 @@ class NXDL_ElementFactory(object):
 
             element = self.db[element_name]
             element.nxdl = self.file_set.schema_manager.nxdl
-            # TODO: where are file types - expecting them in .nxdl
             element.set_defaults()
 
         element = copy.deepcopy(self.db[element_name])
@@ -142,8 +144,8 @@ class NXDL_Base(object):
         '''
         use the NXDL Schema to set defaults
         '''
-        assert(self.nxdl_file_set is not None)
-        sm = self.nxdl_file_set.schema_manager
+        # assert(self.nxdl_file_set is not None)
+        # sm = self.nxdl_file_set.schema_manager
 
         raise RuntimeWarning('NXDL defaults not assigned')
 
@@ -226,10 +228,7 @@ class NXDL_definition(NXDL_Base):
             msg = 'NXDL file is nto valid: ' + self.file_name
             msg += '\n' + str(exc)
 
-        # TODO: get the defaults from the XML Schema
-        schema = punx.schema_manager.SchemaManager()
-
-        # parse the XML content
+        # parse the XML content of this NXDL definition element
         root = self.lxml_tree.getroot()
         _breakpoint = True  # TODO: get the specifications from the NXDL file
 

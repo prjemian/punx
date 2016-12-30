@@ -377,6 +377,8 @@ class Schema_Root(_Mixin):
         if schema_manager is not None:
             self.types, self.units = schema_manager.parse_nxdlTypes()
             self.patterns = schema_manager.parse_nxdl_patterns()
+            self.schema_types = dict(definition=self) # FIXME:
+            self.schema_types.update(self.children)
 
     def parse_sequence(self, seq_node):
         '''

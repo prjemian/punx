@@ -398,6 +398,7 @@ class NXDL_File_Set(object):
         '''
         if len(args) == 1 \
                 and args[0] == 'schema_manager' \
+                and self.path is not None \
                 and os.path.exists(self.path) \
                 and not self.__schema_manager_loaded__:
             import punx.schema_manager
@@ -405,9 +406,9 @@ class NXDL_File_Set(object):
             self.__schema_manager_loaded__ = True
         return object.__getattribute__(self, *args, **kwargs)
     
-    def __str__(self, *args, **kwargs):
+    def __str__(self):
         if self.ref is None:
-            return object.__str__(self, *args, **kwargs)
+            return object.__str__(self)
 
         s = 'NXDL_File_Set('
         s += 'ref_type=' + str(self.ref_type)

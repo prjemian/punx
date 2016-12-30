@@ -43,9 +43,10 @@ class NXDL_Manager(object):
             raise punx.FileNotFound('NXDL directory: ' + str(file_set.path))
     
         self.classes = collections.OrderedDict()
+        get_element = file_set.nxdl_element_factory.get_element
     
         for nxdl_file_name in get_NXDL_file_list(file_set.path):
-            obj = file_set.nxdl_element_factory.get_element('definition')
+            obj = get_element('definition')
             obj.set_file(nxdl_file_name)
             obj.parse()
             self.classes[obj.title] = obj
@@ -86,49 +87,6 @@ def validate_xml_tree(xml_tree):
     return result
 
 
-class NXDL_ElementFactory(object):
-    '''
-    creates and serves new classes with proper default values from the NXDL rules
-    '''
-    
-    db = collections.OrderedDict()         # internal set of known elements
-    file_set = None
-    
-    def __init__(self, file_set):
-        self.file_set = file_set
-    
-    def get_element(self, element_name, parent=None, rules=None):
-        '''
-        create a new element or get one already built
-        '''
-        import copy
-        if element_name not in self.db:
-            if element_name == 'definition':
-                self.db[element_name] = NXDL_definition(None, self.file_set)
-            elif element_name == 'attribute':
-                self.db[element_name] = NXDL_attribute(parent, rules)
-            elif element_name == 'field':
-                self.db[element_name] = NXDL_field(parent)
-            elif element_name == 'group':
-                self.db[element_name] = NXDL_group(parent)
-            elif element_name == 'link':
-                self.db[element_name] = NXDL_link(parent)
-            elif element_name == 'symbols':
-                self.db[element_name] = NXDL_symbols(parent)
-            else:
-                raise KeyError('unhandled NXDL element: ' + element_name)
-
-            element = self.db[element_name]
-            element.nxdl = self.file_set.schema_manager.nxdl
-            element.set_defaults()
-
-        element = copy.deepcopy(self.db[element_name])
-
-        # TODO set the defaults accordingly for application definitions
-
-        return element
-
-
 class NXDL_Base(object):
     '''
     a complete description of a specific NXDL definition
@@ -139,15 +97,12 @@ class NXDL_Base(object):
     def __init__(self, parent):
         self.parent = parent
 
-    def set_defaults(self):
+    def set_defaults(self, rules):
         '''
         use the NXDL Schema to set defaults
+        
+        do not call this from the constructor due to infinite loop
         '''
-        # assert(self.nxdl_file_set is not None)
-        # sm = self.nxdl_file_set.schema_manager
-
-        # raise RuntimeWarning('NXDL defaults not assigned')
-        # print("raise RuntimeWarning('NXDL defaults not assigned')" + str(self.__class__))
         pass
 
 
@@ -163,19 +118,16 @@ class NXDL_definition(NXDL_Base):
     lxml_tree = None
     nxdl_file_set = None
     
-    attributes = collections.OrderedDict()
-    groups = collections.OrderedDict()
-    fields = collections.OrderedDict()
-    symbols = collections.OrderedDict()
+    attributes = {}
+    groups = {}
+    fields = {}
+    symbols = {}
     
     __parsed__ = False
     
-    def __init__(self, fname, file_set):
-        NXDL_Base.__init__(self, None)
-
+    def __init__(self, file_set):
         self.nxdl_file_set = file_set
-        if fname is not None:
-            self.set_file(fname)
+        NXDL_Base.__init__(self, None)
     
     def __getattribute__(self, *args, **kwargs):
         '''
@@ -185,18 +137,18 @@ class NXDL_definition(NXDL_Base):
             self.parse()  # only parse this file once content is requested
         return object.__getattribute__(self, *args, **kwargs)
 
-    def set_defaults(self):
+    def set_defaults(self, rules):
         '''
         use the NXDL Schema to set defaults
-        '''
-        assert(self.nxdl_file_set is not None)
-        sm = self.nxdl_file_set.schema_manager
+
+        :param obj rules: instance of Schema_Attribute
         
-        for k, v in sm.nxdl.attrs.items():
-            #self.attributes[k] = NXDL_attribute(self, v)
-            obj = self.nxdl_file_set.nxdl_element_factory.get_element('attribute', parent=self, rules=v)
-            self.attributes[k] = NXDL_attribute(self, v)
-            
+        do not call this from the constructor due to infinite loop
+        '''
+        get_element = self.nxdl_file_set.nxdl_element_factory.get_element # alias
+
+        for k, v in rules.attrs.items():
+            self.attributes[k] = get_element('attribute', parent=self)
 
         _breakpoint = True      # TODO:
     
@@ -242,28 +194,45 @@ class NXDL_definition(NXDL_Base):
 
 class NXDL_attribute(NXDL_Base):
     '''
-    a complete description of a specific NXDL attribute
+    a complete description of a specific NXDL attribute element
     
     :param obj parent: instance of NXDL_Base
-    :param obj rules: instance of Schema_Attribute
     '''
     
-    nxdl_name = None
-    nxdl_type = 'str'
+    name = None
+    type = 'str'
     required = False
     default_value = None
     enum = None
     patterns = None
+    attributes = {}
     
-    def __init__(self, parent, rules):
+    def __init__(self, parent):
         NXDL_Base.__init__(self, parent)
+
+    def set_defaults(self, rules):
+        '''
+        use the NXDL Schema to set defaults
+
+        :param obj rules: instance of Schema_Attribute
+        '''
+        if self.parent is not None:
+            get_element = self.parent.nxdl_file_set.nxdl_element_factory.get_element
+        elif hasattr(self, 'nxdl_file_set'):
+            get_element = self.nxdl_file_set.nxdl_element_factory.get_element # alias
+        else:
+            raise RuntimeError('cannot locate get_element()')
         
-        for k in 'required default_value enum patterns'.split():
-            self.__setattr__(k, rules.__getattribute__(k))
-        for k in 'name type'.split():
-            self.__setattr__('nxdl_'+k, rules.__getattribute__(k))
+        for k in 'required default_value enum patterns name type'.split():
+            if hasattr(rules, k):
+                self.__setattr__(k, rules.__getattribute__(k))
         # TODO: convert type (such as nx:validItemName into pattern
         # self.parent.nxdl.children['attribute']
+        
+        for k, v in rules.attrs.items():
+            self.attributes[k] = get_element('attribute', parent=self)
+
+        _breakpoint = True      # TODO:
 
 
 class NXDL_field(NXDL_Base):    # TODO:
@@ -273,7 +242,7 @@ class NXDL_field(NXDL_Base):    # TODO:
     
     optional = True
     
-    attributes = collections.OrderedDict()
+    attributes = {}
 
 
 class NXDL_group(NXDL_Base):    # TODO:
@@ -283,9 +252,9 @@ class NXDL_group(NXDL_Base):    # TODO:
     
     optional = True
     
-    attributes = collections.OrderedDict()
-    groups = collections.OrderedDict()
-    fields = collections.OrderedDict()
+    attributes = {}
+    groups = {}
+    fields = {}
 
 
 class NXDL_link(NXDL_Base):    # TODO:
@@ -302,6 +271,59 @@ class NXDL_symbols(NXDL_Base):    # TODO:
     '''
     
     optional = True
+
+
+class NXDL_ElementFactory(object):
+    '''
+    creates and serves new classes with proper default values from the NXDL rules
+    '''
+    
+    db = {}         # internal set of known elements
+    file_set = None
+    creators = {
+        'definition': NXDL_definition,
+        'attribute': NXDL_attribute,
+        'field': NXDL_field,
+        'group': NXDL_group,
+        'link': NXDL_link,
+        'symbols': NXDL_symbols,
+        }
+    
+    def __init__(self, file_set):
+        self.file_set = file_set
+    
+    def get_element(self, element_name, parent=None):
+        '''
+        create a new element or get one already built with defaults from the XML Schema
+        '''
+        import copy
+
+        if element_name not in self.db:
+            if element_name == 'definition':
+                # special case
+                self.db[element_name] = NXDL_definition(self.file_set)
+
+            elif element_name in self.creators.keys():
+                self.db[element_name] = self.creators[element_name](parent)
+
+            else:
+                raise KeyError('unhandled NXDL element: ' + element_name)
+
+            element = self.db[element_name]
+            element.nxdl = self.file_set.schema_manager.nxdl
+
+            schema_types = element.nxdl.schema_types    # alias
+            if element_name not in schema_types:
+                msg = 'unexpected element type: ' + element_name
+                msg += ', expected one of these: ' + ' '.join(sorted(schema_types.keys()))
+                raise KeyError(msg)
+            element.set_defaults(schema_types[element_name])
+
+        element = copy.deepcopy(self.db[element_name])
+
+        # TODO set the defaults accordingly for application definitions
+
+        return element
 
 
 if __name__ == '__main__':

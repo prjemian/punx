@@ -107,23 +107,60 @@ class SchemaManager(object):
         
         self.lxml_tree = lxml.etree.parse(self.schema_file)
         self.lxml_schema = lxml.etree.XMLSchema(self.lxml_tree)
-        
         self.lxml_root = self.lxml_tree.getroot()
+        
         nodes = self.lxml_root.xpath('xs:element', namespaces=self.ns)
         if len(nodes) != 1:
             raise punx.InvalidNxdlFile(self.schema_file)
-
-        self.types, self.units = self.parse_nxdlTypes() # TODO: put into .nxdl
-        # TODO: where are patterns such as "validItemName"?
-
-        self.nxdl = Schema_Root(nodes[0], ns_dict=self.ns, schema_root=self.lxml_root)
+        self.nxdl = Schema_Root(
+            nodes[0], 
+            ns_dict=self.ns, 
+            schema_root=self.lxml_root,
+            schema_manager=self)
         
         # cleanup these internal structures
         del self.lxml_root
         #del self.lxml_schema    # needed for XML file validation
         del self.lxml_tree
 
+    def parse_nxdl_patterns(self):
+        '''
+        get regexp patterns for validItemName, validNXClassName, & validTargetName from nxdl.xsd
+        '''
+        db = {}
+        for node in self.lxml_root.xpath('xs:simpleType', namespaces=self.ns):
+            key = node.attrib['name']
+            if key.startswith('valid'):
+                obj = Schema_pattern()
+                obj.pattern_name = key
+                db[key] = obj
+
+                subnodes = node.xpath('xs:restriction', namespaces=self.ns)
+                assert(len(subnodes) == 1)
+                obj.base = strip_ns(subnodes[0].attrib['base'])
+                
+                for item in subnodes[0]:
+                    if isinstance(item, lxml.etree._Comment):
+                        pass
+                    elif item.tag.endswith('}pattern'):
+                        obj.re_list.append(item.attrib['value'])
+                    elif item.tag.endswith('}maxLength'):
+                        obj.maxLength = int(item.attrib['value'])
+        
+        # adjust for any restrictions with NeXus base
+        for v in db.values():
+            if v.base != 'token' and v.base in db:
+                base = db[v.base]
+                v.base = base.base
+                v.maxLength = base.maxLength
+                v.re_list += base.re_list
+
+        return db
+
     def parse_nxdlTypes(self):
+        '''
+        get the allowed data types and unit types from nxdlTypes.xsd
+        '''
         if os.path.exists(self.schema_file):
             path = os.path.dirname(self.schema_file)
         else:
@@ -156,6 +193,18 @@ class SchemaManager(object):
         del db['primitiveType']
         
         return db, units
+
+
+class Schema_pattern(object):
+    '''
+    describe the regular expression patterns ofr names of NeXus things
+    '''
+    
+    def __init__(self):
+        self.base = 'token'
+        self.pattern_name = None
+        self.re_list = []
+        self.maxLength = -1  # unlimited
 
 
 class Schema_nxdlType(object):
@@ -288,21 +337,26 @@ class Schema_Root(_Mixin):
     :param dict ns_dict: optional, default taken from :data:`NAMESPACE_DICT`
     :param obj schema_root: optional, instance of lxml.etree._Element
     '''
+
+    attrs = {}
+    children = {}
+    patterns = None
+    type = None
+    units = None
     
-    def __init__(self, xml_obj, obj_name=None, ns_dict=None, schema_root=None):
+    def __init__(self, element_node, obj_name=None, ns_dict=None, schema_root=None, schema_manager=None):
         _Mixin.__init__(
             self, 
-            xml_obj, 
+            element_node, 
             obj_name=obj_name, 
             ns_dict=ns_dict, 
             schema_root=schema_root)
-        self.attrs = {}
-        self.children = {}
 
-        element_type = xml_obj.attrib.get('type')
+        self.schema_manager = schema_manager
+        element_type = element_node.attrib.get('type')
         if element_type is None:
-            element_name = xml_obj.attrib.get('name')
-            raise_error(xml_obj, 'no @type for element node: ', element_name)
+            element_name = element_node.attrib.get('name')
+            raise_error(element_node, 'no @type for element node: ', element_name)
         
         ref = strip_ns(element_type)
         type_node = self.get_named_node('complexType', 'name', ref)
@@ -319,6 +373,10 @@ class Schema_Root(_Mixin):
                 pass
             else:
                 raise_error(node, 'unhandled tag=', node.tag)
+
+        if schema_manager is not None:
+            self.types, self.units = schema_manager.parse_nxdlTypes()
+            self.patterns = schema_manager.parse_nxdl_patterns()
 
     def parse_sequence(self, seq_node):
         '''
@@ -346,9 +404,9 @@ class Schema_Attribute(_Mixin):
     '''
     
     def __init__(self, xml_obj, obj_name=None, ns_dict=None, schema_root=None):
-        # TODO: confirm this is xs:attribute, not nx:attribute
         assert(xml_obj is not None)
         assert(xml_obj.tag == '{'+xml_obj.nsmap['xs']+'}attribute')
+
         _Mixin.__init__(
             self, 
             xml_obj, 

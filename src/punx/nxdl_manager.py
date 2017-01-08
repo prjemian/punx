@@ -106,7 +106,7 @@ class NXDL_Base(object):
         pass
 
 
-class NXDL_definition(NXDL_Base):
+class NXDL_element__definition(NXDL_Base):
     '''
     a complete description of a specific NXDL definition
     '''
@@ -192,7 +192,7 @@ class NXDL_definition(NXDL_Base):
             _break = True
 
 
-class NXDL_attribute(NXDL_Base):
+class NXDL_element__attribute(NXDL_Base):
     '''
     a complete description of a specific NXDL attribute element
     
@@ -235,7 +235,7 @@ class NXDL_attribute(NXDL_Base):
         _breakpoint = True      # TODO:
 
 
-class NXDL_field(NXDL_Base):    # TODO:
+class NXDL_element__field(NXDL_Base):    # TODO:
     '''
     a complete description of a specific NXDL field
     '''
@@ -245,7 +245,7 @@ class NXDL_field(NXDL_Base):    # TODO:
     attributes = {}
 
 
-class NXDL_group(NXDL_Base):    # TODO:
+class NXDL_element__group(NXDL_Base):    # TODO:
     '''
     a complete description of a specific NXDL group
     '''
@@ -257,7 +257,7 @@ class NXDL_group(NXDL_Base):    # TODO:
     fields = {}
 
 
-class NXDL_link(NXDL_Base):    # TODO:
+class NXDL_element__link(NXDL_Base):    # TODO:
     '''
     a complete description of a specific NXDL link
     '''
@@ -265,7 +265,7 @@ class NXDL_link(NXDL_Base):    # TODO:
     optional = True
 
 
-class NXDL_symbols(NXDL_Base):    # TODO:
+class NXDL_element__symbols(NXDL_Base):    # TODO:
     '''
     a complete description of a specific NXDL symbol
     '''
@@ -281,12 +281,12 @@ class NXDL_ElementFactory(object):
     db = {}         # internal set of known elements
     file_set = None
     creators = {
-        'definition': NXDL_definition,
-        'attribute': NXDL_attribute,
-        'field': NXDL_field,
-        'group': NXDL_group,
-        'link': NXDL_link,
-        'symbols': NXDL_symbols,
+        'definition': NXDL_element__definition,
+        'attribute': NXDL_element__attribute,
+        'field': NXDL_element__field,
+        'group': NXDL_element__group,
+        'link': NXDL_element__link,
+        'symbols': NXDL_element__symbols,
         }
     
     def __init__(self, file_set):
@@ -301,7 +301,7 @@ class NXDL_ElementFactory(object):
         if element_name not in self.db:
             if element_name == 'definition':
                 # special case
-                self.db[element_name] = NXDL_definition(self.file_set)
+                self.db[element_name] = NXDL_element__definition(self.file_set)
 
             elif element_name in self.creators.keys():
                 self.db[element_name] = self.creators[element_name](parent)

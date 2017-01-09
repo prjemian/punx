@@ -129,7 +129,6 @@ class NXDL_Named_simpleType(object):
             l.append('%s=%s' % (k, str(self.__getattribute__(k))))
         msg += ', '.join(l)
         msg += ')'
-        # return NXDL_Base.__str__(self, *args, **kwargs)
         return msg
     
     def parse(self, xml_node):
@@ -300,7 +299,6 @@ class NXDL_element__attribute(NXDL_Base):
         msg += ', '.join(l)
         msg += ')'
 
-        # return NXDL_Base.__str__(self, *args, **kwargs)
         return msg
 
     def parse(self, xml_node):
@@ -519,7 +517,6 @@ class NXDL_element__element(NXDL_Base):
             l.append('%s=%s' % (k, str(self.__getattribute__(k))))
         msg += ', '.join(l)
         msg += ')'
-        # return NXDL_Base.__str__(self, *args, **kwargs)
         return msg
 
     def parse(self, xml_node):
@@ -547,6 +544,7 @@ class NXDL_item_catalog(object):
         self._parse_nxdl_attribute_nodes(root)
         self._parse_nxdl_element_nodes(root)
         self._parse_nxdl_group_nodes(root)
+        self._parse_nxdl_complexType_nodes(root)
     
     def _parse_nxdl_simpleType_nodes(self, root):
         for node in root.xpath('/xs:schema/xs:simpleType', namespaces=self.ns):
@@ -603,13 +601,22 @@ class NXDL_item_catalog(object):
                 self.db[key] = {}
             obj = None
             self.db[key][node.attrib.get('name', 'unnamed')] = obj
+    
+    def _parse_nxdl_complexType_nodes(self, root):
+        # only look at root node children: 'xs:complexType', not '//xs:complexType' 
+        for node in root.xpath('xs:complexType', namespaces=self.ns):
+            if 'name' in node.attrib:
+                print(node.attrib['name'])
+                # TODO: parse xs:sequence
+                # TODO: parse xs:complexContent
+                # TODO: parse xs:group (?already complete?)
+                # TODO: parse xs:attribute (?already complete?)
+                # TODO: parse xs:attributeGroup (?already complete?)
 
 
 def issue_67_main():
-    import pprint
     nxdl_xsd_file_name = os.path.join('cache', 'v3.2','nxdl.xsd')
     known_nxdl_items = NXDL_item_catalog(nxdl_xsd_file_name)
-    #pprint.pprint(known_nxdl_items.db)
     
     for k1, v1 in sorted(known_nxdl_items.db.items()):
         print(k1 + ' :')

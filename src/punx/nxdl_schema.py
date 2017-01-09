@@ -4,7 +4,7 @@
 #-----------------------------------------------------------------------------
 # :author:    Pete R. Jemian
 # :email:     prjemian@gmail.com
-# :copyright: (c) 2016, Pete R. Jemian
+# :copyright: (c) 2017, Pete R. Jemian
 #
 # Distributed under the terms of the Creative Commons Attribution 4.0 International Public License.
 #
@@ -112,7 +112,7 @@ class NXDL_schema__attribute(object):
     def __str__(self, *args, **kwargs):
         msg = '%s(' % type(self).__name__
         l = []
-        for k in 'name type required default_value enum patterns'.split():
+        for k in 'name type required default_value enum patterns parent'.split():
             l.append('%s=%s' % (k, str(self.__getattribute__(k))))
         msg += ', '.join(l)
         msg += ')'
@@ -153,6 +153,52 @@ class NXDL_schema__attribute(object):
                 raise ValueError(msg)
 
 
+class NXDL_schema_complexType(object):
+    '''
+    node matches XPath query: /xs:schema/xs:complexType
+    
+    xml_node is xs:complexType
+    '''
+    
+    def __init__(self, parent):
+        self.parent = parent
+        self.name = None
+    
+    def __str__(self, *args, **kwargs):
+        msg = '%s(' % type(self).__name__
+        l = []
+        for k in 'name parent'.split():
+            l.append('%s=%s' % (k, str(self.__getattribute__(k))))
+        msg += ', '.join(l)
+        msg += ')'
+        return msg
+
+    def parse(self, xml_node):
+        '''
+        read the element node content from the XML Schema
+        '''
+        assert(xml_node.tag.endswith('}complexType'))
+        self.name = xml_node.attrib.get('name', self.name)
+
+        tag_list = 'sequence complexContent group attribute attributeGroup'.split()
+        tags_ignored = ['annotation',]
+        for node in xml_node:
+            if isinstance(node, lxml.etree._Comment):
+                continue
+            
+            tag = node.tag.split('}')[-1]
+            if tag in tag_list:
+                # print(xml_node.attrib['name'], tag, node.sourceline)
+                # TODO: parse the content based on the tag
+                pass
+            
+            elif tag in tags_ignored:
+                pass
+            
+            else:
+                print('!\t', xml_node.attrib['name'], tag, node.sourceline)
+
+
 class NXDL_schema__element(object):
     '''
     a complete description of a specific NXDL xs:element node
@@ -170,7 +216,7 @@ class NXDL_schema__element(object):
     def __str__(self, *args, **kwargs):
         msg = '%s(' % type(self).__name__
         l = []
-        for k in 'name type minOccurs maxOccurs'.split():
+        for k in 'name type minOccurs maxOccurs parent'.split():
             l.append('%s=%s' % (k, str(self.__getattribute__(k))))
         msg += ', '.join(l)
         msg += ')'
@@ -180,10 +226,42 @@ class NXDL_schema__element(object):
         '''
         read the element node content from the XML Schema
         '''
+        assert(xml_node.tag.endswith('}element'))
         self.name = xml_node.attrib.get('name', self.name)
         self.type = xml_node.attrib.get('type', self.type)
         if self.type is not None:
             self.type = self.type.split(':')[-1]
+        self.minOccurs = xml_node.attrib.get('minOccurs', self.minOccurs)
+        self.maxOccurs = xml_node.attrib.get('maxOccurs', self.maxOccurs)
+
+
+class NXDL_schema__group(object):
+
+    def __init__(self, parent):
+        self.parent = parent
+        self.name = None
+        self.ref = None
+        self.minOccurs = None
+        self.maxOccurs = None
+    
+    def __str__(self, *args, **kwargs):
+        msg = '%s(' % type(self).__name__
+        l = []
+        for k in 'name ref minOccurs maxOccurs parent'.split():
+            l.append('%s=%s' % (k, str(self.__getattribute__(k))))
+        msg += ', '.join(l)
+        msg += ')'
+        return msg
+
+    def parse(self, xml_node):
+        '''
+        read the element node content from the XML Schema
+        '''
+        assert(xml_node.tag.endswith('}group'))
+        self.name = xml_node.attrib.get('name', self.name)
+        self.ref = xml_node.attrib.get('ref', self.ref)
+        if self.ref is not None:
+            self.ref = self.ref.split(':')[-1]
         self.minOccurs = xml_node.attrib.get('minOccurs', self.minOccurs)
         self.maxOccurs = xml_node.attrib.get('maxOccurs', self.maxOccurs)
 
@@ -206,7 +284,7 @@ class NXDL_schema_named_simpleType(object):
     def __str__(self, *args, **kwargs):
         msg = '%s(' % type(self).__name__
         l = []
-        for k in 'name base parent maxLength patterns'.split():
+        for k in 'name base parent maxLength patterns parent'.split():
             l.append('%s=%s' % (k, str(self.__getattribute__(k))))
         msg += ', '.join(l)
         msg += ')'
@@ -318,19 +396,23 @@ class NXDL_item_catalog(object):
             key = named_parent_node.attrib.get('name', 'schema')
             if key not in self.db:
                 self.db[key] = {}
-            obj = None
+            obj = NXDL_schema__group(None)
+            obj.parse(node)
             self.db[key][node.attrib.get('name', 'unnamed')] = obj
     
     def _parse_nxdl_complexType_nodes(self, root):
+        tag_list = 'sequence complexContent group attribute attributeGroup'.split()
+        tags_ignored = ['annotation',]
         # only look at root node children: 'xs:complexType', not '//xs:complexType' 
         for node in root.xpath('xs:complexType', namespaces=self.ns):
             if 'name' in node.attrib:
-                print(node.attrib['name'])
-                # TODO: parse xs:sequence
-                # TODO: parse xs:complexContent
-                # TODO: parse xs:group (?already complete?)
-                # TODO: parse xs:attribute (?already complete?)
-                # TODO: parse xs:attributeGroup (?already complete?)
+                # names.append(node.attrib['name'])
+                obj = NXDL_schema_complexType(None)
+                obj.parse(node)
+                key = 'schema'
+                if key not in self.db:
+                    self.db[key] = {}
+                self.db[key][node.attrib.get('name', 'unnamed')] = obj
 
 
 def issue_67_main():

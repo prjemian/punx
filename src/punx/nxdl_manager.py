@@ -122,6 +122,16 @@ class NXDL_Named_simpleType(object):
         self.maxLength = None
         #self.enums = []
     
+    def __str__(self, *args, **kwargs):
+        msg = '%s(' % type(self).__name__
+        l = []
+        for k in 'name base parent maxLength patterns'.split():
+            l.append('%s=%s' % (k, str(self.__getattribute__(k))))
+        msg += ', '.join(l)
+        msg += ')'
+        # return NXDL_Base.__str__(self, *args, **kwargs)
+        return msg
+    
     def parse(self, xml_node):
         '''
         read the attribute node content from the XML Schema
@@ -272,16 +282,15 @@ class NXDL_element__attribute(NXDL_Base):
     :param obj parent: instance of NXDL_Base
     '''
     
-    name = None
-    type = 'str'
-    required = False
-    default_value = None
-    enum = []
-    patterns = []
-    nxdl_attributes = {}
-    
     def __init__(self, parent):
         NXDL_Base.__init__(self, parent)
+        self.name = None
+        self.type = 'str'
+        self.required = False
+        self.default_value = None
+        self.enum = []
+        self.patterns = []
+        self.nxdl_attributes = {}
     
     def __str__(self, *args, **kwargs):
         msg = '%s(' % type(self).__name__
@@ -525,7 +534,7 @@ class NXDL_element__element(NXDL_Base):
         self.maxOccurs = xml_node.attrib.get('maxOccurs', self.maxOccurs)
 
 
-class NXDL_item_factory(object):
+class NXDL_item_catalog(object):
     
     def __init__(self, nxdl_file_name):
         self.db = {}
@@ -537,13 +546,7 @@ class NXDL_item_factory(object):
         self._parse_nxdl_simpleType_nodes(root)
         self._parse_nxdl_attribute_nodes(root)
         self._parse_nxdl_element_nodes(root)
-        for node in root.xpath('//xs:group', namespaces=self.ns):
-            named_parent_node = get_named_parent_node(node)
-            key = named_parent_node.attrib.get('name', 'schema')
-            if key not in self.db:
-                self.db[key] = {}
-            obj = None
-            self.db[key][node.attrib.get('name', 'unnamed')] = obj
+        self._parse_nxdl_group_nodes(root)
     
     def _parse_nxdl_simpleType_nodes(self, root):
         for node in root.xpath('/xs:schema/xs:simpleType', namespaces=self.ns):
@@ -591,12 +594,21 @@ class NXDL_item_factory(object):
         
 #         for key1, key2 in keylist:
 #             print(key1, key2)
+    
+    def _parse_nxdl_group_nodes(self, root):
+        for node in root.xpath('//xs:group', namespaces=self.ns):
+            named_parent_node = get_named_parent_node(node)
+            key = named_parent_node.attrib.get('name', 'schema')
+            if key not in self.db:
+                self.db[key] = {}
+            obj = None
+            self.db[key][node.attrib.get('name', 'unnamed')] = obj
 
 
 def issue_67_main():
     import pprint
     nxdl_xsd_file_name = os.path.join('cache', 'v3.2','nxdl.xsd')
-    known_nxdl_items = NXDL_item_factory(nxdl_xsd_file_name)
+    known_nxdl_items = NXDL_item_catalog(nxdl_xsd_file_name)
     #pprint.pprint(known_nxdl_items.db)
     
     for k1, v1 in sorted(known_nxdl_items.db.items()):

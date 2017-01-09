@@ -43,3 +43,5 @@ tests/__pycache__
 /src/punx/data/local
 
 src/punx/__github_creds__.txt
+definitions-master
+nxdl.p

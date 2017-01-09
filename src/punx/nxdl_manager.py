@@ -39,10 +39,10 @@ def get_xml_namespace_dictionary():
 
 def get_named_parent_node(xml_node):
     '''
-    return the closest ancestor node with a ``name`` attribute
+    return the closest XML ancestor node with a ``name`` attribute or the schema node
     '''
     parent = xml_node.getparent()
-    if 'name' not in parent.attrib:
+    if 'name' not in parent.attrib and not parent.tag.endswith('}schema'):
         parent = get_named_parent_node(parent)
     return parent
 
@@ -154,6 +154,7 @@ class NXDL_Named_simpleType(object):
 
             else:
                 msg = node.getparent().attrib['name']
+                msg += ' (line %d)' % node.sourceline
                 msg += ': unexpected xs:attribute child node: '
                 msg += node.tag
                 raise ValueError(msg)
@@ -281,6 +282,17 @@ class NXDL_element__attribute(NXDL_Base):
     
     def __init__(self, parent):
         NXDL_Base.__init__(self, parent)
+    
+    def __str__(self, *args, **kwargs):
+        msg = '%s(' % type(self).__name__
+        l = []
+        for k in 'name type required default_value enum patterns'.split():
+            l.append('%s=%s' % (k, str(self.__getattribute__(k))))
+        msg += ', '.join(l)
+        msg += ')'
+
+        # return NXDL_Base.__str__(self, *args, **kwargs)
+        return msg
 
     def parse(self, xml_node):
         '''
@@ -356,6 +368,7 @@ class NXDL_element__attribute(NXDL_Base):
 
             else:
                 msg = node.getparent().attrib['name']
+                msg += ' (line %d)' % node.sourceline
                 msg += ': unexpected xs:attribute child node: '
                 msg += node.tag
                 raise ValueError(msg)
@@ -476,6 +489,42 @@ class NXDL_ElementFactory(object):
         return element
 
 
+class NXDL_element__element(NXDL_Base):
+    '''
+    a complete description of a specific NXDL xs:element node
+    
+    :param obj parent: instance of NXDL_Base
+    '''
+    
+    def __init__(self, parent):
+        NXDL_Base.__init__(self, parent)
+        self.name = None
+        self.type = 'str'
+        self.minOccurs = None
+        self.maxOccurs = None
+    
+    def __str__(self, *args, **kwargs):
+        msg = '%s(' % type(self).__name__
+        l = []
+        for k in 'name type minOccurs maxOccurs'.split():
+            l.append('%s=%s' % (k, str(self.__getattribute__(k))))
+        msg += ', '.join(l)
+        msg += ')'
+        # return NXDL_Base.__str__(self, *args, **kwargs)
+        return msg
+
+    def parse(self, xml_node):
+        '''
+        read the element node content from the XML Schema
+        '''
+        self.name = xml_node.attrib.get('name', self.name)
+        self.type = xml_node.attrib.get('type', self.type)
+        if self.type is not None:
+            self.type = self.type.split(':')[-1]
+        self.minOccurs = xml_node.attrib.get('minOccurs', self.minOccurs)
+        self.maxOccurs = xml_node.attrib.get('maxOccurs', self.maxOccurs)
+
+
 class NXDL_item_factory(object):
     
     def __init__(self, nxdl_file_name):
@@ -487,19 +536,30 @@ class NXDL_item_factory(object):
         
         self._parse_nxdl_simpleType_nodes(root)
         self._parse_nxdl_attribute_nodes(root)
+        self._parse_nxdl_element_nodes(root)
+        for node in root.xpath('//xs:group', namespaces=self.ns):
+            named_parent_node = get_named_parent_node(node)
+            key = named_parent_node.attrib.get('name', 'schema')
+            if key not in self.db:
+                self.db[key] = {}
+            obj = None
+            self.db[key][node.attrib.get('name', 'unnamed')] = obj
     
     def _parse_nxdl_simpleType_nodes(self, root):
         for node in root.xpath('/xs:schema/xs:simpleType', namespaces=self.ns):
-            key = node.attrib['name']
             obj = NXDL_Named_simpleType(None)
             obj.parse(node)
-            self.db[key] = obj
+            
+            key = 'simpleType'
+            if key not in self.db:
+                self.db[key] = {}
+            self.db[key][node.attrib['name']] = obj
         
         # substitute base values defined in NXDL
-        for v in self.db.values():
+        for v in self.db['simpleType'].values():
             if hasattr(v, 'base'):
-                if v.base in self.db:
-                    known_base = self.db[v.base]
+                if v.base in self.db['simpleType']:
+                    known_base = self.db['simpleType'][v.base]
                     v.maxLength = known_base.maxLength
                     v.patterns += known_base.patterns
                     v.base = known_base.base
@@ -510,14 +570,40 @@ class NXDL_item_factory(object):
             key = named_parent_node.attrib['name'] + ':' + node.attrib['name']
             obj = NXDL_element__attribute(None)
             obj.parse(node)
-            self.db[key] = obj
+            
+            key = named_parent_node.attrib['name']
+            if key not in self.db:
+                self.db[key] = {}
+            self.db[key][node.attrib['name']] = obj
+    
+    def _parse_nxdl_element_nodes(self, root):
+        keylist = []
+        for node in root.xpath('//xs:element', namespaces=self.ns):
+            named_parent_node = get_named_parent_node(node)
+            obj = NXDL_element__element(None)
+            obj.parse(node)
+            
+            key = named_parent_node.attrib.get('name', 'schema')
+            if key not in self.db:
+                self.db[key] = {}
+            self.db[key][node.attrib['name']] = obj
+            keylist.append((key, node.attrib['name']))
+        
+#         for key1, key2 in keylist:
+#             print(key1, key2)
 
 
 def issue_67_main():
     import pprint
     nxdl_xsd_file_name = os.path.join('cache', 'v3.2','nxdl.xsd')
     known_nxdl_items = NXDL_item_factory(nxdl_xsd_file_name)
-    pprint.pprint(known_nxdl_items.db)
+    #pprint.pprint(known_nxdl_items.db)
+    
+    for k1, v1 in sorted(known_nxdl_items.db.items()):
+        print(k1 + ' :')
+        if isinstance(v1, dict):
+            for k2, v2 in sorted(v1.items()):
+                print(' '*4, k2 + ' : ', str(v2))
 
 
 def cache_manager_main():

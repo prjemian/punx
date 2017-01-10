@@ -390,7 +390,7 @@ class NXDL_File_Set(object):
     
     def __init__(self):
         import punx.nxdl_manager
-        self.nxdl_element_factory = punx.nxdl_manager.NXDL_ElementFactory(self)
+        #self.nxdl_element_factory = punx.nxdl_manager.NXDL_ElementFactory(self)
     
     def __getattribute__(self, *args, **kwargs):
         '''

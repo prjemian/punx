@@ -51,8 +51,8 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 import punx
 import punx.singletons
 
-
-NXDL_TEST_FILE = os.path.join(os.path.dirname(__file__), 'cache', 'v3.2','nxdl.xsd')
+NXDL_XSD_NAME = 'nxdl.xsd'
+NXDL_TEST_FILE = os.path.join(os.path.dirname(__file__), 'cache', 'v3.2', NXDL_XSD_NAME)
 
 
 def get_xml_namespace_dictionary():

@@ -335,6 +335,7 @@ class NXDL_element__attribute(object):
     def __init__(self, nxdl_defaults):
         for k, v in nxdl_defaults.__dict__.items():
             self.__setattr__(k, v)
+        # TODO: something odd with the self.attributes dictionary
 
 
 class NXDL_element__field(object):

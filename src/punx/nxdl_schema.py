@@ -14,6 +14,31 @@
 
 '''
 Read the NeXus XML Schema
+
+.. autosummary::
+   
+   ~NXDL_item_catalog
+   ~render_class_str
+   ~get_reference_keys
+   ~get_named_parent_node
+   ~get_xml_namespace_dictionary
+
+The ``NXDL_item_catalog.definition_element`` will provide the
+defaults for the definition, group, field, link, and symbols 
+NXDL structures.  These internal structures are used:
+
+
+.. autosummary::
+   
+   ~NXDL_schema__attribute
+   ~NXDL_schema__attributeGroup
+   ~NXDL_schema__complexType
+   ~NXDL_schema__element
+   ~NXDL_schema__group
+   ~NXDL_schema_named_simpleType
+
+Note there is a recursion within :class:`NXDL_schema__group`
+since a *group* may contain a child *group*.
 '''
 
 from __future__ import print_function
@@ -47,13 +72,34 @@ def get_named_parent_node(xml_node):
 
 
 def get_reference_keys(xml_node):
+    '''
+    reference an xml_node in the catalog: ``catalog[section][line]``
+    '''
     section = xml_node.tag.split('}')[-1]
     line = 'Line %d' % xml_node.sourceline
     return section, line
 
 
+def render_class_str(obj):
+    '''
+    for use in classes: ``def __str(self): return render_class_str(self)``
+    '''
+    msg = '%s(' % type(obj).__name__
+    l = []
+    for k, v in sorted(obj.__dict__.items()):
+        if k not in ['children',] and v is not None:
+            l.append('%s=%s' % (k, str(v).lstrip('_')))
+    msg += ', '.join(l)
+    msg += ')'
+    return msg
+
+
 class NXDL_schema__attribute(object):
     '''
+    node matches XPath query: ``//xs:attribute``
+    
+    xml_node is ``xs:attribute``
+
     a complete description of a specific NXDL attribute element
     
     notes on attributes
@@ -114,14 +160,7 @@ class NXDL_schema__attribute(object):
         self.nxdl_attributes = {}
     
     def __str__(self, *args, **kwargs):
-        msg = '%s(' % type(self).__name__
-        l = []
-        for k in 'name type required default_value enum patterns'.split():
-            l.append('%s=%s' % (k, str(self.__getattribute__(k))))
-        msg += ', '.join(l)
-        msg += ')'
-
-        return msg
+        return render_class_str(self)
 
     def parse(self, xml_node):
         '''
@@ -158,20 +197,18 @@ class NXDL_schema__attribute(object):
 
 
 class NXDL_schema__attributeGroup(object):
+    '''
+    node matches XPath query: ``/xs:schema/xs:attributeGroup``
+    
+    xml_node is ``xs:attributeGroup``
+    '''
     
     def __init__(self):
         self.name = None
         self.children = []
     
     def __str__(self, *args, **kwargs):
-        msg = '%s(' % type(self).__name__
-        l = []
-        for k in ['name', ]:
-            l.append('%s=%s' % (k, str(self.__getattribute__(k))))
-        msg += ', '.join(l)
-        msg += ')'
-
-        return msg
+        return render_class_str(self)
 
     def parse(self, xml_node):
         '''
@@ -193,9 +230,9 @@ class NXDL_schema__attributeGroup(object):
 
 class NXDL_schema_complexType(object):
     '''
-    node matches XPath query: /xs:schema/xs:complexType
+    node matches XPath query: ``/xs:schema/xs:complexType``
     
-    xml_node is xs:complexType
+    xml_node is ``xs:complexType``
     '''
     
     def __init__(self):
@@ -203,13 +240,7 @@ class NXDL_schema_complexType(object):
         self.name = None
     
     def __str__(self, *args, **kwargs):
-        msg = '%s(' % type(self).__name__
-        l = []
-        for k in ['name',]:
-            l.append('%s=%s' % (k, str(self.__getattribute__(k))))
-        msg += ', '.join(l)
-        msg += ')'
-        return msg
+        return render_class_str(self)
 
     def parse(self, xml_node, catalog):
         '''
@@ -333,13 +364,7 @@ class NXDL_schema__element(object):
         self.maxOccurs = None
     
     def __str__(self, *args, **kwargs):
-        msg = '%s(' % type(self).__name__
-        l = []
-        for k in 'name type minOccurs maxOccurs'.split():
-            l.append('%s=%s' % (k, str(self.__getattribute__(k))))
-        msg += ', '.join(l)
-        msg += ')'
-        return msg
+        return render_class_str(self)
 
     def parse(self, xml_node):
         '''
@@ -373,6 +398,11 @@ class NXDL_schema__element(object):
 
 
 class NXDL_schema__group(object):
+    '''
+    node matches XPath query: ``//xs:group``
+    
+    xml_node is ``xs:group``
+    '''
 
     def __init__(self):
         self.children = []
@@ -382,13 +412,7 @@ class NXDL_schema__group(object):
         self.maxOccurs = None
     
     def __str__(self, *args, **kwargs):
-        msg = '%s(' % type(self).__name__
-        l = []
-        for k in 'name ref minOccurs maxOccurs'.split():
-            l.append('%s=%s' % (k, str(self.__getattribute__(k))))
-        msg += ', '.join(l)
-        msg += ')'
-        return msg
+        return render_class_str(self)
 
     def parse(self, xml_node):
         '''
@@ -416,9 +440,9 @@ class NXDL_schema__group(object):
 
 class NXDL_schema_named_simpleType(object):
     '''
-    node matches XPath query: /xs:schema/xs:simpleType
+    node matches XPath query: ``/xs:schema/xs:simpleType``
     
-    xml_node is xs:simpleType
+    xml_node is ``xs:simpleType``
     '''
     
     def __init__(self):
@@ -430,13 +454,7 @@ class NXDL_schema_named_simpleType(object):
         #self.enums = []
     
     def __str__(self, *args, **kwargs):
-        msg = '%s(' % type(self).__name__
-        l = []
-        for k in 'name base maxLength patterns'.split():
-            l.append('%s=%s' % (k, str(self.__getattribute__(k))))
-        msg += ', '.join(l)
-        msg += ')'
-        return msg
+        return render_class_str(self)
     
     def parse(self, xml_node):
         '''
@@ -477,6 +495,16 @@ class NXDL_schema_named_simpleType(object):
 
 
 class NXDL_item_catalog(object):
+    '''
+    content from the NeXus XML Schema (``nxdl.xsd``)
+    
+    EXAMPLE:
+
+        nxdl_xsd_file_name = os.path.join('cache', 'v3.2','nxdl.xsd')
+        known_nxdl_items = NXDL_item_catalog(nxdl_xsd_file_name)
+        definitions = nxdl_xsd_file_name.definition_element
+    
+    '''
     
     def __init__(self, nxdl_file_name):
         self.db = {}
@@ -503,7 +531,7 @@ class NXDL_item_catalog(object):
         reference_type_name = nodes[0].attrib['type'].split(':')[-1]
         self.definition_element.children += self.db['schema'][reference_type_name].children
         
-        def substitute(parent_node, catalog):
+        def apply_substitutions(parent_node, catalog):
             for node in parent_node.children:
                 for nm in 'type base ref'.split():
                     if hasattr(node, nm):
@@ -517,15 +545,22 @@ class NXDL_item_catalog(object):
 
                             if hasattr(node, 'children') and hasattr(reference, 'children'):
                                 for item in reference.children:
-                                    if not isinstance(item, NXDL_schema__group):
+                                    if type(item).__name__[len('NXDL_schema__'):] != 'group' \
+                                           or not hasattr(item, 'ref') \
+                                           or item.ref != 'groupGroup':
+                                        # avoid a recursion (group can have child group)
                                         node.children.append(copy.deepcopy(item))
-#                                 if not isinstance(node, NXDL_schema__group):
-                                substitute(node, catalog)       # substitutions in the children
-                            for at in 'patterns maxLength'.split():
-                                if hasattr(reference, at):
-                                    node.__setattr__(at, reference.__getattribute__(at))
 
-        substitute(self.definition_element, self.db)
+                                # substitutions in the children
+                                apply_substitutions(node, catalog)
+
+                            for attribute_name in 'patterns maxLength'.split():
+                                if hasattr(reference, attribute_name):
+                                    node.__setattr__(
+                                        attribute_name, 
+                                        reference.__getattribute__(attribute_name))
+
+        apply_substitutions(self.definition_element, self.db)
     
     def add_to_catalog(self, node, obj, key=None):
         section, line = get_reference_keys(node)
@@ -581,7 +616,7 @@ class NXDL_item_catalog(object):
             self.db['schema'][obj.name] = obj     # for cross-reference
             xref[obj.name] = obj
         
-        # substitute base values defined in NXDL
+        # apply_substitutions base values defined in NXDL
         for v in xref.values():
             if hasattr(v, 'base'):
                 if v.base in xref:
@@ -591,30 +626,59 @@ class NXDL_item_catalog(object):
                     v.base = known_base.base
 
 
-def print_node(obj, indent=''):
+def print_tree(obj, level=0):
+    indent = ' '*4*level
+    k = type(obj).__name__[len('NXDL_schema__'):]
+    count = 1
+    db = {k: 1}
+
     if hasattr(obj, 'name') and obj.name is not None:
         nm = str(obj.name)
     else:
-        nm = '(no_name)'
+        nm = '(%s)' % type(obj).__name__[len('NXDL_schema__'):]
     if isinstance(obj, NXDL_schema__attribute):
         nm = '@' + nm
     print(indent + nm + ' : ' + str(obj))
+    
+    # sort the children into their different groups
+    attributes = {}
+    elements = {}
+    groups = []
     if hasattr(obj, 'children'):
         for child in obj.children:
-            print_node(child, indent + '  ')
+            if isinstance(child, NXDL_schema__attribute):
+                attributes[child.name] = child
+            elif isinstance(child, NXDL_schema__element):
+                elements[child.name] = child
+            elif isinstance(child, NXDL_schema__group):
+                groups.append(child)
+    
+    def keep_stats(count, db, c, d):
+        count += c
+        for item, value in d.items():
+            if item not in db:
+                db[item] = 0
+            db[item] += value
+        return count
+
+    # show the children in order: attributes, elements, groups
+    for nm, child in sorted(attributes.items()):
+        c, d = print_tree(child, level+1)
+        count = keep_stats(count, db, c, d)
+    for nm, child in sorted(elements.items()):
+        c, d = print_tree(child, level+1)
+        count = keep_stats(count, db, c, d)
+    for child in groups:
+        c, d = print_tree(child, level+1)
+        count = keep_stats(count, db, c, d)
+    return count, db
 
 
 def issue_67_main():
     nxdl_xsd_file_name = os.path.join('cache', 'v3.2','nxdl.xsd')
     known_nxdl_items = NXDL_item_catalog(nxdl_xsd_file_name)
-    
-    # for k1, v1 in sorted(known_nxdl_items.db.items()):
-    #     print(k1 + ' :')
-    #     if isinstance(v1, dict):
-    #         for k2, v2 in sorted(v1.items()):
-    #             print(' '*4, k2 + ' : ', str(v2))
-    
-    print_node(known_nxdl_items.definition_element)
+    count, db = print_tree(known_nxdl_items.definition_element)
+    print(count, db)
 
 
 if __name__ == '__main__':

@@ -181,8 +181,7 @@ class NXDL_element__definition(NXDL_Base):
             msg += '\n' + str(exc)
 
         # parse the XML content of this NXDL definition element
-        root = self.lxml_tree.getroot()    # TODO:
-        for node in root:
+        for node in self.lxml_tree.getroot():
             if isinstance(node, lxml.etree._Comment):
                 continue
 

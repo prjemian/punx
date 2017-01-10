@@ -46,6 +46,15 @@ def get_named_parent_node(xml_node):
     return parent
 
 
+def get_reference_keys(xml_node):
+    '''
+    for storing objects in the catalog: ``catalog[section][line]``
+    '''
+    section = xml_node.tag.split('}')[-1]
+    line = 'Line %d' % xml_node.sourceline
+    return section, line
+
+
 class NXDL_schema__attribute(object):
     '''
     a complete description of a specific NXDL attribute element
@@ -153,6 +162,41 @@ class NXDL_schema__attribute(object):
                 raise ValueError(msg)
 
 
+class NXDL_schema__attributeGroup(object):
+    
+    def __init__(self, parent):
+        self.parent = parent
+        self.name = None
+        self.children = []
+    
+    def __str__(self, *args, **kwargs):
+        msg = '%s(' % type(self).__name__
+        l = []
+        for k in 'name parent'.split():
+            l.append('%s=%s' % (k, str(self.__getattribute__(k))))
+        msg += ', '.join(l)
+        msg += ')'
+
+        return msg
+
+    def parse(self, xml_node):
+        '''
+        read the attributeGroup node content from the XML Schema
+        
+        xml_node is xs:attributeGroup
+        '''
+        assert(xml_node.tag.endswith('}attributeGroup'))
+        self.name = xml_node.attrib.get('name', self.name)
+        for node in xml_node:
+            if isinstance(node, lxml.etree._Comment):
+                continue
+
+            elif node.tag.endswith('}attribute'):
+                obj = NXDL_schema__attribute(self)
+                obj.parse(node)
+                self.children.append(obj)
+
+
 class NXDL_schema_complexType(object):
     '''
     node matches XPath query: /xs:schema/xs:complexType
@@ -162,6 +206,7 @@ class NXDL_schema_complexType(object):
     
     def __init__(self, parent):
         self.parent = parent
+        self.children = []
         self.name = None
     
     def __str__(self, *args, **kwargs):
@@ -173,30 +218,113 @@ class NXDL_schema_complexType(object):
         msg += ')'
         return msg
 
-    def parse(self, xml_node):
+    def parse(self, xml_node, catalog):
         '''
         read the element node content from the XML Schema
         '''
         assert(xml_node.tag.endswith('}complexType'))
         self.name = xml_node.attrib.get('name', self.name)
 
-        tag_list = 'sequence complexContent group attribute attributeGroup'.split()
+        handlers = dict(
+            sequence = self._parse_sequence,
+            complexContent = self._parse_complexContent,
+            group = self._parse_group,
+            attribute = self._parse_attribute,
+            attributeGroup = self._parse_attributeGroup,
+            )
+
         tags_ignored = ['annotation',]
         for node in xml_node:
             if isinstance(node, lxml.etree._Comment):
                 continue
             
             tag = node.tag.split('}')[-1]
-            if tag in tag_list:
-                # print(xml_node.attrib['name'], tag, node.sourceline)
-                # TODO: parse the content based on the tag
-                pass
+            if tag in handlers.keys():
+                handlers[tag](node, catalog)
             
-            elif tag in tags_ignored:
-                pass
-            
-            else:
+            elif tag not in tags_ignored:
                 print('!\t', xml_node.attrib['name'], tag, node.sourceline)
+    
+    def _parse_attribute(self, xml_node, catalog):
+        '''
+        parse a xs:attribute node
+        '''
+        assert(xml_node.tag.endswith('}attribute'))
+        section, line = get_reference_keys(xml_node)
+        obj = catalog[section][line]
+        self.children.append(obj)
+    
+    def _parse_attributeGroup(self, xml_node, catalog):
+        '''
+        parse a xs:attributeGroup node
+        '''
+        assert(xml_node.tag.endswith('}attributeGroup'))
+        ref = xml_node.attrib['ref'].split(':')[-1]
+        obj = catalog['schema'][ref]
+        self.children += obj.children
+    
+    def _parse_complexContent(self, xml_node, catalog):
+        '''
+        parse a xs:complexContent node
+        '''
+        assert(xml_node.tag.endswith('}complexContent'))
+        self._parse_extension(xml_node[0], catalog)
+    
+    def _parse_element(self, xml_node, catalog):
+        '''
+        parse a xs:element node
+        '''
+        assert(xml_node.tag.endswith('}element'))
+        section, line = get_reference_keys(xml_node)
+        obj = catalog[section][line]
+        self.children.append(obj)
+    
+    def _parse_extension(self, xml_node, catalog):
+        '''
+        parse a xs:extension node
+        '''
+        assert(xml_node.tag.endswith('}extension'))
+        base = xml_node.attrib.get('base', None)
+        if base is not None:
+            base = base.split(':')[-1]
+            obj = catalog['schema'][base]
+            self.children += obj.children
+        for node in xml_node:
+            if isinstance(node, lxml.etree._Comment):
+                continue
+
+            elif node.tag.endswith('}sequence'):
+                self._parse_sequence(node, catalog)
+
+            elif node.tag.endswith('}attribute'):
+                self._parse_attribute(node, catalog)
+    
+    def _parse_group(self, xml_node, catalog):
+        '''
+        parse a xs:group node
+        '''
+        assert(xml_node.tag.endswith('}group'))
+        section, line = get_reference_keys(xml_node)
+        obj = catalog[section][line]
+        self.children.append(obj)
+    
+    def _parse_sequence(self, xml_node, catalog):
+        '''
+        parse a xs:sequence node
+        '''
+        assert(xml_node.tag.endswith('}sequence'))
+        for node in xml_node:
+            if isinstance(node, lxml.etree._Comment):
+                continue
+
+            elif node.tag.endswith('}element'):
+                self._parse_element(node, catalog)
+
+            elif node.tag.endswith('}group'):
+                self._parse_group(node, catalog)
+
+            elif node.tag.endswith('}any'):
+                pass
 
 
 class NXDL_schema__element(object):
@@ -208,6 +336,7 @@ class NXDL_schema__element(object):
     
     def __init__(self, parent):
         self.parent = parent
+        self.children = []      # TODO: look for them
         self.name = None
         self.type = 'str'
         self.minOccurs = None
@@ -233,12 +362,15 @@ class NXDL_schema__element(object):
             self.type = self.type.split(':')[-1]
         self.minOccurs = xml_node.attrib.get('minOccurs', self.minOccurs)
         self.maxOccurs = xml_node.attrib.get('maxOccurs', self.maxOccurs)
+        # TODO: look for additional content
+        # xs:complexType
 
 
 class NXDL_schema__group(object):
 
     def __init__(self, parent):
         self.parent = parent
+        self.children = []      # TODO: look for them
         self.name = None
         self.ref = None
         self.minOccurs = None
@@ -264,6 +396,8 @@ class NXDL_schema__group(object):
             self.ref = self.ref.split(':')[-1]
         self.minOccurs = xml_node.attrib.get('minOccurs', self.minOccurs)
         self.maxOccurs = xml_node.attrib.get('maxOccurs', self.maxOccurs)
+        
+        # TODO: what about children?
 
 
 class NXDL_schema_named_simpleType(object):
@@ -275,6 +409,7 @@ class NXDL_schema_named_simpleType(object):
     
     def __init__(self, parent):
         self.parent = parent
+        self.children = []      # TODO: look for them
         self.name = None
         self.base = None
         self.patterns = []
@@ -339,80 +474,107 @@ class NXDL_item_catalog(object):
         
         self._parse_nxdl_simpleType_nodes(root)
         self._parse_nxdl_attribute_nodes(root)
+        self._parse_nxdl_attributeGroup_nodes(root)
         self._parse_nxdl_element_nodes(root)
         self._parse_nxdl_group_nodes(root)
         self._parse_nxdl_complexType_nodes(root)
+
+        self._init_definition_element(root)        # Now, start from the "definition" element
     
-    def _parse_nxdl_simpleType_nodes(self, root):
-        for node in root.xpath('/xs:schema/xs:simpleType', namespaces=self.ns):
-            obj = NXDL_schema_named_simpleType(None)
-            obj.parse(node)
-            
-            key = 'simpleType'
-            if key not in self.db:
-                self.db[key] = {}
-            self.db[key][node.attrib['name']] = obj
+    def _init_definition_element(self, root):
+        nodes = root.xpath('xs:element', namespaces=self.ns)
+        assert(len(nodes) == 1)
+        self.definition_element = self.db['element']['Line %d' % nodes[0].sourceline]
+        reference_type_name = nodes[0].attrib['type'].split(':')[-1]
+        self.definition_element.children += self.db['schema'][reference_type_name].children
         
-        # substitute base values defined in NXDL
-        for v in self.db['simpleType'].values():
-            if hasattr(v, 'base'):
-                if v.base in self.db['simpleType']:
-                    known_base = self.db['simpleType'][v.base]
-                    v.maxLength = known_base.maxLength
-                    v.patterns += known_base.patterns
-                    v.base = known_base.base
+        def substitute(parent_node, catalog):
+            for node in parent_node.children:
+                if hasattr(node, 'type'):
+                    key = node.type
+
+                elif hasattr(node, 'base'):
+                    key = node.base
+
+                elif hasattr(node, 'ref'):
+                    key = node.ref
+
+                else:
+                    continue
+                
+                if key in catalog['schema']:
+                    reference = catalog['schema'][key]
+                    if hasattr(node, 'children') and hasattr(reference, 'children'):
+                        node.children += reference.children
+                    # TODO: patterns, maxLength
+                    # TODO: what about substitutions in the children?
+                    # TODO: what about deep copy?
+
+        substitute(self.definition_element, self.db)
+    
+    def add_to_catalog(self, node, obj, key=None):
+        section, line = get_reference_keys(node)
+        section = key or section
+        if section not in self.db:
+            self.db[section] = {}
+        self.db[section][line] = obj
     
     def _parse_nxdl_attribute_nodes(self, root):
         for node in root.xpath('//xs:attribute', namespaces=self.ns):
-            named_parent_node = get_named_parent_node(node)
-            key = named_parent_node.attrib['name'] + ':' + node.attrib['name']
             obj = NXDL_schema__attribute(None)
             obj.parse(node)
-            
-            key = named_parent_node.attrib['name']
-            if key not in self.db:
-                self.db[key] = {}
-            self.db[key][node.attrib['name']] = obj
+            self.add_to_catalog(node, obj)
     
-    def _parse_nxdl_element_nodes(self, root):
-        keylist = []
-        for node in root.xpath('//xs:element', namespaces=self.ns):
-            named_parent_node = get_named_parent_node(node)
-            obj = NXDL_schema__element(None)
+    def _parse_nxdl_attributeGroup_nodes(self, root):
+        for node in root.xpath('xs:attributeGroup', namespaces=self.ns):
+            obj = NXDL_schema__attributeGroup(None)
             obj.parse(node)
-            
-            key = named_parent_node.attrib.get('name', 'schema')
-            if key not in self.db:
-                self.db[key] = {}
-            self.db[key][node.attrib['name']] = obj
-            keylist.append((key, node.attrib['name']))
-        
-#         for key1, key2 in keylist:
-#             print(key1, key2)
-    
-    def _parse_nxdl_group_nodes(self, root):
-        for node in root.xpath('//xs:group', namespaces=self.ns):
-            named_parent_node = get_named_parent_node(node)
-            key = named_parent_node.attrib.get('name', 'schema')
-            if key not in self.db:
-                self.db[key] = {}
-            obj = NXDL_schema__group(None)
-            obj.parse(node)
-            self.db[key][node.attrib.get('name', 'unnamed')] = obj
+            self.add_to_catalog(node, obj, key='schema')
+            self.db['schema'][obj.name] = obj     # for cross-reference
     
     def _parse_nxdl_complexType_nodes(self, root):
-        tag_list = 'sequence complexContent group attribute attributeGroup'.split()
-        tags_ignored = ['annotation',]
         # only look at root node children: 'xs:complexType', not '//xs:complexType' 
         for node in root.xpath('xs:complexType', namespaces=self.ns):
             if 'name' in node.attrib:
                 # names.append(node.attrib['name'])
                 obj = NXDL_schema_complexType(None)
-                obj.parse(node)
-                key = 'schema'
-                if key not in self.db:
-                    self.db[key] = {}
-                self.db[key][node.attrib.get('name', 'unnamed')] = obj
+                obj.parse(node, self.db)
+                self.add_to_catalog(node, obj, key = 'schema')
+                self.db['schema'][obj.name] = obj     # for cross-reference
+    
+    def _parse_nxdl_element_nodes(self, root):
+        for node in root.xpath('//xs:element', namespaces=self.ns):
+            obj = NXDL_schema__element(None)
+            obj.parse(node)
+            self.add_to_catalog(node, obj)
+    
+    def _parse_nxdl_group_nodes(self, root):
+        for node in root.xpath('//xs:group', namespaces=self.ns):
+            obj = NXDL_schema__group(None)
+            obj.parse(node)
+            self.add_to_catalog(node, obj)
+            if obj.name is not None:
+                self.db['schema'][obj.name] = obj     # for cross-reference
+        
+    def _parse_nxdl_simpleType_nodes(self, root):
+        xref = {}
+        for node in root.xpath('/xs:schema/xs:simpleType', namespaces=self.ns):
+            obj = NXDL_schema_named_simpleType(None)
+            obj.parse(node)
+            self.add_to_catalog(node, obj, key='simpleType')
+            if 'schema' not in self.db:
+                self.db['schema'] = {}
+            self.db['schema'][obj.name] = obj     # for cross-reference
+            xref[obj.name] = obj
+        
+        # substitute base values defined in NXDL
+        for v in xref.values():
+            if hasattr(v, 'base'):
+                if v.base in xref:
+                    known_base = xref[v.base]
+                    v.maxLength = known_base.maxLength
+                    v.patterns += known_base.patterns
+                    v.base = known_base.base
 
 
 def issue_67_main():

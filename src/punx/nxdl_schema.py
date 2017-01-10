@@ -501,8 +501,8 @@ class NXDL_item_catalog(object):
     EXAMPLE:
 
         nxdl_xsd_file_name = os.path.join('cache', 'v3.2','nxdl.xsd')
-        known_nxdl_items = NXDL_item_catalog(nxdl_xsd_file_name)
-        definitions = nxdl_xsd_file_name.definition_element
+        catalog = NXDL_item_catalog(nxdl_xsd_file_name)
+        definition = catalog.definition_element
     
     '''
     
@@ -675,9 +675,9 @@ def print_tree(obj, level=0):
 
 
 def issue_67_main():
-    nxdl_xsd_file_name = os.path.join('cache', 'v3.2','nxdl.xsd')
-    known_nxdl_items = NXDL_item_catalog(nxdl_xsd_file_name)
-    count, db = print_tree(known_nxdl_items.definition_element)
+    nxdl_xsd_file_name = os.path.join(os.path.dirname(__file__), 'cache', 'v3.2','nxdl.xsd')
+    catalog = NXDL_item_catalog(nxdl_xsd_file_name)
+    count, db = print_tree(catalog.definition_element)
     print(count, db)
 
 

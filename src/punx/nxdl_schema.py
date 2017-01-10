@@ -113,6 +113,7 @@ class NXDL_schema__attribute(object):
         self.default_value = None
         self.enum = []
         self.patterns = []
+        self.maxLength = None
         self.nxdl_attributes = {}
     
     def __str__(self, *args, **kwargs):
@@ -359,15 +360,31 @@ class NXDL_schema__element(object):
             self.type = self.type.split(':')[-1]
         self.minOccurs = xml_node.attrib.get('minOccurs', self.minOccurs)
         self.maxOccurs = xml_node.attrib.get('maxOccurs', self.maxOccurs)
-        # TODO: look for additional content
-        # xs:complexType
+
+        ns = get_xml_namespace_dictionary()
+        nodes = xml_node.xpath('xs:complexType', namespaces=ns)
+        if len(nodes) == 1:
+            for node in nodes[0]:
+                if isinstance(node, lxml.etree._Comment):
+                    continue
+     
+                elif node.tag.endswith('}sequence'):
+                    for subnode in node.xpath('xs:element', namespaces=ns):
+                        obj = NXDL_schema__element(None)
+                        obj.parse(subnode)
+                        self.children.append(obj)
+     
+                elif node.tag.endswith('}attribute'):
+                    obj = NXDL_schema__attribute(None)
+                    obj.parse(node)
+                    self.children.append(obj)
 
 
 class NXDL_schema__group(object):
 
     def __init__(self, parent):
         self.parent = parent
-        self.children = []      # TODO: look for them
+        self.children = []
         self.name = None
         self.ref = None
         self.minOccurs = None
@@ -394,7 +411,16 @@ class NXDL_schema__group(object):
         self.minOccurs = xml_node.attrib.get('minOccurs', self.minOccurs)
         self.maxOccurs = xml_node.attrib.get('maxOccurs', self.maxOccurs)
         
-        # TODO: what about children?
+        ns = get_xml_namespace_dictionary()
+        for node in xml_node:
+            if isinstance(node, lxml.etree._Comment):
+                continue
+
+            elif node.tag.endswith('}sequence'):
+                for subnode in node.xpath('xs:element', namespaces=ns):
+                    obj = NXDL_schema__element(None)
+                    obj.parse(subnode)
+                    self.children.append(obj)
 
 
 class NXDL_schema_named_simpleType(object):
@@ -479,6 +505,8 @@ class NXDL_item_catalog(object):
         self._init_definition_element(root)        # Now, start from the "definition" element
     
     def _init_definition_element(self, root):
+        import copy
+        
         nodes = root.xpath('xs:element', namespaces=self.ns)
         assert(len(nodes) == 1)
         self.definition_element = self.db['element']['Line %d' % nodes[0].sourceline]
@@ -492,13 +520,18 @@ class NXDL_item_catalog(object):
                         key = node.__getattribute__(nm)
                         if key in catalog['schema']:
                             reference = catalog['schema'][key]
-                            if hasattr(node, 'children') and hasattr(reference, 'children'):
-                                node.children += reference.children       # TODO: what about deep copy?
-                                substitute(node, catalog)       # substitutions in the children
-                            # TODO: patterns, maxLength
-                                   
-                            # once the substitution has been made, mark up the key so the substitution is not repeated
+                            
+                            # once the substitution has been made, 
+                            # mark up the key so the substitution process is not repeated
                             node.__setattr__(nm, '__'+key)
+
+                            if hasattr(node, 'children') and hasattr(reference, 'children'):
+                                node.children += [copy.deepcopy(_) for _ in reference.children]
+                                if not isinstance(node, NXDL_schema__group):
+                                    substitute(node, catalog)       # substitutions in the children
+                            for at in 'patterns maxLength'.split():
+                                if hasattr(reference, at):
+                                    node.__setattr__(at, reference.__getattribute__(at))
 
         substitute(self.definition_element, self.db)
     
@@ -571,11 +604,11 @@ def issue_67_main():
     nxdl_xsd_file_name = os.path.join('cache', 'v3.2','nxdl.xsd')
     known_nxdl_items = NXDL_item_catalog(nxdl_xsd_file_name)
     
-    for k1, v1 in sorted(known_nxdl_items.db.items()):
-        print(k1 + ' :')
-        if isinstance(v1, dict):
-            for k2, v2 in sorted(v1.items()):
-                print(' '*4, k2 + ' : ', str(v2))
+    # for k1, v1 in sorted(known_nxdl_items.db.items()):
+    #     print(k1 + ' :')
+    #     if isinstance(v1, dict):
+    #         for k2, v2 in sorted(v1.items()):
+    #             print(' '*4, k2 + ' : ', str(v2))
 
 
 if __name__ == '__main__':

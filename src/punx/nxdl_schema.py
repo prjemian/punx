@@ -47,9 +47,6 @@ def get_named_parent_node(xml_node):
 
 
 def get_reference_keys(xml_node):
-    '''
-    for storing objects in the catalog: ``catalog[section][line]``
-    '''
     section = xml_node.tag.split('}')[-1]
     line = 'Line %d' % xml_node.sourceline
     return section, line

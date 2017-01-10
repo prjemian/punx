@@ -110,7 +110,15 @@ class Test_Catalog(unittest.TestCase):
         import tests.common
         with tests.common.Capture_stdout() as printed_lines:
             punx.nxdl_schema.issue_67_main()
-        self.assertEqual(len(printed_lines), 81)    # TODO: could do much better testing here
+        self.assertEqual(len(printed_lines), 81)    # TODO: could do more extensive testing here
+
+    def test_NXDL_summary(self):
+        summary = punx.nxdl_schema.NXDL_Summary(punx.nxdl_schema.NXDL_TEST_FILE)
+        self.assertTrue(isinstance(summary, punx.nxdl_schema.NXDL_Summary))
+        s2 = punx.nxdl_schema.NXDL_Summary(punx.nxdl_schema.NXDL_TEST_FILE)
+        self.assertTrue(isinstance(s2, punx.nxdl_schema.NXDL_Summary))
+        self.assertEqual(summary, s2, 'singleton is working')
+        # TODO: could do more extensive testing here
 
 
 def suite(*args, **kw):

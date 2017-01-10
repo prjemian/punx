@@ -17,7 +17,7 @@ Read the NeXus XML Schema
 
 .. autosummary::
    
-   ~NXDL_item_catalog
+   ~NXDL_Summary
    ~render_class_str
    ~get_reference_keys
    ~get_named_parent_node
@@ -27,9 +27,9 @@ The ``NXDL_item_catalog.definition_element`` will provide the
 defaults for the definition, group, field, link, and symbols 
 NXDL structures.  These internal structures are used:
 
-
 .. autosummary::
    
+   ~NXDL_item_catalog
    ~NXDL_schema__attribute
    ~NXDL_schema__attributeGroup
    ~NXDL_schema__complexType
@@ -49,6 +49,10 @@ import sys
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import punx
+import punx.singletons
+
+
+NXDL_TEST_FILE = os.path.join(os.path.dirname(__file__), 'cache', 'v3.2','nxdl.xsd')
 
 
 def get_xml_namespace_dictionary():
@@ -545,7 +549,7 @@ class NXDL_item_catalog(object):
 
                             if hasattr(node, 'children') and hasattr(reference, 'children'):
                                 for item in reference.children:
-                                    if type(item).__name__[len('NXDL_schema__'):] != 'group' \
+                                    if type(item).__name__.split('_')[-1] != 'group' \
                                            or not hasattr(item, 'ref') \
                                            or item.ref != 'groupGroup':
                                         # avoid a recursion (group can have child group)
@@ -614,6 +618,7 @@ class NXDL_item_catalog(object):
             if 'schema' not in self.db:
                 self.db['schema'] = {}
             self.db['schema'][obj.name] = obj     # for cross-reference
+            self.db['simpleType'][obj.name] = obj     # for cross-reference
             xref[obj.name] = obj
         
         # apply_substitutions base values defined in NXDL
@@ -626,32 +631,76 @@ class NXDL_item_catalog(object):
                     v.base = known_base.base
 
 
+class NXDL_Summary(punx.singletons.Singleton):
+    '''
+    provide an easy interface for the nxdl_manager
+    
+    USAGE::
+    
+        summary = NXDL_Summary(nxdl_xsd_file_name)
+        ...
+        summary.simpleType['validItemName'].patterns
+    
+    '''
+    
+    def __init__(self, nxdl_xsd_file_name):
+        self.definition = None
+        self.attribute = None
+        self.doc = None
+        self.field = None
+        self.group = None
+        self.link = None
+        self.symbols = None
+        self.simpleType = {}
+        
+        self.setup(nxdl_xsd_file_name)
+    
+    def setup(self, nxdl_xsd_file_name):
+        catalog = NXDL_item_catalog(nxdl_xsd_file_name)
+        
+        self.build_tree(catalog.definition_element)
+        self.definition = catalog.definition_element
+        
+        self.group = self.definition.groups.values()[0]
+        self.group.attributes = self.group.elements['group'].attributes
+        self.attribute = self.group.elements['attribute']
+        self.doc = self.group.elements['doc']
+        self.field = self.group.elements['field']
+        self.group.elements['group'] = 'recursion'
+        self.link = self.group.elements['link']
+        self.symbols = self.definition.elements.values()[0]
+
+        self.simpleType = catalog.db['simpleType']
+    
+    def build_tree(self, obj):
+        obj.attributes = {}
+        obj.elements = {}
+        obj.groups = {}
+        if hasattr(obj, 'children'):
+            for child in obj.children:
+                if isinstance(child, NXDL_schema__attribute) \
+                        or isinstance(child, NXDL_schema__element) \
+                        or isinstance(child, NXDL_schema__group):
+                    kind = type(child).__name__.split('_')[-1]
+                    target = obj.__getattribute__(kind + 's')
+                    nm = child.name or '(%s)' % kind
+                    target[nm] = child
+                    self.build_tree(child)
+
+
 def print_tree(obj, level=0):
     indent = ' '*4*level
-    k = type(obj).__name__[len('NXDL_schema__'):]
+    k = type(obj).__name__.split('_')[-1]
     count = 1
     db = {k: 1}
 
     if hasattr(obj, 'name') and obj.name is not None:
         nm = str(obj.name)
     else:
-        nm = '(%s)' % type(obj).__name__[len('NXDL_schema__'):]
+        nm = '(%s)' % type(obj).__name__.split('_')[-1]
     if isinstance(obj, NXDL_schema__attribute):
         nm = '@' + nm
     print(indent + nm + ' : ' + str(obj))
-    
-    # sort the children into their different groups
-    attributes = {}
-    elements = {}
-    groups = []
-    if hasattr(obj, 'children'):
-        for child in obj.children:
-            if isinstance(child, NXDL_schema__attribute):
-                attributes[child.name] = child
-            elif isinstance(child, NXDL_schema__element):
-                elements[child.name] = child
-            elif isinstance(child, NXDL_schema__group):
-                groups.append(child)
     
     def keep_stats(count, db, c, d):
         count += c
@@ -662,22 +711,18 @@ def print_tree(obj, level=0):
         return count
 
     # show the children in order: attributes, elements, groups
-    for nm, child in sorted(attributes.items()):
-        c, d = print_tree(child, level+1)
-        count = keep_stats(count, db, c, d)
-    for nm, child in sorted(elements.items()):
-        c, d = print_tree(child, level+1)
-        count = keep_stats(count, db, c, d)
-    for child in groups:
-        c, d = print_tree(child, level+1)
-        count = keep_stats(count, db, c, d)
+    for kind in 'attributes elements groups'.split():
+        if hasattr(obj, kind):
+            item = obj.__getattribute__(kind)
+            for nm, child in sorted(item.items()):
+                c, d = print_tree(child, level+1)
+                count = keep_stats(count, db, c, d)
     return count, db
 
 
 def issue_67_main():
-    nxdl_xsd_file_name = os.path.join(os.path.dirname(__file__), 'cache', 'v3.2','nxdl.xsd')
-    catalog = NXDL_item_catalog(nxdl_xsd_file_name)
-    count, db = print_tree(catalog.definition_element)
+    summary = NXDL_Summary(NXDL_TEST_FILE)
+    count, db = print_tree(summary.definition)
     print(count, db)
 
 

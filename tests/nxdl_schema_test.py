@@ -95,7 +95,7 @@ class Test_Catalog(unittest.TestCase):
     def tearDown(self):
         pass
 
-    def test_tba(self):
+    def test_NXDL_item_catalog_creation(self):
         import punx.cache_manager
 
         cm = punx.cache_manager.CacheManager()
@@ -104,6 +104,13 @@ class Test_Catalog(unittest.TestCase):
         
         catalog = punx.nxdl_schema.NXDL_item_catalog(fname)
         self.assertTrue(isinstance(catalog, punx.nxdl_schema.NXDL_item_catalog))
+
+    def test_NXDL_item_catalog_issue_67_main(self):
+        sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+        import tests.common
+        with tests.common.Capture_stdout() as printed_lines:
+            punx.nxdl_schema.issue_67_main()
+        self.assertEqual(len(printed_lines), 81)    # TODO: could do much better testing here
 
 
 def suite(*args, **kw):

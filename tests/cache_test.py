@@ -34,7 +34,7 @@ class TestCache(unittest.TestCase):
 
     def test_get_nxdl_dir(self):
         base = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-        base += '/'
+        base += os.path.sep
         received = punx.cache.get_nxdl_dir()
         self.assertTrue(base.startswith(base))
         self.assertTrue(received.startswith(base))

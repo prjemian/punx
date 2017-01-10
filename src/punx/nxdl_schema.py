@@ -56,57 +56,54 @@ class NXDL_schema__attribute(object):
     '''
     a complete description of a specific NXDL attribute element
     
-    :param obj parent: instance of NXDL_Base
-        
-        notes on attributes
-        -------------------
-        
-        In nxdl.xsd, "attributeType" is used by fieldType and groupGroup to define
-        the NXDL "attribute" element used in fields and groups, respectively.
-        It is not necessary for this code to parse "attributeType" from the rules.
-        
-        Each of these XML *complexType* elements defines its own set of 
-        attributes and defaults for use in corresponding NXDL elements:
-        
-        * attributeType
-        * basicComponent
-        * definitionType
-        * enumerationType
-        * fieldType
-        * groupType
-        * linkType
-        
-        There is also an "xs:attributeGroup" which may appear as a sibling 
-        to any ``xs:attribute`` element.  The ``xs:attributeGroup`` provides
-        a list of additional ``xs:attribute`` elements to add to the list.  
-        This is the only one known at this time (2017-01-08):
-        
-        * ``deprecatedAttributeGroup``
-        
-        When the content under ``xs:complexType`` is described within
-        an ``xs:complexContent/xs:extension`` element, the ``xs:extension``
-        element has a ``base`` attribute which names a ``xs:complexType`` 
-        element to use as a starting point (like a superclass) for the
-        additional content described within the ``xs:extension`` element.
-        
-        The content may be found at any of these nodes under the parent 
-        XML element.  Parse them in the order shown:
-        
-        * ``xs:complexContent/xs:extension/xs:attribute``
-        * ``xs:attribute``
-        * (``xs:attributeGroup/``)``xs:attribute``
-        
-        This will get picked up when parsing the ``xs:sequence/xs:element``.
-        
-        * ``xs:sequence/xs:element/xs:complexType/xs:attribute`` (
-        
-        The XPath query for ``//xs:attribute`` from the root node will 
-        pick up all of these.  It will be necessary to walk through the 
-        parent nodes to determine where each should be applied.
+    notes on attributes
+    -------------------
+    
+    In nxdl.xsd, "attributeType" is used by fieldType and groupGroup to define
+    the NXDL "attribute" element used in fields and groups, respectively.
+    It is not necessary for this code to parse "attributeType" from the rules.
+    
+    Each of these XML *complexType* elements defines its own set of 
+    attributes and defaults for use in corresponding NXDL elements:
+    
+    * attributeType
+    * basicComponent
+    * definitionType
+    * enumerationType
+    * fieldType
+    * groupType
+    * linkType
+    
+    There is also an "xs:attributeGroup" which may appear as a sibling 
+    to any ``xs:attribute`` element.  The ``xs:attributeGroup`` provides
+    a list of additional ``xs:attribute`` elements to add to the list.  
+    This is the only one known at this time (2017-01-08):
+    
+    * ``deprecatedAttributeGroup``
+    
+    When the content under ``xs:complexType`` is described within
+    an ``xs:complexContent/xs:extension`` element, the ``xs:extension``
+    element has a ``base`` attribute which names a ``xs:complexType`` 
+    element to use as a starting point (like a superclass) for the
+    additional content described within the ``xs:extension`` element.
+    
+    The content may be found at any of these nodes under the parent 
+    XML element.  Parse them in the order shown:
+    
+    * ``xs:complexContent/xs:extension/xs:attribute``
+    * ``xs:attribute``
+    * (``xs:attributeGroup/``)``xs:attribute``
+    
+    This will get picked up when parsing the ``xs:sequence/xs:element``.
+    
+    * ``xs:sequence/xs:element/xs:complexType/xs:attribute`` (
+    
+    The XPath query for ``//xs:attribute`` from the root node will 
+    pick up all of these.  It will be necessary to walk through the 
+    parent nodes to determine where each should be applied.
     '''
     
-    def __init__(self, parent):
-        self.parent = parent
+    def __init__(self):
         self.name = None
         self.type = 'str'
         self.required = False
@@ -119,7 +116,7 @@ class NXDL_schema__attribute(object):
     def __str__(self, *args, **kwargs):
         msg = '%s(' % type(self).__name__
         l = []
-        for k in 'name type required default_value enum patterns parent'.split():
+        for k in 'name type required default_value enum patterns'.split():
             l.append('%s=%s' % (k, str(self.__getattribute__(k))))
         msg += ', '.join(l)
         msg += ')'
@@ -162,15 +159,14 @@ class NXDL_schema__attribute(object):
 
 class NXDL_schema__attributeGroup(object):
     
-    def __init__(self, parent):
-        self.parent = parent
+    def __init__(self):
         self.name = None
         self.children = []
     
     def __str__(self, *args, **kwargs):
         msg = '%s(' % type(self).__name__
         l = []
-        for k in 'name parent'.split():
+        for k in ['name', ]:
             l.append('%s=%s' % (k, str(self.__getattribute__(k))))
         msg += ', '.join(l)
         msg += ')'
@@ -190,7 +186,7 @@ class NXDL_schema__attributeGroup(object):
                 continue
 
             elif node.tag.endswith('}attribute'):
-                obj = NXDL_schema__attribute(self)
+                obj = NXDL_schema__attribute()
                 obj.parse(node)
                 self.children.append(obj)
 
@@ -202,15 +198,14 @@ class NXDL_schema_complexType(object):
     xml_node is xs:complexType
     '''
     
-    def __init__(self, parent):
-        self.parent = parent
+    def __init__(self):
         self.children = []
         self.name = None
     
     def __str__(self, *args, **kwargs):
         msg = '%s(' % type(self).__name__
         l = []
-        for k in 'name parent'.split():
+        for k in ['name',]:
             l.append('%s=%s' % (k, str(self.__getattribute__(k))))
         msg += ', '.join(l)
         msg += ')'
@@ -328,12 +323,9 @@ class NXDL_schema_complexType(object):
 class NXDL_schema__element(object):
     '''
     a complete description of a specific NXDL xs:element node
-    
-    :param obj parent: instance of NXDL_Base
     '''
     
-    def __init__(self, parent):
-        self.parent = parent
+    def __init__(self):
         self.children = []
         self.name = None
         self.type = 'str'
@@ -343,7 +335,7 @@ class NXDL_schema__element(object):
     def __str__(self, *args, **kwargs):
         msg = '%s(' % type(self).__name__
         l = []
-        for k in 'name type minOccurs maxOccurs parent'.split():
+        for k in 'name type minOccurs maxOccurs'.split():
             l.append('%s=%s' % (k, str(self.__getattribute__(k))))
         msg += ', '.join(l)
         msg += ')'
@@ -370,20 +362,19 @@ class NXDL_schema__element(object):
      
                 elif node.tag.endswith('}sequence'):
                     for subnode in node.xpath('xs:element', namespaces=ns):
-                        obj = NXDL_schema__element(None)
+                        obj = NXDL_schema__element()
                         obj.parse(subnode)
                         self.children.append(obj)
      
                 elif node.tag.endswith('}attribute'):
-                    obj = NXDL_schema__attribute(None)
+                    obj = NXDL_schema__attribute()
                     obj.parse(node)
                     self.children.append(obj)
 
 
 class NXDL_schema__group(object):
 
-    def __init__(self, parent):
-        self.parent = parent
+    def __init__(self):
         self.children = []
         self.name = None
         self.ref = None
@@ -393,7 +384,7 @@ class NXDL_schema__group(object):
     def __str__(self, *args, **kwargs):
         msg = '%s(' % type(self).__name__
         l = []
-        for k in 'name ref minOccurs maxOccurs parent'.split():
+        for k in 'name ref minOccurs maxOccurs'.split():
             l.append('%s=%s' % (k, str(self.__getattribute__(k))))
         msg += ', '.join(l)
         msg += ')'
@@ -418,7 +409,7 @@ class NXDL_schema__group(object):
 
             elif node.tag.endswith('}sequence'):
                 for subnode in node.xpath('xs:element', namespaces=ns):
-                    obj = NXDL_schema__element(None)
+                    obj = NXDL_schema__element()
                     obj.parse(subnode)
                     self.children.append(obj)
 
@@ -430,8 +421,7 @@ class NXDL_schema_named_simpleType(object):
     xml_node is xs:simpleType
     '''
     
-    def __init__(self, parent):
-        self.parent = parent
+    def __init__(self):
         self.children = []
         self.name = None
         self.base = None
@@ -442,7 +432,7 @@ class NXDL_schema_named_simpleType(object):
     def __str__(self, *args, **kwargs):
         msg = '%s(' % type(self).__name__
         l = []
-        for k in 'name base parent maxLength patterns parent'.split():
+        for k in 'name base maxLength patterns'.split():
             l.append('%s=%s' % (k, str(self.__getattribute__(k))))
         msg += ', '.join(l)
         msg += ')'
@@ -544,13 +534,13 @@ class NXDL_item_catalog(object):
     
     def _parse_nxdl_attribute_nodes(self, root):
         for node in root.xpath('//xs:attribute', namespaces=self.ns):
-            obj = NXDL_schema__attribute(None)
+            obj = NXDL_schema__attribute()
             obj.parse(node)
             self.add_to_catalog(node, obj)
     
     def _parse_nxdl_attributeGroup_nodes(self, root):
         for node in root.xpath('xs:attributeGroup', namespaces=self.ns):
-            obj = NXDL_schema__attributeGroup(None)
+            obj = NXDL_schema__attributeGroup()
             obj.parse(node)
             self.add_to_catalog(node, obj, key='schema')
             self.db['schema'][obj.name] = obj     # for cross-reference
@@ -559,21 +549,20 @@ class NXDL_item_catalog(object):
         # only look at root node children: 'xs:complexType', not '//xs:complexType' 
         for node in root.xpath('xs:complexType', namespaces=self.ns):
             if 'name' in node.attrib:
-                # names.append(node.attrib['name'])
-                obj = NXDL_schema_complexType(None)
+                obj = NXDL_schema_complexType()
                 obj.parse(node, self.db)
                 self.add_to_catalog(node, obj, key = 'schema')
                 self.db['schema'][obj.name] = obj     # for cross-reference
     
     def _parse_nxdl_element_nodes(self, root):
         for node in root.xpath('//xs:element', namespaces=self.ns):
-            obj = NXDL_schema__element(None)
+            obj = NXDL_schema__element()
             obj.parse(node)
             self.add_to_catalog(node, obj)
     
     def _parse_nxdl_group_nodes(self, root):
         for node in root.xpath('//xs:group', namespaces=self.ns):
-            obj = NXDL_schema__group(None)
+            obj = NXDL_schema__group()
             obj.parse(node)
             self.add_to_catalog(node, obj)
             if obj.name is not None:
@@ -582,7 +571,7 @@ class NXDL_item_catalog(object):
     def _parse_nxdl_simpleType_nodes(self, root):
         xref = {}
         for node in root.xpath('/xs:schema/xs:simpleType', namespaces=self.ns):
-            obj = NXDL_schema_named_simpleType(None)
+            obj = NXDL_schema_named_simpleType()
             obj.parse(node)
             self.add_to_catalog(node, obj, key='simpleType')
             if 'schema' not in self.db:

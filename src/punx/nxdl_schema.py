@@ -516,9 +516,11 @@ class NXDL_item_catalog(object):
                             node.__setattr__(nm, '__'+key)
 
                             if hasattr(node, 'children') and hasattr(reference, 'children'):
-                                node.children += [copy.deepcopy(_) for _ in reference.children]
-                                if not isinstance(node, NXDL_schema__group):
-                                    substitute(node, catalog)       # substitutions in the children
+                                for item in reference.children:
+                                    if not isinstance(item, NXDL_schema__group):
+                                        node.children.append(copy.deepcopy(item))
+#                                 if not isinstance(node, NXDL_schema__group):
+                                substitute(node, catalog)       # substitutions in the children
                             for at in 'patterns maxLength'.split():
                                 if hasattr(reference, at):
                                     node.__setattr__(at, reference.__getattribute__(at))
@@ -590,7 +592,13 @@ class NXDL_item_catalog(object):
 
 
 def print_node(obj, indent=''):
-    print(indent + str(obj))
+    if hasattr(obj, 'name') and obj.name is not None:
+        nm = str(obj.name)
+    else:
+        nm = '(no_name)'
+    if isinstance(obj, NXDL_schema__attribute):
+        nm = '@' + nm
+    print(indent + nm + ' : ' + str(obj))
     if hasattr(obj, 'children'):
         for child in obj.children:
             print_node(child, indent + '  ')

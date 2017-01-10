@@ -8,6 +8,8 @@ import os
 import sys
 import tempfile
 import unittest
+from six import StringIO
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
 
 
@@ -174,3 +176,19 @@ class ValidHdf5File(BaseHdf5File):
         self.report += validator.report_findings(punx.finding.VALID_STATUS_LIST).splitlines()
         self.report.append('')
         self.report += validator.report_findings_summary().splitlines()
+
+
+class Capture_stdout(list):
+    '''
+    capture all printed output (to stdout) into list
+    
+    # http://stackoverflow.com/questions/16571150/how-to-capture-stdout-output-from-a-python-function-call
+    '''
+    def __enter__(self):
+        self._stdout = sys.stdout
+        sys.stdout = self._stringio = StringIO()
+        return self
+    def __exit__(self, *args):
+        self.extend(self._stringio.getvalue().splitlines())
+        del self._stringio    # free up some memory
+        sys.stdout = self._stdout

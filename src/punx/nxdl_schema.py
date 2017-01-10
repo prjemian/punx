@@ -334,7 +334,7 @@ class NXDL_schema__element(object):
     
     def __init__(self, parent):
         self.parent = parent
-        self.children = []      # TODO: look for them
+        self.children = []
         self.name = None
         self.type = 'str'
         self.minOccurs = None
@@ -432,7 +432,7 @@ class NXDL_schema_named_simpleType(object):
     
     def __init__(self, parent):
         self.parent = parent
-        self.children = []      # TODO: look for them
+        self.children = []
         self.name = None
         self.base = None
         self.patterns = []
@@ -600,6 +600,13 @@ class NXDL_item_catalog(object):
                     v.base = known_base.base
 
 
+def print_node(obj, indent=''):
+    print(indent + str(obj))
+    if hasattr(obj, 'children'):
+        for child in obj.children:
+            print_node(child, indent + '  ')
+
+
 def issue_67_main():
     nxdl_xsd_file_name = os.path.join('cache', 'v3.2','nxdl.xsd')
     known_nxdl_items = NXDL_item_catalog(nxdl_xsd_file_name)
@@ -609,6 +616,8 @@ def issue_67_main():
     #     if isinstance(v1, dict):
     #         for k2, v2 in sorted(v1.items()):
     #             print(' '*4, k2 + ' : ', str(v2))
+    
+    print_node(known_nxdl_items.definition_element)
 
 
 if __name__ == '__main__':

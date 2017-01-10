@@ -487,25 +487,18 @@ class NXDL_item_catalog(object):
         
         def substitute(parent_node, catalog):
             for node in parent_node.children:
-                if hasattr(node, 'type'):
-                    key = node.type
-
-                elif hasattr(node, 'base'):
-                    key = node.base
-
-                elif hasattr(node, 'ref'):
-                    key = node.ref
-
-                else:
-                    continue
-                
-                if key in catalog['schema']:
-                    reference = catalog['schema'][key]
-                    if hasattr(node, 'children') and hasattr(reference, 'children'):
-                        node.children += reference.children
-                    # TODO: patterns, maxLength
-                    # TODO: what about substitutions in the children?
-                    # TODO: what about deep copy?
+                for nm in 'type base ref'.split():
+                    if hasattr(node, nm):
+                        key = node.__getattribute__(nm)
+                        if key in catalog['schema']:
+                            reference = catalog['schema'][key]
+                            if hasattr(node, 'children') and hasattr(reference, 'children'):
+                                node.children += reference.children       # TODO: what about deep copy?
+                                substitute(node, catalog)       # substitutions in the children
+                            # TODO: patterns, maxLength
+                                   
+                            # once the substitution has been made, mark up the key so the substitution is not repeated
+                            node.__setattr__(nm, '__'+key)
 
         substitute(self.definition_element, self.db)
     

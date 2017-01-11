@@ -99,7 +99,13 @@ def render_class_str(obj):
     return msg
 
 
-class NXDL_schema__attribute(object):
+class Mixin(object):
+    
+    def __str__(self, *args, **kwargs):
+        return render_class_str(self)
+
+
+class NXDL_schema__attribute(Mixin):
     '''
     node matches XPath query: ``//xs:attribute``
     
@@ -164,9 +170,6 @@ class NXDL_schema__attribute(object):
         self.maxLength = None
         self.nxdl_attributes = {}
     
-    def __str__(self, *args, **kwargs):
-        return render_class_str(self)
-
     def parse(self, xml_node):
         '''
         read the attribute node content from the XML Schema
@@ -201,7 +204,7 @@ class NXDL_schema__attribute(object):
                 raise ValueError(msg)
 
 
-class NXDL_schema__attributeGroup(object):
+class NXDL_schema__attributeGroup(Mixin):
     '''
     node matches XPath query: ``/xs:schema/xs:attributeGroup``
     
@@ -212,9 +215,6 @@ class NXDL_schema__attributeGroup(object):
         self.name = None
         self.children = []
     
-    def __str__(self, *args, **kwargs):
-        return render_class_str(self)
-
     def parse(self, xml_node):
         '''
         read the attributeGroup node content from the XML Schema
@@ -233,7 +233,7 @@ class NXDL_schema__attributeGroup(object):
                 self.children.append(obj)
 
 
-class NXDL_schema_complexType(object):
+class NXDL_schema_complexType(Mixin):
     '''
     node matches XPath query: ``/xs:schema/xs:complexType``
     
@@ -244,9 +244,6 @@ class NXDL_schema_complexType(object):
         self.children = []
         self.name = None
     
-    def __str__(self, *args, **kwargs):
-        return render_class_str(self)
-
     def parse(self, xml_node, catalog):
         '''
         read the element node content from the XML Schema
@@ -356,7 +353,7 @@ class NXDL_schema_complexType(object):
                 pass
 
 
-class NXDL_schema__element(object):
+class NXDL_schema__element(Mixin):
     '''
     a complete description of a specific NXDL xs:element node
     '''
@@ -368,9 +365,6 @@ class NXDL_schema__element(object):
         self.minOccurs = None
         self.maxOccurs = None
     
-    def __str__(self, *args, **kwargs):
-        return render_class_str(self)
-
     def parse(self, xml_node):
         '''
         read the element node content from the XML Schema
@@ -402,7 +396,7 @@ class NXDL_schema__element(object):
                     self.children.append(obj)
 
 
-class NXDL_schema__group(object):
+class NXDL_schema__group(Mixin):
     '''
     node matches XPath query: ``//xs:group``
     
@@ -416,9 +410,6 @@ class NXDL_schema__group(object):
         self.minOccurs = None
         self.maxOccurs = None
     
-    def __str__(self, *args, **kwargs):
-        return render_class_str(self)
-
     def parse(self, xml_node):
         '''
         read the element node content from the XML Schema
@@ -443,7 +434,7 @@ class NXDL_schema__group(object):
                     self.children.append(obj)
 
 
-class NXDL_schema_named_simpleType(object):
+class NXDL_schema_named_simpleType(Mixin):
     '''
     node matches XPath query: ``/xs:schema/xs:simpleType``
     
@@ -457,9 +448,6 @@ class NXDL_schema_named_simpleType(object):
         self.patterns = []
         self.maxLength = None
         #self.enums = []
-    
-    def __str__(self, *args, **kwargs):
-        return render_class_str(self)
     
     def parse(self, xml_node):
         '''

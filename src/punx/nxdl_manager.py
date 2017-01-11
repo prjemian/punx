@@ -4,7 +4,7 @@
 #-----------------------------------------------------------------------------
 # :author:    Pete R. Jemian
 # :email:     prjemian@gmail.com
-# :copyright: (c) 2016, Pete R. Jemian
+# :copyright: (c) 2017, Pete R. Jemian
 #
 # Distributed under the terms of the Creative Commons Attribution 4.0 International Public License.
 #
@@ -283,7 +283,16 @@ def validate_xml_tree(xml_tree):
 #     optional = True
 
 
-class NXDL_element__definition(punx.singletons.Singleton):
+class Mixin(object):
+    
+    def __init__(self):         # TODO:
+        pass
+    
+    def __str__(self, *args, **kwargs):
+        return punx.nxdl_schema.render_class_str(self)
+
+
+class NXDL_element__definition(punx.singletons.Singleton, Mixin):
     '''
     contents of a *definition* element in a NXDL XML file
     
@@ -302,7 +311,7 @@ class NXDL_element__definition(punx.singletons.Singleton):
 
         # parse this content into classes in _this_ module
         for k, v in self.attributes.items():
-            attribute = NXDL_element__attribute(nxdl_defaults.attribute)    # the default
+            attribute = NXDL_element__attribute(nxdl_defaults.attribute)
             obj = copy.deepcopy(attribute)         # ALWAYS make a copy of that
             for item in 'name type required'.split():
                 obj.__setattr__(item, v.__getattribute__(item)) # TODO: should override default
@@ -311,11 +320,15 @@ class NXDL_element__definition(punx.singletons.Singleton):
             # TODO: what else to retain?
             self.attributes[k] = obj
 
-        for k, v in self.elements.items():
-            pass
+        for k, v in self.elements.items():  # TODO: is this a field?
+            print(k, str(v))
+#             field = NXDL_element__field(nxdl_defaults.field)
+#             obj = copy.deepcopy(field)         # ALWAYS make a copy of that
 
         for k, v in self.groups.items():
-            pass
+            print(k, str(v))
+#             group = NXDL_element__group(nxdl_defaults.group)
+#             obj = copy.deepcopy(group)         # ALWAYS make a copy of that
 
     def set_file(self, fname):
         self.file_name = fname
@@ -327,7 +340,7 @@ class NXDL_element__definition(punx.singletons.Singleton):
         pass
 
 
-class NXDL_element__attribute(object):
+class NXDL_element__attribute(Mixin):
     '''
     contents of a *attribute* element in a NXDL XML file
     '''
@@ -335,43 +348,30 @@ class NXDL_element__attribute(object):
     def __init__(self, nxdl_defaults):
         for k, v in nxdl_defaults.__dict__.items():
             self.__setattr__(k, v)
-        # TODO: something odd with the self.attributes dictionary
 
 
-class NXDL_element__field(object):
+class NXDL_element__field(Mixin):
     '''
     contents of a *field* element in a NXDL XML file
     '''
-    
-    def __init__(self):         # TODO:
-        pass
 
 
-class NXDL_element__group(object):
+class NXDL_element__group(Mixin):
     '''
     contents of a *group* element in a NXDL XML file
     '''
-    
-    def __init__(self):         # TODO:
-        pass
 
 
-class NXDL_element__link(object):
+class NXDL_element__link(Mixin):
     '''
     contents of a *link* element in a NXDL XML file
     '''
-    
-    def __init__(self):         # TODO:
-        pass
 
 
-class NXDL_element__symbols(object):
+class NXDL_element__symbols(Mixin):
     '''
     contents of a *symbols* element in a NXDL XML file
     '''
-    
-    def __init__(self):         # TODO:
-        pass
 
 
 # class NXDL_ElementFactory(object):
@@ -427,7 +427,7 @@ class NXDL_element__symbols(object):
 #         return element
 
 
-def nxdl_manager_main():
+def main():
     import punx.cache_manager
     cm = punx.cache_manager.CacheManager()
     if cm is not None and cm.default_file_set is not None:
@@ -439,4 +439,4 @@ def nxdl_manager_main():
 
 
 if __name__ == '__main__':
-    nxdl_manager_main()
+    main()

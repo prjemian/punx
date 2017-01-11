@@ -88,10 +88,11 @@ def render_class_str(obj):
     '''
     for use in classes: ``def __str(self): return render_class_str(self)``
     '''
+    excluded = (list, dict)
     msg = '%s(' % type(obj).__name__
     l = []
     for k, v in sorted(obj.__dict__.items()):
-        if k not in ['children',] and v is not None:
+        if v is not None and type(v) not in excluded:
             l.append('%s=%s' % (k, str(v).lstrip('_')))
     msg += ', '.join(l)
     msg += ')'

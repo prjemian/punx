@@ -86,13 +86,13 @@ def get_reference_keys(xml_node):
 
 def render_class_str(obj):
     '''
-    for use in classes: ``def __str(self): return render_class_str(self)``
+    for use in classes: ``def __str__(self): return render_class_str(self)``
     '''
     excluded = (list, dict)
     msg = '%s(' % type(obj).__name__
     l = []
     for k, v in sorted(obj.__dict__.items()):
-        if v is not None and type(v) not in excluded:
+        if not k.startswith('_') and v is not None and type(v) not in excluded:
             l.append('%s=%s' % (k, str(v).lstrip('_')))
     msg += ', '.join(l)
     msg += ')'

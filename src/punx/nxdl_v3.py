@@ -55,6 +55,11 @@ When each of these elements is encountered, this code
 must know what are the default values.  Any of these 
 elements may have a list of XML attributes which may
 have default values.  Easy to get confused.
+
+These are the items (from above) that will need to be modeled with classes:
+
+attribute definition dim dimensions doc enumeration field group item symbols
+
 '''
 
 from __future__ import print_function
@@ -107,6 +112,7 @@ class NXDL_Defaults(object):
     def __init__(self):
         self.attributes = {}
         self.children = {}
+        self.elements = None
 
 
 class NXDL_element(object):
@@ -137,23 +143,41 @@ class NXDL_element(object):
         self.name = nm
 
 
+class NXDL_Doc(NXDL_element):
+    '''
+    Occurrence of ``nx:doc``
+    '''
+    
+    _nm_ = 'doc'
+    
+    def set_defaults(self, schema):
+        NXDL_element.set_defaults(self, schema)
+    
+    def read_NXDL(self, xml_node):
+        NXDL_element.read_NXDL(self, xml_node)
+
+
 class NXDL_Definition(NXDL_element):
     '''
+    Occurrence of ``nx:definition``
     '''
     
     _nm_ = 'definition'
     
     def set_defaults(self, schema):        # nx:definitionType
         NXDL_element.set_defaults(self, schema)
+        
+        defaults = self._defaults_
 
         # content from "group" (nx:groupType)
         group = NXDL_Group()
         group.set_defaults(schema)
         for k, v in group._defaults_.attributes.items():
-            self._defaults_.attributes[k] = copy.deepcopy(v)
+            defaults.attributes[k] = copy.deepcopy(v)
         for k, v in group._defaults_.children.items():
-            self._defaults_.children[k] = copy.deepcopy(v)
-        self._defaults_.children['(group)'] = group    # override the recursion *here*
+            defaults.children[k] = copy.deepcopy(v)
+        defaults.children['(group)'] = group    # override the recursion *here*
+        defaults.elements = {'(group)': group}  # and here, too
 
         # plus elements from nx:groupGroup
         # this is: attribute, doc, field, group, link
@@ -168,12 +192,14 @@ class NXDL_Definition(NXDL_element):
 
         # attributes (nx:definitionType)
         for k, v in schema.definition.attributes.items():
-            self._defaults_.attributes[k] = copy.deepcopy(v)
+            defaults.attributes[k] = copy.deepcopy(v)
 
         # plus a "symbols" child element (nx:definitionType)
         # schema.symbols
-        symbols = NXDL_element()
-        self._defaults_.children['symbols'] = symbols  # FIXME:
+        symbols = NXDL_Symbols()
+        symbols.set_defaults(schema)
+        defaults.children['symbols'] = symbols
+        defaults.elements['symbols'] = symbols
     
     def read_NXDL(self, xml_root_node):
         NXDL_element.read_NXDL(self, xml_root_node)
@@ -190,6 +216,7 @@ class NXDL_Definition(NXDL_element):
 
 class NXDL_Group(NXDL_element):
     '''
+    Occurrence of ``nx:group``
     '''
     
     _nm_ = 'group'
@@ -203,6 +230,65 @@ class NXDL_Group(NXDL_element):
 
         # a group may contain a child group (circular reference to be handled)
         self._defaults_.children['(group)'] = 'recursion'
+    
+    def read_NXDL(self, xml_node):
+        NXDL_element.read_NXDL(self, xml_node)
+
+
+class NXDL_Item(NXDL_element):
+    '''
+    Occurrence of ``nx:item``
+    '''
+    
+    _nm_ = 'item'
+    
+    def set_defaults(self, schema):
+        NXDL_element.set_defaults(self, schema)
+    
+    def read_NXDL(self, xml_node):
+        NXDL_element.read_NXDL(self, xml_node)
+
+
+class NXDL_Symbol(NXDL_element):
+    '''
+    Occurrence of ``nx:symbol``
+    '''
+    
+    _nm_ = 'symbol'
+    
+    def set_defaults(self, schema):
+        NXDL_element.set_defaults(self, schema)
+    
+    def read_NXDL(self, xml_node):
+        NXDL_element.read_NXDL(self, xml_node)
+
+
+class NXDL_Symbols(NXDL_element):
+    '''
+    Occurrence of ``nx:symbols``
+    '''
+    
+    _nm_ = 'symbols'
+    
+    def set_defaults(self, schema):
+        NXDL_element.set_defaults(self, schema)
+        symbols_schema = schema.definition.elements['symbols']
+        
+        handlers = dict(doc=NXDL_Doc, symbol=NXDL_Symbol)
+        defaults = self._defaults_
+        defaults.elements = {}
+
+        for k, v in symbols_schema.attributes.items():
+            defaults.attributes[k] = copy.deepcopy(v)
+        for k, v in symbols_schema.elements.items():
+            handler = handlers.get(k)
+            if handler is None:
+                raise KeyError('"symbols" has no handler for: ' + k)
+            obj = handler()
+            obj.set_defaults(schema)
+            defaults.elements[k] = obj
+        for k in 'name type minOccurs maxOccurs'.split():
+            defaults.__setattr__(k, symbols_schema.__getattribute__(k))
     
     def read_NXDL(self, xml_node):
         NXDL_element.read_NXDL(self, xml_node)

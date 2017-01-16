@@ -64,7 +64,6 @@ attribute definition dim dimensions doc enumeration field group item symbols
 
 from __future__ import print_function
 
-import collections
 import copy
 import lxml.etree
 import os
@@ -73,7 +72,6 @@ import sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import punx
 import punx.nxdl_schema
-#import punx.singletons
 
 
 TEST_NEXUS_DEF_DIR = os.path.dirname(punx.nxdl_schema.NXDL_TEST_FILE)
@@ -89,12 +87,15 @@ def get_tag_name(element):
 
 
 def process_NXDL_file(filename, schema):
+    '''
+    learn about a single NXDL (XML) file
+    '''
     assert(isinstance(filename, (str, unicode)))
     assert(isinstance(schema, punx.nxdl_schema.NXDL_Summary))
     if not os.path.exists(filename):
         raise IOError('file does not exist: ' + filename)
     
-    # TODO: validate the NXDL file before this function is caloled
+    # TODO: validate the NXDL file before this function is called
     
     tree = lxml.etree.parse(filename)
     root = tree.getroot()
@@ -107,6 +108,8 @@ def process_NXDL_file(filename, schema):
 class NXDL_Defaults(object):
     '''
     bury the defaults below the actual content
+    
+    If the ``elements`` attribute is used, set it to other than ``None``.
     '''
     
     def __init__(self):
@@ -117,6 +120,25 @@ class NXDL_Defaults(object):
 
 class NXDL_element(object):
     '''
+    superclass to represent NXDL elements
+    
+    There are two main responsibilities of this class:
+    
+    .. autosummary::
+   
+        ~set_defaults
+        ~read_NXDL
+
+    In :ref:`~set_defaults`, the specification of a NeXus base class,
+       application definition, or contributed definition
+       is read from the NXDL (XML) file.
+
+    In :ref:`~read_NXDL`, the default values are set from the
+       XML Schema.
+    
+    In principle, there is not reason why the :ref:`~read_NXDL`
+    code should need to refer to the XML Schema.  All necessary
+    information should be retrieved by the :ref:`~set_defaults` code.
     '''
     
     _nm_ = None
@@ -133,14 +155,29 @@ class NXDL_element(object):
         return punx.nxdl_schema.render_class_str(self)
     
     def set_defaults(self, schema):
+        '''
+        get default values from the XML Schema
+        '''
         assert(isinstance(schema, punx.nxdl_schema.NXDL_Summary))
     
     def read_NXDL(self, xml_node):
+        '''
+        read specifications from the NXDL (XML) file
+        '''
         assert(isinstance(xml_node, lxml.etree._Element))
         nm = get_tag_name(xml_node)
         if self._nm_ is not None:
             assert(nm == self._nm_)
         self.name = nm
+    
+    def _copy_dict_(self, source, target):
+        '''
+        blend a deepcopy of ``source`` items into ``target``
+        '''
+        assert(isinstance(source, dict))
+        assert(isinstance(target, dict))
+        for k, v in source.items():
+            target[k] = copy.deepcopy(v)
 
 
 class NXDL_Doc(NXDL_element):
@@ -172,10 +209,8 @@ class NXDL_Definition(NXDL_element):
         # content from "group" (nx:groupType)
         group = NXDL_Group()
         group.set_defaults(schema)
-        for k, v in group._defaults_.attributes.items():
-            defaults.attributes[k] = copy.deepcopy(v)
-        for k, v in group._defaults_.children.items():
-            defaults.children[k] = copy.deepcopy(v)
+        self._copy_dict_(group._defaults_.attributes, defaults.attributes)
+        self._copy_dict_(group._defaults_.children, defaults.children)
         defaults.children['(group)'] = group    # override the recursion *here*
         defaults.elements = {'(group)': group}  # and here, too
 
@@ -191,8 +226,7 @@ class NXDL_Definition(NXDL_element):
 #             self.children[child.name] = 'FIXME'       # FIXME:
 
         # attributes (nx:definitionType)
-        for k, v in schema.definition.attributes.items():
-            defaults.attributes[k] = copy.deepcopy(v)
+        self._copy_dict_(schema.definition.attributes, defaults.attributes)
 
         # plus a "symbols" child element (nx:definitionType)
         # schema.symbols
@@ -225,8 +259,7 @@ class NXDL_Group(NXDL_element):
         NXDL_element.set_defaults(self, schema)
 
         # attributes from "group" (nx:groupType)
-        for k, v in schema.group.attributes.items():
-            self._defaults_.attributes[k] = copy.deepcopy(v)
+        self._copy_dict_(schema.group.attributes, self._defaults_.attributes)
 
         # a group may contain a child group (circular reference to be handled)
         self._defaults_.children['(group)'] = 'recursion'
@@ -278,8 +311,7 @@ class NXDL_Symbols(NXDL_element):
         defaults = self._defaults_
         defaults.elements = {}
 
-        for k, v in symbols_schema.attributes.items():
-            defaults.attributes[k] = copy.deepcopy(v)
+        self._copy_dict_(symbols_schema.attributes, defaults.attributes)
         for k, v in symbols_schema.elements.items():
             handler = handlers.get(k)
             if handler is None:
@@ -287,6 +319,7 @@ class NXDL_Symbols(NXDL_element):
             obj = handler()
             obj.set_defaults(schema)
             defaults.elements[k] = obj
+            # TODO: what about ``v``?
         for k in 'name type minOccurs maxOccurs'.split():
             defaults.__setattr__(k, symbols_schema.__getattribute__(k))
     

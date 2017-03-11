@@ -501,30 +501,6 @@ class NX_symbols(NX_mixin):
         # TODO: finish this
 
 
-def _get_specs_from_pickle_file():
-    '''
-    try to get the NXDL dictionary from the pickle file
-    
-    :return: dict with definitions or None
-    '''
-    from punx import cache
-    qset = cache.qsettings()
-    pfile = cache.get_pickle_file_name(qset.cache_dir())
-    if not os.path.exists(pfile):
-        return
-
-    sha = qset.getKey('git_sha')
-    try:
-        nxdl_dict = cache.read_pickle_file(pfile, sha)
-    except (AttributeError, ImportError):
-        # could not read the pickle file, suggest user update the cache
-        nxdl_dict = None
-    if nxdl_dict is None:
-        return
-
-    return  nxdl_dict
-
-
 def _get_specs_from_NXDL_files():
     '''
     get the NXDL dictionary from the NXDL files in the cache
@@ -559,7 +535,7 @@ def get_NXDL_specifications():
     '''
     return a dictionary of NXDL structures, keyed by NX_class name
     '''
-    return _get_specs_from_pickle_file() or _get_specs_from_NXDL_files()
+    return _get_specs_from_NXDL_files()
 
 
 def _developer():

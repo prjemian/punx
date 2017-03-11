@@ -46,11 +46,6 @@ class TestCache(unittest.TestCase):
         self.assertIsInstance(nxdl_xsd, lxml.etree._ElementTree)
         self.assertIsInstance(nxdl_xsd.docinfo, lxml.etree.DocInfo)
         self.assertIsInstance(nxdl_xsd.parser, lxml.etree.XMLParser)
-
-    def test_get_pickle_file_name(self):
-        path = punx.cache.SOURCE_CACHE_ROOT
-        pf = punx.cache.get_pickle_file_name(path)
-        self.assertEqual(os.path.sep +'nxdl.p', pf[len(path):])
     
     def test___get_github_info__(self):
         info = punx.cache.__get_github_info__()
@@ -59,44 +54,34 @@ class TestCache(unittest.TestCase):
         expected_url = 'https://github.com/nexusformat/definitions/archive/master.zip'
         self.assertEqual(expected_url, info['zip_url'])
     
-    def test_read_pickle_file(self):
-        info = punx.cache.__get_github_info__()
-        pfile = punx.cache.get_pickle_file_name(punx.cache.SOURCE_CACHE_ROOT)
-        
-        #self.assertRaises(ImportError, 
-        #                  punx.cache.read_pickle_file, 
-        #                  pfile, info['git_sha']
-        #                  )
-
-#         from punx import nxdlstructure
-#         data = punx.cache.read_pickle_file(pfile, info['git_sha'])
-#         print data
-
-
-class TestCacheExceptions(unittest.TestCase):
- 
-    def setUp(self):
-        punx.cache.__singleton_nxdl_xsd__ = None
-        self.xsd_file = punx.cache.abs_NXDL_filename(punx.cache.NXDL_SCHEMA_FILE)
-        self.tname = self.xsd_file + '.ignore'
-        os.rename(self.xsd_file, self.tname)
- 
-    def tearDown(self):
-        os.rename(self.tname, self.xsd_file)
- 
-    def test_get_nxdl_xsd_exceptions(self):
-        # FIXME: not working
-#         with self.assertRaises((punx.FileNotFound,
-#                                 punx.SchemaNotFound,
-#                                 punx.CannotUpdateFromGithubNow)):
-#             punx.cache.get_nxdl_xsd()
-        pass
+# class TestCacheExceptions(unittest.TestCase):
+#  
+#     def setUp(self):
+#         punx.cache.__singleton_nxdl_xsd__ = None
+#         self.xsd_file = punx.cache.abs_NXDL_filename(punx.cache.NXDL_SCHEMA_FILE)
+#         self.tname = self.xsd_file + '.ignore'
+#         os.rename(self.xsd_file, self.tname)
+#  
+#     def tearDown(self):
+#         os.rename(self.tname, self.xsd_file)
+#  
+#     def test_get_nxdl_xsd_exceptions(self):
+#         # FIXME: not working
+# #         with self.assertRaises((punx.FileNotFound,
+# #                                 punx.SchemaNotFound,
+# #                                 punx.CannotUpdateFromGithubNow)):
+# #             punx.cache.get_nxdl_xsd()
+#         pass
      
 
 def suite(*args, **kw):
     test_suite = unittest.TestSuite()
-    test_suite.addTest(unittest.makeSuite(TestCache))
-    test_suite.addTest(unittest.makeSuite(TestCacheExceptions))
+    test_list = [
+        TestCache,
+        # TestCacheExceptions,
+        ]
+    for test_case in test_list:
+        test_suite.addTest(unittest.makeSuite(test_case)) 
     return test_suite
 
 

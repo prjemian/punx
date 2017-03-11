@@ -76,7 +76,6 @@ download the NeXus definitions and setup the cache directory.
    INFO: updating NeXus definitions files in directory: C:\Users\shoun\AppData\Roaming\punx
    INFO: download: https://github.com/nexusformat/definitions/archive/master.zip
    INFO: extract ZIP to directory: C:\Users\shoun\AppData\Roaming\punx
-   INFO: update pickle file: C:\Users\shoun\AppData\Roaming\punx\nxdl.p
 
 Then, re-run the demo to get the first result above.
 

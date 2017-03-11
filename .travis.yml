@@ -13,6 +13,10 @@ python:
 before_script:
   # detect if py2 or py3 worker
   - export PYVER=`python -c "import sys; print(sys.version_info.major)"`
+  - |
+    if [ $PYVER == "3" ]; then
+        PYVER=3.5;
+    fi
   - wget http://repo.continuum.io/miniconda/Miniconda${PYVER}-latest-Linux-x86_64.sh -O miniconda.sh
   - chmod +x miniconda.sh
   - bash miniconda.sh -b -p $HOME/miniconda

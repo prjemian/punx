@@ -3,7 +3,7 @@
 <!--
 # NeXus - Neutron and X-ray Common Data Format
 # 
-# Copyright (C) 2012-2016 NeXus International Advisory Committee (NIAC)
+# Copyright (C) 2012-2017 NeXus International Advisory Committee (NIAC)
 # 
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -53,11 +53,16 @@
         The minimum requirements for *reduced* small-angle scattering data 
         as described by canSAS are summarized in the following figure:
         
+        .. _canSAS_2012_minimum:
+        
         .. figure:: canSAS/2012-minimum.png
            :width: 60%
            
            The minimum requirements for *reduced* small-angle scattering data.
            (:download:`full image &lt;canSAS/2012-minimum.png&gt;`)
+           See :ref:`below &lt;NXcanSAS_minimum&gt;` for the minimum required 
+           information for a NeXus data file
+           written to the NXcanSAS specification.
         
         .. rubric::  Implementation of canSAS standard in NeXus
         
@@ -98,10 +103,21 @@
         
         Refer to the NeXus Coordinate System drawing (:ref:`Design-CoordinateSystem`)
         for choice and direction of :math:`x`, :math:`y`, and :math:`z` axes.
+        
+        .. _NXcanSAS_minimum:
+        
+        .. rubric:: The minimum required information for a NeXus data file
+           written to the NXcanSAS specification.
+        
+        .. literalinclude:: canSAS/minimum-required.txt
+           :tab-width: 4
+           :linenos:
+           :language: text
+
   </doc>
 
   <group type="NXentry">
-	<attribute name="default">
+	<attribute name="default" optional="true">
 		<doc>
 			.. index:: plotting
 			
@@ -162,7 +178,7 @@
         
     <group type="NXdata">
       <doc>
-        A *SASData* group contains reduced a single small-angle scattering data set 
+        A *SASData* group contains a single reduced small-angle scattering data set 
         that can be represented as :math:`I(\vec{Q})` or :math:`I(|\vec{Q}|)`.
         
         *Q* can be either a vector (:math:`\vec{Q}`) or a vector magnitude (:math:`|\vec{Q}|`)
@@ -231,7 +247,20 @@
           ``Q`` data is time-dependent: :math:`\vec{Q}(t)`.
         </doc>
       </attribute>
-      <attribute name="Mask_indices">
+      <attribute name="mask" type="NX_CHAR" >
+        <doc>
+          Name of the data mask field.
+          
+          .. see: https://github.com/nexusformat/definitions/issues/533
+          
+          The data *mask* must have the same shape as the *data* field.
+          Positions in the mask correspond to positions in the *data* field.
+          The value of the mask field may be either a boolean array 
+          where ``false`` means *no mask* and ``true`` means *mask*
+          or a more descriptive array as as defined in :ref:`NXdetector`.
+        </doc>
+      </attribute>
+      <attribute name="Mask_indices" optional="true">
         <doc>
           Integer or integer array that describes which indices
           (of the :math:`I` data object) are used to 
@@ -244,7 +273,7 @@
           from the :math:`I` data object for Q position.
         </doc>
       </attribute>
-      <attribute name="timestamp" type="NX_DATE_TIME">
+      <attribute name="timestamp" type="NX_DATE_TIME" optional="true">
         <doc>
           ISO-8601 time [#iso8601]_
         </doc>
@@ -273,7 +302,24 @@
           :math:`|\vec{Q}|` 
           or :math:`\vec{Q}`,  depending on the context.
         </doc>
-        <attribute name="uncertainties">
+        <attribute name="units" optional="false">
+          <doc>
+            Engineering units to use when expressing
+            :math:`Q` and related terms.
+            
+            Data expressed in other units will generate
+            a warning from validation software and may not 
+            be processed by some analysis software packages.
+          </doc>
+          <enumeration>
+            <item value="1/m" />
+            <item value="1/nm">
+              <doc>preferred</doc>
+            </item>
+            <item value="1/angstrom" />
+          </enumeration>
+        </attribute>
+        <attribute name="uncertainties" optional="true">
           <doc>
             (optional: for numerical arrays) 
             
@@ -306,7 +352,7 @@
 
           </doc>
         </attribute>
-        <attribute name="resolutions" type="NX_CHAR" >
+        <attribute name="resolutions" type="NX_CHAR"  optional="true">
           <doc>
             .. index:: NXcanSAS (applications); resolutions
             
@@ -354,7 +400,7 @@
             
           </doc>
         </attribute>
-        <attribute name="resolutions_description" type="NX_CHAR">
+        <attribute name="resolutions_description" type="NX_CHAR" optional="true">
           <doc>
             (optional) 
             Generally, this describes the :math:`Q` ``@resolutions`` data object.
@@ -423,7 +469,30 @@
           data may be presented in other units and still be consistent with NeXus.
           See the :ref:`design-units` section.
 		</doc>
-        <attribute name="uncertainties">
+        <attribute name="units" optional="false">
+          <doc>
+            Engineering units to use when expressing
+            :math:`I` and intensity-related terms.
+            
+            Data expressed in other units (or missing a ``@units`` attribute)
+            will be treated as ``arbitrary`` by some software packages.
+            
+            For software using the UDUNITS-2 library, ``arbitrary`` will be
+            changed to ``unknown`` for handling with that library.
+          </doc>
+          <enumeration>
+            <item value="1/m">
+              <doc>includes m2/m3 and 1/m/sr</doc>
+            </item>
+            <item value="1/cm">
+              <doc>includes cm2/cm3 and 1/cm/sr</doc>
+            </item>
+            <item value="m2/g" />
+            <item value="cm2/g" />
+            <item value="arbitrary" />
+          </enumeration>
+        </attribute>
+        <attribute name="uncertainties" optional="true">
           <doc>
             (optional: for numerical arrays) 
             
@@ -446,7 +515,7 @@
             
           </doc>
         </attribute>
-        <attribute name="scaling_factor">
+        <attribute name="scaling_factor" optional="true">
           <doc>
             (optional) 
             Names the field (a.k.a. dataset) that contains a factor
@@ -484,6 +553,30 @@
               I/@uncertainties="Idev"
 
         </doc>
+        <attribute name="units" optional="false">
+          <doc>
+            Engineering units to use when expressing
+            :math:`I` and intensity-related terms.
+            
+            Data expressed in other units (or missing a ``@units`` attribute)
+            will generate a warning from any validation process
+            and will be treated as ``arbitrary`` by some analysis software packages.
+            
+            For software using the UDUNITS-2 library, ``arbitrary`` will be
+            changed to ``unknown`` for handling with that library.
+          </doc>
+          <enumeration>
+            <item value="1/m">
+              <doc>includes m2/m3 and 1/m/sr</doc>
+            </item>
+            <item value="1/cm">
+              <doc>includes cm2/cm3 and 1/cm/sr</doc>
+            </item>
+            <item value="m2/g" />
+            <item value="cm2/g" />
+            <item value="arbitrary" />
+          </enumeration>
+        </attribute>
       </field>
       
       <field name="Qdev" type="NX_NUMBER" units="NX_PER_LENGTH" minOccurs="0">
@@ -504,6 +597,22 @@
               Q/@resolutions="dQw", "dQl"
 
         </doc>
+        <attribute name="units" optional="false">
+          <doc>
+            Engineering units to use when expressing
+            :math:`Q` and related terms.
+            
+            Data expressed in other units may not be processed by some 
+            software packages.
+          </doc>
+          <enumeration>
+            <item value="1/m" />
+            <item value="1/nm">
+              <doc>preferred</doc>
+            </item>
+            <item value="1/angstrom" />
+          </enumeration>
+        </attribute>
       </field>
       
       <field name="dQw" type="NX_NUMBER" units="NX_PER_LENGTH" minOccurs="0">
@@ -523,6 +632,22 @@
               Q/@resolutions="dQw", "dQl"
           
         </doc>
+        <attribute name="units" optional="false">
+          <doc>
+            Engineering units to use when expressing
+            :math:`Q` and related terms.
+            
+            Data expressed in other units may not be processed by some 
+            software packages.
+          </doc>
+          <enumeration>
+            <item value="1/m" />
+            <item value="1/nm">
+              <doc>preferred</doc>
+            </item>
+            <item value="1/angstrom" />
+          </enumeration>
+        </attribute>
       </field>
       
       <field name="dQl" type="NX_NUMBER" units="NX_PER_LENGTH" minOccurs="0">
@@ -542,6 +667,22 @@
               Q/@resolutions="dQw", "dQl"
           
         </doc>
+        <attribute name="units" optional="false">
+          <doc>
+            Engineering units to use when expressing
+            :math:`Q` and related terms.
+            
+            Data expressed in other units may not be processed by some 
+            software packages.
+          </doc>
+          <enumeration>
+            <item value="1/m" />
+            <item value="1/nm">
+              <doc>preferred</doc>
+            </item>
+            <item value="1/angstrom" />
+          </enumeration>
+        </attribute>
       </field>
       
       <field name="Qmean" minOccurs="0" units="NX_PER_LENGTH" type="NX_NUMBER">
@@ -553,6 +694,22 @@
           It is expected that ``Q`` is provided 
           and that both ``Q`` and ``Qmean`` will have the same units.
         </doc>
+        <attribute name="units" optional="false">
+          <doc>
+            Engineering units to use when expressing
+            :math:`Q` and related terms.
+            
+            Data expressed in other units may not be processed by some 
+            software packages.
+          </doc>
+          <enumeration>
+            <item value="1/m" />
+            <item value="1/nm">
+              <doc>preferred</doc>
+            </item>
+            <item value="1/angstrom" />
+          </enumeration>
+        </attribute>
       </field>
       <field name="ShadowFactor" minOccurs="0" units="NX_DIMENSIONLESS">
         <doc>
@@ -568,18 +725,21 @@
     <!-- optional items -->
     <field name="title" minOccurs="1" maxOccurs="1">
       <doc>
-        Title of this *SASentry*.
+        Title of this *SASentry*.  
+        Make it so that you can recognize the data by its title.
+        Could be the name of the sample,
+        the name for the measured data, or something else representative.
       </doc>
     </field>
     <field name="run" minOccurs="1" maxOccurs="unbounded" nameType="any">
       <doc>
         Run identification for this *SASentry*. 
-        For many facilities, this is an integer. 
+        For many facilities, this is an integer, such as en experiment number. 
         Use multiple instances of ``run`` as needed, keeping
         in mind that HDF5 requires unique names for all entities
         in a group.
       </doc>
-      <attribute name="name">
+      <attribute name="name" optional="true">
         <doc>
           Optional string attribute to identify this particular *run*. 
           Could use this to associate (correlate) multiple *SASdata* elements with *run* elements. 
@@ -846,7 +1006,7 @@
         ==============
       -->
 
-    <group type="NXsample">
+    <group type="NXsample" minOccurs="0">
       <attribute name="canSAS_class">
         <doc>Official canSAS group: :index:`NXcanSAS (applications); SASsample`</doc>
         <enumeration>
@@ -1064,7 +1224,7 @@
           ======  ==============================================
         </doc>
       </attribute>
-      <attribute name="timestamp" type="NX_DATE_TIME">
+      <attribute name="timestamp" type="NX_DATE_TIME" optional="true">
         <doc>
           ISO-8601 time [#iso8601]_
         </doc>
@@ -1079,18 +1239,17 @@
       </field>
       <field name="T" type="NX_NUMBER" units="NX_DIMENSIONLESS">
         <doc>
-          Transmission value (:math:`I/I_0`)
+          Transmission values (:math:`I/I_0`)
+          as a function of wavelength.
           
           This array is of the same shape as ``lambda`` and ``Tdev``.
         </doc>
         <attribute name="uncertainties">
           <doc>
-            (optional: for numerical arrays) 
-            
             Names the dataset (in this SASdata group) that provides the 
             uncertainty of each transmission :math:`T` to be used for data analysis.  
             The name of the dataset containing the :math:`T` uncertainty
-            is flexible.  The name must be unique in the *SASdata* group.
+            is expected to be ``Tdev``.
             
             .. comment
                see: https://github.com/canSAS-org/canSAS2012/issues/7
@@ -1110,8 +1269,7 @@
           Estimated uncertainty (usually standard deviation)
           in :math:`T`.  Must have the same units as :math:`T`.
           
-          When present, the name of this field is also 
-          recorded in the *uncertainties* attribute of *T*, as in::
+          This is the field is named in the *uncertainties* attribute of *T*, as in::
           
               T/@uncertainties="Tdev"
               

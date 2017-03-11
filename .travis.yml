@@ -36,7 +36,7 @@ before_script:
 # command to run tests
 script:
   - python ./src/punx/main.py -h
-  - python ./src/punx/main.py update --force
+  - # python ./src/punx/main.py update --force
   - which coverage
   - coverage run tests/
 

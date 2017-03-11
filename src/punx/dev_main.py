@@ -88,8 +88,8 @@ if __name__ == '__main__':
     # sys.argv.append('--version')
     # sys.argv.append('--release')
     
-    # demo_prep()
-    update_prep()
+    demo_prep()
+    # update_prep()
     # structure_prep()
     # validate_prep()
 

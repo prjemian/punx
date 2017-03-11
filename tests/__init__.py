@@ -22,7 +22,6 @@ def suite(*args, **kw):
     from tests import logs_test
     from tests import nxdlstructure_test
     from tests import validate_test
-    from tests import _version_test
     from tests import warnings_test
     test_suite = unittest.TestSuite()
     test_list = [
@@ -34,7 +33,6 @@ def suite(*args, **kw):
         logs_test, 
         nxdlstructure_test,
         validate_test, 
-        _version_test,
         warnings_test,
         ]
 
@@ -43,6 +41,6 @@ def suite(*args, **kw):
     return test_suite
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':   # pragma: no cover
     runner=unittest.TextTestRunner(verbosity=2)
     runner.run(suite())

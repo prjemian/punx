@@ -13,7 +13,14 @@ python:
 before_script:
   # detect if py2 or py3 worker
   - export PYVER=`python -c "import sys; print(sys.version_info.major)"`
-  - wget http://repo.continuum.io/miniconda/Miniconda${PYVER}-latest-Linux-x86_64.sh -O miniconda.sh
+  - |
+    if [ $PYVER == "3" ]; then
+        export MINICONDA=Miniconda3-4.2.12-Linux-x86_64.sh
+    else
+        export MINICONDA=Miniconda${PYVER}-latest-Linux-x86_64.sh
+    fi
+  - echo $MINICONDA
+  - wget http://repo.continuum.io/miniconda/$MINICONDA -O miniconda.sh
   - chmod +x miniconda.sh
   - bash miniconda.sh -b -p $HOME/miniconda
   - export PATH=$HOME/miniconda/bin:$PATH
@@ -29,7 +36,6 @@ before_script:
 # command to run tests
 script:
   - python ./src/punx/main.py -h
-  - python ./src/punx/main.py --release
   - python ./src/punx/main.py update --force
   - which coverage
   - coverage run tests/

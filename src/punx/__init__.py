@@ -108,6 +108,12 @@ NOISY = 1
 CONSOLE_ONLY = -1
 DEFAULT_LOG_LEVEL = INFO
 
+NXDL_XML_NAMESPACE = 'http://definition.nexusformat.org/nxdl/3.1'
+XMLSCHEMA_NAMESPACE = 'http://www.w3.org/2001/XMLSchema'
+NAMESPACE_DICT = {'nx': NXDL_XML_NAMESPACE, 
+                  'xs': XMLSCHEMA_NAMESPACE}
+
+
 class FileNotFound(Exception): 
     'custom exception'
 

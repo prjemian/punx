@@ -268,7 +268,6 @@ def parse_command_line_arguments():
     '''process command line'''
     doc = __doc__.strip().splitlines()[0]
     doc += '\n  version: ' + punx.__version__
-    doc += '\n  release: ' + punx.__release__
     doc += '\n  URL: ' + punx.__url__
     epilog = 'Note: It is only necessary to use the first two (or'
     epilog += ' more) characters of any subcommand, enough that the'
@@ -283,11 +282,6 @@ def parse_command_line_arguments():
                     '--version', 
                     action='version', 
                     version=punx.__version__)
-    p.add_argument('-r', 
-                    '--release',
-                    action='version', 
-                    help="show program's release number and exit",
-                    version=punx.__release__)
     
     def add_logging_argument(subp):
         '''

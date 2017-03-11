@@ -58,7 +58,16 @@ have default values.  Easy to get confused.
 
 These are the items (from above) that will need to be modeled with classes:
 
-attribute definition dim dimensions doc enumeration field group item symbols
+* attribute
+* definition
+* dim
+* dimensions
+* doc
+* enumeration
+* field
+* group
+* item
+* symbols
 
 '''
 

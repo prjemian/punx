@@ -18,6 +18,7 @@ def suite(*args, **kw):
     from tests import cache_test
     from tests import default_plot_test
     from tests import external_links
+    from tests import github_handler_test
     from tests import h5structure_test
     from tests import logs_test
     from tests import nxdlstructure_test
@@ -25,14 +26,15 @@ def suite(*args, **kw):
     from tests import warnings_test
     test_suite = unittest.TestSuite()
     test_list = [
-        common_test, 
-        cache_test, 
+        common_test,
+        cache_test,
         default_plot_test,
-        external_links, 
+        external_links,
+        github_handler_test,
         h5structure_test,
-        logs_test, 
+        logs_test,
         nxdlstructure_test,
-        validate_test, 
+        validate_test,
         warnings_test,
         ]
 

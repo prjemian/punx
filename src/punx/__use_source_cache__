@@ -1,9 +1,0 @@
-
-Presence of this file in the source directory
-informs cache.py that this is a development
-directory and that only the source cache will be updated.
-
-If this file does not exist in the source directory,
-then cache.py code will only update the user cache.
-
-Do NOT package this file with the sdist created from setup.py.

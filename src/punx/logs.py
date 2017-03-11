@@ -120,6 +120,7 @@ def to_console(message, interest=None):
     '''
     used when *only* logging output to the console (not using the logging package)
     '''
+    interest = interest or punx.DEFAULT_LOG_LEVEL
     if interest >= punx.DEFAULT_LOG_LEVEL:
         status = logging.getLevelName(interest) + ':'
         print(status, message)

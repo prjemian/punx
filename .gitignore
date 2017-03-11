@@ -1,7 +1,7 @@
 *.py[cod]
 
 # local creds for authenticated access
-src/punx/cache/__github_creds__.txt
+src/punx/__github_creds__.txt
 
 # local NXDL source cache (to be packaged with sdist)
 #src/punx/cache/*

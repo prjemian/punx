@@ -588,10 +588,8 @@ class Validate_NXDL__issue_63(unittest.TestCase):
             fp.write('<empty_root_node />\n')
 
         punx.logs.ignore_logging()
-        self.assertRaises(
-            punx.InvalidNxdlFile,
-            punx.validate.validate_xml, 
-            self.test_file)
+        self.assertRaises(punx.InvalidNxdlFile,
+                          punx.validate.validate_xml, self.test_file)
         
         
 

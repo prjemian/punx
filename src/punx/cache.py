@@ -179,8 +179,8 @@ def abs_NXDL_filename(file_name):
     import punx.cache_manager
     cm = punx.cache_manager.CacheManager()
     absolute_name = os.path.abspath(os.path.join(cm.default_file_set.path, file_name))
-    msg = 'file does not exist: ' + absolute_name
     if not os.path.exists(absolute_name):
+        msg = 'file does not exist: ' + absolute_name
         raise punx.FileNotFound(msg)
     punx.LOG_MESSAGE('user cache: ' + absolute_name, punx.DEBUG)
     return absolute_name

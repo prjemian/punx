@@ -49,14 +49,27 @@ __keywords__     = ['NeXus', 'HDF5']
 __settings_organization__ = __package_name__
 __settings_package__ = __package_name__
 
-__install_requires__ = ['h5py', 'lxml', 'numpy', 
-                        'pyRestTable',
-                        'requests',
-                        # 'PyQt4',  
+__install_requires__ = [
+    'h5py', 
+    'lxml', 
+    'numpy', 
+    'pyRestTable',
+    'requests',
+    # 'PyQt4',  
     # see: http://stackoverflow.com/questions/4628519/is-it-possible-to-require-pyqt-from-setuptools-setup-py
-                        'PyGithub',
-                        ]
-__sphinx_mock_list__ = __install_requires__ + ['lxml.etree', ]
+    'PyGithub',
+    ]
+__sphinx_mock_list__ = [
+    'h5py', 
+    'lxml',
+    'lxml.etree',
+    'numpy', 
+    'pyRestTable',
+    #'requests',
+    # 'PyQt4',  
+    # see: http://stackoverflow.com/questions/4628519/is-it-possible-to-require-pyqt-from-setuptools-setup-py
+    'PyGithub',
+    ]
 __classifiers__ = [
      #'Development Status :: 5 - Production/Stable',
      #'Development Status :: 4 - Beta',

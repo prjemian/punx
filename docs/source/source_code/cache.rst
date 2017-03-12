@@ -21,13 +21,13 @@ There are two distinct cache directories:
 :source cache:
    The *source  cache* is provided from the installation
    source of the **punx** package.  It is stored in a subdirectory
-   of the Python source code.  It is provided as a the latest released version
-   of the NXDL files.
-   The user may install additional sets of the NeXus definitions (NXDL files)
-   in the *user cache* and select from any of these for use by punx.    
+   of the Python source code.  It is provided as a minimum version
+   of the NXDL files, in case it is not possible to establish a 
+   *user cache* with a more up-to-date version of the NeXus definitions.
    
-   The *source cache* is updated only by the developer, in preparation
-   of a source code release.
+   This cache is only updated by the developer, in preparation
+   of a source code release.  It is not stored in the GitHub repository,
+   to avoid duplication of the NeXus definitions sources.
    
 .. index: user cache
 

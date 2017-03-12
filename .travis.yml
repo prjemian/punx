@@ -30,7 +30,6 @@ before_script:
   - python --version
   - conda install --yes numpy h5py lxml requests pyqt=4 coverage docopt
   - pip install pyRestTable
-  - pip install PyGitHub
   - pip install coveralls
   - which coveralls
 

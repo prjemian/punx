@@ -12,6 +12,7 @@ Production
 Development
 ***********
 
+:0.1.8: 2017-03-12 -- package .json file in the cache file sets
 :0.1.7: 2017-03-11 -- NeXus def 3.2 bundled into repo now
 :0.1.4: 2016-12-09 -- validation reports sorted by HDF5 address
 :0.1.3: 2016-12-07 -- Py2 & Py3: passes all unit tests

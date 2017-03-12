@@ -1,6 +1,7 @@
 include README.rst
 include src/punx/LICENSE.txt
 include src/punx/cache/*
+include src/punx/cache/*/__github_info__.json
 include src/punx/cache/*/*.xsd
 include src/punx/cache/*/*/*.xml
 include src/punx/cache/*/*/*.xsl

@@ -7,6 +7,8 @@ User interface: subcommand: **update**
 **punx** keeps a local copy of the NeXus definition files.
 The originals of these files are located on GitHub.
 
++.. caution::  The update process is being refactored, this may not work correctly now
+
 To *update* the local cache of NeXus definitions, run:
 
 .. code-block:: console
@@ -54,6 +56,8 @@ Examples
 
 Problems
 ********
+
+.. _github_api_rate_limit_exceeded:
 
 GitHub API rate limit exceeded
 ==============================

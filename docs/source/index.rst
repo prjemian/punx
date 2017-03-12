@@ -4,13 +4,12 @@
 :release:   |release|
 :published: |today|
 
-Use these three steps to :ref:`install <install>` and try the :ref:`demo <demo>`:
+Use these steps to :ref:`install <install>` and try the :ref:`demo <demo>`:
 
 .. code-block:: console
    :linenos:
 
     pip install punx
-    punx update
     punx demo
 
 

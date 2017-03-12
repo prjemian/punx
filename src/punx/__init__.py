@@ -54,6 +54,7 @@ __install_requires__ = ['h5py', 'lxml', 'numpy',
                         'requests',
                         # 'PyQt4',  
     # see: http://stackoverflow.com/questions/4628519/is-it-possible-to-require-pyqt-from-setuptools-setup-py
+                        'PyGithub',
                         ]
 __sphinx_mock_list__ = __install_requires__ + ['lxml.etree', ]
 __classifiers__ = [
@@ -88,7 +89,6 @@ GITHUB_NXDL_BRANCH              = 'master'
 GLOBAL_INI_GROUP                = '___global___'
 CACHE_SUBDIR                    = 'cache'
 SOURCE_CACHE_SETTINGS_FILENAME  = 'punx.ini'
-PICKLE_FILE                     = 'nxdl.p'
 NXDL_CACHE_SUBDIR               = GITHUB_NXDL_REPOSITORY + '-' + GITHUB_NXDL_BRANCH
 GITHUB_RETRY_COUNT              = 3
 
@@ -107,6 +107,12 @@ NOTSET = 0
 NOISY = 1
 CONSOLE_ONLY = -1
 DEFAULT_LOG_LEVEL = INFO
+
+NXDL_XML_NAMESPACE = 'http://definition.nexusformat.org/nxdl/3.1'
+XMLSCHEMA_NAMESPACE = 'http://www.w3.org/2001/XMLSchema'
+NAMESPACE_DICT = {'nx': NXDL_XML_NAMESPACE, 
+                  'xs': XMLSCHEMA_NAMESPACE}
+
 
 class FileNotFound(Exception): 
     'custom exception'

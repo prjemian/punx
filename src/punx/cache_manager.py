@@ -204,10 +204,16 @@ class CacheManager(punx.singletons.Singleton):
         self.user = UserCache()
         
         self.NXDL_file_sets = self.file_sets()
+        msg = 'NXDL_file_sets names = ' 
+        msg += str(sorted(list(self.NXDL_file_sets.keys())))
+        punx.LOG_MESSAGE(msg, punx.DEBUG)
         try:
             self.select_NXDL_file_set()
         except KeyError:
             pass
+        if self.default_file_set is None:
+            msg = 'CacheManager: no default_file_set selected yet'
+            punx.LOG_MESSAGE(msg, punx.DEBUG)
             
         # TODO: update the .ini file as needed (remember the default_file_set value
     
@@ -227,7 +233,13 @@ class CacheManager(punx.singletons.Singleton):
         return the named self.default_file_set instance or raise KeyError exception if unknown
         '''
         import punx.github_handler
+        msg = 'DEBUG - given ref: ' + str(ref)
+        punx.LOG_MESSAGE(msg, punx.DEBUG)
+
         ref = ref or punx.github_handler.DEFAULT_NXDL_SET
+        msg = 'DEBUG - final ref: ' + str(ref)
+        punx.LOG_MESSAGE(msg, punx.DEBUG)
+
         if ref not in self.NXDL_file_sets:
             #msg = 'unknown NXDL file set: ' + str(ref)
             msg = 'expected one of ' + ' '.join(sorted(self.NXDL_file_sets.keys()))
@@ -243,9 +255,11 @@ class CacheManager(punx.singletons.Singleton):
         '''
         index all NXDL file sets in both source and user caches, return a dictionary
         '''
-        fs = {}
-        for k, v in self.source.file_sets().items():
-            fs[k] = v
+        fs = {k: v for k, v in self.source.file_sets().items()}
+        msg = 'DEBUG - source file set names: ' 
+        msg += str(sorted(list(fs.keys())))
+        punx.LOG_MESSAGE(msg, punx.DEBUG)
+
         for k, v in self.user.file_sets().items():
             if k in fs:
                 raise ValueError('user cache file set already known: ' + k)
@@ -253,6 +267,9 @@ class CacheManager(punx.singletons.Singleton):
                 fs[k] = v
                 
         self.NXDL_file_sets = fs    # remember
+        msg = 'DEBUG - all file set names: '
+        msg += str(sorted(list(fs.keys())))
+        punx.LOG_MESSAGE(msg, punx.DEBUG)
         return fs
     
     def cleanup(self):
@@ -300,6 +317,9 @@ class Base_Cache(object):
         if self.qsettings is None:
             raise RuntimeError('cache qsettings not defined!')
         cache_path = self.path()
+        msg = 'DEBUG - cache path: ' + str(cache_path)
+        punx.LOG_MESSAGE(msg, punx.DEBUG)
+        
         for item in os.listdir(cache_path):
             if os.path.isdir(os.path.join(cache_path, item)):
                 info_file = os.path.join(cache_path, item, INFO_FILE_NAME)

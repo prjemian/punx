@@ -178,6 +178,10 @@ def abs_NXDL_filename(file_name):
     '''return absolute path to file_name, within NXDL directory'''
     import punx.cache_manager
     cm = punx.cache_manager.CacheManager()
+    punx.LOG_MESSAGE('file_name: ' + str(file_name), punx.DEBUG)
+    punx.LOG_MESSAGE('cm.default_file_set: ' + str(cm.default_file_set), punx.DEBUG)
+    if cm.default_file_set is None:
+        raise ValueError('no default file set')
     absolute_name = os.path.abspath(os.path.join(cm.default_file_set.path, file_name))
     if not os.path.exists(absolute_name):
         msg = 'file does not exist: ' + absolute_name

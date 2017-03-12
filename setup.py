@@ -48,6 +48,7 @@ setup (
             'cache/*.p', 
             'cache/*.ini', 
             'cache/*.zip', 
+            'cache/*/*.json',
             'cache/*/*.xsd',
             'cache/*/*/*.xml',
             'cache/*/*/*.xsl',

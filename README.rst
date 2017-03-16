@@ -26,3 +26,8 @@ NOTE: project is under initial construction
    .. image:: https://coveralls.io/repos/github/prjemian/punx/badge.svg?branch=master
               :target: https://coveralls.io/github/prjemian/punx?branch=master
 
+:discussion: 
+    .. image:: https://badges.gitter.im/punx-nexus/Lobby.svg
+       :alt: Join the chat at https://gitter.im/punx-nexus/Lobby
+       :target: https://gitter.im/punx-nexus/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge 
+

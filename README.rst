@@ -44,4 +44,3 @@ NOTE: project is under initial construction
       :target: http://depsy.org/package/python/punx
    .. image:: https://badges.gitter.im/punx/Lobby.svg
       :target: https://gitter.im/punx/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
-      :alt: Join the chat at https://gitter.im/punx/Lobby

@@ -19,10 +19,29 @@ NOTE: project is under initial construction
 :git:       https://github.com/prjemian/punx
 :PyPI:      https://pypi.python.org/pypi/punx/ 
 :TODO list: https://github.com/prjemian/punx/issues
-:travis-ci:
-    .. image:: https://travis-ci.org/prjemian/punx.svg?branch=master
-               :target: https://travis-ci.org/prjemian/punx
-:coveralls:
-   .. image:: https://coveralls.io/repos/github/prjemian/punx/badge.svg?branch=master
-              :target: https://coveralls.io/github/prjemian/punx?branch=master
 
+:build badges:
+
+   ..  see http://shields.io/ for more badge ideas
+
+   .. image:: https://travis-ci.org/prjemian/punx.svg?branch=master
+      :target: https://travis-ci.org/prjemian/punx
+   .. image:: https://coveralls.io/repos/github/prjemian/punx/badge.svg?branch=master
+      :target: https://coveralls.io/github/prjemian/punx?branch=master
+
+:release badges:
+      
+   .. image:: https://img.shields.io/github/tag/prjemian/punx.svg
+      :target: https://github.com/prjemian/punx/tags
+   .. image:: https://img.shields.io/github/release/prjemian/punx.svg
+      :target: https://github.com/prjemian/punx/releases
+   .. image:: https://img.shields.io/pypi/v/punx.svg
+      :target: https://pypi.python.org/pypi/punx/
+
+:social badges:
+      
+   .. image:: http://depsy.org/api/package/pypi/punx/badge.svg
+      :target: http://depsy.org/package/python/punx
+   .. image:: https://badges.gitter.im/punx/Lobby.svg
+      :target: https://gitter.im/punx/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
+      :alt: Join the chat at https://gitter.im/punx/Lobby

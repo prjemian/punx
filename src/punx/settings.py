@@ -132,6 +132,6 @@ def gmt_github_style():
 
 
 def timestamp():
-    '''current ISO8601 time in GMT, matches format from GitHub'''
+    '''current ISO8601 time in GMT'''
     ts = str(datetime.datetime.now())
     return ts

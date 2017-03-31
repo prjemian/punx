@@ -1,7 +1,9 @@
 Manage the XML Schema files : :mod:`schema_manager`
 ###################################################
 
-----
+-tba-
+
+--------
 
 source code documentation
 *************************

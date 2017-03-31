@@ -1,0 +1,15 @@
+name: punx
+dependencies:
+  - h5py
+  - lxml
+  - numpy
+  - python=2.7.*
+  - pyqt=4.*
+  - requests
+  - sip
+  - sphinx
+  - pip:
+    - versioneer
+    - pyRestTable
+    - PyGithub
+    - sphinx_rtd_theme

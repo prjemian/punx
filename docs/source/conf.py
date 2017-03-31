@@ -240,31 +240,3 @@ latex_documents = [
 
 # If false, no module index is generated.
 #latex_domain_indices = True
-
-
-# -- Mock  ---------------------------------------------
-# substitute calls for packages not used in building documentation
-
-try:
-    from unittest.mock import MagicMock
-except ImportError:
-    try:
-        from mock import MagicMock
-    except ImportError:
-        raise ImportError("No module named mock - you need to install "
-                           "mock to build the documentation")
-
-for mod_name in punx.__sphinx_mock_list__:
-    sys.modules[mod_name] = MagicMock()
-
-
-class MyPyQt4(MagicMock):
-    class QtCore(object):
-        # PyQt4.QtCore public class mocks
-        _QtCore_public_classes = """QSettings QVariant"""
-        for _name in _QtCore_public_classes.split():
-            locals()[_name] = type(_name, (), {})
-        del _name
-
-
-sys.modules['PyQt4'] = MyPyQt4()

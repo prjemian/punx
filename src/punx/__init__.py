@@ -59,17 +59,6 @@ __install_requires__ = [
     # see: http://stackoverflow.com/questions/4628519/is-it-possible-to-require-pyqt-from-setuptools-setup-py
     'PyGithub',
     ]
-__sphinx_mock_list__ = [
-    'h5py', 
-    'lxml',
-    'lxml.etree',
-    'numpy', 
-    'pyRestTable',
-    #'requests',
-    # 'PyQt4',  
-    # see: http://stackoverflow.com/questions/4628519/is-it-possible-to-require-pyqt-from-setuptools-setup-py
-    'PyGithub',
-    ]
 __classifiers__ = [
      #'Development Status :: 5 - Production/Stable',
      #'Development Status :: 4 - Beta',

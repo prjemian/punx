@@ -45,11 +45,8 @@ from __future__ import print_function
 
 import lxml.etree
 import os
-import sys
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-import punx
-import punx.singletons
+import singletons
 
 NXDL_XSD_NAME = 'nxdl.xsd'
 NXDL_TEST_FILE = os.path.join(os.path.dirname(__file__), 'cache', 'v3.2', NXDL_XSD_NAME)
@@ -620,7 +617,7 @@ class NXDL_item_catalog(object):
                     v.base = known_base.base
 
 
-class NXDL_Summary(punx.singletons.Singleton):
+class NXDL_Summary(singletons.Singleton):
     '''
     provide an easy interface for the nxdl_manager
     

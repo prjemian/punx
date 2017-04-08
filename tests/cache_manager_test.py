@@ -81,11 +81,12 @@ class Test_NXDL_File_Set_class(unittest.TestCase):
         self.assertRaises(
             ValueError, 
             fs.read_info_file)
-        self.assertRaises(
-            punx.FileNotFound, 
-            fs.read_info_file, '! this file does not exist')
         self.assertTrue(
             str(fs).startswith('<punx.cache_manager.NXDL_File_Set'))
+        self.assertRaises(
+            IOError,
+            # TODO: should be: punx.FileNotFound,
+            fs.read_info_file, 'this file does not exist')
     
     def test_class(self):
         cm = punx.cache_manager.CacheManager()
@@ -98,6 +99,8 @@ class Test_NXDL_File_Set_class(unittest.TestCase):
 
 
 def suite(*args, **kw):
+    import punx.logs
+    punx.logs.ignore_logging()
     test_suite = unittest.TestSuite()
     test_list = [
         Test_CacheManager_class,

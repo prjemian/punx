@@ -102,6 +102,7 @@ class GitHub_Repository_Reference(object):
         connect with the GitHub repository
         
         :param str repo_name: name of repository in https://github.com/nexusformat (default: *definitions*)
+        :returns bool: True if using GitHub credentials
         '''
         repo_name = repo_name or self.appName
         
@@ -113,6 +114,7 @@ class GitHub_Repository_Reference(object):
             gh = github.Github(creds['user'], creds['password'])
             user = gh.get_user(self.orgName)
             self.repo = user.get_repo(repo_name)
+        return creds is not None
     
     def request_info(self, ref=None):
         '''

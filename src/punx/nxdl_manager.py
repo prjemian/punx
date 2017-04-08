@@ -14,6 +14,10 @@
 
 '''
 Load and/or document the structure of a NeXus NXDL class specification
+
+The *nxdl_manager* calls the *schema_manager* and
+is called by *____tba_____*.
+
 '''
 
 from __future__ import print_function
@@ -22,12 +26,10 @@ import collections
 import copy
 import lxml.etree
 import os
-import sys
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-import punx
-import punx.singletons
-import punx.nxdl_schema
+import __init__
+import singletons
+import nxdl_schema
 
 
 class NXDL_Manager(object):
@@ -38,10 +40,10 @@ class NXDL_Manager(object):
     nxdl_file_set = None
     
     def __init__(self, file_set):
-        import punx.cache_manager
-        assert(isinstance(file_set, punx.cache_manager.NXDL_File_Set))
+        import cache_manager
+        assert(isinstance(file_set, cache_manager.NXDL_File_Set))
         if file_set.path is None or not os.path.exists(file_set.path):
-            raise punx.FileNotFound('NXDL directory: ' + str(file_set.path))
+            raise __init__.FileNotFound('NXDL directory: ' + str(file_set.path))
     
         self.nxdl_file_set = file_set
         self.classes = collections.OrderedDict()
@@ -61,7 +63,7 @@ def get_NXDL_file_list(nxdl_dir):
     return a list of all NXDL files in the ``nxdl_dir``
     '''
     if not os.path.exists(nxdl_dir):
-        raise punx.FileNotFound('NXDL directory: ' + nxdl_dir)
+        raise __init__.FileNotFound('NXDL directory: ' + nxdl_dir)
     NXDL_categories = 'base_classes applications contributed_definitions'.split()
     nxdl_file_list = []
     for category in NXDL_categories:
@@ -80,12 +82,12 @@ def validate_xml_tree(xml_tree):
 
     :param str xml_file_name: name of XML file
     '''
-    import punx.schema_manager
-    schema = punx.schema_manager.get_default_schema_manager().lxml_schema
+    import schema_manager
+    schema = schema_manager.get_default_schema_manager().lxml_schema
     try:
         result = schema.assertValid(xml_tree)
     except lxml.etree.DocumentInvalid as exc:
-        raise punx.InvalidNxdlFile(str(exc))
+        raise __init__.InvalidNxdlFile(str(exc))
     return result
 
 
@@ -171,14 +173,14 @@ def validate_xml_tree(xml_tree):
 #             return  # only parse this file when content is requested
 # 
 #         if self.file_name is None or not os.path.exists(self.file_name):
-#             raise punx.FileNotFound('NXDL file: ' + str(self.file_name))
+#             raise __init__.FileNotFound('NXDL file: ' + str(self.file_name))
 # 
 #         self.lxml_tree = lxml.etree.parse(self.file_name)
 #         self.__parsed__ = True  # NOW, the file has been parsed
 #         
 #         try:
 #             validate_xml_tree(self.lxml_tree)
-#         except punx.InvalidNxdlFile as exc:
+#         except __init__.InvalidNxdlFile as exc:
 #             msg = 'NXDL file is not valid: ' + self.file_name
 #             msg += '\n' + str(exc)
 # 
@@ -289,10 +291,10 @@ class Mixin(object):
         pass
     
     def __str__(self, *args, **kwargs):
-        return punx.nxdl_schema.render_class_str(self)
+        return nxdl_schema.render_class_str(self)
 
 
-class NXDL_element__definition(punx.singletons.Singleton, Mixin):
+class NXDL_element__definition(singletons.Singleton, Mixin):
     '''
     contents of a *definition* element in a NXDL XML file
     
@@ -301,9 +303,9 @@ class NXDL_element__definition(punx.singletons.Singleton, Mixin):
     
     def __init__(self, path):
         self.nxdl_path = path
-        self.schema_file = os.path.join(path, punx.nxdl_schema.NXDL_XSD_NAME)
+        self.schema_file = os.path.join(path, nxdl_schema.NXDL_XSD_NAME)
         assert(os.path.exists(self.schema_file))
-        nxdl_defaults = punx.nxdl_schema.NXDL_Summary(self.schema_file)
+        nxdl_defaults = nxdl_schema.NXDL_Summary(self.schema_file)
         
         for k, v in nxdl_defaults.definition.__dict__.items():
             self.__setattr__(k, v)
@@ -428,8 +430,8 @@ class NXDL_element__symbols(Mixin):
 
 
 def main():
-    import punx.cache_manager
-    cm = punx.cache_manager.CacheManager()
+    import cache_manager
+    cm = cache_manager.CacheManager()
     if cm is not None and cm.default_file_set is not None:
         nxdl_dict = NXDL_Manager(cm.default_file_set).classes
 

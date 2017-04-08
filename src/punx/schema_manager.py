@@ -14,6 +14,9 @@
 '''
 manages the XML Schema of this project
 
+The *schema_manager* calls the *cache_manager* and
+is called by *nxdl_manager*.
+
 Public
 
 .. autosummary::
@@ -44,9 +47,8 @@ import lxml.etree
 import os
 import sys
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-import punx
-import punx.singletons
+import __init__
+import singletons
 
 
 def strip_ns(ref):
@@ -76,8 +78,8 @@ def get_default_schema_manager():
     '''
     internal: convenience function
     '''
-    import punx.cache_manager
-    cm = punx.cache_manager.CacheManager()
+    import cache_manager
+    cm = cache_manager.CacheManager()
     assert(cm is not None)
     assert(cm.default_file_set is not None)
     return cm.default_file_set.schema_manager
@@ -88,22 +90,22 @@ class SchemaManager(object):
     describes the XML Schema for the NeXus NXDL definitions files
     '''
     
-    ns = punx.NAMESPACE_DICT
+    ns = __init__.NAMESPACE_DICT
     
     def __init__(self, path=None):
-        import punx.cache_manager
+        import cache_manager
         if path is None:
-            cm = punx.cache_manager.CacheManager()
+            cm = cache_manager.CacheManager()
             if cm is None or cm.default_file_set is None:
                 raise ValueError('Could not get NXDL file set from the cache')
             path = cm.default_file_set.path
         schema_file = os.path.join(path, 'nxdl.xsd')
         if not os.path.exists(schema_file):
-            raise punx.FileNotFound(schema_file)
+            raise __init__.FileNotFound(schema_file)
         
         self.schema_file = schema_file
         if not os.path.exists(self.schema_file):
-            raise punx.FileNotFound('XML Schema file: ' + self.schema_file)
+            raise __init__.FileNotFound('XML Schema file: ' + self.schema_file)
         
         self.lxml_tree = lxml.etree.parse(self.schema_file)
         self.lxml_schema = lxml.etree.XMLSchema(self.lxml_tree)
@@ -111,7 +113,7 @@ class SchemaManager(object):
         
         nodes = self.lxml_root.xpath('xs:element', namespaces=self.ns)
         if len(nodes) != 1:
-            raise punx.InvalidNxdlFile(self.schema_file)
+            raise __init__.InvalidNxdlFile(self.schema_file)
         self.nxdl = Schema_Root(
             nodes[0], 
             ns_dict=self.ns, 
@@ -164,15 +166,15 @@ class SchemaManager(object):
         if os.path.exists(self.schema_file):
             path = os.path.dirname(self.schema_file)
         else:
-            import punx.cache_manager
-            cm = punx.cache_manager.CacheManager()
+            import cache_manager
+            cm = cache_manager.CacheManager()
             if cm is None or cm.default_file_set is None:
                 raise ValueError('Could not get NXDL file set from the cache')
             path = cm.default_file_set.path
 
         self.types_file = os.path.join(path, 'nxdlTypes.xsd')
         if not os.path.exists(self.types_file):
-            raise punx.FileNotFound(self.types_file)
+            raise __init__.FileNotFound(self.types_file)
         lxml_types_tree = lxml.etree.parse(self.types_file)
 
         db = {}
@@ -247,13 +249,13 @@ class _Mixin(object):
     
     :param lxml.etree.Element xml_obj: XML element
     :param str obj_name: optional, default taken from ``xml_obj``
-    :param dict ns_dict: optional, default taken from :data:`punx.NAMESPACE_DICT`
+    :param dict ns_dict: optional, default taken from :data:`__init__.NAMESPACE_DICT`
     :param obj schema_root: optional, instance of lxml.etree._Element
     '''
     
     def __init__(self, xml_obj, obj_name=None, ns_dict=None, schema_root=None):
         self.name = obj_name or xml_obj.attrib.get('name')
-        self.ns = ns_dict or punx.NAMESPACE_DICT
+        self.ns = ns_dict or __init__.NAMESPACE_DICT
         self.lxml_root = schema_root
     
     def get_named_node(self, tag, attribute, value):
@@ -516,7 +518,7 @@ class Schema_Type(_Mixin):
     def __init__(self, ref, tag = '*', schema_root=None):
         # _Mixin.__init__(self, xml_obj)
         # do the _Mixin.__init__ directly here
-        self.ns = punx.NAMESPACE_DICT
+        self.ns = __init__.NAMESPACE_DICT
         self.lxml_root = schema_root
 
         xml_obj = self.get_named_node(tag, 'name', strip_ns(ref))
@@ -559,7 +561,7 @@ class Schema_Type(_Mixin):
                 raise_error(subnode, 'unexpected tag=', subnode.tag)
 
 
-class _GroupParsing(punx.singletons.Singleton):
+class _GroupParsing(singletons.Singleton):
     '''
     internal: avoid a known recursion of group in a group
     '''

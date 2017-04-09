@@ -65,14 +65,14 @@ class Test_Github_Handler_Module(unittest.TestCase):
         grr = punx.github_handler.GitHub_Repository_Reference()
         using_creds = grr.connect_repo()
         self.assertNotEqual(grr.repo, None, u'grr.repo is not None')
+        if not using_creds:
+            return      # skip if on travis-ci
+
         self.assertTrue(isinstance(grr.repo, github.Repository.Repository), 
                         u'grr.repo is a Repository()')
         self.assertEqual(grr.repo.name, punx.GITHUB_NXDL_REPOSITORY, 
                          u'grr.repo.name = ' + punx.GITHUB_NXDL_REPOSITORY)
         
-        if not using_creds:
-            return      # skip if on travis-ci
-
         node = grr.get_branch()
         self.assertTrue(isinstance(node, (type(None), github.Branch.Branch)), 
                         u'grr.get_branch() returns ' + str(type(node)))

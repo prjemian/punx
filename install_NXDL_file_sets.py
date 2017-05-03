@@ -1,8 +1,8 @@
 
 import os, sys
-import pyRestTable
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), 'src')))
 import punx.github_handler, punx.cache_manager, punx.logs
+
 
 if __name__ == '__main__':
     punx.logs.ignore_logging()
@@ -23,14 +23,4 @@ if __name__ == '__main__':
         if isinstance(m, list):
             print(str(m[-1]))
     
-    t = pyRestTable.Table()
-    fs = cm.file_sets()
-    t.labels = ['NXDL file set', 'type', 'cache', 'date & time', 'commit', 'path']
-    for k, v in fs.items():
-        # print(k, str(v))
-        row = [k,]
-        v.short_sha = punx.cache_manager.get_short_sha(v.sha)
-        for w in 'ref_type cache last_modified short_sha path'.split():
-            row.append(str(v.__getattribute__(w)))
-        t.rows.append(row)
-    print(t.reST())
+    print(punx.cache_manager.table_of_caches())

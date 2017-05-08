@@ -24,12 +24,16 @@ from __future__ import print_function
 
 import collections
 import copy
+import logging
 import lxml.etree
 import os
 
 import punx
 from punx import singletons
 from punx import nxdl_schema
+
+
+logging.getLogger(__name__)
 
 
 class NXDL_Manager(object):

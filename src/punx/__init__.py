@@ -85,12 +85,12 @@ __classifiers__ = [
      'Topic :: Utilities',
    ]
 
-def logs_ignored(*args, **kw):
-    pass        # TODO: scrap this inelegant per #89
-
-DEFAULT_LOG_LEVEL = 999999
-# a function object, re-define as function to add text to program logs
-LOG_MESSAGE = logs_ignored
+# def logs_ignored(*args, **kw):
+#     pass        # TODO: scrap this inelegant per #89
+# 
+# DEFAULT_LOG_LEVEL = 999999
+# # a function object, re-define as function to add text to program logs
+# LOG_MESSAGE = logs_ignored
 
 # logging level, from logging.__init__.py
 CRITICAL = 50

@@ -43,10 +43,14 @@ since a *group* may contain a child *group*.
 
 from __future__ import print_function
 
+import logging
 import lxml.etree
 import os
 
 from punx import singletons
+
+
+logging.getLogger(__name__)
 
 NXDL_XSD_NAME = 'nxdl.xsd'
 NXDL_TEST_FILE = os.path.join(os.path.dirname(__file__), 'cache', 'v3.2', NXDL_XSD_NAME)

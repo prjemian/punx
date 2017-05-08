@@ -59,6 +59,7 @@ is called by *schema_manager* and *nxdl_manager*.
 
 import datetime
 import json
+import logging
 import os
 import pyRestTable
 import shutil
@@ -68,6 +69,8 @@ import punx
 from punx import singletons
 from punx import github_handler
 
+
+logging.getLogger(__name__)
 
 SOURCE_CACHE_SUBDIR = u'cache'
 SOURCE_CACHE_SETTINGS_FILENAME = u'punx.ini'

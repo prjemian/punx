@@ -43,12 +43,16 @@ Internal
 
 from __future__ import print_function
 
+import logging
 import lxml.etree
 import os
 import sys
 
 import punx
 from punx import singletons
+
+
+logging.getLogger(__name__)
 
 
 def strip_ns(ref):

@@ -99,8 +99,6 @@ class Test_NXDL_File_Set_class(unittest.TestCase):
 
 
 def suite(*args, **kw):
-    import punx.logs
-    punx.logs.ignore_logging()
     test_suite = unittest.TestSuite()
     test_list = [
         Test_CacheManager_class,

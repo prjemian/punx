@@ -52,7 +52,7 @@ import punx
 from punx import singletons
 
 
-logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 def strip_ns(ref):

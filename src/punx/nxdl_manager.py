@@ -33,7 +33,7 @@ from punx import singletons
 from punx import nxdl_schema
 
 
-logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 class NXDL_Manager(object):

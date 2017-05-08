@@ -70,7 +70,7 @@ from punx import singletons
 from punx import github_handler
 
 
-logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 SOURCE_CACHE_SUBDIR = u'cache'
 SOURCE_CACHE_SETTINGS_FILENAME = u'punx.ini'
@@ -248,14 +248,14 @@ class CacheManager(singletons.Singleton):
         self.NXDL_file_sets = self.file_sets()
         msg = 'NXDL_file_sets names = ' 
         msg += str(sorted(list(self.NXDL_file_sets.keys())))
-        punx.LOG_MESSAGE(msg, punx.DEBUG)
+        logger.debug(msg)
         try:
             self.select_NXDL_file_set()
         except KeyError:
             pass
         if self.default_file_set is None:
             msg = 'CacheManager: no default_file_set selected yet'
-            punx.LOG_MESSAGE(msg, punx.DEBUG)
+            logger.debug(msg)
             
         # TODO: update the .ini file as needed (remember the default_file_set value
     
@@ -275,11 +275,11 @@ class CacheManager(singletons.Singleton):
         return the named self.default_file_set instance or raise KeyError exception if unknown
         '''
         msg = 'DEBUG - given ref: ' + str(ref)
-        punx.LOG_MESSAGE(msg, punx.DEBUG)
+        logger.debug(msg)
 
         ref = ref or github_handler.DEFAULT_NXDL_SET
         msg = 'DEBUG - final ref: ' + str(ref)
-        punx.LOG_MESSAGE(msg, punx.DEBUG)
+        logger.debug(msg)
 
         if ref not in self.NXDL_file_sets:
             #msg = 'unknown NXDL file set: ' + str(ref)
@@ -299,7 +299,7 @@ class CacheManager(singletons.Singleton):
         fs = {k: v for k, v in self.source.file_sets().items()}
         msg = 'DEBUG - source file set names: ' 
         msg += str(sorted(list(fs.keys())))
-        punx.LOG_MESSAGE(msg, punx.DEBUG)
+        logger.debug(msg)
 
         for k, v in self.user.file_sets().items():
             if k in fs:
@@ -310,7 +310,7 @@ class CacheManager(singletons.Singleton):
         self.NXDL_file_sets = fs    # remember
         msg = 'DEBUG - all file set names: '
         msg += str(sorted(list(fs.keys())))
-        punx.LOG_MESSAGE(msg, punx.DEBUG)
+        logger.debug(msg)
         return fs
     
     def cleanup(self):
@@ -359,7 +359,7 @@ class Base_Cache(object):
             raise RuntimeError('cache qsettings not defined!')
         cache_path = self.path()
         msg = 'DEBUG - cache path: ' + str(cache_path)
-        punx.LOG_MESSAGE(msg, punx.DEBUG)
+        logger.debug(msg)
         
         for item in os.listdir(cache_path):
             if os.path.isdir(os.path.join(cache_path, item)):

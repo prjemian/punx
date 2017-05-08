@@ -71,7 +71,7 @@ __classifiers__ = [
      'Programming Language :: Python :: 2',
      'Programming Language :: Python :: 2.7',
      'Programming Language :: Python :: 3',
-     'Programming Language :: Python :: 3.4',
+     'Programming Language :: Python :: 3.5',
      'Topic :: Scientific/Engineering',
      'Topic :: Scientific/Engineering :: Astronomy',
      'Topic :: Scientific/Engineering :: Bio-Informatics',
@@ -85,26 +85,6 @@ __classifiers__ = [
      'Topic :: Utilities',
    ]
 
-# def logs_ignored(*args, **kw):
-#     pass        # TODO: scrap this inelegant per #89
-# 
-# DEFAULT_LOG_LEVEL = 999999
-# # a function object, re-define as function to add text to program logs
-# LOG_MESSAGE = logs_ignored
-
-# logging level, from logging.__init__.py
-CRITICAL = 50
-FATAL = CRITICAL
-ERROR = 40
-WARNING = 30
-WARN = WARNING
-INFO = 20
-DEBUG = 10
-NOTSET = 0
-# unique to this code
-NOISY = 1
-CONSOLE_ONLY = -1
-DEFAULT_LOG_LEVEL = INFO
 
 NXDL_XML_NAMESPACE = 'http://definition.nexusformat.org/nxdl/3.1'
 XMLSCHEMA_NAMESPACE = 'http://www.w3.org/2001/XMLSchema'

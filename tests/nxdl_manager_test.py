@@ -130,8 +130,6 @@ class Test_NXDL_Manager(unittest.TestCase):
 
 
 def suite(*args, **kw):
-    import punx.logs
-    punx.logs.ignore_logging()
     test_suite = unittest.TestSuite()
     test_list = [
         Test_XML_functions,

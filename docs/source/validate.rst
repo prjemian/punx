@@ -54,8 +54,8 @@ The **REPORT** findings are as presented in the table above for each validation 
 
 The logging **INTEREST** levels are for output from the program, 
 
-
-For now, refer to the source code documentation: :ref:`source.validate`.
+..
+	For now, refer to the source code documentation: :ref:`source.validate`.
 
 Examples
 ========

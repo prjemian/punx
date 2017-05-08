@@ -27,9 +27,9 @@ import copy
 import lxml.etree
 import os
 
-import __init__
-import singletons
-import nxdl_schema
+import punx
+from punx import singletons
+from punx import nxdl_schema
 
 
 class NXDL_Manager(object):
@@ -40,10 +40,10 @@ class NXDL_Manager(object):
     nxdl_file_set = None
     
     def __init__(self, file_set):
-        import cache_manager
+        from punx import cache_manager
         assert(isinstance(file_set, cache_manager.NXDL_File_Set))
         if file_set.path is None or not os.path.exists(file_set.path):
-            raise __init__.FileNotFound('NXDL directory: ' + str(file_set.path))
+            raise punx.FileNotFound('NXDL directory: ' + str(file_set.path))
     
         self.nxdl_file_set = file_set
         self.classes = collections.OrderedDict()
@@ -63,7 +63,7 @@ def get_NXDL_file_list(nxdl_dir):
     return a list of all NXDL files in the ``nxdl_dir``
     '''
     if not os.path.exists(nxdl_dir):
-        raise __init__.FileNotFound('NXDL directory: ' + nxdl_dir)
+        raise punx.FileNotFound('NXDL directory: ' + nxdl_dir)
     NXDL_categories = 'base_classes applications contributed_definitions'.split()
     nxdl_file_list = []
     for category in NXDL_categories:
@@ -82,12 +82,12 @@ def validate_xml_tree(xml_tree):
 
     :param str xml_file_name: name of XML file
     '''
-    import schema_manager
+    from punx import schema_manager
     schema = schema_manager.get_default_schema_manager().lxml_schema
     try:
         result = schema.assertValid(xml_tree)
     except lxml.etree.DocumentInvalid as exc:
-        raise __init__.InvalidNxdlFile(str(exc))
+        raise punx.InvalidNxdlFile(str(exc))
     return result
 
 
@@ -430,7 +430,7 @@ class NXDL_element__symbols(Mixin):
 
 
 def main():
-    import cache_manager
+    from punx import cache_manager
     cm = cache_manager.CacheManager()
     if cm is not None and cm.default_file_set is not None:
         nxdl_dict = NXDL_Manager(cm.default_file_set).classes

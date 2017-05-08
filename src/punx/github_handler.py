@@ -36,7 +36,7 @@ from requests.packages.urllib3 import disable_warnings
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 import github
 
-import __init__
+import punx
 
 
 CREDS_FILE_NAME = u'__github_creds__.txt'
@@ -89,8 +89,8 @@ class GitHub_Repository_Reference(object):
     '''
     
     def __init__(self):
-        self.orgName = __init__.GITHUB_NXDL_ORGANIZATION
-        self.appName = __init__.GITHUB_NXDL_REPOSITORY
+        self.orgName = punx.GITHUB_NXDL_ORGANIZATION
+        self.appName = punx.GITHUB_NXDL_REPOSITORY
         self.repo = None
         self.ref = None
         self.ref_type = None
@@ -152,7 +152,7 @@ class GitHub_Repository_Reference(object):
 
         creds = get_BasicAuth_credentials()
         content = None
-        for _retry in range(__init__.GITHUB_RETRY_COUNT):
+        for _retry in range(punx.GITHUB_RETRY_COUNT):
             try:
                 if creds is None:
                     content = requests.get(self.zip_url, verify=False)

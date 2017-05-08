@@ -94,7 +94,12 @@ SOURCE_CACHE_SETTINGS_FILENAME  = 'punx.ini'
 NXDL_CACHE_SUBDIR               = GITHUB_NXDL_REPOSITORY + '-' + GITHUB_NXDL_BRANCH
 GITHUB_RETRY_COUNT              = 3
 
-LOG_MESSAGE                     = None      # a function object, re-define as function to add text to program logs
+def logs_ignored(*args, **kw):
+    pass
+
+DEFAULT_LOG_LEVEL = 999999
+# a function object, re-define as function to add text to program logs
+LOG_MESSAGE = logs_ignored
 
 # logging level, from logging.__init__.py
 CRITICAL = 50

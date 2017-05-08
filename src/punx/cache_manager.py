@@ -65,9 +65,9 @@ import pyRestTable
 import shutil
 from PyQt4 import QtCore
 
-import __init__
-import singletons
-import github_handler
+import punx
+from punx import singletons
+from punx import github_handler
 
 
 SOURCE_CACHE_SUBDIR = u'cache'
@@ -246,14 +246,14 @@ class CacheManager(singletons.Singleton):
         self.NXDL_file_sets = self.file_sets()
         msg = 'NXDL_file_sets names = ' 
         msg += str(sorted(list(self.NXDL_file_sets.keys())))
-        __init__.LOG_MESSAGE(msg, __init__.DEBUG)
+        punx.LOG_MESSAGE(msg, punx.DEBUG)
         try:
             self.select_NXDL_file_set()
         except KeyError:
             pass
         if self.default_file_set is None:
             msg = 'CacheManager: no default_file_set selected yet'
-            __init__.LOG_MESSAGE(msg, __init__.DEBUG)
+            punx.LOG_MESSAGE(msg, punx.DEBUG)
             
         # TODO: update the .ini file as needed (remember the default_file_set value
     
@@ -273,11 +273,11 @@ class CacheManager(singletons.Singleton):
         return the named self.default_file_set instance or raise KeyError exception if unknown
         '''
         msg = 'DEBUG - given ref: ' + str(ref)
-        __init__.LOG_MESSAGE(msg, __init__.DEBUG)
+        punx.LOG_MESSAGE(msg, punx.DEBUG)
 
         ref = ref or github_handler.DEFAULT_NXDL_SET
         msg = 'DEBUG - final ref: ' + str(ref)
-        __init__.LOG_MESSAGE(msg, __init__.DEBUG)
+        punx.LOG_MESSAGE(msg, punx.DEBUG)
 
         if ref not in self.NXDL_file_sets:
             #msg = 'unknown NXDL file set: ' + str(ref)
@@ -297,7 +297,7 @@ class CacheManager(singletons.Singleton):
         fs = {k: v for k, v in self.source.file_sets().items()}
         msg = 'DEBUG - source file set names: ' 
         msg += str(sorted(list(fs.keys())))
-        __init__.LOG_MESSAGE(msg, __init__.DEBUG)
+        punx.LOG_MESSAGE(msg, punx.DEBUG)
 
         for k, v in self.user.file_sets().items():
             if k in fs:
@@ -308,7 +308,7 @@ class CacheManager(singletons.Singleton):
         self.NXDL_file_sets = fs    # remember
         msg = 'DEBUG - all file set names: '
         msg += str(sorted(list(fs.keys())))
-        __init__.LOG_MESSAGE(msg, __init__.DEBUG)
+        punx.LOG_MESSAGE(msg, punx.DEBUG)
         return fs
     
     def cleanup(self):
@@ -357,7 +357,7 @@ class Base_Cache(object):
             raise RuntimeError('cache qsettings not defined!')
         cache_path = self.path()
         msg = 'DEBUG - cache path: ' + str(cache_path)
-        __init__.LOG_MESSAGE(msg, __init__.DEBUG)
+        punx.LOG_MESSAGE(msg, punx.DEBUG)
         
         for item in os.listdir(cache_path):
             if os.path.isdir(os.path.join(cache_path, item)):
@@ -408,8 +408,8 @@ class UserCache(Base_Cache):
         self.qsettings = QtCore.QSettings(
             QtCore.QSettings.IniFormat, 
             QtCore.QSettings.UserScope, 
-            __init__.__settings_organization__, 
-            __init__.__settings_package__)
+            punx.__settings_organization__, 
+            punx.__settings_package__)
 
         path = self.path()
         if not os.path.exists(path):
@@ -457,7 +457,7 @@ class NXDL_File_Set(object):
                 and self.path is not None \
                 and os.path.exists(self.path) \
                 and not self.__schema_manager_loaded__:
-            import schema_manager
+            from punx import schema_manager
             self.schema_manager = schema_manager.SchemaManager(self.path)
             self.__schema_manager_loaded__ = True
         return object.__getattribute__(self, *args, **kwargs)
@@ -483,7 +483,7 @@ class NXDL_File_Set(object):
 
         file_name = file_name or self.info
         if not os.path.exists(file_name):
-            raise __init__.FileNotFound('info file not found: ' + file_name)
+            raise punx.FileNotFound('info file not found: ' + file_name)
 
         self.info = file_name
         self.path = os.path.abspath(os.path.dirname(file_name))

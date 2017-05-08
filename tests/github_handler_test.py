@@ -30,7 +30,8 @@ class Test_Github_Handler_Module(unittest.TestCase):
                          u'v3.2', 
                          u'default release: ' + punx.github_handler.DEFAULT_RELEASE_NAME)
         self.assertEqual(punx.github_handler.DEFAULT_TAG_NAME, 
-                         u'NXroot-1.0', 
+                         # u'NXroot-1.0', 
+                         u'Schema-3.3',
                          u'default tag: ' + punx.github_handler.DEFAULT_TAG_NAME)
         self.assertEqual(punx.github_handler.DEFAULT_COMMIT_NAME, 
                          u'a4fd52d', 

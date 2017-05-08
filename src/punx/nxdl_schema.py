@@ -46,7 +46,7 @@ from __future__ import print_function
 import lxml.etree
 import os
 
-import singletons
+from punx import singletons
 
 NXDL_XSD_NAME = 'nxdl.xsd'
 NXDL_TEST_FILE = os.path.join(os.path.dirname(__file__), 'cache', 'v3.2', NXDL_XSD_NAME)

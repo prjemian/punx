@@ -42,6 +42,9 @@ class Test_get_default_schema_manager(unittest.TestCase):
     
     def test__function(self):
         import punx.cache_manager
+        import punx.logs
+        
+        punx.logs.ignore_logging()
 
         default_sm = punx.schema_manager.get_default_schema_manager()
         self.assertTrue(isinstance(default_sm, punx.schema_manager.SchemaManager))

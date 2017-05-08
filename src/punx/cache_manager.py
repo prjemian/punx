@@ -51,8 +51,8 @@ is called by *schema_manager* and *nxdl_manager*.
    ~extract_from_download
    ~table_of_caches
    ~Base_Cache
-   ~Source_Cache
-   ~User_Cache
+   ~SourceCache
+   ~UserCache
    ~NXDL_File_Set
 
 '''
@@ -114,7 +114,8 @@ def extract_from_download(grr, path):       # TODO refactor into NXDL_File_Set
         if grr.request_info() is not None:
             extract_from_download(grr, cache_directory)
     
-    .. autosummary::
+    .. 
+        autosummary::
        
        ~should_avoid_download
        ~should_extract_this

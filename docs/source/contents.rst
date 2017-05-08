@@ -23,11 +23,10 @@ Source Code
 .. autosummary::
    :nosignatures:
    
-   ~punx.cache_manager
-   ~punx.github_handler
-   ~punx.logs
    ~punx.nxdl_manager
    ~punx.schema_manager
+   ~punx.cache_manager
+   ~punx.github_handler
 
 ..
    ~punx.main

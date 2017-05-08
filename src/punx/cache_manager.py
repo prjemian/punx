@@ -22,11 +22,10 @@ There are two cache directories:
 * the source cache
 * the user cache
 
-Within each of these cache directories, there is a settings file
-(such as *punx.ini*) that stores the configuration of that cache 
-directory.  Also, there are a number of subdirectories, each
+Within each of these cache directories, 
+there may be one or more subdirectories, each
 containing the NeXus definitions subdirectories and files (``*.xml``, 
-``*.xsl``, & ``*.xsd``) of a specific branch, release, or commit hash
+``*.xsl``, & ``*.xsd``) of a specific branch, release, tag, or commit hash
 from the NeXus definitions repository.
 
 :source cache: contains default set of NeXus NXDL files

@@ -647,14 +647,15 @@ class NXDL_Summary(singletons.Singleton):
         self.build_tree(catalog.definition_element)
         self.definition = catalog.definition_element
         
-        self.group = self.definition.groups.values()[0]
+        _g = list(self.definition.groups.values())
+        self.group = list(self.definition.groups.values())[0]
         self.group.attributes = self.group.elements['group'].attributes
         self.attribute = self.group.elements['attribute']
         self.doc = self.group.elements['doc']
         self.field = self.group.elements['field']
         self.group.elements['group'] = 'recursion'
         self.link = self.group.elements['link']
-        self.symbols = self.definition.elements.values()[0]
+        self.symbols = list(self.definition.elements.values())[0]
 
         self.simpleType = catalog.db['simpleType']
     

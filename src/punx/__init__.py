@@ -85,17 +85,8 @@ __classifiers__ = [
      'Topic :: Utilities',
    ]
 
-GITHUB_NXDL_ORGANIZATION        = 'nexusformat'
-GITHUB_NXDL_REPOSITORY          = 'definitions'
-GITHUB_NXDL_BRANCH              = 'master'
-GLOBAL_INI_GROUP                = '___global___'
-CACHE_SUBDIR                    = 'cache'
-SOURCE_CACHE_SETTINGS_FILENAME  = 'punx.ini'
-NXDL_CACHE_SUBDIR               = GITHUB_NXDL_REPOSITORY + '-' + GITHUB_NXDL_BRANCH
-GITHUB_RETRY_COUNT              = 3
-
 def logs_ignored(*args, **kw):
-    pass
+    pass        # TODO: scrap this inelegant per #89
 
 DEFAULT_LOG_LEVEL = 999999
 # a function object, re-define as function to add text to program logs

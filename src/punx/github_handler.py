@@ -48,6 +48,12 @@ DEFAULT_COMMIT_NAME = u'a4fd52d'
 DEFAULT_NXDL_SET = DEFAULT_RELEASE_NAME
 GITHUB_RETRY_COUNT = 3
 
+GITHUB_NXDL_ORGANIZATION = 'nexusformat'
+GITHUB_NXDL_REPOSITORY = 'definitions'
+GITHUB_NXDL_BRANCH = 'master'
+GITHUB_RETRY_COUNT = 3
+#NXDL_CACHE_SUBDIR = GITHUB_NXDL_REPOSITORY + '-' + GITHUB_NXDL_BRANCH
+
 
 def get_BasicAuth_credentials(creds_file_name = None):
     '''
@@ -89,8 +95,8 @@ class GitHub_Repository_Reference(object):
     '''
     
     def __init__(self):
-        self.orgName = punx.GITHUB_NXDL_ORGANIZATION
-        self.appName = punx.GITHUB_NXDL_REPOSITORY
+        self.orgName = GITHUB_NXDL_ORGANIZATION
+        self.appName = GITHUB_NXDL_REPOSITORY
         self.repo = None
         self.ref = None
         self.ref_type = None
@@ -152,7 +158,7 @@ class GitHub_Repository_Reference(object):
 
         creds = get_BasicAuth_credentials()
         content = None
-        for _retry in range(punx.GITHUB_RETRY_COUNT):
+        for _retry in range(GITHUB_RETRY_COUNT):
             try:
                 if creds is None:
                     content = requests.get(self.zip_url, verify=False)

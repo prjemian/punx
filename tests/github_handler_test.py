@@ -49,10 +49,10 @@ class Test_Github_Handler_Module(unittest.TestCase):
         self.assertTrue(isinstance(grr, punx.github_handler.GitHub_Repository_Reference), 
                         u'correct object')
         self.assertEqual(grr.orgName, 
-                         punx.GITHUB_NXDL_ORGANIZATION, 
+                         punx.github_handler.GITHUB_NXDL_ORGANIZATION, 
                          u'organization name')
         self.assertEqual(grr.appName, 
-                         punx.GITHUB_NXDL_REPOSITORY, 
+                         punx.github_handler.GITHUB_NXDL_REPOSITORY, 
                          u'package name')
         self.assertEqual(grr._make_zip_url(), 
                          u'https://github.com/nexusformat/definitions/archive/master.zip', 
@@ -71,8 +71,8 @@ class Test_Github_Handler_Module(unittest.TestCase):
 
         self.assertTrue(isinstance(grr.repo, github.Repository.Repository), 
                         u'grr.repo is a Repository()')
-        self.assertEqual(grr.repo.name, punx.GITHUB_NXDL_REPOSITORY, 
-                         u'grr.repo.name = ' + punx.GITHUB_NXDL_REPOSITORY)
+        self.assertEqual(grr.repo.name, punx.github_handler.GITHUB_NXDL_REPOSITORY, 
+                         u'grr.repo.name = ' + punx.github_handler.GITHUB_NXDL_REPOSITORY)
         
         node = grr.get_branch()
         self.assertTrue(isinstance(node, (type(None), github.Branch.Branch)), 

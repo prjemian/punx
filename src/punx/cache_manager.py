@@ -442,7 +442,7 @@ class NXDL_File_Set(object):
     sha = None
     zip_url = None
     last_modified = None
-    nxdl_element_factory = None
+    #nxdl_element_factory = None
     
     # these keys are written and read to the JSON info files in each downloaded file set
     json_file_keys = 'ref ref_type sha zip_url last_modified'.split()

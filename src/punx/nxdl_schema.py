@@ -651,7 +651,6 @@ class NXDL_Summary(singletons.Singleton):
         self.build_tree(catalog.definition_element)
         self.definition = catalog.definition_element
         
-        _g = list(self.definition.groups.values())
         self.group = list(self.definition.groups.values())[0]
         self.group.attributes = self.group.elements['group'].attributes
         self.attribute = self.group.elements['attribute']

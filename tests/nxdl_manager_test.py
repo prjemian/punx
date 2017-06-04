@@ -125,7 +125,7 @@ class Test_NXDL_Manager(unittest.TestCase):
             'NXDL files found: ' + str(len(nxdl_defs)))
         for k, v in nxdl_defs.items():
             self.assertTrue(
-                isinstance(v, punx.nxdl_manager.NXDL_element__definition),
+                isinstance(v, punx.nxdl_manager.NXDL_structure__definition),
                 'NXDL definitions type: '+ k +'=' + str(type(v)))
 
 

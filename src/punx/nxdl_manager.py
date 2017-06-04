@@ -214,13 +214,13 @@ class NXDL_structure__definition(Mixin):
             element_type = node.tag.split('}')[-1]
             obj = self.get_default_element(element_type, node)
             if obj is not None and element_type in ("group", "field", "attribute"):
-                if obj.name in self.elements:
+                if obj.name in self.components:
                     base_name = obj.name
                     index = 1
-                    while base_name+str(index) in self.elements:
+                    while base_name+str(index) in self.components:
                         index += 1
                     obj.name = base_name+str(index)
-                self.elements[obj.name] = obj
+                self.components[obj.name] = obj
             pass    # TODO:
 
 

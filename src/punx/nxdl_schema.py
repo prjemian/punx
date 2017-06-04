@@ -122,7 +122,7 @@ class NXDL_schema__attribute(Mixin):
     It is not necessary for this code to parse "attributeType" from the rules.
     
     Each of these XML *complexType* elements defines its own set of 
-    attributes and defaults for use in corresponding NXDL elements:
+    attributes and defaults for use in corresponding NXDL components:
     
     * attributeType
     * basicComponent
@@ -652,13 +652,13 @@ class NXDL_Summary(singletons.Singleton):
         self.definition = catalog.definition_element
         
         self.group = list(self.definition.groups.values())[0]
-        self.group.attributes = self.group.elements['group'].attributes
-        self.attribute = self.group.elements['attribute']
-        self.doc = self.group.elements['doc']
-        self.field = self.group.elements['field']
-        self.group.elements['group'] = 'recursion'
-        self.link = self.group.elements['link']
-        self.symbols = list(self.definition.elements.values())[0]
+        self.group.attributes = self.group.components['group'].attributes
+        self.attribute = self.group.components['attribute']
+        self.doc = self.group.components['doc']
+        self.field = self.group.components['field']
+        self.group.components['group'] = 'recursion'
+        self.link = self.group.components['link']
+        self.symbols = list(self.definition.components.values())[0]
 
         self.simpleType = catalog.db['simpleType']
     
@@ -676,6 +676,10 @@ class NXDL_Summary(singletons.Singleton):
                     nm = child.name or '(%s)' % kind
                     target[nm] = child
                     self.build_tree(child)
+        
+        # renamed thi
+        obj.components = obj.elements
+        del obj.elements
 
 
 def print_tree(obj, level=0):

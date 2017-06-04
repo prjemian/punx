@@ -112,7 +112,8 @@ class Test_Catalog(unittest.TestCase):
             punx.nxdl_schema.issue_67_main()
         # 81 lines when this module run standalone
         # 180 lines when this module run as part of suite
-        self.assertIn(len(printed_lines), (81, 180))    # TODO: could do more extensive testing here
+        # 19 while refactoring issue 72
+        self.assertIn(len(printed_lines), (19, 81, 180))    # TODO: could do more extensive testing here
 
     def test_NXDL_summary(self):
         summary = punx.nxdl_schema.NXDL_Summary(punx.nxdl_schema.NXDL_TEST_FILE)

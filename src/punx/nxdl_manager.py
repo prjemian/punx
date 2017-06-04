@@ -156,6 +156,9 @@ class NXDL_structure__definition(Mixin):
         self._init_defaults()
 
     def _init_defaults(self):
+        # definition is special: it has structure of a group AND a symbols table
+        # make sure we get that BEFORE proceeding
+        
         assert(os.path.exists(self.schema_file))
         nxdl_defaults = nxdl_schema.NXDL_Summary(self.schema_file)
 
@@ -171,7 +174,9 @@ class NXDL_structure__definition(Mixin):
             attribute = NXDL_structure__attribute(nxdl_defaults.attribute)
             obj = copy.deepcopy(attribute)         # ALWAYS make a copy of that
             for item in 'name type required'.split():
-                obj.__setattr__(item, v.__getattribute__(item)) # TODO: should override default
+                if hasattr(v, item):
+                    obj.__setattr__(item, v.__getattribute__(item)) 
+                    # TODO: should override default
             del obj.maxOccurs
             del obj.minOccurs
             # TODO: what else to retain?
@@ -180,6 +185,10 @@ class NXDL_structure__definition(Mixin):
         # remove the recusrion part
         if "(group)" in self.groups:
             del self.groups["(group)"]
+        
+        # define these by brute force for now
+        self.fields = {}
+        self.symbols = {}
 
     def set_file(self, fname):
         """
@@ -214,13 +223,19 @@ class NXDL_structure__definition(Mixin):
             element_type = node.tag.split('}')[-1]
             obj = self.get_default_element(element_type, node)
             if obj is not None and element_type in ("group", "field", "attribute"):
-                if obj.name in self.components:
+                if obj.name in self.components: # FIXME: only for groups & fields
                     base_name = obj.name
                     index = 1
                     while base_name+str(index) in self.components:
                         index += 1
                     obj.name = base_name+str(index)
                 self.components[obj.name] = obj
+                structure_type = {
+                    "attribute": self.attributes,
+                    "field": self.fields,
+                    "group": self.groups,
+                    }[element_type]
+                structure_type[obj.name] = obj
             pass    # TODO:
 
 

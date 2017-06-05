@@ -216,27 +216,45 @@ class NXDL_structure__definition(Mixin):
             raise punx.InvalidNxdlFile(msg)
  
         # parse the XML content of this NXDL definition element
+        elements_handled = ("group", "field", "attribute", "symbols", "link")
         for node in lxml_tree.getroot():
             if isinstance(node, lxml.etree._Comment):
                 continue
-  
+
             element_type = node.tag.split('}')[-1]
-            obj = self.get_default_element(element_type, node)
-            if obj is not None and element_type in ("group", "field", "attribute"):
-                if obj.name in self.components: # FIXME: only for groups & fields
+            if element_type not in elements_handled:
+                continue
+
+            if element_type == "link":
+                pass    # TODO:
+
+            elif element_type == "symbols":
+                pass    # TODO:
+
+            elif element_type in ("group", "field", "attribute"):
+                obj = self.get_default_element(element_type, node)
+                if obj is None:
+                    pass
+                if obj.name in self.components and element_type in ("group", "field", "link"):
                     base_name = obj.name
                     index = 1
                     while base_name+str(index) in self.components:
                         index += 1
                     obj.name = base_name+str(index)
+    
                 self.components[obj.name] = obj
+                
                 structure_type = {
                     "attribute": self.attributes,
                     "field": self.fields,
                     "group": self.groups,
                     }[element_type]
                 structure_type[obj.name] = obj
-            pass    # TODO:
+
+            else:
+                pass    # TODO: raise exception?
+            
+            pass    # TODO: what else?
 
 
 class NXDL_structure__attribute(Mixin):

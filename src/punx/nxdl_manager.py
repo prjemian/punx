@@ -55,7 +55,7 @@ class NXDL_Manager(object):
 #         get_element = file_set.nxdl_element_factory.get_element
     
         for nxdl_file_name in get_NXDL_file_list(file_set.path):
-            definition = NXDL_structure__definition(self)     # the default
+            definition = NXDL__definition(self)     # the default
             definition.set_file(nxdl_file_name)
             self.classes[definition.title] = definition     # MUST come after definition.set_file()
             if definition.category in ('applications', ):
@@ -116,13 +116,13 @@ class Mixin(object):
         if element_type in ('doc', ):
             pass
         elif element_type in ('group', ):
-            obj = NXDL_structure__group()
+            obj = NXDL__group()
             obj.name = xml_node.attrib.get('name', xml_node.attrib['type'][2:])
         elif element_type in ('field', ):
-            obj = NXDL_structure__field()
+            obj = NXDL__field()
             obj.name = xml_node.attrib['name']
         elif element_type in ('attribute', ):
-            obj = NXDL_structure__attribute(nxdl_defaults)
+            obj = NXDL__attribute(nxdl_defaults)
             obj.name = xml_node.attrib['name']
         elif element_type in ('link', ):
             # print(self.title, element_type)     # TODO
@@ -134,7 +134,7 @@ class Mixin(object):
         return obj
 
 
-class NXDL_structure__definition(Mixin):
+class NXDL__definition(Mixin):
     '''
     contents of a *definition* element in a NXDL XML file
     
@@ -171,7 +171,7 @@ class NXDL_structure__definition(Mixin):
 
         # parse this content into classes in _this_ module
         for k, v in self.attributes.items():
-            attribute = NXDL_structure__attribute(nxdl_defaults.attribute)
+            attribute = NXDL__attribute(nxdl_defaults.attribute)
             obj = copy.deepcopy(attribute)         # ALWAYS make a copy of that
             for item in 'name type required'.split():
                 if hasattr(v, item):
@@ -257,7 +257,7 @@ class NXDL_structure__definition(Mixin):
             pass    # TODO: what else?
 
 
-class NXDL_structure__attribute(Mixin):
+class NXDL__attribute(Mixin):
     '''
     contents of a *attribute* structure (XML element) in a NXDL XML file
     '''
@@ -267,25 +267,25 @@ class NXDL_structure__attribute(Mixin):
             self.__setattr__(k, v)
 
 
-class NXDL_structure__field(Mixin):
+class NXDL__field(Mixin):
     '''
     contents of a *field* structure (XML element) in a NXDL XML file
     '''
 
 
-class NXDL_structure__group(Mixin):
+class NXDL__group(Mixin):
     '''
     contents of a *group* structure (XML element) in a NXDL XML file
     '''
 
 
-class NXDL_structure__link(Mixin):
+class NXDL__link(Mixin):
     '''
     contents of a *link* structure (XML element) in a NXDL XML file
     '''
 
 
-class NXDL_structure__symbols(Mixin):
+class NXDL__symbols(Mixin):
     '''
     contents of a *symbols* structure (XML element) in a NXDL XML file
     '''

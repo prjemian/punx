@@ -57,7 +57,7 @@ __install_requires__ = [
     'requests',
     # 'PyQt4',  
     # see: http://stackoverflow.com/questions/4628519/is-it-possible-to-require-pyqt-from-setuptools-setup-py
-    'PyGithub',
+    'PyGithub >= 1.32',
     ]
 __classifiers__ = [
      #'Development Status :: 5 - Production/Stable',

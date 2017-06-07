@@ -53,7 +53,7 @@ class NXDL_Manager(object):
 #         get_element = file_set.nxdl_element_factory.get_element
     
         for nxdl_file_name in get_NXDL_file_list(file_set.path):
-            definition = NXDL__definition(self)     # the default
+            definition = NXDL__definition(nxdl_manager=self)     # the default
             definition.set_file(nxdl_file_name)
             self.classes[definition.title] = definition     # MUST come after definition.set_file()
             # TODO: optimization: can we defer parsing until this definition is needed?
@@ -102,34 +102,32 @@ class NXDL__Mixin(object):
     
     name = None
     
+    def __init__(self, *args, **kwds):
+        pass
+    
     def __str__(self, *args, **kwargs):
         return nxdl_schema.render_class_str(self)
     
     def get_default_element(self, element_type, xml_node):
-        obj = None
-        nxdl_defaults = nxdl_schema.NXDL_Summary(self.schema_file)
-        
+        """
+        return a default instance of NXDL object of the given element type
+        """
         # fs = self.parent.nxdl_file_set
         # sm = fs.schema_manager
         # schema_element = sm.nxdl.children[element_type]
 
-        if element_type in ('doc', ):
-            pass
-        elif element_type in ('group', ):
-            obj = NXDL__group()
-            obj.name = xml_node.attrib.get('name', xml_node.attrib['type'][2:])
-        elif element_type in ('field', ):
-            obj = NXDL__field()
-            obj.name = xml_node.attrib['name']
-        elif element_type in ('attribute', ):
-            obj = NXDL__attribute(nxdl_defaults)
-            obj.name = xml_node.attrib['name']
-        elif element_type in ('link', ):
-            obj = NXDL__link()
-        elif element_type in ('symbols', ):
-            obj = NXDL__symbols()
-        
-        return obj
+        creators = {
+            "attribute": NXDL__attribute,
+            "field": NXDL__field,
+            "group": NXDL__group,
+            "link": NXDL__link,
+            "symbols": NXDL__symbols,
+        }
+        if element_type in creators:
+            return creators[element_type](
+                xml_node=xml_node, 
+                nxdl_defaults=nxdl_schema.NXDL_Summary(self.schema_file),
+                )
 
 
 class NXDL__definition(NXDL__Mixin):
@@ -146,7 +144,7 @@ class NXDL__definition(NXDL__Mixin):
     parent = None
     title = None
     
-    def __init__(self, nxdl_manager):
+    def __init__(self, nxdl_manager=None, *args, **kwds):
         self.parent = nxdl_manager
         self.nxdl_path = self.parent.nxdl_file_set.path
         self.schema_file = os.path.join(self.nxdl_path, nxdl_schema.NXDL_XSD_NAME)
@@ -275,27 +273,51 @@ class NXDL__attribute(NXDL__Mixin):
     contents of a *attribute* structure (XML element) in a NXDL XML file
     '''
     
-    def __init__(self, nxdl_defaults):
+    def __init__(self, nxdl_defaults=None, xml_node=None, *args, **kwds):
         for k, v in nxdl_defaults.__dict__.items():
             self.__setattr__(k, v)
+        if xml_node is not None:
+            self.name = xml_node.attrib['name']
 
 
 class NXDL__field(NXDL__Mixin):
     '''
     contents of a *field* structure (XML element) in a NXDL XML file
     '''
+    
+    def __init__(self, xml_node=None, *args, **kwds):
+        if xml_node is not None:
+            self.name = xml_node.attrib['name']
+        pass # TODO:
+    
+    def parse(self):
+        pass # TODO:
 
 
 class NXDL__group(NXDL__Mixin):
     '''
     contents of a *group* structure (XML element) in a NXDL XML file
     '''
+    
+    def __init__(self, xml_node=None, *args, **kwds):
+        if xml_node is not None:
+            self.name = xml_node.attrib.get('name', xml_node.attrib['type'][2:])
+        pass # TODO:
+    
+    def parse(self):
+        pass # TODO:
 
 
 class NXDL__link(NXDL__Mixin):
     '''
     contents of a *link* structure (XML element) in a NXDL XML file
     '''
+    
+    def __init__(self, *args, **kwds):
+        pass # TODO:
+    
+    def parse(self):
+        pass # TODO:
 
 
 class NXDL__symbols(NXDL__Mixin):

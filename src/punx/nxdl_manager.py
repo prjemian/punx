@@ -23,12 +23,10 @@ is called by *____tba_____*.
 from __future__ import print_function
 
 import collections
-import time
 import copy
 import logging
 import lxml.etree
 import os
-import sys
 
 import punx
 from punx import nxdl_schema

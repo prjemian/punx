@@ -47,8 +47,6 @@ import logging
 import lxml.etree
 import os
 
-from punx import singletons
-
 
 logger = logging.getLogger(__name__)
 
@@ -621,7 +619,6 @@ class NXDL_item_catalog(object):
                     v.base = known_base.base
 
 
-#class NXDL_Summary(singletons.Singleton):
 class NXDL_Summary(object):
     '''
     provide an easy interface for the nxdl_manager

@@ -675,7 +675,7 @@ class NXDL_Summary(object):
                     target[nm] = child
                     self.build_tree(child)
         
-        # renamed thi
+        # rename this
         obj.components = obj.elements
         del obj.elements
 

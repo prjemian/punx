@@ -56,16 +56,18 @@ class NXDL_Manager(object):
             definition = NXDL__definition(self)     # the default
             definition.set_file(nxdl_file_name)
             self.classes[definition.title] = definition     # MUST come after definition.set_file()
-            if definition.category in ('applications', ):
-                # TODO: adjust minOccurs defaults for application definition or contributed definition
-                pass
+            # TODO: optimization: can we defer parsing until this definition is needed?
             definition.parse()
-            pass
+            pass    # remove for production
 
 
 def get_NXDL_file_list(nxdl_dir):
     '''
     return a list of all NXDL files in the ``nxdl_dir``
+    
+    The list is sorted by NXDL category 
+    (base_classes, applications, contributed_definitions)
+    and then alphabetically within each category.
     '''
     if not os.path.exists(nxdl_dir):
         raise punx.FileNotFound('NXDL directory: ' + nxdl_dir)
@@ -123,11 +125,9 @@ class Mixin(object):
             obj = NXDL__attribute(nxdl_defaults)
             obj.name = xml_node.attrib['name']
         elif element_type in ('link', ):
-            # print(self.title, element_type)     # TODO
-            pass
+            obj = NXDL__link()
         elif element_type in ('symbols', ):
-            # print(self.title, element_type)     # TODO
-            pass
+            obj = NXDL__symbols()
         
         return obj
 
@@ -186,7 +186,7 @@ class NXDL__definition(Mixin):
         
         # define these by brute force for now
         self.fields = {}
-        self.symbols = {}
+        self.symbols = []
 
     def set_file(self, fname):
         """
@@ -213,6 +213,16 @@ class NXDL__definition(Mixin):
             msg += '\n' + str(exc)
             raise punx.InvalidNxdlFile(msg)
  
+        # if definition.category in ('applications', ):
+        #     # TODO: adjust minOccurs defaults for application definitions
+        #     # contributed definition are intended for either base class or application definition
+        #     # How to handle contributed definitions?
+        #     #  Suggest they need some indicator in the NXDL file.
+        #     #  For now, treat them like a base class.
+        #     # defer this to the parser for each component
+        #     pass
+            
+
         # parse the XML content of this NXDL definition element
         elements_handled = ("group", "field", "attribute", "symbols", "link")
         for node in lxml_tree.getroot():
@@ -227,11 +237,16 @@ class NXDL__definition(Mixin):
                 pass    # TODO:
 
             elif element_type == "symbols":
-                pass    # TODO:
+                obj = self.get_default_element(element_type, node)
+                obj.parse(node)
+                if len(obj.symbols) > 0:
+                    self.symbols += obj.symbols 
 
             elif element_type in ("group", "field", "attribute"):
                 obj = self.get_default_element(element_type, node)
                 if obj is None:
+                    pass
+                if self.category in ('applications', ):
                     pass
                 if obj.name in self.components and element_type in ("group", "field", "link"):
                     base_name = obj.name
@@ -286,7 +301,32 @@ class NXDL__link(Mixin):
 class NXDL__symbols(Mixin):
     '''
     contents of a *symbols* structure (XML element) in a NXDL XML file
+    
+    example from NXcrystal::
+
+      <symbols>
+        <doc>These symbols will be used below to coordinate dimensions with the same lengths.</doc>
+        <symbol name="n_comp"><doc>number of different unit cells to be described</doc></symbol>
+        <symbol name="i"><doc>number of wavelengths</doc></symbol>
+      </symbols>
+    
     '''
+    
+    symbols = []
+    
+    def parse(self, symbols_node):
+        """
+        parse the XML content
+        """
+        for node in symbols_node:
+            if isinstance(node, lxml.etree._Comment):
+                continue
+    
+            element_type = node.tag.split('}')[-1]
+            if element_type == "symbol":
+                nm = node.attrib.get('name')
+                if nm is not None:
+                    self.symbols.append(nm)
 
 
 def main():

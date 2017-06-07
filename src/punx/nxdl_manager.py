@@ -165,7 +165,7 @@ class NXDL__definition(Mixin):
         self.minOccurs = 0
         self.maxOccurs = 1
         
-        for k, v in nxdl_defaults.definition.__dict__.items():
+        for k, v in sorted(nxdl_defaults.definition.__dict__.items()):
             self.__setattr__(k, v)
         del self.children
 

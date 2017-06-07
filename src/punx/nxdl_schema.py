@@ -98,13 +98,13 @@ def render_class_str(obj):
     return msg
 
 
-class Mixin(object):
+class NXDL_schema__Mixin(object):
     
     def __str__(self, *args, **kwargs):
         return render_class_str(self)
 
 
-class NXDL_schema__attribute(Mixin):
+class NXDL_schema__attribute(NXDL_schema__Mixin):
     '''
     node matches XPath query: ``//xs:attribute``
     
@@ -203,7 +203,7 @@ class NXDL_schema__attribute(Mixin):
                 raise ValueError(msg)
 
 
-class NXDL_schema__attributeGroup(Mixin):
+class NXDL_schema__attributeGroup(NXDL_schema__Mixin):
     '''
     node matches XPath query: ``/xs:schema/xs:attributeGroup``
     
@@ -232,7 +232,7 @@ class NXDL_schema__attributeGroup(Mixin):
                 self.children.append(obj)
 
 
-class NXDL_schema_complexType(Mixin):
+class NXDL_schema_complexType(NXDL_schema__Mixin):
     '''
     node matches XPath query: ``/xs:schema/xs:complexType``
     
@@ -352,7 +352,7 @@ class NXDL_schema_complexType(Mixin):
                 pass
 
 
-class NXDL_schema__element(Mixin):
+class NXDL_schema__element(NXDL_schema__Mixin):
     '''
     a complete description of a specific NXDL xs:element node
     '''
@@ -395,7 +395,7 @@ class NXDL_schema__element(Mixin):
                     self.children.append(obj)
 
 
-class NXDL_schema__group(Mixin):
+class NXDL_schema__group(NXDL_schema__Mixin):
     '''
     node matches XPath query: ``//xs:group``
     
@@ -433,7 +433,7 @@ class NXDL_schema__group(Mixin):
                     self.children.append(obj)
 
 
-class NXDL_schema_named_simpleType(Mixin):
+class NXDL_schema_named_simpleType(NXDL_schema__Mixin):
     '''
     node matches XPath query: ``/xs:schema/xs:simpleType``
     

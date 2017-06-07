@@ -98,7 +98,7 @@ def validate_xml_tree(xml_tree):
     return result
 
 
-class Mixin(object):
+class NXDL__Mixin(object):
     
     name = None
     
@@ -132,7 +132,7 @@ class Mixin(object):
         return obj
 
 
-class NXDL__definition(Mixin):
+class NXDL__definition(NXDL__Mixin):
     '''
     contents of a *definition* element in a NXDL XML file
     
@@ -270,7 +270,7 @@ class NXDL__definition(Mixin):
             pass    # TODO: what else?
 
 
-class NXDL__attribute(Mixin):
+class NXDL__attribute(NXDL__Mixin):
     '''
     contents of a *attribute* structure (XML element) in a NXDL XML file
     '''
@@ -280,25 +280,25 @@ class NXDL__attribute(Mixin):
             self.__setattr__(k, v)
 
 
-class NXDL__field(Mixin):
+class NXDL__field(NXDL__Mixin):
     '''
     contents of a *field* structure (XML element) in a NXDL XML file
     '''
 
 
-class NXDL__group(Mixin):
+class NXDL__group(NXDL__Mixin):
     '''
     contents of a *group* structure (XML element) in a NXDL XML file
     '''
 
 
-class NXDL__link(Mixin):
+class NXDL__link(NXDL__Mixin):
     '''
     contents of a *link* structure (XML element) in a NXDL XML file
     '''
 
 
-class NXDL__symbols(Mixin):
+class NXDL__symbols(NXDL__Mixin):
     '''
     contents of a *symbols* structure (XML element) in a NXDL XML file
     

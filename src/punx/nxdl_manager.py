@@ -54,11 +54,10 @@ class NXDL_Manager(object):
     
         for nxdl_file_name in get_NXDL_file_list(file_set.path):
             definition = NXDL__definition(nxdl_manager=self)     # the default
-            definition.set_file(nxdl_file_name)
-            self.classes[definition.title] = definition     # MUST come after definition.set_file()
+            definition.set_file(nxdl_file_name)             # defines definition.title
+            self.classes[definition.title] = definition
             # TODO: optimization: can we defer parsing until this definition is needed?
             definition.parse()
-            pass    # remove for production
 
 
 def get_NXDL_file_list(nxdl_dir):
@@ -107,6 +106,9 @@ class NXDL__Mixin(object):
     
     def __str__(self, *args, **kwargs):
         return nxdl_schema.render_class_str(self)
+    
+    def parse(self, *args, **kwargs):
+        raise NotImplementedError('must override parse() in subclass')
     
     def get_default_element(self, element_type, xml_node):
         """
@@ -232,7 +234,8 @@ class NXDL__definition(NXDL__Mixin):
                 continue
 
             if element_type == "link":
-                pass    # TODO:
+                obj = self.get_default_element(element_type, node)
+                #obj.parse(node)
 
             elif element_type == "symbols":
                 obj = self.get_default_element(element_type, node)
@@ -278,6 +281,12 @@ class NXDL__attribute(NXDL__Mixin):
             self.__setattr__(k, v)
         if xml_node is not None:
             self.name = xml_node.attrib['name']
+    
+    def parse(self):
+        """
+        parse the XML content
+        """
+        pass # TODO:
 
 
 class NXDL__field(NXDL__Mixin):
@@ -291,6 +300,9 @@ class NXDL__field(NXDL__Mixin):
         pass # TODO:
     
     def parse(self):
+        """
+        parse the XML content
+        """
         pass # TODO:
 
 
@@ -305,19 +317,37 @@ class NXDL__group(NXDL__Mixin):
         pass # TODO:
     
     def parse(self):
+        """
+        parse the XML content
+        """
         pass # TODO:
 
 
 class NXDL__link(NXDL__Mixin):
     '''
     contents of a *link* structure (XML element) in a NXDL XML file
+    
+    example from NXmonopd::
+
+        <link name="polar_angle" target="/NXentry/NXinstrument/NXdetector/polar_angle">
+            <doc>Link to polar angle in /NXentry/NXinstrument/NXdetector</doc>
+        </link>
+        <link name="data" target="/NXentry/NXinstrument/NXdetector/data">
+            <doc>Link to data in /NXentry/NXinstrument/NXdetector</doc>
+        </link>
+
     '''
     
-    def __init__(self, *args, **kwds):
-        pass # TODO:
+    def __init__(self, xml_node=None, *args, **kwds):
+        if xml_node is not None:
+            self.name = xml_node.attrib['name']
+            self.target = xml_node.attrib.get('target')
     
-    def parse(self):
-        pass # TODO:
+#     def parse(self):
+#         """
+#         parse the XML content
+#         """
+#         pass # TODO:
 
 
 class NXDL__symbols(NXDL__Mixin):

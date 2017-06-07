@@ -23,7 +23,6 @@ is called by *____tba_____*.
 from __future__ import print_function
 
 import collections
-import copy
 import logging
 import lxml.etree
 import os
@@ -170,15 +169,15 @@ class NXDL__definition(NXDL__Mixin):
         # parse this content into classes in _this_ module
         for k, v in self.attributes.items():
             attribute = NXDL__attribute(nxdl_defaults.attribute)
-            obj = copy.deepcopy(attribute)         # ALWAYS make a copy of that
+
             for item in 'name type required'.split():
                 if hasattr(v, item):
-                    obj.__setattr__(item, v.__getattribute__(item)) 
+                    attribute.__setattr__(item, v.__getattribute__(item)) 
                     # TODO: should override default
-            del obj.maxOccurs
-            del obj.minOccurs
+            del attribute.maxOccurs
+            del attribute.minOccurs
             # TODO: what else to retain?
-            self.attributes[k] = obj
+            self.attributes[k] = attribute
 
         # remove the recusrion part
         if "(group)" in self.groups:
@@ -281,6 +280,8 @@ class NXDL__attribute(NXDL__Mixin):
             self.__setattr__(k, v)
         if xml_node is not None:
             self.name = xml_node.attrib['name']
+        if hasattr(self, 'groups'):
+            del self.groups     # TODO: any problems with this?
     
     def parse(self):
         """

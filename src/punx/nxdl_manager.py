@@ -57,6 +57,18 @@ class NXDL_Manager(object):
             self.classes[definition.title] = definition
             # TODO: optimization: can we defer parsing until this definition is needed?
             definition.parse()
+    
+    def __str__(self, *args, **kwargs):
+        s = "NXDL_Manager("
+        count = {}
+        for v in self.classes.values():
+            if v.category not in count:
+                count[v.category] = 0
+            count[v.category] += 1
+        args = [k + ":%d" % v for k, v in sorted(count.items())]
+        s += ", ".join(args)
+        s += ")"
+        return s
 
 
 def get_NXDL_file_list(nxdl_dir):
@@ -99,6 +111,7 @@ def validate_xml_tree(xml_tree):
 class NXDL__Mixin(object):
     
     name = None
+    nxdl_definition = None
     
     def __init__(self, *args, **kwds):
         pass
@@ -125,10 +138,12 @@ class NXDL__Mixin(object):
             "symbols": NXDL__symbols,
         }
         if element_type in creators:
-            return creators[element_type](
+            obj = creators[element_type](
                 xml_node=xml_node, 
                 nxdl_defaults=nxdl_schema.NXDL_Summary(self.schema_file),
                 )
+            obj.NXDL__definition = self.nxdl_definition
+            return obj
 
 
 class NXDL__definition(NXDL__Mixin):
@@ -146,11 +161,25 @@ class NXDL__definition(NXDL__Mixin):
     title = None
     
     def __init__(self, nxdl_manager=None, *args, **kwds):
+        self.nxdl_definition = self
         self.parent = nxdl_manager
         self.nxdl_path = self.parent.nxdl_file_set.path
         self.schema_file = os.path.join(self.nxdl_path, nxdl_schema.NXDL_XSD_NAME)
         assert(os.path.exists(self.schema_file))
         self._init_defaults()
+    
+    def __str__(self, *args, **kwargs):
+        s = self.title + "("
+        args = []
+        args.append("category=" + self.category)
+        args.append("attributes:%d" % len(self.attributes))
+        args.append("fields:%d" % len(self.fields))
+        args.append("groups:%d" % len(self.groups))
+        args.append("links:%d" % len(self.links))
+        args.append("symbols:%d" % len(self.symbols))
+        s += ", ".join(args)
+        s += ")"
+        return s
 
     def _init_defaults(self):
         # definition is special: it has structure of a group AND a symbols table
@@ -186,6 +215,7 @@ class NXDL__definition(NXDL__Mixin):
         # define these by brute force for now
         self.fields = {}
         self.symbols = []
+        self.links = {}
 
     def set_file(self, fname):
         """
@@ -234,7 +264,9 @@ class NXDL__definition(NXDL__Mixin):
 
             if element_type == "link":
                 obj = self.get_default_element(element_type, node)
-                #obj.parse(node)
+                if obj is None:
+                    raise ValueError("link with no content!")   # TODO: improve message
+                self.links[obj.name] = obj
 
             elif element_type == "symbols":
                 obj = self.get_default_element(element_type, node)
@@ -386,11 +418,14 @@ def main():
     from punx import cache_manager
     cm = cache_manager.CacheManager()
     if cm is not None and cm.default_file_set is not None:
-        nxdl_dict = NXDL_Manager(cm.default_file_set).classes
+        mgr = NXDL_Manager(cm.default_file_set)
+        nxdl_dict = mgr.classes
 
         _t = True
-        for k, v in nxdl_dict.items():
-            print(v.category, k)
+        for v in nxdl_dict.values():
+            print(v)
+        
+        print(mgr)
 
 
 if __name__ == '__main__':

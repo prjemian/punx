@@ -130,6 +130,7 @@ class NXDL__Mixin(object):
         # sm = fs.schema_manager
         # schema_element = sm.nxdl.children[element_type]
 
+        nxdl_defaults = nxdl_schema.NXDL_Summary(self.schema_file)
         creators = {
             "attribute": NXDL__attribute,
             "field": NXDL__field,
@@ -138,11 +139,9 @@ class NXDL__Mixin(object):
             "symbols": NXDL__symbols,
         }
         if element_type in creators:
-            obj = creators[element_type](
-                xml_node=xml_node, 
-                nxdl_defaults=nxdl_schema.NXDL_Summary(self.schema_file),
-                )
+            obj = creators[element_type](nxdl_defaults)
             obj.NXDL__definition = self.nxdl_definition
+            obj.parse(xml_node)
             return obj
 
 
@@ -305,18 +304,17 @@ class NXDL__attribute(NXDL__Mixin):
     contents of a *attribute* structure (XML element) in a NXDL XML file
     '''
     
-    def __init__(self, nxdl_defaults=None, xml_node=None, *args, **kwds):
+    def __init__(self, nxdl_defaults=None, *args, **kwds):
         for k, v in nxdl_defaults.__dict__.items():
             self.__setattr__(k, v)
-        if xml_node is not None:
-            self.name = xml_node.attrib['name']
         if hasattr(self, 'groups'):
             del self.groups     # TODO: any problems with this?
     
-    def parse(self):
+    def parse(self, xml_node):
         """
         parse the XML content
         """
+        self.name = xml_node.attrib['name']
         pass # TODO:
 
 
@@ -325,15 +323,11 @@ class NXDL__field(NXDL__Mixin):
     contents of a *field* structure (XML element) in a NXDL XML file
     '''
     
-    def __init__(self, xml_node=None, *args, **kwds):
-        if xml_node is not None:
-            self.name = xml_node.attrib['name']
-        pass # TODO:
-    
-    def parse(self):
+    def parse(self, xml_node):
         """
         parse the XML content
         """
+        self.name = xml_node.attrib['name']
         pass # TODO:
 
 
@@ -342,15 +336,11 @@ class NXDL__group(NXDL__Mixin):
     contents of a *group* structure (XML element) in a NXDL XML file
     '''
     
-    def __init__(self, xml_node=None, *args, **kwds):
-        if xml_node is not None:
-            self.name = xml_node.attrib.get('name', xml_node.attrib['type'][2:])
-        pass # TODO:
-    
-    def parse(self):
+    def parse(self, xml_node):
         """
         parse the XML content
         """
+        self.name = xml_node.attrib.get('name', xml_node.attrib['type'][2:])
         pass # TODO:
 
 
@@ -369,16 +359,13 @@ class NXDL__link(NXDL__Mixin):
 
     '''
     
-    def __init__(self, xml_node=None, *args, **kwds):
-        if xml_node is not None:
-            self.name = xml_node.attrib['name']
-            self.target = xml_node.attrib.get('target')
-    
-#     def parse(self):
-#         """
-#         parse the XML content
-#         """
-#         pass # TODO:
+    def parse(self, xml_node):
+        """
+        parse the XML content
+        """
+        self.name = xml_node.attrib['name']
+        self.target = xml_node.attrib.get('target')
+        pass # TODO:
 
 
 class NXDL__symbols(NXDL__Mixin):

@@ -113,18 +113,21 @@ class NXDL__Mixin(object):
     name = None
     nxdl_definition = None
     
-    def __init__(self, *args, **kwds):
+    def __init__(self, nxdl_defaults, *args, **kwds):
         pass
     
     def __str__(self, *args, **kwargs):
         return nxdl_schema.render_class_str(self)
     
     def parse(self, *args, **kwargs):
+        """parse the XML node and assemble NXDL structure"""
         raise NotImplementedError('must override parse() in subclass')
     
     def get_default_element(self, element_type, xml_node):
         """
         return a default instance of NXDL object of the given element type
+        
+        :return: instance of NXDL_Mixin subclass or None if not recognized
         """
         # fs = self.parent.nxdl_file_set
         # sm = fs.schema_manager
@@ -140,7 +143,7 @@ class NXDL__Mixin(object):
         }
         if element_type in creators:
             obj = creators[element_type](nxdl_defaults)
-            obj.NXDL__definition = self.nxdl_definition
+            obj.nxdl_definition = self.nxdl_definition
             obj.parse(xml_node)
             return obj
 
@@ -239,16 +242,6 @@ class NXDL__definition(NXDL__Mixin):
             msg += '\n' + str(exc)
             raise punx.InvalidNxdlFile(msg)
  
-        # if definition.category in ('applications', ):
-        #     # TODO: adjust minOccurs defaults for application definitions
-        #     # contributed definition are intended for either base class or application definition
-        #     # How to handle contributed definitions?
-        #     #  Suggest they need some indicator in the NXDL file.
-        #     #  For now, treat them like a base class.
-        #     # defer this to the parser for each component
-        #     pass
-            
-
         # parse the XML content of this NXDL definition element
         elements_handled = ("group", "field", "attribute", "symbols", "link")
         for node in lxml_tree.getroot():
@@ -275,8 +268,16 @@ class NXDL__definition(NXDL__Mixin):
                 obj = self.get_default_element(element_type, node)
                 if obj is None:
                     pass
-                if self.category in ('applications', ):
+
+                if self.nxdl_definition.category in ('applications', ):
+                    # TODO: adjust minOccurs defaults for application definitions
+                    # contributed definition are intended for either base class or application definition
+                    # How to handle contributed definitions?
+                    #  Suggest they need some indicator in the NXDL file.
+                    #  For now, treat them like a base class.
+                    # defer this to the parser for each component
                     pass
+
                 if obj.name in self.components and element_type in ("group", "field", "link"):
                     base_name = obj.name
                     index = 1
@@ -315,6 +316,16 @@ class NXDL__attribute(NXDL__Mixin):
         parse the XML content
         """
         self.name = xml_node.attrib['name']
+
+        if self.nxdl_definition.category in ('applications', ):
+            # TODO: adjust minOccurs defaults for application definitions
+            # contributed definition are intended for either base class or application definition
+            # How to handle contributed definitions?
+            #  Suggest they need some indicator in the NXDL file.
+            #  For now, treat them like a base class.
+            # defer this to the parser for each component
+            pass
+
         pass # TODO:
 
 
@@ -328,6 +339,16 @@ class NXDL__field(NXDL__Mixin):
         parse the XML content
         """
         self.name = xml_node.attrib['name']
+
+        if self.nxdl_definition.category in ('applications', ):
+            # TODO: adjust minOccurs defaults for application definitions
+            # contributed definition are intended for either base class or application definition
+            # How to handle contributed definitions?
+            #  Suggest they need some indicator in the NXDL file.
+            #  For now, treat them like a base class.
+            # defer this to the parser for each component
+            pass
+
         pass # TODO:
 
 
@@ -341,6 +362,16 @@ class NXDL__group(NXDL__Mixin):
         parse the XML content
         """
         self.name = xml_node.attrib.get('name', xml_node.attrib['type'][2:])
+
+        if self.nxdl_definition.category in ('applications', ):
+            # TODO: adjust minOccurs defaults for application definitions
+            # contributed definition are intended for either base class or application definition
+            # How to handle contributed definitions?
+            #  Suggest they need some indicator in the NXDL file.
+            #  For now, treat them like a base class.
+            # defer this to the parser for each component
+            pass
+
         pass # TODO:
 
 
@@ -403,14 +434,12 @@ def main():
     from punx import cache_manager
     cm = cache_manager.CacheManager()
     if cm is not None and cm.default_file_set is not None:
-        mgr = NXDL_Manager(cm.default_file_set)
-        nxdl_dict = mgr.classes
+        manager = NXDL_Manager(cm.default_file_set)
+        nxdl_dict = manager.classes
 
-        _t = True
         for v in nxdl_dict.values():
             print(v)
-        
-        print(mgr)
+        print(manager)
 
 
 if __name__ == '__main__':

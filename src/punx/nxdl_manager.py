@@ -172,11 +172,9 @@ class NXDL__definition(NXDL__Mixin):
         s = self.title + "("
         args = []
         args.append("category=" + self.category)
+        for k in "attributes fields groups links symbols".split():
+            args.append(k + ":%d" % len(self.__getattribute__(k)))
         args.append("attributes:%d" % len(self.attributes))
-        args.append("fields:%d" % len(self.fields))
-        args.append("groups:%d" % len(self.groups))
-        args.append("links:%d" % len(self.links))
-        args.append("symbols:%d" % len(self.symbols))
         s += ", ".join(args)
         s += ")"
         return s

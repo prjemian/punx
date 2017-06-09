@@ -210,7 +210,9 @@ class NXDL__Mixin(object):
                 self.symbols += obj.symbols
     
     def ensure_unique_name(self, obj):
-        name_list = self.groups.keys() + self.fields.keys() + self.links.keys()
+        name_list = []
+        for k in 'groups fields links'.split():
+            name_list += list(self.__getattribute__(k).keys())
         if obj.name in name_list:
             base_name = obj.name
             index = 1

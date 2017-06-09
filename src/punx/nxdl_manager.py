@@ -40,6 +40,7 @@ class NXDL_Manager(object):
     '''
 
     nxdl_file_set = None
+    nxdl_defaults = None
     
     def __init__(self, file_set):
         from punx import cache_manager
@@ -48,6 +49,7 @@ class NXDL_Manager(object):
             raise punx.FileNotFound('NXDL directory: ' + str(file_set.path))
     
         self.nxdl_file_set = file_set
+        self.nxdl_defaults = self.get_nxdl_defaults()
         self.classes = collections.OrderedDict()
 #         get_element = file_set.nxdl_element_factory.get_element
     
@@ -55,8 +57,10 @@ class NXDL_Manager(object):
             definition = NXDL__definition(nxdl_manager=self)     # the default
             definition.set_file(nxdl_file_name)             # defines definition.title
             self.classes[definition.title] = definition
+            parse_now = True
             # TODO: optimization: can we defer parsing until this definition is needed?
-            definition.parse()
+            if parse_now:
+                definition.parse()
     
     def __str__(self, *args, **kwargs):
         s = "NXDL_Manager("
@@ -69,6 +73,13 @@ class NXDL_Manager(object):
         s += ", ".join(args)
         s += ")"
         return s
+
+    def get_nxdl_defaults(self):
+        schema_file = os.path.join(
+            self.nxdl_file_set.path, 
+            nxdl_schema.NXDL_XSD_NAME)
+        if os.path.exists(schema_file):
+            return nxdl_schema.NXDL_Summary(schema_file)
 
 
 def get_NXDL_file_list(nxdl_dir):
@@ -113,8 +124,8 @@ class NXDL__Mixin(object):
     name = None
     nxdl_definition = None
     
-    def __init__(self, nxdl_defaults, *args, **kwds):
-        pass
+    def __init__(self, nxdl_definition, *args, **kwds):
+        self.nxdl_definition = nxdl_definition
     
     def __str__(self, *args, **kwargs):
         return nxdl_schema.render_class_str(self)
@@ -123,30 +134,72 @@ class NXDL__Mixin(object):
         """parse the XML node and assemble NXDL structure"""
         raise NotImplementedError('must override parse() in subclass')
     
-    def get_default_element(self, element_type, xml_node):
-        """
-        return a default instance of NXDL object of the given element type
-        
-        :return: instance of NXDL_Mixin subclass or None if not recognized
-        """
-        # fs = self.parent.nxdl_file_set
-        # sm = fs.schema_manager
-        # schema_element = sm.nxdl.children[element_type]
+    def parse_attributes(self, xml_node):
+        ns = nxdl_schema.get_xml_namespace_dictionary()
+        manager = self.nxdl_definition.nxdl_manager
+        nxdl_defaults = manager.nxdl_defaults
 
-        nxdl_defaults = nxdl_schema.NXDL_Summary(self.schema_file)
-        creators = {
-            "attribute": NXDL__attribute,
-            "field": NXDL__field,
-            "group": NXDL__group,
-            "link": NXDL__link,
-            "symbols": NXDL__symbols,
-        }
-        if element_type in creators:
-            obj = creators[element_type](nxdl_defaults)
-            obj.nxdl_definition = self.nxdl_definition
-            obj.parse(xml_node)
-            return obj
+        for node in xml_node.xpath('nx:attribute', namespaces=ns):
+            obj = NXDL__attribute(self.nxdl_definition, nxdl_defaults=nxdl_defaults)
+            obj.parse(node)
+            # TODO: does a default already exist?
+            self.attributes[obj.name] = obj
+    
+    def parse_fields(self, xml_node):
+        ns = nxdl_schema.get_xml_namespace_dictionary()
+        manager = self.nxdl_definition.nxdl_manager
+        nxdl_defaults = manager.nxdl_defaults
 
+        for node in xml_node.xpath('nx:field', namespaces=ns):
+            obj = NXDL__field(self.nxdl_definition, nxdl_defaults=nxdl_defaults)
+            obj.parse(node)
+            self.ensure_unique_name(obj)
+            self.fields[obj.name] = obj
+    
+    def parse_groups(self, xml_node):
+        ns = nxdl_schema.get_xml_namespace_dictionary()
+        manager = self.nxdl_definition.nxdl_manager
+        nxdl_defaults = manager.nxdl_defaults
+
+        for node in xml_node.xpath('nx:group', namespaces=ns):
+            obj = NXDL__group(self.nxdl_definition, nxdl_defaults=nxdl_defaults)
+            obj.parse(node)
+            self.ensure_unique_name(obj)
+            self.groups[obj.name] = obj
+    
+    def parse_links(self, xml_node):
+        ns = nxdl_schema.get_xml_namespace_dictionary()
+        manager = self.nxdl_definition.nxdl_manager
+        nxdl_defaults = manager.nxdl_defaults
+
+        for node in xml_node.xpath('nx:link', namespaces=ns):
+            obj = NXDL__link(self.nxdl_definition, nxdl_defaults=nxdl_defaults)
+            obj.parse(node)
+            if obj is None:
+                raise ValueError("link with no content!")   # TODO: improve message
+            self.ensure_unique_name(obj)
+            self.links[obj.name] = obj
+
+    def parse_symbols(self, xml_node):
+        ns = nxdl_schema.get_xml_namespace_dictionary()
+        manager = self.nxdl_definition.nxdl_manager
+        nxdl_defaults = manager.nxdl_defaults
+
+        for node in xml_node.xpath('nx:symbols', namespaces=ns):
+            # obj = self.get_default_elemet(nxdl_defaults, "symbols", node)
+            obj = NXDL__symbols(self.nxdl_definition, nxdl_defaults=nxdl_defaults)
+            obj.parse(node)
+            if len(obj.symbols) > 0:
+                self.symbols += obj.symbols
+    
+    def ensure_unique_name(self, obj):
+        name_list = self.groups.keys() + self.fields.keys() + self.links.keys()
+        if obj.name in name_list:
+            base_name = obj.name
+            index = 1
+            while base_name+str(index) in name_list:
+                index += 1
+            obj.name = base_name+str(index)
 
 class NXDL__definition(NXDL__Mixin):
     '''
@@ -159,15 +212,22 @@ class NXDL__definition(NXDL__Mixin):
     file_name = None
     lxml_tree = None
     nxdl = None
-    parent = None
+    nxdl_manager = None
     title = None
-    
+
     def __init__(self, nxdl_manager=None, *args, **kwds):
         self.nxdl_definition = self
-        self.parent = nxdl_manager
-        self.nxdl_path = self.parent.nxdl_file_set.path
+        self.nxdl_manager = nxdl_manager
+        self.nxdl_path = self.nxdl_manager.nxdl_file_set.path
         self.schema_file = os.path.join(self.nxdl_path, nxdl_schema.NXDL_XSD_NAME)
         assert(os.path.exists(self.schema_file))
+
+        self.attributes = {}
+        self.fields = {}
+        self.groups = {}
+        self.links = {}
+        self.symbols = []
+    
         self._init_defaults()
     
     def __str__(self, *args, **kwargs):
@@ -185,8 +245,7 @@ class NXDL__definition(NXDL__Mixin):
         # definition is special: it has structure of a group AND a symbols table
         # make sure we get that BEFORE proceeding
         
-        assert(os.path.exists(self.schema_file))
-        nxdl_defaults = nxdl_schema.NXDL_Summary(self.schema_file)
+        nxdl_defaults = self.nxdl_manager.nxdl_defaults
 
         self.minOccurs = 0
         self.maxOccurs = 1
@@ -196,26 +255,20 @@ class NXDL__definition(NXDL__Mixin):
         del self.children
 
         # parse this content into classes in _this_ module
-        for k, v in self.attributes.items():
-            attribute = NXDL__attribute(nxdl_defaults.attribute)
+        for k, v in sorted(self.attributes.items()):
+            attribute = NXDL__attribute(
+                self.nxdl_definition, 
+                nxdl_defaults=nxdl_defaults)
 
             for item in 'name type required'.split():
                 if hasattr(v, item):
                     attribute.__setattr__(item, v.__getattribute__(item)) 
                     # TODO: should override default
-            del attribute.maxOccurs
-            del attribute.minOccurs
-            # TODO: what else to retain?
             self.attributes[k] = attribute
 
         # remove the recusrion part
         if "(group)" in self.groups:
             del self.groups["(group)"]
-        
-        # define these by brute force for now
-        self.fields = {}
-        self.symbols = []
-        self.links = {}
 
     def set_file(self, fname):
         """
@@ -241,63 +294,72 @@ class NXDL__definition(NXDL__Mixin):
             msg = 'NXDL file is not valid: ' + self.file_name
             msg += '\n' + str(exc)
             raise punx.InvalidNxdlFile(msg)
+
+        root_node = lxml_tree.getroot()
  
         # parse the XML content of this NXDL definition element
-        elements_handled = ("group", "field", "attribute", "symbols", "link")
-        for node in lxml_tree.getroot():
-            if isinstance(node, lxml.etree._Comment):
-                continue
-
-            element_type = node.tag.split('}')[-1]
-            if element_type not in elements_handled:
-                continue
-
-            if element_type == "link":
-                obj = self.get_default_element(element_type, node)
-                if obj is None:
-                    raise ValueError("link with no content!")   # TODO: improve message
-                self.links[obj.name] = obj
-
-            elif element_type == "symbols":
-                obj = self.get_default_element(element_type, node)
-                obj.parse(node)
-                if len(obj.symbols) > 0:
-                    self.symbols += obj.symbols 
-
-            elif element_type in ("group", "field", "attribute"):
-                obj = self.get_default_element(element_type, node)
-                if obj is None:
-                    pass
-
-                if self.nxdl_definition.category in ('applications', ):
-                    # TODO: adjust minOccurs defaults for application definitions
-                    # contributed definition are intended for either base class or application definition
-                    # How to handle contributed definitions?
-                    #  Suggest they need some indicator in the NXDL file.
-                    #  For now, treat them like a base class.
-                    # defer this to the parser for each component
-                    pass
-
-                if obj.name in self.components and element_type in ("group", "field", "link"):
-                    base_name = obj.name
-                    index = 1
-                    while base_name+str(index) in self.components:
-                        index += 1
-                    obj.name = base_name+str(index)
-    
-                self.components[obj.name] = obj
-                
-                structure_type = {
-                    "attribute": self.attributes,
-                    "field": self.fields,
-                    "group": self.groups,
-                    }[element_type]
-                structure_type[obj.name] = obj
-
-            else:
-                pass    # TODO: raise exception?
-            
-            pass    # TODO: what else?
+        self.parse_symbols(root_node)
+        self.parse_attributes(root_node)
+        self.parse_groups(root_node)
+        self.parse_fields(root_node)
+        self.parse_links(root_node)
+        
+#         if False:
+#             elements_handled = ("group", "field", "attribute", "symbols", "link")
+#             for node in lxml_tree.getroot():
+#                 if isinstance(node, lxml.etree._Comment):
+#                     continue
+#     
+#                 element_type = node.tag.split('}')[-1]
+#                 if element_type not in elements_handled:
+#                     continue
+#     
+#                 if element_type == "link":
+#                     obj = self.get_default_element(nxdl_defaults, element_type, node)
+#                     if obj is None:
+#                         raise ValueError("link with no content!")   # TODO: improve message
+#                     self.links[obj.name] = obj
+#     
+#                 elif element_type == "symbols":
+#                     obj = self.get_default_element(nxdl_defaults, element_type, node)
+#                     obj.parse(node)
+#                     if len(obj.symbols) > 0:
+#                         self.symbols += obj.symbols 
+#     
+#                 elif element_type in ("group", "field", "attribute"):
+#                     obj = self.get_default_element(nxdl_defaults, element_type, node)
+#                     if obj is None:
+#                         pass
+#     
+#                     if self.nxdl_definition.category in ('applications', ):
+#                         # TODO: adjust minOccurs defaults for application definitions
+#                         # contributed definition are intended for either base class or application definition
+#                         # How to handle contributed definitions?
+#                         #  Suggest they need some indicator in the NXDL file.
+#                         #  For now, treat them like a base class.
+#                         # defer this to the parser for each component
+#                         pass
+#     
+#                     if obj.name in self.components and element_type in ("group", "field", "link"):
+#                         base_name = obj.name
+#                         index = 1
+#                         while base_name+str(index) in self.components:
+#                             index += 1
+#                         obj.name = base_name+str(index)
+#         
+#                     self.components[obj.name] = obj
+#                     
+#                     structure_type = {
+#                         "attribute": self.attributes,
+#                         "field": self.fields,
+#                         "group": self.groups,
+#                         }[element_type]
+#                     structure_type[obj.name] = obj
+#     
+#                 else:
+#                     pass    # TODO: raise exception?
+#                 
+#                 pass    # TODO: what else?
 
 
 class NXDL__attribute(NXDL__Mixin):
@@ -305,11 +367,17 @@ class NXDL__attribute(NXDL__Mixin):
     contents of a *attribute* structure (XML element) in a NXDL XML file
     '''
     
-    def __init__(self, nxdl_defaults=None, *args, **kwds):
-        for k, v in nxdl_defaults.__dict__.items():
+    def __init__(self, nxdl_definition, nxdl_defaults=None, *args, **kwds):
+        NXDL__Mixin.__init__(self, nxdl_definition)
+        attribute_defaults = nxdl_defaults.attribute
+        for k, v in sorted(attribute_defaults.__dict__.items()):
             self.__setattr__(k, v)
         if hasattr(self, 'groups'):
             del self.groups     # TODO: any problems with this?
+        if hasattr(self, 'minOccurs'):
+            del self.minOccurs
+        if hasattr(self, 'maxOccurs'):
+            del self.maxOccurs
     
     def parse(self, xml_node):
         """
@@ -317,14 +385,14 @@ class NXDL__attribute(NXDL__Mixin):
         """
         self.name = xml_node.attrib['name']
 
-        if self.nxdl_definition.category in ('applications', ):
-            # TODO: adjust minOccurs defaults for application definitions
-            # contributed definition are intended for either base class or application definition
-            # How to handle contributed definitions?
-            #  Suggest they need some indicator in the NXDL file.
-            #  For now, treat them like a base class.
-            # defer this to the parser for each component
-            pass
+#         if self.nxdl_definition.category in ('applications', ):
+#             # TODO: adjust minOccurs defaults for application definitions
+#             # contributed definition are intended for either base class or application definition
+#             # How to handle contributed definitions?
+#             #  Suggest they need some indicator in the NXDL file.
+#             #  For now, treat them like a base class.
+#             # defer this to the parser for each component
+#             pass
 
         pass # TODO:
 
@@ -334,6 +402,11 @@ class NXDL__field(NXDL__Mixin):
     contents of a *field* structure (XML element) in a NXDL XML file
     '''
     
+    def __init__(self, nxdl_definition, nxdl_defaults=None, *args, **kwds):
+        NXDL__Mixin.__init__(self, nxdl_definition)
+
+        self.attributes = {}
+    
     def parse(self, xml_node):
         """
         parse the XML content
@@ -349,6 +422,7 @@ class NXDL__field(NXDL__Mixin):
             # defer this to the parser for each component
             pass
 
+        self.parse_attributes(xml_node)
         pass # TODO:
 
 
@@ -356,6 +430,14 @@ class NXDL__group(NXDL__Mixin):
     '''
     contents of a *group* structure (XML element) in a NXDL XML file
     '''
+    
+    def __init__(self, nxdl_definition, nxdl_defaults=None, *args, **kwds):
+        NXDL__Mixin.__init__(self, nxdl_definition)
+
+        self.attributes = {}
+        self.fields = {}
+        self.groups = {}
+        self.links = {}
     
     def parse(self, xml_node):
         """
@@ -372,7 +454,10 @@ class NXDL__group(NXDL__Mixin):
             # defer this to the parser for each component
             pass
 
-        pass # TODO:
+        self.parse_attributes(xml_node)
+        self.parse_groups(xml_node)
+        self.parse_fields(xml_node)
+        self.parse_links(xml_node)
 
 
 class NXDL__link(NXDL__Mixin):
@@ -389,6 +474,9 @@ class NXDL__link(NXDL__Mixin):
         </link>
 
     '''
+    
+    name = None
+    target = None
     
     def parse(self, xml_node):
         """
@@ -413,7 +501,10 @@ class NXDL__symbols(NXDL__Mixin):
     
     '''
     
-    symbols = []
+    def __init__(self, nxdl_definition, nxdl_defaults=None, *args, **kwds):
+        NXDL__Mixin.__init__(self, nxdl_definition)
+
+        self.symbols = []
     
     def parse(self, symbols_node):
         """
@@ -436,9 +527,20 @@ def main():
     if cm is not None and cm.default_file_set is not None:
         manager = NXDL_Manager(cm.default_file_set)
         nxdl_dict = manager.classes
-
+        
+        import pyRestTable
+        t = pyRestTable.Table()
+        t.labels = 'class category attributes fields groups links symbols'.split()
         for v in nxdl_dict.values():
-            print(v)
+            row = [v.title, v.category]
+            for k in 'attributes fields groups links symbols'.split():
+                n = len(v.__getattribute__(k))
+                if n == 0:
+                    n = ""
+                row.append(n)
+            t.addRow(row)
+        print(t)
+
         print(manager)
 
 

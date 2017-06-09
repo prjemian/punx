@@ -46,13 +46,16 @@ class NXDL_Manager(object):
         from punx import cache_manager
         assert(isinstance(file_set, cache_manager.NXDL_File_Set))
         if file_set.path is None or not os.path.exists(file_set.path):
-            raise punx.FileNotFound('NXDL directory: ' + str(file_set.path))
+            msg = 'NXDL directory: ' + str(file_set.path)
+            logger.error(msg)
+            raise punx.FileNotFound(msg)
     
         self.nxdl_file_set = file_set
         self.nxdl_defaults = self.get_nxdl_defaults()
         self.classes = collections.OrderedDict()
     
         for nxdl_file_name in get_NXDL_file_list(file_set.path):
+            logger.debug("reading NXDL file: " + nxdl_file_name)
             definition = NXDL__definition(nxdl_manager=self)     # the default
             definition.set_file(nxdl_file_name)             # defines definition.title
             self.classes[definition.title] = definition
@@ -95,13 +98,17 @@ def get_NXDL_file_list(nxdl_dir):
     and then alphabetically within each category.
     '''
     if not os.path.exists(nxdl_dir):
-        raise punx.FileNotFound('NXDL directory: ' + nxdl_dir)
+        msg = 'NXDL directory: ' + nxdl_dir
+        logger.error(msg)
+        raise punx.FileNotFound(msg)
     NXDL_categories = 'base_classes applications contributed_definitions'.split()
     nxdl_file_list = []
     for category in NXDL_categories:
         path = os.path.join(nxdl_dir, category)
         if not os.path.exists(path):
-            raise IOError('no definition available, cannot find ' + path)
+            msg = 'no definition available, cannot find ' + path
+            logger.error(msg)
+            raise IOError(msg)
         for fname in sorted(os.listdir(path)):
             if fname.endswith('.nxdl.xml'):
                 nxdl_file_list.append(os.path.join(path, fname))
@@ -119,6 +126,7 @@ def validate_xml_tree(xml_tree):
     try:
         result = schema.assertValid(xml_tree)
     except lxml.etree.DocumentInvalid as exc:
+        logger.error(str(exc))
         raise punx.InvalidNxdlFile(str(exc))
     return result
 
@@ -155,6 +163,7 @@ class NXDL__Mixin(object):
             if obj.name in self.attributes:
                 msg = "replace attribute @" + obj.name
                 msg += " in " + str(self)
+                logger.error(msg)
                 raise KeyError(msg)
             self.attributes[obj.name] = obj
     
@@ -202,6 +211,7 @@ class NXDL__Mixin(object):
                 msg = "link with no content!"
                 msg += " line: %d" % node.sourceline
                 msg += " file: %s" % node.base
+                logger.error(msg)
                 raise ValueError(msg)
             self.ensure_unique_name(obj)
             self.links[obj.name] = obj
@@ -290,7 +300,9 @@ class NXDL__definition(NXDL__Mixin):
         parse the XML content
         """
         if self.file_name is None or not os.path.exists(self.file_name):
-            raise punx.FileNotFound('NXDL file: ' + str(self.file_name))
+            msg = 'NXDL file: ' + str(self.file_name)
+            logger.error(msg)
+            raise punx.FileNotFound(msg)
  
         lxml_tree = lxml.etree.parse(self.file_name)
  
@@ -299,6 +311,7 @@ class NXDL__definition(NXDL__Mixin):
         except punx.InvalidNxdlFile as exc:
             msg = 'NXDL file is not valid: ' + self.file_name
             msg += '\n' + str(exc)
+            logger.error(msg)
             raise punx.InvalidNxdlFile(msg)
 
         root_node = lxml_tree.getroot()

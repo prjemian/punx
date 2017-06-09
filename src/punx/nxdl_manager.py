@@ -57,7 +57,15 @@ class NXDL_Manager(object):
             definition.set_file(nxdl_file_name)             # defines definition.title
             self.classes[definition.title] = definition
             definition.parse()
-    
+
+            logger.debug(definition)
+            for j in "attributes groups fields links".split():
+                for _k, v in sorted(definition.__getattribute__(j).items()):
+                    logger.debug(v)
+            for v in sorted(definition.symbols):
+                logger.debug("symbol: " + v)
+            logger.debug("-"*50)
+
     def __str__(self, *args, **kwargs):
         s = "NXDL_Manager("
         count = {}
@@ -468,18 +476,21 @@ def main():
         manager = NXDL_Manager(cm.default_file_set)
         nxdl_dict = manager.classes
         
-        import pyRestTable
-        t = pyRestTable.Table()
-        t.labels = 'class category attributes fields groups links symbols'.split()
-        for v in nxdl_dict.values():
-            row = [v.title, v.category]
-            for k in 'attributes fields groups links symbols'.split():
-                n = len(v.__getattribute__(k))
-                if n == 0:
-                    n = ""
-                row.append(n)
-            t.addRow(row)
-        print(t)
+        try:
+            import pyRestTable
+            t = pyRestTable.Table()
+            t.labels = 'class category attributes fields groups links symbols'.split()
+            for v in nxdl_dict.values():
+                row = [v.title, v.category]
+                for k in 'attributes fields groups links symbols'.split():
+                    n = len(v.__getattribute__(k))
+                    if n == 0:
+                        n = ""
+                    row.append(n)
+                t.addRow(row)
+            print(t)
+        except:
+            pass
 
         print(manager)
 

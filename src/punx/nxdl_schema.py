@@ -183,24 +183,9 @@ class NXDL_schema__attribute(NXDL_schema__Mixin):
         self.required = xml_node.attrib.get('use', self.required) in ('required', True)
         self.default_value = xml_node.attrib.get('default', self.default_value)
 
-        for node in xml_node:
-            if isinstance(node, lxml.etree._Comment):
-                continue
-
-            elif node.tag.endswith('}annotation'):
-                pass
-
-            elif node.tag.endswith('}simpleType'):
-                nodelist = node.xpath('xs:restriction/xs:pattern', namespaces=ns)
-                if len(nodelist) == 1:
-                    self.patterns.append(nodelist[0].attrib['value'])
-
-            else:
-                msg = node.getparent().attrib['name']
-                msg += ' (line %d)' % node.sourceline
-                msg += ': unexpected xs:attribute child node: '
-                msg += node.tag
-                raise ValueError(msg)
+        nodelist = xml_node.xpath('xs:simpleType/xs:restriction/xs:pattern', namespaces=ns)
+        if len(nodelist) == 1:
+            self.patterns.append(nodelist[0].attrib['value'])
 
 
 class NXDL_schema__attributeGroup(NXDL_schema__Mixin):
@@ -221,15 +206,14 @@ class NXDL_schema__attributeGroup(NXDL_schema__Mixin):
         xml_node is xs:attributeGroup
         '''
         assert(xml_node.tag.endswith('}attributeGroup'))
-        self.name = xml_node.attrib.get('name', self.name)
-        for node in xml_node:
-            if isinstance(node, lxml.etree._Comment):
-                continue
+        ns = get_xml_namespace_dictionary()
 
-            elif node.tag.endswith('}attribute'):
-                obj = NXDL_schema__attribute()
-                obj.parse(node)
-                self.children.append(obj)
+        self.name = xml_node.attrib.get('name', self.name)
+
+        for node in xml_node.xpath('xs:attribute', namespaces=ns):
+            obj = NXDL_schema__attribute()
+            obj.parse(node)
+            self.children.append(obj)
 
 
 class NXDL_schema_complexType(NXDL_schema__Mixin):
@@ -248,6 +232,8 @@ class NXDL_schema_complexType(NXDL_schema__Mixin):
         read the element node content from the XML Schema
         '''
         assert(xml_node.tag.endswith('}complexType'))
+        ns = get_xml_namespace_dictionary()
+
         self.name = xml_node.attrib.get('name', self.name)
 
         handlers = dict(
@@ -258,17 +244,12 @@ class NXDL_schema_complexType(NXDL_schema__Mixin):
             attributeGroup = self._parse_attributeGroup,
             )
 
-        tags_ignored = ['annotation',]
-        for node in xml_node:
-            if isinstance(node, lxml.etree._Comment):
-                continue
-            
-            tag = node.tag.split('}')[-1]
-            if tag in handlers.keys():
+        element_list = '''sequence complexContent 
+                          group attribute attributeGroup'''.split()
+        for element_type in element_list:
+            for node in xml_node.xpath('xs:'+element_type, namespaces=ns):
+                tag = node.tag.split('}')[-1]
                 handlers[tag](node, catalog)
-            
-            elif tag not in tags_ignored:
-                print('!\t', xml_node.attrib['name'], tag, node.sourceline)
     
     def _parse_attribute(self, xml_node, catalog):
         '''
@@ -309,20 +290,18 @@ class NXDL_schema_complexType(NXDL_schema__Mixin):
         parse a xs:extension node
         '''
         assert(xml_node.tag.endswith('}extension'))
+        ns = get_xml_namespace_dictionary()
+
         base = xml_node.attrib.get('base', None)
         if base is not None:
             base = base.split(':')[-1]
             obj = catalog['schema'][base]
             self.children += obj.children
-        for node in xml_node:
-            if isinstance(node, lxml.etree._Comment):
-                continue
-
-            elif node.tag.endswith('}sequence'):
-                self._parse_sequence(node, catalog)
-
-            elif node.tag.endswith('}attribute'):
-                self._parse_attribute(node, catalog)
+        
+        for node in xml_node.xpath('xs:sequence', namespaces=ns):
+            self._parse_sequence(node, catalog)
+        for node in xml_node.xpath('xs:attribute', namespaces=ns):
+            self._parse_attribute(node, catalog)
     
     def _parse_group(self, xml_node, catalog):
         '''
@@ -338,18 +317,14 @@ class NXDL_schema_complexType(NXDL_schema__Mixin):
         parse a xs:sequence node
         '''
         assert(xml_node.tag.endswith('}sequence'))
-        for node in xml_node:
-            if isinstance(node, lxml.etree._Comment):
-                continue
+        ns = get_xml_namespace_dictionary()
 
-            elif node.tag.endswith('}element'):
-                self._parse_element(node, catalog)
-
-            elif node.tag.endswith('}group'):
-                self._parse_group(node, catalog)
-
-            elif node.tag.endswith('}any'):
-                pass
+        for node in xml_node.xpath('xs:element', namespaces=ns):
+            self._parse_element(node, catalog)
+        for node in xml_node.xpath('xs:group', namespaces=ns):
+            self._parse_group(node, catalog)
+        # for node in xml_node.xpath('xs:any', namespaces=ns):
+        #     pass        # and do what?
 
 
 class NXDL_schema__element(NXDL_schema__Mixin):
@@ -369,6 +344,8 @@ class NXDL_schema__element(NXDL_schema__Mixin):
         read the element node content from the XML Schema
         '''
         assert(xml_node.tag.endswith('}element'))
+        ns = get_xml_namespace_dictionary()
+
         self.name = xml_node.attrib.get('name', self.name)
         self.type = xml_node.attrib.get('type', self.type)
         if self.type is not None:
@@ -376,23 +353,16 @@ class NXDL_schema__element(NXDL_schema__Mixin):
         self.minOccurs = xml_node.attrib.get('minOccurs', self.minOccurs)
         self.maxOccurs = xml_node.attrib.get('maxOccurs', self.maxOccurs)
 
-        ns = get_xml_namespace_dictionary()
         nodes = xml_node.xpath('xs:complexType', namespaces=ns)
         if len(nodes) == 1:
-            for node in nodes[0]:
-                if isinstance(node, lxml.etree._Comment):
-                    continue
-     
-                elif node.tag.endswith('}sequence'):
-                    for subnode in node.xpath('xs:element', namespaces=ns):
-                        obj = NXDL_schema__element()
-                        obj.parse(subnode)
-                        self.children.append(obj)
-     
-                elif node.tag.endswith('}attribute'):
-                    obj = NXDL_schema__attribute()
-                    obj.parse(node)
-                    self.children.append(obj)
+            for node in nodes[0].xpath('xs:sequence/xs:element', namespaces=ns):
+                obj = NXDL_schema__element()
+                obj.parse(node)
+                self.children.append(obj)
+            for node in nodes[0].xpath('xs:attribute', namespaces=ns):
+                obj = NXDL_schema__attribute()
+                obj.parse(node)
+                self.children.append(obj)
 
 
 class NXDL_schema__group(NXDL_schema__Mixin):
@@ -414,23 +384,19 @@ class NXDL_schema__group(NXDL_schema__Mixin):
         read the element node content from the XML Schema
         '''
         assert(xml_node.tag.endswith('}group'))
+        ns = get_xml_namespace_dictionary()
+
         self.name = xml_node.attrib.get('name', self.name)
         self.ref = xml_node.attrib.get('ref', self.ref)
         if self.ref is not None:
             self.ref = self.ref.split(':')[-1]
         self.minOccurs = xml_node.attrib.get('minOccurs', self.minOccurs)
         self.maxOccurs = xml_node.attrib.get('maxOccurs', self.maxOccurs)
-        
-        ns = get_xml_namespace_dictionary()
-        for node in xml_node:
-            if isinstance(node, lxml.etree._Comment):
-                continue
 
-            elif node.tag.endswith('}sequence'):
-                for subnode in node.xpath('xs:element', namespaces=ns):
-                    obj = NXDL_schema__element()
-                    obj.parse(subnode)
-                    self.children.append(obj)
+        for node in xml_node.xpath('xs:sequence/xs:element', namespaces=ns):
+            obj = NXDL_schema__element()
+            obj.parse(node)
+            self.children.append(obj)
 
 
 class NXDL_schema_named_simpleType(NXDL_schema__Mixin):
@@ -454,36 +420,24 @@ class NXDL_schema_named_simpleType(NXDL_schema__Mixin):
         '''
         assert(xml_node.tag.endswith('}simpleType'))
         ns = get_xml_namespace_dictionary()
+
         self.name = xml_node.attrib.get('name', self.name)
-        
-        for node in xml_node:
-            if isinstance(node, lxml.etree._Comment):
-                continue
 
-            elif node.tag.endswith('}annotation'):
-                pass
-
-            elif node.tag.endswith('}restriction'):
-                self.base = node.attrib.get('base', self.base)
-                if self.base is not None:
-                    self.base = self.base.split(':')[-1]
-                for subnode in node.xpath('xs:pattern', namespaces=ns):
-                    self.patterns.append(subnode.attrib['value'])
-                for subnode in node.xpath('xs:maxLength', namespaces=ns):
-                    self.maxLength = int(subnode.attrib['value'])
-
-            elif node.tag.endswith('}union'):
-                # TODO: nonNegativeUnbounded
-                # either xs:nonNegativeInteger or xs:string = "unbounded"
-                # How to represent this?
-                pass
-
-            else:
-                msg = node.getparent().attrib['name']
-                msg += ' (line %d)' % node.sourceline
-                msg += ': unexpected xs:attribute child node: '
-                msg += node.tag
-                raise ValueError(msg)
+        for node in xml_node.xpath('xs:annotation', namespaces=ns):
+            pass
+        for node in xml_node.xpath('xs:union', namespaces=ns):
+            # TODO: nonNegativeUnbounded
+            # either xs:nonNegativeInteger or xs:string = "unbounded"
+            # How to represent this?
+            pass
+        for node in xml_node.xpath('xs:restriction', namespaces=ns):
+            self.base = node.attrib.get('base', self.base)
+            if self.base is not None:
+                self.base = self.base.split(':')[-1]
+            for subnode in node.xpath('xs:pattern', namespaces=ns):
+                self.patterns.append(subnode.attrib['value'])
+            for subnode in node.xpath('xs:maxLength', namespaces=ns):
+                self.maxLength = int(subnode.attrib['value'])
 
 
 class NXDL_item_catalog(object):

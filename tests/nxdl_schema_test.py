@@ -120,7 +120,7 @@ class Test_Catalog(unittest.TestCase):
         self.assertTrue(isinstance(summary, punx.nxdl_schema.NXDL_Summary))
         s2 = punx.nxdl_schema.NXDL_Summary(punx.nxdl_schema.NXDL_TEST_FILE)
         self.assertTrue(isinstance(s2, punx.nxdl_schema.NXDL_Summary))
-        self.assertEqual(summary, s2, 'singleton is working')
+        self.assertNotEqual(summary, s2, 'no longer using singleton')
         # TODO: could do more extensive testing here
 
 

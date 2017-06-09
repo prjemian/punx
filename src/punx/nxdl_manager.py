@@ -485,6 +485,7 @@ class NXDL__symbols(NXDL__Mixin):
 def main():
     from punx import cache_manager
     cm = cache_manager.CacheManager()
+    cm.select_NXDL_file_set("master")
     if cm is not None and cm.default_file_set is not None:
         manager = NXDL_Manager(cm.default_file_set)
         nxdl_dict = manager.classes

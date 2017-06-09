@@ -194,7 +194,7 @@ class SchemaManager(object):
                     db[obj.name] = obj
 
         # re-arrange
-        units = list(db['anyUnitsAttr'].values)
+        units = list(db['anyUnitsAttr'].values or [])
         del db['anyUnitsAttr']
         del db['primitiveType']
         

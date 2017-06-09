@@ -191,7 +191,10 @@ class NXDL__Mixin(object):
             obj = NXDL__link(self.nxdl_definition, nxdl_defaults=nxdl_defaults)
             obj.parse(node)
             if obj is None:
-                raise ValueError("link with no content!")   # TODO: improve message
+                msg = "link with no content!"
+                msg += " line: %d" % node.sourceline
+                msg += " file: %s" % node.base
+                raise ValueError(msg)
             self.ensure_unique_name(obj)
             self.links[obj.name] = obj
 
@@ -214,13 +217,6 @@ class NXDL__Mixin(object):
             while base_name+str(index) in name_list:
                 index += 1
             obj.name = base_name+str(index)
-
-    # def isValidItemName(self, item):
-    #     ns = nxdl_schema.get_xml_namespace_dictionary()
-    #     manager = self.nxdl_definition.nxdl_manager
-    #     nxdl_defaults = manager.nxdl_defaults
-    # 
-    #     return True
 
 
 class NXDL__definition(NXDL__Mixin):
@@ -262,31 +258,11 @@ class NXDL__definition(NXDL__Mixin):
 
     def _init_defaults(self):
         # definition is special: it has structure of a group AND a symbols table
-        # make sure we get that BEFORE proceeding
-        
-        nxdl_defaults = self.nxdl_manager.nxdl_defaults
 
         self.minOccurs = 0
         self.maxOccurs = 1
 
-        if False:
-            for k, v in sorted(nxdl_defaults.definition.__dict__.items()):
-                self.__setattr__(k, v)
-            del self.children
-    
-            # parse this content into classes in _this_ module
-            for k, v in sorted(self.attributes.items()):
-                attribute = NXDL__attribute(
-                    self.nxdl_definition, 
-                    nxdl_defaults=nxdl_defaults)
-    
-                for item in 'name type required'.split():
-                    if hasattr(v, item):
-                        attribute.__setattr__(item, v.__getattribute__(item)) 
-                        # TODO: should override default
-                self.attributes[k] = attribute
-
-        # remove the recusrion part
+        # remove the recursion part
         if "(group)" in self.groups:
             del self.groups["(group)"]
 
@@ -336,7 +312,7 @@ class NXDL__attribute(NXDL__Mixin):
         self.enumerations = []
 
         if hasattr(self, 'groups'):
-            del self.groups     # TODO: any problems with this?
+            del self.groups
         if hasattr(self, 'minOccurs'):
             del self.minOccurs
         if hasattr(self, 'maxOccurs'):
@@ -385,17 +361,7 @@ class NXDL__field(NXDL__Mixin):
         """
         self.name = xml_node.attrib['name']
 
-        if self.nxdl_definition.category in ('applications', ):
-            # TODO: adjust minOccurs defaults for application definitions
-            # contributed definition are intended for either base class or application definition
-            # How to handle contributed definitions?
-            #  Suggest they need some indicator in the NXDL file.
-            #  For now, treat them like a base class.
-            # defer this to the parser for each component
-            pass
-
         self.parse_attributes(xml_node)
-        pass # TODO:
 
 
 class NXDL__group(NXDL__Mixin):
@@ -423,15 +389,6 @@ class NXDL__group(NXDL__Mixin):
         parse the XML content
         """
         self.name = xml_node.attrib.get('name', xml_node.attrib['type'][2:])
-
-        if self.nxdl_definition.category in ('applications', ):
-            # TODO: adjust minOccurs defaults for application definitions
-            # contributed definition are intended for either base class or application definition
-            # How to handle contributed definitions?
-            #  Suggest they need some indicator in the NXDL file.
-            #  For now, treat them like a base class.
-            # defer this to the parser for each component
-            pass
 
         self.parse_attributes(xml_node)
         self.parse_groups(xml_node)
@@ -481,12 +438,12 @@ class NXDL__symbols(NXDL__Mixin):
       </symbols>
     
     '''
-    
+
     def __init__(self, nxdl_definition, nxdl_defaults=None, *args, **kwds):
         NXDL__Mixin.__init__(self, nxdl_definition)
 
         self.symbols = []
-    
+
     def parse(self, symbols_node):
         """
         parse the XML content
@@ -494,7 +451,7 @@ class NXDL__symbols(NXDL__Mixin):
         for node in symbols_node:
             if isinstance(node, lxml.etree._Comment):
                 continue
-    
+
             element_type = node.tag.split('}')[-1]
             if element_type == "symbol":
                 nm = node.attrib.get('name')

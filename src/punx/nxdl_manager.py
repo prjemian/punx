@@ -186,7 +186,6 @@ class NXDL__Mixin(object):
         nxdl_defaults = manager.nxdl_defaults
 
         for node in xml_node.xpath('nx:symbols', namespaces=ns):
-            # obj = self.get_default_elemet(nxdl_defaults, "symbols", node)
             obj = NXDL__symbols(self.nxdl_definition, nxdl_defaults=nxdl_defaults)
             obj.parse(node)
             if len(obj.symbols) > 0:

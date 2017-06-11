@@ -59,7 +59,7 @@ class NXDL_Manager(object):
             definition = NXDL__definition(nxdl_manager=self)     # the default
             definition.set_file(nxdl_file_name)             # defines definition.title
             self.classes[definition.title] = definition
-            definition.parse()
+            definition.parse_nxdl_xml()
 
             logger.debug(definition)
             for j in "attributes groups fields links".split():
@@ -132,19 +132,22 @@ def validate_xml_tree(xml_tree):
 
 
 class NXDL__Mixin(object):
-    
-    name = None
-    nxdl_definition = None
+    """
+    base class for each NXDL structure
+    """
     
     def __init__(self, nxdl_definition, *args, **kwds):
+        self.name = None
         self.nxdl_definition = nxdl_definition
+        self.nxdl_attributes = {}
+        self.xml_attributes = {}
     
     def __str__(self, *args, **kwargs):
         return nxdl_schema.render_class_str(self)
     
-    def parse(self, *args, **kwargs):
+    def parse_nxdl_xml(self, *args, **kwargs):
         """parse the XML node and assemble NXDL structure"""
-        raise NotImplementedError('must override parse() in subclass')
+        raise NotImplementedError('must override parse_nxdl_xml() in subclass')
     
     def parse_attributes(self, xml_node):
         ns = nxdl_schema.get_xml_namespace_dictionary()
@@ -153,11 +156,11 @@ class NXDL__Mixin(object):
 
         for node in xml_node.xpath('nx:attribute', namespaces=ns):
             obj = NXDL__attribute(self.nxdl_definition, nxdl_defaults=nxdl_defaults)
-            obj.parse(node)
+            obj.parse_nxdl_xml(node)
 
             if self.nxdl_definition.category in ('applications', ):
                 # handle contributed definitions as base classes (for now, minOccurs = 0)
-                obj.optional.required = True    # This is UGLY!
+                obj.xml_attributes['optional'].default_value = True
 
             # Does a default already exist?
             if obj.name in self.attributes:
@@ -166,6 +169,7 @@ class NXDL__Mixin(object):
                 logger.error(msg)
                 raise KeyError(msg)
             self.attributes[obj.name] = obj
+            self.nxdl_attributes[obj.name] = obj
     
     def parse_fields(self, xml_node):
         ns = nxdl_schema.get_xml_namespace_dictionary()
@@ -174,11 +178,11 @@ class NXDL__Mixin(object):
 
         for node in xml_node.xpath('nx:field', namespaces=ns):
             obj = NXDL__field(self.nxdl_definition, nxdl_defaults=nxdl_defaults)
-            obj.parse(node)
+            obj.parse_nxdl_xml(node)
 
             if self.nxdl_definition.category in ('applications', ):
                 # handle contributed definitions as base classes (for now, minOccurs = 0)
-                obj.minOccurs.default_value = 1
+                obj.xml_attributes['minOccurs'].default_value = 1
 
             self.ensure_unique_name(obj)
             self.fields[obj.name] = obj
@@ -190,11 +194,11 @@ class NXDL__Mixin(object):
 
         for node in xml_node.xpath('nx:group', namespaces=ns):
             obj = NXDL__group(self.nxdl_definition, nxdl_defaults=nxdl_defaults)
-            obj.parse(node)
+            obj.parse_nxdl_xml(node)
 
             if self.nxdl_definition.category in ('applications', ):
                 # handle contributed definitions as base classes (for now, minOccurs = 0)
-                obj.minOccurs.default_value = 1
+                obj.xml_attributes['minOccurs'].default_value = 1
 
             self.ensure_unique_name(obj)
             self.groups[obj.name] = obj
@@ -206,7 +210,7 @@ class NXDL__Mixin(object):
 
         for node in xml_node.xpath('nx:link', namespaces=ns):
             obj = NXDL__link(self.nxdl_definition, nxdl_defaults=nxdl_defaults)
-            obj.parse(node)
+            obj.parse_nxdl_xml(node)
             if obj is None:
                 msg = "link with no content!"
                 msg += " line: %d" % node.sourceline
@@ -223,7 +227,7 @@ class NXDL__Mixin(object):
 
         for node in xml_node.xpath('nx:symbols', namespaces=ns):
             obj = NXDL__symbols(self.nxdl_definition, nxdl_defaults=nxdl_defaults)
-            obj.parse(node)
+            obj.parse_nxdl_xml(node)
             if len(obj.symbols) > 0:
                 self.symbols += obj.symbols
     
@@ -258,6 +262,8 @@ class NXDL__definition(NXDL__Mixin):
         self.file_name = None
 
         self.attributes = {}
+        self.nxdl_attributes = {}
+        self.xml_attributes = {}
         self.fields = {}
         self.groups = {}
         self.links = {}
@@ -295,7 +301,7 @@ class NXDL__definition(NXDL__Mixin):
         self.title = os.path.split(fname)[-1].split('.')[0]
         self.category = os.path.split(os.path.dirname(fname))[-1]
 
-    def parse(self):
+    def parse_nxdl_xml(self):
         """
         parse the XML content
         """
@@ -345,9 +351,10 @@ class NXDL__attribute(NXDL__Mixin):
     
     def _init_defaults_from_schema(self, nxdl_defaults):
         for k, v in sorted(nxdl_defaults.attribute.attributes.items()):
-            self.__setattr__(k, v)
+            #self.__setattr__(k, v)
+            self.xml_attributes[k] = v
 
-    def parse(self, xml_node):
+    def parse_nxdl_xml(self, xml_node):
         """
         parse the XML content
         """
@@ -376,9 +383,10 @@ class NXDL__field(NXDL__Mixin):
     
     def _init_defaults_from_schema(self, nxdl_defaults):
         for k, v in sorted(nxdl_defaults.field.attributes.items()):
-            self.__setattr__(k, v)
+            #self.__setattr__(k, v)
+            self.xml_attributes[k] = v
     
-    def parse(self, xml_node):
+    def parse_nxdl_xml(self, xml_node):
         """
         parse the XML content
         """
@@ -404,10 +412,11 @@ class NXDL__group(NXDL__Mixin):
     
     def _init_defaults_from_schema(self, nxdl_defaults):
         for k, v in sorted(nxdl_defaults.field.attributes.items()):
-            self.__setattr__(k, v)
+            #self.__setattr__(k, v)
+            self.xml_attributes[k] = v
         pass
     
-    def parse(self, xml_node):
+    def parse_nxdl_xml(self, xml_node):
         """
         parse the XML content
         """
@@ -440,7 +449,7 @@ class NXDL__link(NXDL__Mixin):
         self.name = None
         self.target = None
     
-    def parse(self, xml_node):
+    def parse_nxdl_xml(self, xml_node):
         """
         parse the XML content
         """
@@ -467,7 +476,7 @@ class NXDL__symbols(NXDL__Mixin):
 
         self.symbols = []
 
-    def parse(self, symbols_node):
+    def parse_nxdl_xml(self, symbols_node):
         """
         parse the XML content
         """

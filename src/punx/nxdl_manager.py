@@ -263,7 +263,7 @@ class NXDL__definition(NXDL__Mixin):
         self.links = {}
         self.symbols = []
     
-        self._init_defaults()
+        self._init_defaults_from_schema()
     
     def __str__(self, *args, **kwargs):
         s = self.title + "("
@@ -276,7 +276,7 @@ class NXDL__definition(NXDL__Mixin):
         s += ")"
         return s
 
-    def _init_defaults(self):
+    def _init_defaults_from_schema(self):
         # definition is special: it has structure of a group AND a symbols table
 
         self.minOccurs = 0
@@ -341,9 +341,9 @@ class NXDL__attribute(NXDL__Mixin):
         if hasattr(self, 'maxOccurs'):
             del self.maxOccurs
         
-        self.init_defaults(nxdl_defaults)
+        self._init_defaults_from_schema(nxdl_defaults)
     
-    def init_defaults(self, nxdl_defaults):
+    def _init_defaults_from_schema(self, nxdl_defaults):
         for k, v in sorted(nxdl_defaults.attribute.attributes.items()):
             self.__setattr__(k, v)
 
@@ -372,9 +372,9 @@ class NXDL__field(NXDL__Mixin):
 
         self.attributes = {}
         
-        self.init_defaults(nxdl_defaults)
+        self._init_defaults_from_schema(nxdl_defaults)
     
-    def init_defaults(self, nxdl_defaults):
+    def _init_defaults_from_schema(self, nxdl_defaults):
         for k, v in sorted(nxdl_defaults.field.attributes.items()):
             self.__setattr__(k, v)
     
@@ -400,9 +400,9 @@ class NXDL__group(NXDL__Mixin):
         self.groups = {}
         self.links = {}
         
-        self.init_defaults(nxdl_defaults)
+        self._init_defaults_from_schema(nxdl_defaults)
     
-    def init_defaults(self, nxdl_defaults):
+    def _init_defaults_from_schema(self, nxdl_defaults):
         for k, v in sorted(nxdl_defaults.field.attributes.items()):
             self.__setattr__(k, v)
         pass

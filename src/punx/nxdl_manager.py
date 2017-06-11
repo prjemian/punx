@@ -139,7 +139,6 @@ class NXDL__Mixin(object):
     def __init__(self, nxdl_definition, *args, **kwds):
         self.name = None
         self.nxdl_definition = nxdl_definition
-        self.nxdl_attributes = {}
         self.xml_attributes = {}
     
     def __str__(self, *args, **kwargs):
@@ -173,7 +172,6 @@ class NXDL__Mixin(object):
                 logger.error(msg)
                 raise KeyError(msg)
             self.attributes[obj.name] = obj
-            self.nxdl_attributes[obj.name] = obj
     
     def parse_fields(self, xml_node):
         ns = nxdl_schema.get_xml_namespace_dictionary()
@@ -266,7 +264,6 @@ class NXDL__definition(NXDL__Mixin):
         self.file_name = None
 
         self.attributes = {}
-        self.nxdl_attributes = {}
         self.xml_attributes = {}
         self.fields = {}
         self.groups = {}
@@ -383,6 +380,8 @@ class NXDL__field(NXDL__Mixin):
         NXDL__Mixin.__init__(self, nxdl_definition)
 
         self.attributes = {}
+        self.dimensions = {}
+        self.enumerations = []
         
         self._init_defaults_from_schema(nxdl_defaults)
     
@@ -396,6 +395,19 @@ class NXDL__field(NXDL__Mixin):
         self.name = xml_node.attrib['name']
 
         self.parse_attributes(xml_node)
+        
+        ns = nxdl_schema.get_xml_namespace_dictionary()
+
+        dims_nodes = xml_node.xpath('nx:dimensions', namespaces=ns)
+        if len(dims_nodes) == 1:
+            self.dimensions["rank"] = dims_nodes[0].attrib.get("rank")
+            for node in dims_nodes[0].xpath('nx:dim', namespaces=ns):
+                k = node.attrib.get("index")
+                v = node.attrib.get("value")
+                self.dimensions["index " + k] = v
+
+        for node in xml_node.xpath('nx:enumeration/nx:item', namespaces=ns):
+            self.enumerations.append(node.attrib.get("value"))
 
 
 class NXDL__group(NXDL__Mixin):
@@ -498,16 +510,28 @@ def main():
     cm.select_NXDL_file_set("master")
     if cm is not None and cm.default_file_set is not None:
         manager = NXDL_Manager(cm.default_file_set)
-        nxdl_dict = manager.classes
+        counts_keys = 'attributes fields groups links symbols'.split()
         
         try:
+            def count_group(g, counts):
+                for k in counts_keys:
+                    if hasattr(g, k):
+                        n = len(g.__getattribute__(k))
+                        if n > 0:
+                            counts[k] += n
+                for group in g.groups.values():
+                    counts = count_group(group, counts)
+                return counts
+
             import pyRestTable
             t = pyRestTable.Table()
             t.labels = 'class category attributes fields groups links symbols'.split()
-            for v in nxdl_dict.values():
+            for v in manager.classes.values():
                 row = [v.title, v.category]
-                for k in 'attributes fields groups links symbols'.split():
-                    n = len(v.__getattribute__(k))
+                counts = {k: 0 for k in counts_keys}
+                counts = count_group(v, counts)
+                for k in counts_keys:
+                    n = counts[k]
                     if n == 0:
                         n = ""
                     row.append(n)

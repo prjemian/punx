@@ -148,6 +148,10 @@ class NXDL__Mixin(object):
     def parse_nxdl_xml(self, *args, **kwargs):
         """parse the XML node and assemble NXDL structure"""
         raise NotImplementedError('must override parse_nxdl_xml() in subclass')
+
+    def parse_xml_attributes(self, defaults):
+        for k, v in sorted(defaults.attributes.items()):
+            self.xml_attributes[k] = v
     
     def parse_attributes(self, xml_node):
         ns = nxdl_schema.get_xml_namespace_dictionary()
@@ -269,7 +273,8 @@ class NXDL__definition(NXDL__Mixin):
         self.links = {}
         self.symbols = []
     
-        self._init_defaults_from_schema()
+        nxdl_defaults = nxdl_manager.get_nxdl_defaults()
+        self._init_defaults_from_schema(nxdl_defaults)
     
     def __str__(self, *args, **kwargs):
         s = self.title + "("
@@ -282,11 +287,13 @@ class NXDL__definition(NXDL__Mixin):
         s += ")"
         return s
 
-    def _init_defaults_from_schema(self):
+    def _init_defaults_from_schema(self, nxdl_defaults):
         # definition is special: it has structure of a group AND a symbols table
 
         self.minOccurs = 0
         self.maxOccurs = 1
+
+        self.parse_xml_attributes(nxdl_defaults.definition)
 
         # remove the recursion part
         if "(group)" in self.groups:
@@ -350,9 +357,7 @@ class NXDL__attribute(NXDL__Mixin):
         self._init_defaults_from_schema(nxdl_defaults)
     
     def _init_defaults_from_schema(self, nxdl_defaults):
-        for k, v in sorted(nxdl_defaults.attribute.attributes.items()):
-            #self.__setattr__(k, v)
-            self.xml_attributes[k] = v
+        self.parse_xml_attributes(nxdl_defaults.attribute)
 
     def parse_nxdl_xml(self, xml_node):
         """
@@ -382,9 +387,7 @@ class NXDL__field(NXDL__Mixin):
         self._init_defaults_from_schema(nxdl_defaults)
     
     def _init_defaults_from_schema(self, nxdl_defaults):
-        for k, v in sorted(nxdl_defaults.field.attributes.items()):
-            #self.__setattr__(k, v)
-            self.xml_attributes[k] = v
+        self.parse_xml_attributes(nxdl_defaults.field)
     
     def parse_nxdl_xml(self, xml_node):
         """
@@ -411,9 +414,7 @@ class NXDL__group(NXDL__Mixin):
         self._init_defaults_from_schema(nxdl_defaults)
     
     def _init_defaults_from_schema(self, nxdl_defaults):
-        for k, v in sorted(nxdl_defaults.field.attributes.items()):
-            #self.__setattr__(k, v)
-            self.xml_attributes[k] = v
+        self.parse_xml_attributes(nxdl_defaults.group)
         pass
     
     def parse_nxdl_xml(self, xml_node):

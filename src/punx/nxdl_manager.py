@@ -163,7 +163,7 @@ class NXDL__Mixin(object):
 
             if self.nxdl_definition.category in ('applications', ):
                 # handle contributed definitions as base classes (for now, minOccurs = 0)
-                obj.xml_attributes['optional'].default_value = True
+                obj.xml_attributes['optional'].default_value = False
 
             # Does a default already exist?
             if obj.name in self.attributes:
@@ -243,6 +243,12 @@ class NXDL__Mixin(object):
             while base_name+str(index) in name_list:
                 index += 1
             obj.name = base_name+str(index)
+    
+    def assign_defaults(self):
+        """set default values for required components now"""
+        for k, v in sorted(self.xml_attributes.items()):
+            if v.required and not hasattr(self, k):
+                self.__setattr__(k, v.default_value)
 
 
 class NXDL__definition(NXDL__Mixin):
@@ -355,7 +361,7 @@ class NXDL__attribute(NXDL__Mixin):
     
     def _init_defaults_from_schema(self, nxdl_defaults):
         self.parse_xml_attributes(nxdl_defaults.attribute)
-        # TODO: set default values for required now
+        self.assign_defaults()
 
     def parse_nxdl_xml(self, xml_node):
         """
@@ -371,44 +377,25 @@ class NXDL__attribute(NXDL__Mixin):
                 if v is not None:
                     self.enumerations.append(v)
 
-
-class NXDL__field(NXDL__Mixin):
+class NXDL__dim(NXDL__Mixin):
     '''
-    contents of a *field* structure (XML element) in a NXDL XML file
+    contents of a *dim* structure (XML element) in a NXDL XML file
     '''
     
     def __init__(self, nxdl_definition, nxdl_defaults=None, *args, **kwds):
         NXDL__Mixin.__init__(self, nxdl_definition)
-
-        self.attributes = {}
-        self.dimensions = None
-        self.enumerations = []
-        
         self._init_defaults_from_schema(nxdl_defaults)
     
     def _init_defaults_from_schema(self, nxdl_defaults):
-        self.parse_xml_attributes(nxdl_defaults.field)
-    
+        self.parse_xml_attributes(nxdl_defaults.field.components["dimensions"].components["dim"])
+
     def parse_nxdl_xml(self, xml_node):
         """
         parse the XML content
         """
-        self.name = xml_node.attrib['name']
-
-        self.parse_attributes(xml_node)
-        
-        ns = nxdl_schema.get_xml_namespace_dictionary()
-        nxdl_defaults = self.nxdl_definition.nxdl_manager.nxdl_defaults
-
-        dims_nodes = xml_node.xpath('nx:dimensions', namespaces=ns)
-        if len(dims_nodes) == 1:
-            self.dimensions =  NXDL__dimensions(
-                self.nxdl_definition, 
-                nxdl_defaults=nxdl_defaults)
-            self.dimensions.parse_nxdl_xml(dims_nodes[0])
-
-        for node in xml_node.xpath('nx:enumeration/nx:item', namespaces=ns):
-            self.enumerations.append(node.attrib.get("value"))
+        for k in "index value ref refindex incr".split():
+            self.__setattr__(k, xml_node.attrib.get(k))
+        self.name = self.index
 
 
 class NXDL__dimensions(NXDL__Mixin):
@@ -439,26 +426,46 @@ class NXDL__dimensions(NXDL__Mixin):
             obj.parse_nxdl_xml(node)
             self.dims[obj.name] = obj
 
-class NXDL__dim(NXDL__Mixin):
+
+
+class NXDL__field(NXDL__Mixin):
     '''
-    contents of a *dim* structure (XML element) in a NXDL XML file
+    contents of a *field* structure (XML element) in a NXDL XML file
     '''
     
     def __init__(self, nxdl_definition, nxdl_defaults=None, *args, **kwds):
         NXDL__Mixin.__init__(self, nxdl_definition)
+
+        self.attributes = {}
+        self.dimensions = None
+        self.enumerations = []
+        
         self._init_defaults_from_schema(nxdl_defaults)
     
     def _init_defaults_from_schema(self, nxdl_defaults):
-        self.parse_xml_attributes(nxdl_defaults.field.components["dimensions"].components["dim"])
-
+        self.parse_xml_attributes(nxdl_defaults.field)
+        self.assign_defaults()
+    
     def parse_nxdl_xml(self, xml_node):
         """
         parse the XML content
         """
-        for k in "index value ref refindex incr".split():
-            self.__setattr__(k, xml_node.attrib.get(k))
-        self.name = self.index
+        self.name = xml_node.attrib['name']
 
+        self.parse_attributes(xml_node)
+        
+        ns = nxdl_schema.get_xml_namespace_dictionary()
+        nxdl_defaults = self.nxdl_definition.nxdl_manager.nxdl_defaults
+
+        dims_nodes = xml_node.xpath('nx:dimensions', namespaces=ns)
+        if len(dims_nodes) == 1:
+            self.dimensions =  NXDL__dimensions(
+                self.nxdl_definition, 
+                nxdl_defaults=nxdl_defaults)
+            self.dimensions.parse_nxdl_xml(dims_nodes[0])
+
+        for node in xml_node.xpath('nx:enumeration/nx:item', namespaces=ns):
+            self.enumerations.append(node.attrib.get("value"))
 
 class NXDL__group(NXDL__Mixin):
     '''
@@ -477,7 +484,7 @@ class NXDL__group(NXDL__Mixin):
     
     def _init_defaults_from_schema(self, nxdl_defaults):
         self.parse_xml_attributes(nxdl_defaults.group)
-        pass
+        self.assign_defaults()
     
     def parse_nxdl_xml(self, xml_node):
         """

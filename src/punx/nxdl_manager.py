@@ -132,12 +132,15 @@ def validate_xml_tree(xml_tree):
 
 
 class NXDL__Mixin(object):
-    
-    name = None
-    nxdl_definition = None
+    """
+    base class for each NXDL structure
+    """
     
     def __init__(self, nxdl_definition, *args, **kwds):
+        self.name = None
         self.nxdl_definition = nxdl_definition
+        self.nxdl_attributes = {}
+        self.xml_attributes = {}
     
     def __str__(self, *args, **kwargs):
         return nxdl_schema.render_class_str(self)
@@ -157,7 +160,7 @@ class NXDL__Mixin(object):
 
             if self.nxdl_definition.category in ('applications', ):
                 # handle contributed definitions as base classes (for now, minOccurs = 0)
-                obj.optional.required = True    # This is UGLY!
+                obj.xml_attributes['optional'].default_value = True
 
             # Does a default already exist?
             if obj.name in self.attributes:
@@ -166,6 +169,7 @@ class NXDL__Mixin(object):
                 logger.error(msg)
                 raise KeyError(msg)
             self.attributes[obj.name] = obj
+            self.nxdl_attributes[obj.name] = obj
     
     def parse_fields(self, xml_node):
         ns = nxdl_schema.get_xml_namespace_dictionary()
@@ -178,7 +182,7 @@ class NXDL__Mixin(object):
 
             if self.nxdl_definition.category in ('applications', ):
                 # handle contributed definitions as base classes (for now, minOccurs = 0)
-                obj.minOccurs.default_value = 1
+                obj.xml_attributes['minOccurs'].default_value = 1
 
             self.ensure_unique_name(obj)
             self.fields[obj.name] = obj
@@ -194,7 +198,7 @@ class NXDL__Mixin(object):
 
             if self.nxdl_definition.category in ('applications', ):
                 # handle contributed definitions as base classes (for now, minOccurs = 0)
-                obj.minOccurs.default_value = 1
+                obj.xml_attributes['minOccurs'].default_value = 1
 
             self.ensure_unique_name(obj)
             self.groups[obj.name] = obj
@@ -258,6 +262,8 @@ class NXDL__definition(NXDL__Mixin):
         self.file_name = None
 
         self.attributes = {}
+        self.nxdl_attributes = {}
+        self.xml_attributes = {}
         self.fields = {}
         self.groups = {}
         self.links = {}
@@ -345,7 +351,8 @@ class NXDL__attribute(NXDL__Mixin):
     
     def init_defaults(self, nxdl_defaults):
         for k, v in sorted(nxdl_defaults.attribute.attributes.items()):
-            self.__setattr__(k, v)
+            #self.__setattr__(k, v)
+            self.xml_attributes[k] = v
 
     def parse_nxdl_xml(self, xml_node):
         """
@@ -376,7 +383,8 @@ class NXDL__field(NXDL__Mixin):
     
     def init_defaults(self, nxdl_defaults):
         for k, v in sorted(nxdl_defaults.field.attributes.items()):
-            self.__setattr__(k, v)
+            #self.__setattr__(k, v)
+            self.xml_attributes[k] = v
     
     def parse_nxdl_xml(self, xml_node):
         """
@@ -404,7 +412,8 @@ class NXDL__group(NXDL__Mixin):
     
     def init_defaults(self, nxdl_defaults):
         for k, v in sorted(nxdl_defaults.field.attributes.items()):
-            self.__setattr__(k, v)
+            #self.__setattr__(k, v)
+            self.xml_attributes[k] = v
         pass
     
     def parse_nxdl_xml(self, xml_node):

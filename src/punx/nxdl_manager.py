@@ -568,6 +568,7 @@ def main():
     if cm is not None and cm.default_file_set is not None:
         manager = NXDL_Manager(cm.default_file_set)
         counts_keys = 'attributes fields groups links symbols'.split()
+        total_counts = {k: 0 for k in counts_keys}
         
         try:
             def count_group(g, counts):
@@ -589,10 +590,20 @@ def main():
                 counts = count_group(v, counts)
                 for k in counts_keys:
                     n = counts[k]
+                    total_counts[k] += n
                     if n == 0:
                         n = ""
                     row.append(n)
                 t.addRow(row)
+            
+            t.addRow(["TOTAL", "-"*4] + ["-"*4 for k in counts_keys])
+            row = [len(manager.classes), 3]
+            for k in counts_keys:
+                n = total_counts[k]
+                if n == 0:
+                    n = ""
+                row.append(n)
+            t.addRow(row)
             print(t)
         except:
             pass

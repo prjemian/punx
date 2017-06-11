@@ -525,7 +525,7 @@ def main():
 
             import pyRestTable
             t = pyRestTable.Table()
-            t.labels = 'class category attributes fields groups links symbols'.split()
+            t.labels = 'class category'.split() + counts_keys
             for v in manager.classes.values():
                 row = [v.title, v.category]
                 counts = {k: 0 for k in counts_keys}

@@ -1,9 +1,7 @@
 
 '''
-test punx tests/schema_manager module
+test punx tests/finding module
 '''
-
-# TODO: lots more tests could be constructed!
 
 import lxml.etree
 import os
@@ -12,7 +10,6 @@ import tempfile
 import unittest
 
 import github
-from blaze.expr.collections import isin
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src')))
 import punx, punx.finding

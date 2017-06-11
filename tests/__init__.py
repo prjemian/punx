@@ -27,7 +27,7 @@ def suite(*args, **kw):
     from tests import nxdl_schema_test
     #from tests import nxdlstructure_test
     from tests import schema_manager_test
-    #from tests import validate_test
+    from tests import validate_test
     #from tests import warnings_test
     
     test_suite = unittest.TestSuite()
@@ -45,7 +45,7 @@ def suite(*args, **kw):
         nxdl_schema_test,
         #nxdlstructure_test,
         schema_manager_test,
-        #validate_test,
+        validate_test,
         #warnings_test,
         ]
 

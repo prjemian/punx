@@ -1,6 +1,6 @@
 
 '''
-test punx tests/schema_manager module
+test punx tests/nxdl_manager module
 '''
 
 # TODO: lots more tests could be constructed!

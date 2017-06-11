@@ -216,7 +216,7 @@ def table_of_caches():
     """
     cm = CacheManager()
     t = pyRestTable.Table()
-    fs = cm.file_sets()
+    fs = cm.find_all_file_sets()
     t.labels = ['NXDL file set', 'type', 'cache', 'date & time', 'commit', 'path']
     for k, v in fs.items():
         # print(k, str(v))
@@ -236,7 +236,7 @@ class CacheManager(singletons.Singleton):
     
         ~install_NXDL_file_set
         ~select_NXDL_file_set
-        ~file_sets
+        ~find_all_file_sets
         ~cleanup
     
     '''
@@ -246,7 +246,7 @@ class CacheManager(singletons.Singleton):
         self.source = SourceCache()
         self.user = UserCache()
         
-        self.NXDL_file_sets = self.file_sets()
+        self.NXDL_file_sets = self.find_all_file_sets()
         msg = 'NXDL_file_sets names = ' 
         msg += str(sorted(list(self.NXDL_file_sets.keys())))
         logger.debug(msg)
@@ -263,13 +263,28 @@ class CacheManager(singletons.Singleton):
     # - - - - - - - - - - - - - -
     # public
     
-    def install_NXDL_file_set(self, grr, user_cache=True, ref=None):
+    def install_NXDL_file_set(self, grr, user_cache=True, ref=None, force=False):
+        """
+        using `ref` as a name, get the se of NXDL files from the NeXus GitHub
+        
+        :param obj grr: instance of :class:`GitHub_Repository_Reference`
+        :param bool user_cache: ``True``: use user cache,
+                                `` False``: use source cache (default)
+        :param str ref: name to use when requesting from GitHub,
+                        (`master`, commit hash such as `abc1234`,
+                        branch name, release name such as `v3.2`,
+                        or tag name)
+        :param bool force: update if installed is not the same SHA
+        """
         ref = ref or github_handler.DEFAULT_NXDL_SET
         cache_obj = {True: self.user, False: self.source}[user_cache]
-        if ref not in cache_obj.file_sets():
+        fs = cache_obj.find_all_file_sets()
+        if force or ref not in fs:
             if grr.request_info(ref) is not None:
-                m = extract_from_download(grr, cache_obj.path())
-                return m
+                force = ref in fs and grr.sha != fs[ref].sha
+                if force:
+                    m = extract_from_download(grr, cache_obj.path())
+                    return m
     
     def select_NXDL_file_set(self, ref=None):
         '''
@@ -293,16 +308,16 @@ class CacheManager(singletons.Singleton):
     # - - - - - - - - - - - - - -
     # private
     
-    def file_sets(self):
+    def find_all_file_sets(self):
         '''
         index all NXDL file sets in both source and user caches, return a dictionary
         '''
-        fs = {k: v for k, v in self.source.file_sets().items()}
+        fs = {k: v for k, v in self.source.find_all_file_sets().items()}
         msg = 'DEBUG - source file set names: ' 
         msg += str(sorted(list(fs.keys())))
         logger.debug(msg)
 
-        for k, v in self.user.file_sets().items():
+        for k, v in self.user.find_all_file_sets().items():
             if k in fs:
                 raise ValueError('user cache file set already known: ' + k)
             else:
@@ -328,7 +343,7 @@ class Base_Cache(object):
     
     .. autosummary::
        
-       ~file_sets
+       ~find_all_file_sets
        ~fileName
        ~path
        ~cleanup
@@ -351,7 +366,7 @@ class Base_Cache(object):
         fn = str(self.qsettings.fileName())
         return fn
     
-    def file_sets(self):
+    def find_all_file_sets(self):
         '''
         index all NXDL file sets in this cache
         '''

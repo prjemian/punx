@@ -355,6 +355,7 @@ class NXDL__attribute(NXDL__Mixin):
     
     def _init_defaults_from_schema(self, nxdl_defaults):
         self.parse_xml_attributes(nxdl_defaults.attribute)
+        # TODO: set default values for required now
 
     def parse_nxdl_xml(self, xml_node):
         """
@@ -380,7 +381,7 @@ class NXDL__field(NXDL__Mixin):
         NXDL__Mixin.__init__(self, nxdl_definition)
 
         self.attributes = {}
-        self.dimensions = {}
+        self.dimensions = None
         self.enumerations = []
         
         self._init_defaults_from_schema(nxdl_defaults)
@@ -397,17 +398,66 @@ class NXDL__field(NXDL__Mixin):
         self.parse_attributes(xml_node)
         
         ns = nxdl_schema.get_xml_namespace_dictionary()
+        nxdl_defaults = self.nxdl_definition.nxdl_manager.nxdl_defaults
 
         dims_nodes = xml_node.xpath('nx:dimensions', namespaces=ns)
         if len(dims_nodes) == 1:
-            self.dimensions["rank"] = dims_nodes[0].attrib.get("rank")
-            for node in dims_nodes[0].xpath('nx:dim', namespaces=ns):
-                k = node.attrib.get("index")
-                v = node.attrib.get("value")
-                self.dimensions["index " + k] = v
+            self.dimensions =  NXDL__dimensions(
+                self.nxdl_definition, 
+                nxdl_defaults=nxdl_defaults)
+            self.dimensions.parse_nxdl_xml(dims_nodes[0])
 
         for node in xml_node.xpath('nx:enumeration/nx:item', namespaces=ns):
             self.enumerations.append(node.attrib.get("value"))
+
+
+class NXDL__dimensions(NXDL__Mixin):
+    '''
+    contents of a *dimensions* structure (XML element) in a NXDL XML file
+    '''
+    
+    def __init__(self, nxdl_definition, nxdl_defaults=None, *args, **kwds):
+        NXDL__Mixin.__init__(self, nxdl_definition)
+        
+        self.rank = None
+        self.dims = collections.OrderedDict()
+        self._init_defaults_from_schema(nxdl_defaults)
+    
+    def _init_defaults_from_schema(self, nxdl_defaults):
+        self.parse_xml_attributes(nxdl_defaults.field.components["dimensions"])
+    
+    def parse_nxdl_xml(self, xml_node):
+        """
+        parse the XML content
+        """
+        ns = nxdl_schema.get_xml_namespace_dictionary()
+        nxdl_defaults = self.nxdl_definition.nxdl_manager.nxdl_defaults
+
+        self.rank = xml_node.attrib.get("rank")     # nxdl.xsd says NX_CHAR but should be NX_UINT? issue #571
+        for node in xml_node.xpath('nx:dim', namespaces=ns):
+            obj = NXDL__dim(self.nxdl_definition, nxdl_defaults=nxdl_defaults)
+            obj.parse_nxdl_xml(node)
+            self.dims[obj.name] = obj
+
+class NXDL__dim(NXDL__Mixin):
+    '''
+    contents of a *dim* structure (XML element) in a NXDL XML file
+    '''
+    
+    def __init__(self, nxdl_definition, nxdl_defaults=None, *args, **kwds):
+        NXDL__Mixin.__init__(self, nxdl_definition)
+        self._init_defaults_from_schema(nxdl_defaults)
+    
+    def _init_defaults_from_schema(self, nxdl_defaults):
+        self.parse_xml_attributes(nxdl_defaults.field.components["dimensions"].components["dim"])
+
+    def parse_nxdl_xml(self, xml_node):
+        """
+        parse the XML content
+        """
+        for k in "index value ref refindex incr".split():
+            self.__setattr__(k, xml_node.attrib.get(k))
+        self.name = self.index
 
 
 class NXDL__group(NXDL__Mixin):

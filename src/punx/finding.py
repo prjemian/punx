@@ -2,7 +2,7 @@
 #-----------------------------------------------------------------------------
 # :author:    Pete R. Jemian
 # :email:     prjemian@gmail.com
-# :copyright: (c) 2016, Pete R. Jemian
+# :copyright: (c) 2017, Pete R. Jemian
 #
 # Distributed under the terms of the Creative Commons Attribution 4.0 International Public License.
 #
@@ -15,7 +15,7 @@ document each item during validation
 .. autosummary::
    
    ~Finding
-   ~CheckupResults
+   ~FindingResults
    ~VALID_STATUS_DICT
 
 '''
@@ -62,13 +62,13 @@ class Finding(object):
     '''
     a single reported observation while validating
     
-    :param str test_name: one-word description of the test
     :param str h5_address: address of h5py item
-    :param int status: one of: OK NOTE WARNING ERROR TODO
+    :param str test_name: one-word description of the test
+    :param obj status: one of: OK NOTE WARNING ERROR TODO
     :param str comment: description
     '''
     
-    def __init__(self, test_name, h5_address, status, comment):
+    def __init__(self, h5_address, test_name, status, comment):
         if status not in VALID_STATUS_LIST:
             msg = 'unknown status value: ' + status
             raise ValueError(msg)
@@ -88,9 +88,9 @@ class Finding(object):
             return object.__str__(self, *args, **kwargs)
 
 
-class CheckupResults(object):
+class FindingResults(object):
     '''
-    various checkups for a single hdf5 address (absolute path)
+    various findings for a single hdf5 address (absolute path)
     
     :param str h5_address: address of h5py item
     '''

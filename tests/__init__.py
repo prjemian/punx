@@ -19,6 +19,7 @@ def suite(*args, **kw):
     from tests import cache_manager_test
     #from tests import default_plot_test
     #from tests import external_links
+    from tests import finding_test
     from tests import github_handler_test
     #from tests import h5structure_test
 #     from tests import logs_test
@@ -36,6 +37,7 @@ def suite(*args, **kw):
         cache_manager_test,
         #default_plot_test,
         #external_links,
+        finding_test,
         github_handler_test,
         #h5structure_test,
 #         logs_test,

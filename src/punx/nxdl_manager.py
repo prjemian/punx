@@ -32,6 +32,13 @@ from punx import nxdl_schema
 
 
 logger = logging.getLogger(__name__)
+# https://docs.python.org/2/library/logging.html
+ch = logging.StreamHandler()
+ch.setLevel(logging.CRITICAL)
+#ch.setLevel(logging.DEBUG)
+formatter = logging.Formatter('(%(asctime)s %(name)s %(message)s %(levelname)s)')
+ch.setFormatter(formatter)
+logger.addHandler(ch)
 
 
 class NXDL_Manager(object):

@@ -39,6 +39,7 @@ ch.setLevel(logging.CRITICAL)
 formatter = logging.Formatter('(%(asctime)s %(name)s %(message)s %(levelname)s)')
 ch.setFormatter(formatter)
 logger.addHandler(ch)
+#  see also: https://docs.python.org/2/howto/logging-cookbook.html
 
 
 class NXDL_Manager(object):

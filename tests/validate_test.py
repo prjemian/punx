@@ -63,7 +63,6 @@ class Test_Constructor(unittest.TestCase):
             "is valid HDF5 file")
         self.validator.close()
         self.validator = None
-        pass
 
     def test_nexus_file(self):
         f = h5py.File(self.hdffile)
@@ -73,7 +72,40 @@ class Test_Constructor(unittest.TestCase):
 
         self.assertRaises(No_Exception, self.avert_exception, self.hdffile)
         self.assertTrue(punx.utils.isNeXusFile(self.hdffile), "is valid NeXus file")
-        pass
+
+
+class Test_Validate(unittest.TestCase):
+
+    def setUp(self):
+        # create the test file
+        tfile = tempfile.NamedTemporaryFile(suffix='.hdf5', delete=False)
+        tfile.close()
+        self.hdffile = tfile.name
+        self.validator = None
+     
+    def tearDown(self):
+        if self.validator is not None:
+            self.validator.close()
+            self.validator = None
+        os.remove(self.hdffile)
+        self.hdffile = None
+
+    def test_addresses(self):
+        f = h5py.File(self.hdffile)
+        f.attrs["default"] = "entry"
+        eg = f.create_group("entry")
+        eg.attrs["NX_class"] = "NXentry"
+        eg.attrs["default"] = "data"
+        dg = eg.create_group("data")
+        dg.attrs["NX_class"] = "NXdata"
+        dg.attrs["signal"] = "data"
+        ds = dg.create_dataset("data", data=[1, 2, 3.14])
+        eg["link_to_data"] = ds
+        f.close()
+
+        self.validator = punx.validate.Data_File_Validator(self.hdffile)
+        self.validator.validate()
+        self.assertEqual(len(self.validator.addresses), 5)
 
 
 def suite(*args, **kw):
@@ -81,6 +113,7 @@ def suite(*args, **kw):
     test_list = [
         Test_Constructor,
         Test_Constructor_Exceptions,
+        Test_Validate,
         ]
     for test_case in test_list:
         test_suite.addTest(unittest.makeSuite(test_case))

@@ -95,6 +95,7 @@ class Data_File_Validator(object):
         """
         catalog this group's address and all its contents
         """
+        # TODO: build objects to hold HDF5 contents and other interesting info such as findings & classpath
         self.addresses[group.name] = group
         for item in group:
             if punx.utils.isHdf5Group(group[item]):

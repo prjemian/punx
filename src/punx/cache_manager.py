@@ -281,8 +281,17 @@ class CacheManager(singletons.Singleton):
         fs = cache_obj.find_all_file_sets()
         if force or ref not in fs:
             if grr.request_info(ref) is not None:
-                force = ref in fs and grr.sha != fs[ref].sha
+                if ref not in fs:
+                    force = True
+                    verb = "Installing"
+                else:
+                    force = ref in fs and grr.sha != fs[ref].sha
+                    if force:
+                        verb = "Updating"
+                    else:
+                        logger.info("NXDL file set: " + ref + " unchanged, not updating")
                 if force:
+                    logger.info(verb + " NXDL file set: " + ref)
                     m = extract_from_download(grr, cache_obj.path())
                     return m
     

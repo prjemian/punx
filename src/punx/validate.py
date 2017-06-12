@@ -15,6 +15,7 @@
 import os
 import h5py
 import punx
+import punx.utils
 
 
 class Data_File_Validator(object):
@@ -31,6 +32,11 @@ class Data_File_Validator(object):
             self.h5 = h5py.File(fname, 'r')
         except IOError:
             raise punx.HDF5_Open_Error(fname)
+    
+    def close(self):
+        if punx.utils.isHdf5FileObject(self.h5):
+            self.h5.close()
+            self.h5 = None
 
 
 if __name__ == '__main__':

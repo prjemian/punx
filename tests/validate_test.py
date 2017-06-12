@@ -10,7 +10,7 @@ import tempfile
 import unittest
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src')))
-import punx, punx.validate
+import punx, punx.validate, punx.utils
 
 
 class No_Exception(Exception): pass
@@ -29,11 +29,12 @@ class Test_Constructor(unittest.TestCase):
     
     def avert_exception(self, fname):
         try:
-            f = punx.validate.Data_File_Validator(fname)
+            self.validator = punx.validate.Data_File_Validator(fname)
         except:
             pass
         else:
-            f.h5.close()
+            self.validator.close()
+            self.validator = None
             raise No_Exception
  
     def setUp(self):
@@ -41,12 +42,12 @@ class Test_Constructor(unittest.TestCase):
         tfile = tempfile.NamedTemporaryFile(suffix='.hdf5', delete=False)
         tfile.close()
         self.hdffile = tfile.name
-#         self.validator = None
+        self.validator = None
      
     def tearDown(self):
-#         if self.validator is not None:
-#             self.validator.close()
-#             self.validator = None
+        if self.validator is not None:
+            self.validator.close()
+            self.validator = None
         os.remove(self.hdffile)
         self.hdffile = None
 
@@ -56,9 +57,23 @@ class Test_Constructor(unittest.TestCase):
         f.close()
 
         self.assertRaises(No_Exception, self.avert_exception, self.hdffile)
-        dfv = punx.validate.Data_File_Validator(self.hdffile)
-        self.assertTrue(isinstance(dfv.h5, h5py.File), "is valid HDF5 file")
-        dfv.h5.close()
+        self.validator = punx.validate.Data_File_Validator(self.hdffile)
+        self.assertTrue(
+            punx.utils.isHdf5FileObject(self.validator.h5), 
+            "is valid HDF5 file")
+        self.validator.close()
+        self.validator = None
+        pass
+
+    def test_nexus_file(self):
+        f = h5py.File(self.hdffile)
+        g = f.create_group("entry")
+        g.attrs["NX_class"] = "NXentry"
+        f.close()
+
+        self.assertRaises(No_Exception, self.avert_exception, self.hdffile)
+        self.assertTrue(punx.utils.isNeXusFile(self.hdffile), "is valid NeXus file")
+        pass
 
 
 def suite(*args, **kw):

@@ -68,10 +68,24 @@ def isHdf5Link(parent, objname):
 
 
 def isHdf5ExternalLink(parent, objname):
-    '''is `parent[objname]` an HDF5 ExternalLink?'''
+    '''
+    is `parent[objname]` an HDF5 ExternalLink?
+    
+    Tricky to detect this one.
+    If external file is available with valid path,
+    this will look like the target's data structure
+    and the result will be False.
+    
+    Note: In the external link object, there are
+    two attributes: ``@filename`` and ``@path``.
+    '''
     if isHdf5Group(parent) or isHdf5FileObject(parent):
         details = parent.get(objname, getclass=True, getlink=True)
-        return isinstance(details, h5py.ExternalLink)
+        # The ``isinstance(details, h5py.ExternalLink)``
+        # function does not identify the 
+        # superclass of ``details`` properly, so we look 
+        # at the result from ``type()``
+        return str(details).find(".ExternalLink") > 0
     return False
 
 

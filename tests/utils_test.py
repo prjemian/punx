@@ -8,7 +8,6 @@ import sys
 import h5py
 import h5py.h5g
 import numpy
-import platform
 import tempfile
 import unittest
 
@@ -92,20 +91,21 @@ class Test_HDF5_Tests(unittest.TestCase):
         f.close()
  
     def test_isHdf5ExternalLink(self):
-        if platform.system() != "Windows":      # FIXME:
-            tfile = tempfile.NamedTemporaryFile(suffix='.hdf5', delete=False)
-            tfile.close()
-            f2_name = tfile.name
-     
-            f1 = h5py.File(self.hfile)
-            ds = f1.create_dataset("name", data=1.0)
-            f1.close()
-     
-            f2 = h5py.File(f2_name)
-            f2["/link"] = h5py.ExternalLink(self.hfile, "/name")
-            self.assertTrue(punx.utils.isHdf5ExternalLink(f2, "/link"))
-            f2.close()
-            os.remove(f2_name)
+        tfile = tempfile.NamedTemporaryFile(suffix='.hdf5', delete=False)
+        tfile.close()
+        f1_name = tfile.name
+ 
+        f1 = h5py.File(f1_name)
+        ds = f1.create_dataset("name", data=1.0)
+        f1.close()
+ 
+        f2 = h5py.File(self.hfile)
+        f2["/link"] = h5py.ExternalLink(f1_name, "/name")
+        self.assertTrue(punx.utils.isHdf5ExternalLink(f2, "/link"))
+
+        os.remove(f1_name)
+        self.assertTrue(punx.utils.isHdf5ExternalLink(f2, "/link"))
+        f2.close()
 
 
 def suite(*args, **kw):

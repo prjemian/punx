@@ -29,6 +29,7 @@ import os
 
 import punx
 from punx import nxdl_schema
+from punx import cache_manager
 
 
 logger = logging.getLogger(__name__)
@@ -50,9 +51,16 @@ class NXDL_Manager(object):
     nxdl_file_set = None
     nxdl_defaults = None
     
-    def __init__(self, file_set):
-        from punx import cache_manager
+    def __init__(self, file_set=None):
+        if file_set is None:
+            cm = punx.cache_manager.CacheManager()
+            file_set = cm.default_file_set
+        elif isinstance(file_set, basestring):
+            cm = punx.cache_manager.CacheManager()
+            cm.select_NXDL_file_set(file_set)
+            file_set = cm.default_file_set
         assert(isinstance(file_set, cache_manager.NXDL_File_Set))
+
         if file_set.path is None or not os.path.exists(file_set.path):
             msg = 'NXDL directory: ' + str(file_set.path)
             logger.error(msg)

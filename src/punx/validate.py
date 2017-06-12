@@ -26,6 +26,7 @@ import os
 import h5py
 import punx
 import punx.utils
+import punx.nxdl_manager
 
 
 class Data_File_Validator(object):
@@ -56,6 +57,7 @@ class Data_File_Validator(object):
         self.findings = []      # list of Finding() instances
         self.addresses = collections.OrderedDict()     # dictionary of all HDF5 address nodes in the data file
         self.classpaths = {}
+        self.manager = None
 
         try:
             self.h5 = h5py.File(fname, 'r')
@@ -70,10 +72,11 @@ class Data_File_Validator(object):
             self.h5.close()
             self.h5 = None
     
-    def validate(self):
+    def validate(self, ref=None):
         '''
         start the validation process from the file root
         '''
+        self.manager = punx.nxdl_manager.NXDL_Manager(ref)
         self.build_address_catalog()
         # 1. check all objects in file (name is valid, ...)
         # 2. check all base classes against defaults

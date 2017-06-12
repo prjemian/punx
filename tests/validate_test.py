@@ -104,7 +104,7 @@ class Test_Validate(unittest.TestCase):
         f.close()
 
         self.validator = punx.validate.Data_File_Validator(self.hdffile)
-        self.validator.validate()
+        self.validator.validate("v3.2")
         self.assertEqual(len(self.validator.addresses), 5)
 
 

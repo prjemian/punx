@@ -19,6 +19,7 @@ def suite(*args, **kw):
     from tests import cache_manager_test
     #from tests import default_plot_test
     #from tests import external_links
+    from tests import finding_test
     from tests import github_handler_test
     #from tests import h5structure_test
 #     from tests import logs_test
@@ -26,7 +27,8 @@ def suite(*args, **kw):
     from tests import nxdl_schema_test
     #from tests import nxdlstructure_test
     from tests import schema_manager_test
-    #from tests import validate_test
+    from tests import utils_test
+    from tests import validate_test
     #from tests import warnings_test
     
     test_suite = unittest.TestSuite()
@@ -36,6 +38,7 @@ def suite(*args, **kw):
         cache_manager_test,
         #default_plot_test,
         #external_links,
+        finding_test,
         github_handler_test,
         #h5structure_test,
 #         logs_test,
@@ -43,7 +46,8 @@ def suite(*args, **kw):
         nxdl_schema_test,
         #nxdlstructure_test,
         schema_manager_test,
-        #validate_test,
+        utils_test,
+        validate_test,
         #warnings_test,
         ]
 

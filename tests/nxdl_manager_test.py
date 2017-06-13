@@ -1,9 +1,9 @@
 
 '''
-test punx tests/schema_manager module
+test punx tests/nxdl_manager module
 '''
 
-# TODO: differentiate between NXDL and XML attributes
+# TODO: lots more tests could be constructed!
 
 import lxml.etree
 import os
@@ -59,6 +59,7 @@ class Test_XML_functions(unittest.TestCase):
         self.assertRaises(
             ValueError, # TODO: should be:  punx.InvalidNxdlFile, 
             punx.nxdl_manager.validate_xml_tree, tree)
+        pass
 
 
 class Test_get_NXDL_file_list(unittest.TestCase):

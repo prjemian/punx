@@ -1,6 +1,6 @@
 
 '''
-test punx tests/schema_manager module
+test punx tests/nxdl_schema module
 '''
 
 import lxml.etree

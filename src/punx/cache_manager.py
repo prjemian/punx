@@ -137,7 +137,7 @@ def extract_from_download(grr, path):       # TODO refactor into NXDL_File_Set
                 info_file_name = os.path.join(path, subdir, INFO_FILE_NAME)
                 if os.path.exists(info_file_name):
                     info = read_json_file(info_file_name)
-                    if info.sha != grr.sha:
+                    if info["sha"] == grr.sha:
                         return True
         return False
 

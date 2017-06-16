@@ -18,10 +18,10 @@ class No_Exception(Exception): pass
 
 class Test_Constructor_Exceptions(unittest.TestCase):
 
-    def test_bad_file_name(self):
+    def test_bad_file_name_detected(self):
         self.assertRaises(punx.FileNotFound, punx.validate.Data_File_Validator, 'bad file name')
 
-    def test_not_HDF5_file(self):
+    def test_not_HDF5_file_detected(self):
         self.assertRaises(punx.HDF5_Open_Error, punx.validate.Data_File_Validator, __file__)
 
 
@@ -51,7 +51,7 @@ class Test_Constructor(unittest.TestCase):
         os.remove(self.hdffile)
         self.hdffile = None
 
-    def test_hdf5_file(self):
+    def test_valid_hdf5_file_constructed(self):
         f = h5py.File(self.hdffile)
         f['item'] = 5
         f.close()
@@ -64,7 +64,7 @@ class Test_Constructor(unittest.TestCase):
         self.validator.close()
         self.validator = None
 
-    def test_nexus_file(self):
+    def test_valid_nexus_file_constructed(self):
         f = h5py.File(self.hdffile)
         g = f.create_group("entry")
         g.attrs["NX_class"] = "NXentry"
@@ -90,7 +90,7 @@ class Test_Validate(unittest.TestCase):
         os.remove(self.hdffile)
         self.hdffile = None
 
-    def test_addresses(self):
+    def test_specific_hdf5_addresses_can_be_found(self):
         f = h5py.File(self.hdffile)
         f.attrs["default"] = "entry"
         eg = f.create_group("entry")

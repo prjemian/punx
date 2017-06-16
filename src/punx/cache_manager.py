@@ -282,11 +282,15 @@ class CacheManager(singletons.Singleton):
         if force or ref not in fs:
             if grr.request_info(ref) is not None:
                 if ref not in fs:
+                    logger.info(" reference not found in cache: " % ref)
                     force = True
                     verb = "Installing"
                 else:
                     force = ref in fs and grr.sha != fs[ref].sha
                     if force:
+                        msg = " different SHAs - existing=" + fs[ref].sha
+                        msg += " GitHub=" + grr.sha
+                        logger.info(msg)
                         verb = "Updating"
                     else:
                         logger.info(" NXDL file set: " + ref + " unchanged, not updating")

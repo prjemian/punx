@@ -247,7 +247,7 @@ class CacheManager(singletons.Singleton):
         self.user = UserCache()
         
         self.NXDL_file_sets = self.find_all_file_sets()
-        msg = 'NXDL_file_sets names = ' 
+        msg = ' NXDL_file_sets names = ' 
         msg += str(sorted(list(self.NXDL_file_sets.keys())))
         logger.debug(msg)
         try:
@@ -255,7 +255,7 @@ class CacheManager(singletons.Singleton):
         except KeyError:
             pass
         if self.default_file_set is None:
-            msg = 'CacheManager: no default_file_set selected yet'
+            msg = ' CacheManager: no default_file_set selected yet'
             logger.debug(msg)
             
         # TODO: update the .ini file as needed (remember the default_file_set value
@@ -289,9 +289,9 @@ class CacheManager(singletons.Singleton):
                     if force:
                         verb = "Updating"
                     else:
-                        logger.info("NXDL file set: " + ref + " unchanged, not updating")
+                        logger.info(" NXDL file set: " + ref + " unchanged, not updating")
                 if force:
-                    logger.info(verb + " NXDL file set: " + ref)
+                    logger.info(" " + verb + " NXDL file set: " + ref)
                     m = extract_from_download(grr, cache_obj.path())
                     return m
     
@@ -299,12 +299,10 @@ class CacheManager(singletons.Singleton):
         '''
         return the named self.default_file_set instance or raise KeyError exception if unknown
         '''
-        msg = 'DEBUG - given ref: ' + str(ref)
-        logger.debug(msg)
+        logger.debug(' given ref: ' + str(ref))
 
         ref = ref or github_handler.DEFAULT_NXDL_SET
-        msg = 'DEBUG - final ref: ' + str(ref)
-        logger.debug(msg)
+        logger.debug(' final ref: ' + str(ref))
 
         if ref not in self.NXDL_file_sets:
             #msg = 'unknown NXDL file set: ' + str(ref)
@@ -312,6 +310,7 @@ class CacheManager(singletons.Singleton):
             msg += ', received: ' + str(ref)
             raise KeyError(msg)
         self.default_file_set = self.NXDL_file_sets[ref]
+        logger.debug(" default file set: " + str(self.default_file_set))
         return self.default_file_set
     
     # - - - - - - - - - - - - - -
@@ -322,7 +321,7 @@ class CacheManager(singletons.Singleton):
         index all NXDL file sets in both source and user caches, return a dictionary
         '''
         fs = {k: v for k, v in self.source.find_all_file_sets().items()}
-        msg = 'DEBUG - source file set names: ' 
+        msg = ' source file set names: ' 
         msg += str(sorted(list(fs.keys())))
         logger.debug(msg)
 
@@ -333,7 +332,7 @@ class CacheManager(singletons.Singleton):
                 fs[k] = v
                 
         self.NXDL_file_sets = fs    # remember
-        msg = 'DEBUG - all file set names: '
+        msg = ' all known file set names: '
         msg += str(sorted(list(fs.keys())))
         logger.debug(msg)
         return fs
@@ -383,8 +382,7 @@ class Base_Cache(object):
         if self.qsettings is None:
             raise RuntimeError('cache qsettings not defined!')
         cache_path = self.path()
-        msg = 'DEBUG - cache path: ' + str(cache_path)
-        logger.debug(msg)
+        logger.debug(' cache path: ' + str(cache_path))
         
         for item in os.listdir(cache_path):
             if os.path.isdir(os.path.join(cache_path, item)):

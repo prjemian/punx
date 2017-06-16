@@ -2,9 +2,13 @@
 
 import os, sys
 from collections import OrderedDict
+import logging
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), 'src')))
 import punx.github_handler, punx.cache_manager
+
+
+logging.basicConfig(level=-1)   # report everything logged
 
 
 if __name__ == '__main__':
@@ -21,6 +25,9 @@ if __name__ == '__main__':
     
     for ref, use_user_cache in releases.items():
         force = ref == "master"    # always update from the master branch
+
+        logging.info(" installing(ref=%s, force=%s)" % (ref, str(force)))
+
         m = cm.install_NXDL_file_set(
             grr, 
             user_cache=use_user_cache, 

@@ -1,6 +1,15 @@
 
 '''
 test punx tests/cache_manager module
+
+ISSUES
+
+..  note::
+    Add new issues here with empty brackets, add "*" when issue is fixed.
+    Issues will only be marked "fixed" on GitHub once this branch is merged.
+    Then, this table may be removed.
+
+* [ ] #94 lazy load NXDL details until needed
 '''
 
 import io

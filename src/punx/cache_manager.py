@@ -472,7 +472,7 @@ class NXDL_File_Set(object):
     # these keys are written and read to the JSON info files in each downloaded file set
     json_file_keys = 'ref ref_type sha zip_url last_modified'.split()
     
-    # TODO: consider defining the SchemaManager here (perhaps lazy load)?  see nxdl_manager for example code:  __getattribute__()
+    # TODO: #94 consider defining the SchemaManager here (perhaps lazy load)?  see nxdl_manager for example code:  __getattribute__()
     schema_manager = None
     __schema_manager_loaded__ = False
     

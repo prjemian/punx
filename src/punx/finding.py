@@ -49,7 +49,7 @@ COMMENT = ValidationResultStatus('COMMENT', 'grey',      'comment from the punx 
 
 VALID_STATUS_LIST = (OK, NOTE, WARN, ERROR, TODO, UNUSED, COMMENT)    
 VALID_STATUS_DICT = {str(f): f for f in VALID_STATUS_LIST}
-'''dictionary (by names) of all available findings'''
+'''dictionary (by names) of all available validations'''
 
 TF_RESULT = {True: OK, False: ERROR}
 
@@ -90,14 +90,14 @@ class Finding(object):
 
 class FindingResults(object):
     '''
-    various findings for a single hdf5 address (absolute path)
+    various validations for a single hdf5 address (absolute path)
     
     :param str h5_address: address of h5py item
     '''
     
     def __init__(self, h5_address):
         self.h5_address = h5_address
-        self.findings = []      # keep list of all findings for this address
+        self.validations = []      # keep list of all validations for this address
         self.classpath = ''
     
     def __str__(self, *args, **kwargs):

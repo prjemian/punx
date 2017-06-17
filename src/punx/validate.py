@@ -57,7 +57,7 @@ class Data_File_Validator(object):
             raise punx.FileNotFound(fname)
         self.fname = fname
 
-        self.findings = []      # list of Finding() instances
+        self.validations = []      # list of Finding() instances
         self.addresses = collections.OrderedDict()     # dictionary of all HDF5 address nodes in the data file
         self.classpaths = {}
         self.manager = None
@@ -92,28 +92,29 @@ class Data_File_Validator(object):
         """
         find all HDF5 addresses and NeXus class paths in the data file
         """
-        self._group_address_catalog_(self.h5)
+        self._group_address_catalog_(None, self.h5)
     
-    def _group_address_catalog_(self, group):
+    def _group_address_catalog_(self, parent, group):
         """
         catalog this group's address and all its contents
         """
-        def add_to_classpath(v):
+        def addClasspath(v):
             if v.classpath not in self.classpaths:
                 self.classpaths[v.classpath] = []
             self.classpaths[v.classpath].append(v)
-        def get_subject(o):
-            v_obj = V_Subject(o)
+        def get_subject(parent, o):
+            v_obj = V_Subject(parent, o)
             self.addresses[v_obj.h5_address] = v_obj
-            add_to_classpath(v_obj)
+            addClasspath(v_obj)
             return v_obj
 
-        get_subject(group)
+        obj = get_subject(parent, group)
+        parent = self.classpaths[obj.classpath][-1]
         for item in group:
             if punx.utils.isHdf5Group(group[item]):
-                self._group_address_catalog_(group[item])
+                self._group_address_catalog_(parent, group[item])
             else:
-                get_subject(group[item])
+                get_subject(parent, group[item])
 
 
 class V_Subject(object):
@@ -121,31 +122,49 @@ class V_Subject(object):
     HDF5 data file object for validation
     """
     
-    _subjects_ = {}
-    
-    def __init__(self, obj):
+    def __init__(self, parent, obj):
+        assert(isinstance(parent, (V_Subject, type(None))))
+        self.parent = parent
         self.h5_object = obj
         self.h5_address = obj.name
-        self.validation_finding = dict(name=None)   # TODO: how using this?
-        self._subjects_[obj.name] = self
-
+        self.validations = {}    # validation findings go here
         if obj.name == SLASH:
-            self.classpath = "/NXroot"      # TODO: or ""?
-            self.short_name = SLASH
+            self.name = SLASH
         else:
-            self.short_name = obj.name.split(SLASH)[-1]
-            parent_addr = SLASH.join(obj.name.split(SLASH)[:-1])
-            if parent_addr == "":
-                parent_addr = SLASH
-            if punx.utils.isHdf5Group(obj) and "NX_class" in obj.attrs:
-                cp = obj.attrs["NX_class"]
-                self.validation_finding["NX_class"] = None
-            else:
-                cp = self.short_name
-            self.classpath = self._subjects_[parent_addr].classpath
-            if not self.classpath.endswith(SLASH):
-                self.classpath += SLASH + cp
-            pass
+            self.name = obj.name.split(SLASH)[-1]
+        self.classpath = self.determine_NeXus_classpath()
+    
+    def determine_NeXus_classpath(self):
+        """
+        determine the NeXus class path
+        
+        :see: http://download.nexusformat.org/sphinx/preface.html#class-path-specification
+        
+        EXAMPLE
+        
+        Given this NeXus data file structure::
+            
+            /
+                entry: NXentry
+                    data: NXdata
+                        data: NX_NUMBER
+        
+        The HDF5 address of the plottable data is: ``/entry/data/data``.
+        The NeXus class path is: ``/NXentry/NXdata/data
+        """
+        if self.name == SLASH:
+            return ""
+        else:
+            h5_obj = self.h5_object
+
+            classpath = self.parent.classpath
+            if not classpath.endswith(SLASH):
+                if punx.utils.isHdf5Group(h5_obj) and "NX_class" in h5_obj.attrs:
+                    nx_class = h5_obj.attrs["NX_class"]
+                else:
+                    nx_class = self.name
+                classpath += SLASH + nx_class
+            return classpath
 
 
 if __name__ == '__main__':

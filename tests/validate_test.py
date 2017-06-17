@@ -90,7 +90,7 @@ class Test_Validate(unittest.TestCase):
         os.remove(self.hdffile)
         self.hdffile = None
 
-    def test_specific_hdf5_addresses_can_be_found(self):
+    def build_simple_test_file(self):
         f = h5py.File(self.hdffile)
         f.attrs["default"] = "entry"
         eg = f.create_group("entry")
@@ -102,10 +102,25 @@ class Test_Validate(unittest.TestCase):
         ds = dg.create_dataset("data", data=[1, 2, 3.14])
         eg["link_to_data"] = ds
         f.close()
+        return punx.validate.Data_File_Validator(self.hdffile)
 
-        self.validator = punx.validate.Data_File_Validator(self.hdffile)
+    def test_specific_hdf5_addresses_can_be_found(self):
+        self.validator = self.build_simple_test_file()
         self.validator.validate("v3.2")
         self.assertEqual(len(self.validator.addresses), 5)
+
+    def test_proper_classpath_determined(self):
+        self.validator = self.build_simple_test_file()
+        self.validator.validate("v3.2")
+        self.assertEqual(len(self.validator.classpaths), 5)
+
+        obj = self.validator.addresses["/"]
+        self.assertTrue(obj.classpath in self.validator.classpaths)
+        self.assertEqual(obj.classpath, "")
+
+        obj = self.validator.addresses["/entry/data/data"]
+        self.assertTrue(obj.classpath in self.validator.classpaths)
+        self.assertEqual(obj.classpath, "/NXentry/NXdata/data")
 
 
 def suite(*args, **kw):

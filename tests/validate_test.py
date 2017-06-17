@@ -4,7 +4,12 @@ test punx tests/validate module
 
 ISSUES
 
-* [ ] #93 special classpath for non-NeXus groups
+..  note::
+    Add new issues here with empty brackets, add "*" when issue is fixed.
+    Issues will only be marked "fixed" on GitHub once this branch is merged.
+    Then, this table may be removed.
+
+* [*] #93 special classpath for non-NeXus groups
 * [*] #92 add attributes to classpath
 * [ ] #91 test changes in NXDL rules
 * [*] #89 while refactoring 72, fix logging
@@ -142,6 +147,34 @@ class Test_Validate(unittest.TestCase):
     def test_specific_hdf5_addresses_can_be_found(self):
         self.setup_simple_test_file()
         self.assertEqual(len(self.validator.addresses), 10)
+
+    def test_non_nexus_group(self):
+        self.setup_simple_test_file()
+        self.validator.close()
+        f = h5py.File(self.hdffile)
+        other = f["/entry"].create_group("other")
+        other.attrs["intentions"] = "good"
+        ds = other.create_dataset("comment", data="this does not need validation")
+        ds.attrs["purpose"] = "testing, only"
+        f.close()
+        self.validator = punx.validate.Data_File_Validator()
+        self.validator.validate(self.hdffile)
+
+        self.assertTrue(punx.validate.CLASSPATH_OF_NON_NEXUS_CONTENT in self.validator.classpaths)
+        self.assertTrue("/entry/other" in self.validator.addresses)
+        self.assertTrue("/entry/other/comment" in self.validator.addresses)
+        self.assertEqual(
+            punx.validate.CLASSPATH_OF_NON_NEXUS_CONTENT, 
+            self.validator.addresses["/entry/other"].classpath)
+        self.assertEqual(
+            punx.validate.CLASSPATH_OF_NON_NEXUS_CONTENT, 
+            self.validator.addresses["/entry/other@intentions"].classpath)
+        self.assertEqual(
+            punx.validate.CLASSPATH_OF_NON_NEXUS_CONTENT, 
+            self.validator.addresses["/entry/other/comment"].classpath)
+        self.assertEqual(
+            punx.validate.CLASSPATH_OF_NON_NEXUS_CONTENT, 
+            self.validator.addresses["/entry/other/comment@purpose"].classpath)
 
     def test_proper_classpath_determined(self):
         self.setup_simple_test_file()

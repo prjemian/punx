@@ -41,6 +41,7 @@ import punx.nxdl_manager
 SLASH = "/"
 INFORMATIVE = (logging.INFO + logging.DEBUG)/2
 logger = punx.utils.setup_logger(__name__)
+CLASSPATH_OF_NON_NEXUS_CONTENT = "note: item is not NeXus content"
 
 
 class Data_File_Validator(object):
@@ -181,7 +182,10 @@ class ValidationItem(object):
         else:
             self.h5_address = None
             self.name = attribute_name
-            self.classpath = parent.classpath + "@" + self.name
+            if parent.classpath == CLASSPATH_OF_NON_NEXUS_CONTENT:
+                self.classpath = CLASSPATH_OF_NON_NEXUS_CONTENT
+            else:
+                self.classpath = parent.classpath + "@" + self.name
     
     def determine_NeXus_classpath(self):
         """
@@ -208,10 +212,18 @@ class ValidationItem(object):
             h5_obj = self.h5_object
 
             classpath = self.parent.classpath
+            if classpath == CLASSPATH_OF_NON_NEXUS_CONTENT:
+                logger.log(INFORMATIVE, "%s is not NeXus content" % h5_obj.name)
+                return CLASSPATH_OF_NON_NEXUS_CONTENT
+
             if not classpath.endswith(SLASH):
-                if punx.utils.isHdf5Group(h5_obj) and "NX_class" in h5_obj.attrs:
-                    nx_class = h5_obj.attrs["NX_class"]
-                    logger.log(INFORMATIVE, "NeXus base class: " + nx_class)
+                if punx.utils.isHdf5Group(h5_obj):
+                    if "NX_class" in h5_obj.attrs:
+                        nx_class = h5_obj.attrs["NX_class"]
+                        logger.log(INFORMATIVE, "NeXus base class: " + nx_class)
+                    else:
+                        logger.log(INFORMATIVE, "HDF5 group is not NeXus: " + self.h5_address)
+                        return CLASSPATH_OF_NON_NEXUS_CONTENT
                 else:
                     nx_class = self.name
                 classpath += SLASH + nx_class

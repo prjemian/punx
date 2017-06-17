@@ -33,8 +33,10 @@ import collections
 import h5py
 import logging
 import os
+import re
 
 import punx
+import punx.finding
 import punx.utils
 import punx.nxdl_manager
 
@@ -42,7 +44,8 @@ import punx.nxdl_manager
 SLASH = "/"
 INFORMATIVE = int((logging.INFO + logging.DEBUG)/2)
 logger = punx.utils.setup_logger(__name__)
-CLASSPATH_OF_NON_NEXUS_CONTENT = "note: item is not NeXus content"
+CLASSPATH_OF_NON_NEXUS_CONTENT = "non-NeXus content"
+VALIDITEMNAME_STRICT_PATTERN = r'[a-z_][a-z0-9_]*'
 
 
 class Data_File_Validator(object):
@@ -92,6 +95,7 @@ class Data_File_Validator(object):
         self.validations = []      # list of Finding() instances
         self.addresses = collections.OrderedDict()     # dictionary of all HDF5 address nodes in the data file
         self.classpaths = {}
+        self.regexp_cache = {}
         self.manager = punx.nxdl_manager.NXDL_Manager(ref)
 
     
@@ -120,9 +124,16 @@ class Data_File_Validator(object):
             raise punx.HDF5_Open_Error(fname)
 
         self.build_address_catalog()
+
         # 1. check all objects in file (name is valid, ...)
+        for v_list in self.classpaths.values():
+            for v in v_list:
+                self.validate_item_name(v)
+
         # 2. check all base classes against defaults
+
         # 3. check application definitions
+
         # 4. check for default plot
     
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -162,6 +173,89 @@ class Data_File_Validator(object):
             else:
                 get_subject(parent, group[item])
 
+    def validate_item_name(self, v_obj, key=None):
+        """
+        validate *h5_addr* using *validItemName* regular expression
+        
+        This is used for the names of groups, fields, links, and attributes.
+        
+        :param obj v_obj: instance of :class:`ValidationItem`
+        :param str key: named key to search, default: None (``validItemName``)
+
+        This method will test the object's name for validation,  
+        comparing with the strict or relaxed regular expressions for 
+        a valid item name.  
+        The finding for each name is classified by the next table:
+        
+        =====  =======  =======  ================================================================
+        order  finding  match    description
+        =====  =======  =======  ================================================================
+        1      OK       strict   matches most stringent NeXus specification
+        2      NOTE     relaxed  matches NeXus specification that is most generally accepted
+        3      ERROR    UTF8     specific to strings with UnicodeDecodeError (see issue #37)
+        4      WARN     HDF5     acceptable to HDF5 but not NeXus
+        =====  =======  =======  ================================================================
+        
+        :see: http://download.nexusformat.org/doc/html/datarules.html?highlight=regular%20expression
+        """
+        if v_obj.parent is None:
+            msg = "no name validation on the HDF5 file root node"
+            logger.log(INFORMATIVE, msg)
+            return
+        if "name" in v_obj.validations:
+            return      # do not repeat this
+
+        key = key or "validItemName"
+
+        # links need the parent added to the call signature
+        if (punx.utils.isHdf5Dataset(v_obj.h5_object) or
+            punx.utils.isHdf5Group(v_obj.h5_object)):
+            nxdl = self.manager.nxdl_file_set.schema_manager.nxdl
+            
+            # build the regular expression patterns to match
+            patterns = collections.OrderedDict()
+            patterns["validItemName-strict"] = VALIDITEMNAME_STRICT_PATTERN
+            if key in nxdl.patterns:
+                expression_list = nxdl.patterns[key].re_list
+                for i, p in enumerate(expression_list):
+                    patterns["validItemName-relaxed-" + str(i)] = p
+            
+            # check against patterns until a match is found
+            status = None
+            for k, p in patterns.items():
+                if k not in self.regexp_cache:
+                    self.regexp_cache[k] = re.compile('^' + p + '$')
+                m = self.regexp_cache[k].match(v_obj.name)
+                matches = m is not None and m.string == v_obj.name
+                msg = "checking %s against %s: %s" % (v_obj.h5_address, k, str(matches))
+                logger.debug(msg)
+                if matches:
+                    if k.endswith('strict'):
+                        status = punx.finding.OK
+                    else:
+                        status = punx.finding.NOTE
+                    # TODO: specific to strings with UnicodeDecodeError (see issue #37)
+                    # status = punx.finding.ERROR
+                    break
+            if status is None:
+                status = punx.finding.WARN
+                k = "valid HDF5 item name, not valid with NeXus"
+            f = punx.finding.Finding(v_obj.h5_address, "name", status, k)
+            self.validations.append(f)
+            v_obj.validations["name"] = f
+
+        else:
+            # TODO:
+            f = punx.finding.Finding(
+                v_obj.h5_address, 
+                "name", 
+                punx.finding.TODO, 
+                "not handled yet")
+            self.validations.append(f)
+            v_obj.validations["name"] = f
+
+        pass
+
 
 class ValidationItem(object):
     """
@@ -189,6 +283,17 @@ class ValidationItem(object):
                 self.h5_address = parent.h5_address + "@" + self.name
                 self.classpath = str(parent.classpath) + "@" + self.name
     
+    def __str__(self, *args, **kwargs):
+        try:
+            terms = collections.OrderedDict()
+            terms["name"] = self.name
+            terms["type"] = type(self.h5_object)
+            terms["classpath"] = self.classpath
+            s = ", ".join(["%s=%s" % (k, str(v)) for k, v in terms.items()])
+            return "ValidationItem(" + s + ")"
+        except Exception as _exc:
+            return object.__str__(self, *args, **kwargs)
+
     def determine_NeXus_classpath(self):
         """
         determine the NeXus class path

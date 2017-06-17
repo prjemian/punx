@@ -9,11 +9,13 @@ ISSUES
     Issues will only be marked "fixed" on GitHub once this branch is merged.
     Then, this table may be removed.
 
-* [*] #93 special classpath for non-NeXus groups
-* [*] #92 add attributes to classpath
-* [ ] #91 test changes in NXDL rules
-* [*] #89 while refactoring 72, fix logging
-* [ ] #72 refactor to validate application definitions
+* [ ] #95  validate item names in the classpath dict
+* [ ] #94  lazy load NXDL details only when needed
+* [*] #93  special classpath for non-NeXus groups
+* [*] #92  add attributes to classpath
+* [ ] #91  test changes in NXDL rules
+* [*] #89  while refactoring 72, fix logging
+* [ ] #72  refactor to validate application definitions
 
 '''
 

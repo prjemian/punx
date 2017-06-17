@@ -15,9 +15,17 @@
 """
 validate files against the NeXus/HDF5 standard
 
+PUBLIC
+
 .. autosummary::
    
    ~Data_File_Validator
+
+INTERNAL
+
+.. autosummary::
+   
+   ~V_Subject
 
 """
 
@@ -49,10 +57,14 @@ class Data_File_Validator(object):
         validator = punx.validate.Data_File_Validator("v3.2")
         validator = punx.validate.Data_File_Validator("master")
         
-    2. use to validate a file or files
+    2. use to validate a file or files::
         
         result = validator.validate(hdf5_file_name)
         result = validator.validate(another_file)
+        
+    3. close the HDF5 file when done with validation::
+        
+        validator.close()
 
     PUBLIC METHODS
     
@@ -71,12 +83,10 @@ class Data_File_Validator(object):
     """
 
     def __init__(self, ref=None):
-
         self.validations = []      # list of Finding() instances
         self.addresses = collections.OrderedDict()     # dictionary of all HDF5 address nodes in the data file
         self.classpaths = {}
         self.manager = punx.nxdl_manager.NXDL_Manager(ref)
-        pass
 
     
     def close(self):
@@ -95,6 +105,8 @@ class Data_File_Validator(object):
             raise punx.FileNotFound(fname)
         self.fname = fname
 
+        if self.h5 is not None:
+            self.close()            # left open from previous call to validate()
         try:
             self.h5 = h5py.File(fname, 'r')
         except IOError:

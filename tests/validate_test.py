@@ -133,8 +133,10 @@ class Test_Validate(unittest.TestCase):
         dg.attrs["NX_class"] = "NXdata"
         dg.attrs["signal"] = "data"
         ds = dg.create_dataset("data", data=[1, 2, 3.14])
+        ds.attrs["units"] = "arbitrary"
         eg["link_to_data"] = ds
         f.close()
+        self.expected_item_count = 12
         self.validator = punx.validate.Data_File_Validator()
         self.validator.validate(self.hdffile)
 
@@ -146,7 +148,7 @@ class Test_Validate(unittest.TestCase):
 
     def test_specific_hdf5_addresses_can_be_found(self):
         self.setup_simple_test_file()
-        self.assertEqual(len(self.validator.addresses), 10)
+        self.assertEqual(len(self.validator.addresses), self.expected_item_count)
 
     def test_non_nexus_group(self):
         self.setup_simple_test_file()
@@ -160,7 +162,9 @@ class Test_Validate(unittest.TestCase):
         self.validator = punx.validate.Data_File_Validator()
         self.validator.validate(self.hdffile)
 
-        self.assertTrue(punx.validate.CLASSPATH_OF_NON_NEXUS_CONTENT in self.validator.classpaths)
+        self.assertTrue(
+            punx.validate.CLASSPATH_OF_NON_NEXUS_CONTENT 
+            in self.validator.classpaths)
         self.assertTrue("/entry/other" in self.validator.addresses)
         self.assertTrue("/entry/other/comment" in self.validator.addresses)
         self.assertEqual(
@@ -178,7 +182,7 @@ class Test_Validate(unittest.TestCase):
 
     def test_proper_classpath_determined(self):
         self.setup_simple_test_file()
-        self.assertEqual(len(self.validator.classpaths), 10)
+        self.assertEqual(len(self.validator.classpaths), self.expected_item_count)
 
         obj = self.validator.addresses["/"]
         self.assertTrue(obj.classpath in self.validator.classpaths)
@@ -194,11 +198,15 @@ class Test_Validate(unittest.TestCase):
 
     def test_writer_1_3(self):
         self.use_example_file("writer_1_3.hdf5")
-        self.assertTrue("/NXentry/NXdata@two_theta_indices" in self.validator.classpaths)
-        self.assertTrue("/NXentry/NXdata@signal" in self.validator.classpaths)
-        self.assertTrue("/NXentry/NXdata/counts" in self.validator.classpaths)
-        self.assertTrue("/NXentry/NXdata/counts@units" in self.validator.classpaths)
-        self.assertTrue("/NXentry/NXdata/two_theta@units" in self.validator.classpaths)
+        items = """
+        /NXentry/NXdata@two_theta_indices
+        /NXentry/NXdata@signal
+        /NXentry/NXdata/counts
+        /NXentry/NXdata/counts@units
+        /NXentry/NXdata/two_theta@units
+        """.strip().split()
+        for k in items:
+            self.assertTrue(k in self.validator.classpaths)
 
 
 def suite(*args, **kw):

@@ -25,6 +25,7 @@ from __future__ import print_function
 import collections
 import lxml.etree
 import os
+import six
 
 import punx
 from punx import nxdl_schema
@@ -47,7 +48,7 @@ class NXDL_Manager(object):
         if file_set is None:
             cm = punx.cache_manager.CacheManager()
             file_set = cm.default_file_set
-        elif isinstance(file_set, basestring):
+        elif isinstance(file_set, six.string_types):
             cm = punx.cache_manager.CacheManager()
             cm.select_NXDL_file_set(file_set)
             file_set = cm.default_file_set

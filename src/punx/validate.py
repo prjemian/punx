@@ -39,7 +39,7 @@ import punx.nxdl_manager
 
 
 SLASH = "/"
-INFORMATIVE = (logging.INFO + logging.DEBUG)/2
+INFORMATIVE = int((logging.INFO + logging.DEBUG)/2)
 logger = punx.utils.setup_logger(__name__)
 CLASSPATH_OF_NON_NEXUS_CONTENT = "note: item is not NeXus content"
 

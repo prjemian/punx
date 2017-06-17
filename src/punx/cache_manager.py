@@ -68,14 +68,14 @@ from PyQt4 import QtCore
 import punx
 from punx import singletons
 from punx import github_handler
+from punx import utils
 
-
-logger = logging.getLogger(__name__)
 
 SOURCE_CACHE_SUBDIR = u'cache'
 SOURCE_CACHE_SETTINGS_FILENAME = u'punx.ini'
 INFO_FILE_NAME = u'__github_info__.json'
 SHORT_SHA_LENGTH = 7
+logger = utils.setup_logger(__name__)
 
 
 def get_short_sha(full_sha):

@@ -24,10 +24,12 @@ utility routines
    ~isNeXusGroup
    ~isNeXusDataset
    ~isNeXusLink
+   ~setup_logger
 
 '''
 
 import h5py
+import logging
 import os
 import numpy
 
@@ -126,3 +128,24 @@ def isNeXusLink(obj):
     '''is `obj` linked to another NeXus item?'''
     target = decode_byte_string(obj.attrs.get('target', ''))
     return len(target) > 0 and target != obj.name
+
+
+def setup_logger(log_name):
+    """
+    setups up python logging handler for named entity
+    
+    without this setup, logging produces errors such as::
+    
+        No handlers could be found for logger "punx.validate"
+    
+    """
+    logger = logging.getLogger(log_name)
+    # https://docs.python.org/2/library/logging.html
+    ch = logging.StreamHandler()
+    ch.setLevel(logging.CRITICAL)
+    #ch.setLevel(logging.DEBUG)
+    formatter = logging.Formatter('(%(asctime)s %(name)s %(message)s %(levelname)s)')
+    ch.setFormatter(formatter)
+    logger.addHandler(ch)
+    #  see also: https://docs.python.org/2/howto/logging-cookbook.html
+    return logger

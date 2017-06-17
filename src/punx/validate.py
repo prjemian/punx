@@ -25,19 +25,22 @@ INTERNAL
 
 .. autosummary::
    
-   ~V_Subject
+   ~ValidationItem
 
 """
 
 import collections
 import os
 import h5py
+import logging
 import punx
 import punx.utils
 import punx.nxdl_manager
 
 
 SLASH = "/"
+INFORMATIVE = (logging.INFO + logging.DEBUG)/2
+logger = punx.utils.setup_logger(__name__)
 
 
 class Data_File_Validator(object):
@@ -111,6 +114,7 @@ class Data_File_Validator(object):
         try:
             self.h5 = h5py.File(fname, 'r')
         except IOError:
+            logger.error("Could not open as HDF5: " + fname)
             raise punx.HDF5_Open_Error(fname)
 
         self.build_address_catalog()
@@ -136,11 +140,13 @@ class Data_File_Validator(object):
             if v.classpath not in self.classpaths:
                 self.classpaths[v.classpath] = []
             self.classpaths[v.classpath].append(v)
+            logger.log(INFORMATIVE, "NeXus classpath: " + v.classpath)
         def get_subject(parent, o):
-            v_obj = V_Subject(parent, o)
-            self.addresses[v_obj.h5_address] = v_obj
-            addClasspath(v_obj)
-            return v_obj
+            v = ValidationItem(parent, o)
+            self.addresses[v.h5_address] = v
+            logger.log(INFORMATIVE, "HDF5 address: " + v.h5_address)
+            addClasspath(v)
+            return v
 
         obj = get_subject(parent, group)
         parent = self.classpaths[obj.classpath][-1]
@@ -151,13 +157,13 @@ class Data_File_Validator(object):
                 get_subject(parent, group[item])
 
 
-class V_Subject(object):
+class ValidationItem(object):
     """
     HDF5 data file object for validation
     """
     
     def __init__(self, parent, obj):
-        assert(isinstance(parent, (V_Subject, type(None))))
+        assert(isinstance(parent, (ValidationItem, type(None))))
         self.parent = parent
         self.h5_object = obj
         self.h5_address = obj.name
@@ -195,6 +201,7 @@ class V_Subject(object):
             if not classpath.endswith(SLASH):
                 if punx.utils.isHdf5Group(h5_obj) and "NX_class" in h5_obj.attrs:
                     nx_class = h5_obj.attrs["NX_class"]
+                    logger.log(INFORMATIVE, "NeXus base class: " + nx_class)
                 else:
                     nx_class = self.name
                 classpath += SLASH + nx_class

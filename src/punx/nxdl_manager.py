@@ -30,17 +30,10 @@ import os
 import punx
 from punx import nxdl_schema
 from punx import cache_manager
+from punx import utils
 
 
-logger = logging.getLogger(__name__)
-# https://docs.python.org/2/library/logging.html
-ch = logging.StreamHandler()
-ch.setLevel(logging.CRITICAL)
-#ch.setLevel(logging.DEBUG)
-formatter = logging.Formatter('(%(asctime)s %(name)s %(message)s %(levelname)s)')
-ch.setFormatter(formatter)
-logger.addHandler(ch)
-#  see also: https://docs.python.org/2/howto/logging-cookbook.html
+logger = utils.setup_logger(__name__)
 
 
 class NXDL_Manager(object):

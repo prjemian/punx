@@ -23,7 +23,6 @@ is called by *____tba_____*.
 from __future__ import print_function
 
 import collections
-import logging
 import lxml.etree
 import os
 

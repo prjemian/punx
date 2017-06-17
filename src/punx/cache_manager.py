@@ -59,7 +59,6 @@ is called by *schema_manager* and *nxdl_manager*.
 
 import datetime
 import json
-import logging
 import os
 import pyRestTable
 import shutil

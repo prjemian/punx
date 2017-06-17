@@ -83,6 +83,7 @@ class Data_File_Validator(object):
     """
 
     def __init__(self, ref=None):
+        self.h5 = None
         self.validations = []      # list of Finding() instances
         self.addresses = collections.OrderedDict()     # dictionary of all HDF5 address nodes in the data file
         self.classpaths = {}

@@ -115,6 +115,12 @@ class Test_Validate(unittest.TestCase):
         self.validator = punx.validate.Data_File_Validator()
         self.validator.validate(self.hdffile)
 
+    def use_example_file(self, fname):
+        path = os.path.join(os.path.dirname(punx.__file__), 'data', )
+        example_file = os.path.abspath(os.path.join(path, fname))
+        self.validator = punx.validate.Data_File_Validator()
+        self.validator.validate(example_file)
+
     def test_specific_hdf5_addresses_can_be_found(self):
         self.setup_simple_test_file()
         self.assertEqual(len(self.validator.addresses), 5)
@@ -130,6 +136,10 @@ class Test_Validate(unittest.TestCase):
         obj = self.validator.addresses["/entry/data/data"]
         self.assertTrue(obj.classpath in self.validator.classpaths)
         self.assertEqual(obj.classpath, "/NXentry/NXdata/data")
+
+    def test_writer_1_3(self):
+        self.use_example_file("writer_1_3.hdf5")
+        self.assertTrue("/NXentry/NXdata/counts" in self.validator.classpaths)
 
 
 def suite(*args, **kw):

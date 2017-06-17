@@ -29,6 +29,9 @@ import punx.utils
 import punx.nxdl_manager
 
 
+SLASH = "/"
+
+
 class Data_File_Validator(object):
     """
     manage the validation of a NeXus HDF5 data file
@@ -87,7 +90,7 @@ class Data_File_Validator(object):
     
     def build_address_catalog(self):
         """
-        find all HDF5 addresses in the data file
+        find all HDF5 addresses and NeXus class paths in the data file
         """
         self._group_address_catalog_(self.h5)
     
@@ -95,13 +98,54 @@ class Data_File_Validator(object):
         """
         catalog this group's address and all its contents
         """
-        # TODO: build objects to hold HDF5 contents and other interesting info such as findings & classpath
-        self.addresses[group.name] = group
+        def add_to_classpath(v):
+            if v.classpath not in self.classpaths:
+                self.classpaths[v.classpath] = []
+            self.classpaths[v.classpath].append(v)
+        def get_subject(o):
+            v_obj = V_Subject(o)
+            self.addresses[v_obj.h5_address] = v_obj
+            add_to_classpath(v_obj)
+            return v_obj
+
+        get_subject(group)
         for item in group:
             if punx.utils.isHdf5Group(group[item]):
                 self._group_address_catalog_(group[item])
             else:
-                self.addresses[item] = group[item]
+                get_subject(group[item])
+
+
+class V_Subject(object):
+    """
+    HDF5 data file object for validation
+    """
+    
+    _subjects_ = {}
+    
+    def __init__(self, obj):
+        self.h5_object = obj
+        self.h5_address = obj.name
+        self.validation_finding = dict(name=None)   # TODO: how using this?
+        self._subjects_[obj.name] = self
+
+        if obj.name == SLASH:
+            self.classpath = "/NXroot"      # TODO: or ""?
+            self.short_name = SLASH
+        else:
+            self.short_name = obj.name.split(SLASH)[-1]
+            parent_addr = SLASH.join(obj.name.split(SLASH)[:-1])
+            if parent_addr == "":
+                parent_addr = SLASH
+            if punx.utils.isHdf5Group(obj) and "NX_class" in obj.attrs:
+                cp = obj.attrs["NX_class"]
+                self.validation_finding["NX_class"] = None
+            else:
+                cp = self.short_name
+            self.classpath = self._subjects_[parent_addr].classpath
+            if not self.classpath.endswith(SLASH):
+                self.classpath += SLASH + cp
+            pass
 
 
 if __name__ == '__main__':

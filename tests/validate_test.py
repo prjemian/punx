@@ -13,6 +13,10 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..',
 import punx, punx.validate, punx.utils
 
 
+# TODO: test something that is defined in one NXDL file set but not another
+#       such as: NXdata group not required after NIAC2016
+
+
 class No_Exception(Exception): pass
 
 

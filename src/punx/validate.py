@@ -149,7 +149,7 @@ class Data_File_Validator(object):
             addClasspath(v)
             for k, a in sorted(o.attrs.items()):
                 av = ValidationItem(v, a, attribute_name=k)
-                self.addresses[v.h5_address+"@"+k] = av
+                self.addresses[av.h5_address] = av
                 addClasspath(av)
             return v
 
@@ -180,11 +180,12 @@ class ValidationItem(object):
                 self.name = obj.name.split(SLASH)[-1]
             self.classpath = self.determine_NeXus_classpath()
         else:
-            self.h5_address = None
             self.name = attribute_name
             if parent.classpath == CLASSPATH_OF_NON_NEXUS_CONTENT:
+                self.h5_address = None
                 self.classpath = CLASSPATH_OF_NON_NEXUS_CONTENT
             else:
+                self.h5_address = parent.h5_address + "@" + self.name
                 self.classpath = parent.classpath + "@" + self.name
     
     def determine_NeXus_classpath(self):

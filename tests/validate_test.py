@@ -170,15 +170,13 @@ class Test_Validate(unittest.TestCase):
         self.assertEqual(
             punx.validate.CLASSPATH_OF_NON_NEXUS_CONTENT, 
             self.validator.addresses["/entry/other"].classpath)
-        self.assertEqual(
-            punx.validate.CLASSPATH_OF_NON_NEXUS_CONTENT, 
-            self.validator.addresses["/entry/other@intentions"].classpath)
+        self.assertFalse(
+            "/entry/other@intentions" in self.validator.addresses)
         self.assertEqual(
             punx.validate.CLASSPATH_OF_NON_NEXUS_CONTENT, 
             self.validator.addresses["/entry/other/comment"].classpath)
-        self.assertEqual(
-            punx.validate.CLASSPATH_OF_NON_NEXUS_CONTENT, 
-            self.validator.addresses["/entry/other/comment@purpose"].classpath)
+        self.assertFalse(
+            "/entry/other/comment@purpose" in self.validator.addresses)
 
     def test_proper_classpath_determined(self):
         self.setup_simple_test_file()

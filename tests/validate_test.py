@@ -18,19 +18,28 @@ class No_Exception(Exception): pass
 
 class Test_Constructor_Exceptions(unittest.TestCase):
 
+    def test_bad_file_set_reference(self):
+        self.assertRaises(
+            KeyError, 
+            punx.validate.Data_File_Validator, 
+            'bad file set reference')
+
     def test_bad_file_name_detected(self):
-        self.assertRaises(punx.FileNotFound, punx.validate.Data_File_Validator, 'bad file name')
+        v = punx.validate.Data_File_Validator()
+        self.assertRaises(punx.FileNotFound, v.validate, 'bad file name')
 
     def test_not_HDF5_file_detected(self):
-        self.assertRaises(punx.HDF5_Open_Error, punx.validate.Data_File_Validator, __file__)
+        v = punx.validate.Data_File_Validator()
+        self.assertRaises(punx.HDF5_Open_Error, v.validate, __file__)
 
 
 class Test_Constructor(unittest.TestCase):
     
     def avert_exception(self, fname):
         try:
-            self.validator = punx.validate.Data_File_Validator(fname)
-        except:
+            self.validator = punx.validate.Data_File_Validator()
+            self.validator.validate(fname)
+        except Exception as _exc:
             pass
         else:
             self.validator.close()
@@ -57,7 +66,8 @@ class Test_Constructor(unittest.TestCase):
         f.close()
 
         self.assertRaises(No_Exception, self.avert_exception, self.hdffile)
-        self.validator = punx.validate.Data_File_Validator(self.hdffile)
+        self.validator = punx.validate.Data_File_Validator()
+        self.validator.validate(self.hdffile)
         self.assertTrue(
             punx.utils.isHdf5FileObject(self.validator.h5), 
             "is valid HDF5 file")
@@ -90,7 +100,7 @@ class Test_Validate(unittest.TestCase):
         os.remove(self.hdffile)
         self.hdffile = None
 
-    def build_simple_test_file(self):
+    def setup_simple_test_file(self):
         f = h5py.File(self.hdffile)
         f.attrs["default"] = "entry"
         eg = f.create_group("entry")
@@ -102,16 +112,15 @@ class Test_Validate(unittest.TestCase):
         ds = dg.create_dataset("data", data=[1, 2, 3.14])
         eg["link_to_data"] = ds
         f.close()
-        return punx.validate.Data_File_Validator(self.hdffile)
+        self.validator = punx.validate.Data_File_Validator()
+        self.validator.validate(self.hdffile)
 
     def test_specific_hdf5_addresses_can_be_found(self):
-        self.validator = self.build_simple_test_file()
-        self.validator.validate("v3.2")
+        self.setup_simple_test_file()
         self.assertEqual(len(self.validator.addresses), 5)
 
     def test_proper_classpath_determined(self):
-        self.validator = self.build_simple_test_file()
-        self.validator.validate("v3.2")
+        self.setup_simple_test_file()
         self.assertEqual(len(self.validator.classpaths), 5)
 
         obj = self.validator.addresses["/"]

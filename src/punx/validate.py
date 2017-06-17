@@ -35,6 +35,24 @@ SLASH = "/"
 class Data_File_Validator(object):
     """
     manage the validation of a NeXus HDF5 data file
+    
+    USAGE
+
+
+    1. make a validator with a certain schema::
+        
+        validator = punx.validate.Data_File_Validator()    # default
+    
+       You may have downloaded additional NeXus Schema (NXDL file sets).
+       If so, pick any of these by name as follows::
+
+        validator = punx.validate.Data_File_Validator("v3.2")
+        validator = punx.validate.Data_File_Validator("master")
+        
+    2. use to validate a file or files
+        
+        result = validator.validate(hdf5_file_name)
+        result = validator.validate(another_file)
 
     PUBLIC METHODS
     
@@ -52,20 +70,14 @@ class Data_File_Validator(object):
 
     """
 
-    def __init__(self, fname):
-        if not os.path.exists(fname):
-            raise punx.FileNotFound(fname)
-        self.fname = fname
+    def __init__(self, ref=None):
 
         self.validations = []      # list of Finding() instances
         self.addresses = collections.OrderedDict()     # dictionary of all HDF5 address nodes in the data file
         self.classpaths = {}
-        self.manager = None
+        self.manager = punx.nxdl_manager.NXDL_Manager(ref)
+        pass
 
-        try:
-            self.h5 = h5py.File(fname, 'r')
-        except IOError:
-            raise punx.HDF5_Open_Error(fname)
     
     def close(self):
         """
@@ -75,11 +87,19 @@ class Data_File_Validator(object):
             self.h5.close()
             self.h5 = None
     
-    def validate(self, ref=None):
+    def validate(self, fname):
         '''
         start the validation process from the file root
         '''
-        self.manager = punx.nxdl_manager.NXDL_Manager(ref)
+        if not os.path.exists(fname):
+            raise punx.FileNotFound(fname)
+        self.fname = fname
+
+        try:
+            self.h5 = h5py.File(fname, 'r')
+        except IOError:
+            raise punx.HDF5_Open_Error(fname)
+
         self.build_address_catalog()
         # 1. check all objects in file (name is valid, ...)
         # 2. check all base classes against defaults

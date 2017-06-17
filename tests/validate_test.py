@@ -1,6 +1,15 @@
 
 '''
 test punx tests/validate module
+
+ISSUES
+
+* [ ] #93 special classpath for non-NeXus groups
+* [*] #92 add attributes to classpath
+* [ ] #91 test changes in NXDL rules
+* [*] #89 while refactoring 72, fix logging
+* [ ] #72 refactor to validate application definitions
+
 '''
 
 import os
@@ -13,7 +22,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..',
 import punx, punx.validate, punx.utils
 
 
-# TODO: test something that is defined in one NXDL file set but not another
+# TODO: (#91) test something that is defined in one NXDL file set but not another
 #       such as: NXdata group not required after NIAC2016
 
 
@@ -127,11 +136,11 @@ class Test_Validate(unittest.TestCase):
 
     def test_specific_hdf5_addresses_can_be_found(self):
         self.setup_simple_test_file()
-        self.assertEqual(len(self.validator.addresses), 5)
+        self.assertEqual(len(self.validator.addresses), 10)
 
     def test_proper_classpath_determined(self):
         self.setup_simple_test_file()
-        self.assertEqual(len(self.validator.classpaths), 5)
+        self.assertEqual(len(self.validator.classpaths), 10)
 
         obj = self.validator.addresses["/"]
         self.assertTrue(obj.classpath in self.validator.classpaths)
@@ -140,10 +149,18 @@ class Test_Validate(unittest.TestCase):
         obj = self.validator.addresses["/entry/data/data"]
         self.assertTrue(obj.classpath in self.validator.classpaths)
         self.assertEqual(obj.classpath, "/NXentry/NXdata/data")
+        
+        self.assertTrue("@default" in self.validator.classpaths)
+        self.assertTrue("/NXentry@default" in self.validator.classpaths)
+        self.assertTrue("/NXentry/NXdata@signal" in self.validator.classpaths)
 
     def test_writer_1_3(self):
         self.use_example_file("writer_1_3.hdf5")
+        self.assertTrue("/NXentry/NXdata@two_theta_indices" in self.validator.classpaths)
+        self.assertTrue("/NXentry/NXdata@signal" in self.validator.classpaths)
         self.assertTrue("/NXentry/NXdata/counts" in self.validator.classpaths)
+        self.assertTrue("/NXentry/NXdata/counts@units" in self.validator.classpaths)
+        self.assertTrue("/NXentry/NXdata/two_theta@units" in self.validator.classpaths)
 
 
 def suite(*args, **kw):

@@ -146,6 +146,10 @@ class Data_File_Validator(object):
             self.addresses[v.h5_address] = v
             logger.log(INFORMATIVE, "HDF5 address: " + v.h5_address)
             addClasspath(v)
+            for k, a in sorted(o.attrs.items()):
+                av = ValidationItem(v, a, attribute_name=k)
+                self.addresses[v.h5_address+"@"+k] = av
+                addClasspath(av)
             return v
 
         obj = get_subject(parent, group)
@@ -162,17 +166,22 @@ class ValidationItem(object):
     HDF5 data file object for validation
     """
     
-    def __init__(self, parent, obj):
+    def __init__(self, parent, obj, attribute_name=None):
         assert(isinstance(parent, (ValidationItem, type(None))))
         self.parent = parent
-        self.h5_object = obj
-        self.h5_address = obj.name
         self.validations = {}    # validation findings go here
-        if obj.name == SLASH:
-            self.name = SLASH
+        self.h5_object = obj
+        if hasattr(obj, 'name'):
+            self.h5_address = obj.name
+            if obj.name == SLASH:
+                self.name = SLASH
+            else:
+                self.name = obj.name.split(SLASH)[-1]
+            self.classpath = self.determine_NeXus_classpath()
         else:
-            self.name = obj.name.split(SLASH)[-1]
-        self.classpath = self.determine_NeXus_classpath()
+            self.h5_address = None
+            self.name = attribute_name
+            self.classpath = parent.classpath + "@" + self.name
     
     def determine_NeXus_classpath(self):
         """
@@ -192,6 +201,7 @@ class ValidationItem(object):
         The HDF5 address of the plottable data is: ``/entry/data/data``.
         The NeXus class path is: ``/NXentry/NXdata/data
         """
+        # TODO: special classpath for non-NeXus groups #93
         if self.name == SLASH:
             return ""
         else:

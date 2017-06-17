@@ -100,7 +100,7 @@ class Test_Constructor(unittest.TestCase):
 
 class Test_Changing_NXDL_Rules(unittest.TestCase):
 
-    def test_specific_hdf5_addresses_can_be_found(self):
+    def test_tba(self):
         # TODO: (#91) test something that is defined in 
         #       one NXDL file set but not another,
         #       such as: NXdata group not required after NIAC2016

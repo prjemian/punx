@@ -204,7 +204,10 @@ class Test_Validate(unittest.TestCase):
         /NXentry/NXdata/two_theta@units
         """.strip().split()
         for k in items:
-            self.assertTrue(k in self.validator.classpaths)
+            if k not in self.validator.classpaths:
+                import pprint
+                pprint.pprint(self.validator.classpaths)
+            self.assertTrue(k in self.validator.classpaths, k)
 
 
 def suite(*args, **kw):

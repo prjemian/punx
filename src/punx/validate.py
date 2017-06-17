@@ -30,9 +30,10 @@ INTERNAL
 """
 
 import collections
-import os
 import h5py
 import logging
+import os
+
 import punx
 import punx.utils
 import punx.nxdl_manager
@@ -186,7 +187,7 @@ class ValidationItem(object):
                 self.classpath = CLASSPATH_OF_NON_NEXUS_CONTENT
             else:
                 self.h5_address = parent.h5_address + "@" + self.name
-                self.classpath = parent.classpath + "@" + self.name
+                self.classpath = str(parent.classpath) + "@" + self.name
     
     def determine_NeXus_classpath(self):
         """
@@ -201,18 +202,21 @@ class ValidationItem(object):
             /
                 entry: NXentry
                     data: NXdata
+                        @signal = data
                         data: NX_NUMBER
         
         The HDF5 address of the plottable data is: ``/entry/data/data``.
         The NeXus class path is: ``/NXentry/NXdata/data
+        
+        For the "signal" attribute of this HDF5 address: ``/entry/data``,
+        the NeXus class path is: ``/NXentry/NXdata@signal
         """
-        # TODO: special classpath for non-NeXus groups #93
         if self.name == SLASH:
             return ""
         else:
             h5_obj = self.h5_object
 
-            classpath = self.parent.classpath
+            classpath = str(self.parent.classpath)
             if classpath == CLASSPATH_OF_NON_NEXUS_CONTENT:
                 logger.log(INFORMATIVE, "%s is not NeXus content" % h5_obj.name)
                 return CLASSPATH_OF_NON_NEXUS_CONTENT
@@ -220,7 +224,7 @@ class ValidationItem(object):
             if not classpath.endswith(SLASH):
                 if punx.utils.isHdf5Group(h5_obj):
                     if "NX_class" in h5_obj.attrs:
-                        nx_class = h5_obj.attrs["NX_class"]
+                        nx_class = punx.utils.decode_byte_string(h5_obj.attrs["NX_class"])
                         logger.log(INFORMATIVE, "NeXus base class: " + nx_class)
                     else:
                         logger.log(INFORMATIVE, "HDF5 group is not NeXus: " + self.h5_address)

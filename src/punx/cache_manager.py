@@ -282,7 +282,7 @@ class CacheManager(singletons.Singleton):
         if force or ref not in fs:
             if grr.request_info(ref) is not None:
                 if ref not in fs:
-                    logger.info(" reference not found in cache: " % ref)
+                    logger.info(" %s not found in cache" % ref)
                     force = True
                     verb = "Installing"
                 else:

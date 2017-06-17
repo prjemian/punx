@@ -8,7 +8,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), 'src'
 import punx.github_handler, punx.cache_manager
 
 
-logging.basicConfig(level=-1)   # report everything logged
+logging.basicConfig(level=logging.DEBUG)   # report everything logged from DEBUG
 
 
 if __name__ == '__main__':
@@ -26,7 +26,9 @@ if __name__ == '__main__':
     for ref, use_user_cache in releases.items():
         force = ref == "master"    # always update from the master branch
 
-        logging.info(" installing(ref=%s, force=%s)" % (ref, str(force)))
+        msg = " install_NXDL_file_set(ref=%s, force=%s, user_cache=%s)"
+        msg = msg % (ref, str(force), str(use_user_cache))
+        logging.info(msg)
 
         m = cm.install_NXDL_file_set(
             grr, 

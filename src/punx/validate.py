@@ -87,6 +87,7 @@ class Data_File_Validator(object):
        
        ~build_address_catalog
        ~_group_address_catalog_
+       ~validate_item_name
 
     """
 
@@ -175,7 +176,7 @@ class Data_File_Validator(object):
 
     def validate_item_name(self, v_obj, key=None):
         """
-        validate *h5_addr* using *validItemName* regular expression
+        check :class:`ValidationItem` *v_obj* using *validItemName* regular expression
         
         This is used for the names of groups, fields, links, and attributes.
         
@@ -206,14 +207,16 @@ class Data_File_Validator(object):
             return      # do not repeat this
 
         key = key or "validItemName"
+        patterns = collections.OrderedDict()
 
-        # links need the parent added to the call signature
         if (punx.utils.isHdf5Dataset(v_obj.h5_object) or
-            punx.utils.isHdf5Group(v_obj.h5_object)):
+            punx.utils.isHdf5Group(v_obj.h5_object) or
+            punx.utils.isHdf5Link(v_obj.parent, v_obj.name) or
+            punx.utils.isHdf5ExternalLink(v_obj.parent, v_obj.name)):
+            
             nxdl = self.manager.nxdl_file_set.schema_manager.nxdl
             
             # build the regular expression patterns to match
-            patterns = collections.OrderedDict()
             patterns["validItemName-strict"] = VALIDITEMNAME_STRICT_PATTERN
             if key in nxdl.patterns:
                 expression_list = nxdl.patterns[key].re_list
@@ -221,13 +224,14 @@ class Data_File_Validator(object):
                     patterns["validItemName-relaxed-" + str(i)] = p
             
             # check against patterns until a match is found
+            key = "name"
             status = None
             for k, p in patterns.items():
                 if k not in self.regexp_cache:
                     self.regexp_cache[k] = re.compile('^' + p + '$')
                 m = self.regexp_cache[k].match(v_obj.name)
                 matches = m is not None and m.string == v_obj.name
-                msg = "checking %s against %s: %s" % (v_obj.h5_address, k, str(matches))
+                msg = "checking %s with %s: %s" % (v_obj.h5_address, k, str(matches))
                 logger.debug(msg)
                 if matches:
                     if k.endswith('strict'):
@@ -240,9 +244,31 @@ class Data_File_Validator(object):
             if status is None:
                 status = punx.finding.WARN
                 k = "valid HDF5 item name, not valid with NeXus"
-            f = punx.finding.Finding(v_obj.h5_address, "name", status, k)
+            f = punx.finding.Finding(v_obj.h5_address, key, status, k)
             self.validations.append(f)
-            v_obj.validations["name"] = f
+            v_obj.validations[key] = f
+
+        elif v_obj.name == "NX_class" and v_obj.classpath.find("@") > 0:
+            nxdl = self.manager.nxdl_file_set.schema_manager.nxdl
+            key = "validNXClassName"
+            for i, p in enumerate(nxdl.patterns[key].re_list):
+                patterns[key + "-" + str(i)] = p
+
+            status = punx.finding.ERROR
+            for k, p in patterns.items():
+                if k not in self.regexp_cache:
+                    self.regexp_cache[k] = re.compile('^' + p + '$')
+                s = punx.utils.decode_byte_string(v_obj.h5_object)
+                m = self.regexp_cache[k].match(s)
+                matches = m is not None and m.string == s
+                msg = "checking %s with %s: %s" % (v_obj.h5_address, k, str(matches))
+                logger.debug(msg)
+                if matches:
+                    status = punx.finding.OK
+                    break
+            f = punx.finding.Finding(v_obj.h5_address, key, status, k)
+            self.validations.append(f)
+            v_obj.validations[key] = f
 
         else:
             # TODO:

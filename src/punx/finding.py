@@ -79,8 +79,8 @@ class Finding(object):
     
     def __str__(self, *args, **kwargs):
         try:
-            s = self.h5_address 
-            s += ' ' + str(self.status)
+            s = str(self.status)
+            s += ' ' + self.h5_address 
             s += ': ' + self.test_name
             s += ': ' + self.comment
             return s

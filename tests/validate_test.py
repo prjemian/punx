@@ -211,6 +211,21 @@ class Test_Validate(unittest.TestCase):
                 pprint.pprint(self.validator.classpaths)
             self.assertTrue(k in self.validator.classpaths, k)
 
+    def test_writer_2_1(self):
+        self.use_example_file("writer_2_1.hdf5")
+        items = """
+        /NXentry/NXdata@two_theta_indices
+        /NXentry/NXdata@signal
+        /NXentry/NXdata/counts
+        /NXentry/NXdata/counts@units
+        /NXentry/NXdata/two_theta@units
+        """.strip().split()
+        for k in items:
+            if k not in self.validator.classpaths:
+                import pprint
+                pprint.pprint(self.validator.classpaths)
+            self.assertTrue(k in self.validator.classpaths, k)
+
 
 def suite(*args, **kw):
     test_suite = unittest.TestSuite()

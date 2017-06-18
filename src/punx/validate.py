@@ -209,7 +209,87 @@ class Data_File_Validator(object):
         key = key or "validItemName"
         patterns = collections.OrderedDict()
 
-        if (punx.utils.isHdf5Dataset(v_obj.h5_object) or
+        if v_obj.name == "NX_class" and v_obj.classpath.find("@") > 0:
+            nxdl = self.manager.nxdl_file_set.schema_manager.nxdl
+            key = "validNXClassName"
+            for i, p in enumerate(nxdl.patterns[key].re_list):
+                patterns[key + "-" + str(i)] = p
+
+            status = punx.finding.ERROR
+            for k, p in patterns.items():
+                if k not in self.regexp_cache:
+                    self.regexp_cache[k] = re.compile('^' + p + '$')
+                s = punx.utils.decode_byte_string(v_obj.h5_object)
+                m = self.regexp_cache[k].match(s)
+                matches = m is not None and m.string == s
+                msg = "checking %s with %s: %s" % (v_obj.h5_address, k, str(matches))
+                logger.debug(msg)
+                if matches:
+                    status = punx.finding.OK
+                    break
+            f = punx.finding.Finding(v_obj.h5_address, key, status, k)
+            self.validations.append(f)
+            v_obj.validations[key] = f
+
+        elif v_obj.name == "target" and v_obj.classpath.find("@") > 0:
+            nxdl = self.manager.nxdl_file_set.schema_manager.nxdl
+            key = "validTargetName"
+            for i, p in enumerate(nxdl.patterns[key].re_list):
+                patterns[key + "-" + str(i)] = p
+
+            status = punx.finding.ERROR
+            for k, p in patterns.items():
+                if k not in self.regexp_cache:
+                    self.regexp_cache[k] = re.compile('^' + p + '$')
+                s = punx.utils.decode_byte_string(v_obj.h5_object)
+                m = self.regexp_cache[k].match(s)
+                matches = m is not None and m.string == s
+                msg = "checking %s with %s: %s" % (v_obj.h5_address, k, str(matches))
+                logger.debug(msg)
+                if matches:
+                    status = punx.finding.OK
+                    break
+            f = punx.finding.Finding(v_obj.h5_address, key, status, k)
+            self.validations.append(f)
+            v_obj.validations[key] = f
+            
+            # TODO: this test belongs in a different test block
+            if False:
+                key = "link target"
+                m = str(s) in self.addresses
+                s += {True: " exists", False: " does not exist"}[m]
+                status = punx.finding.TF_RESULT[m]
+                f = punx.finding.Finding(v_obj.h5_address, key, status, s)
+                self.validations.append(f)
+                v_obj.validations[key] = f
+
+        elif v_obj.classpath.find("@") > -1:
+            nxdl = self.manager.nxdl_file_set.schema_manager.nxdl
+            key = "validItemName"
+            patterns[key + "-strict"] = VALIDITEMNAME_STRICT_PATTERN
+            if key in nxdl.patterns:
+                expression_list = nxdl.patterns[key].re_list
+                for i, p in enumerate(expression_list):
+                    patterns[key + "-relaxed-" + str(i)] = p
+
+            key = "name"
+            status = punx.finding.ERROR
+            for k, p in patterns.items():
+                if k not in self.regexp_cache:
+                    self.regexp_cache[k] = re.compile('^' + p + '$')
+                s = punx.utils.decode_byte_string(v_obj.name)
+                m = self.regexp_cache[k].match(s)
+                matches = m is not None and m.string == s
+                msg = "checking %s with %s: %s" % (s, k, str(matches))
+                logger.debug(msg)
+                if matches:
+                    status = punx.finding.OK
+                    break
+            f = punx.finding.Finding(s, key, status, k)
+            self.validations.append(f)
+            v_obj.validations[key] = f
+
+        elif (punx.utils.isHdf5Dataset(v_obj.h5_object) or
             punx.utils.isHdf5Group(v_obj.h5_object) or
             punx.utils.isHdf5Link(v_obj.parent, v_obj.name) or
             punx.utils.isHdf5ExternalLink(v_obj.parent, v_obj.name)):
@@ -248,29 +328,11 @@ class Data_File_Validator(object):
             self.validations.append(f)
             v_obj.validations[key] = f
 
-        elif v_obj.name == "NX_class" and v_obj.classpath.find("@") > 0:
-            nxdl = self.manager.nxdl_file_set.schema_manager.nxdl
-            key = "validNXClassName"
-            for i, p in enumerate(nxdl.patterns[key].re_list):
-                patterns[key + "-" + str(i)] = p
-
-            status = punx.finding.ERROR
-            for k, p in patterns.items():
-                if k not in self.regexp_cache:
-                    self.regexp_cache[k] = re.compile('^' + p + '$')
-                s = punx.utils.decode_byte_string(v_obj.h5_object)
-                m = self.regexp_cache[k].match(s)
-                matches = m is not None and m.string == s
-                msg = "checking %s with %s: %s" % (v_obj.h5_address, k, str(matches))
-                logger.debug(msg)
-                if matches:
-                    status = punx.finding.OK
-                    break
-            f = punx.finding.Finding(v_obj.h5_address, key, status, k)
-            self.validations.append(f)
-            v_obj.validations[key] = f
+        elif v_obj.classpath == CLASSPATH_OF_NON_NEXUS_CONTENT:
+            pass
 
         else:
+            nxdl = self.manager.nxdl_file_set.schema_manager.nxdl
             # TODO:
             f = punx.finding.Finding(
                 v_obj.h5_address, 

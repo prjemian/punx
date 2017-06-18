@@ -235,7 +235,52 @@ class Test_Validate(unittest.TestCase):
                 len_cp += len(f.validations)
         self.assertEqual(len_f, len_cp, "findings recorded in two places")
 
-    # TODO: need to test bad link target
+    def test_bad_link_target_value(self):
+        # target attribute value points to non-existing item
+        self.setup_simple_test_file()
+        self.validator.close()
+        f = h5py.File(self.hdffile)
+        data = f["/entry/data/data"]
+        f["/entry/bad_target_in_link"] = data
+        data.attrs["target"] = data.name + "_make_it_incorrect"
+        f.close()
+        self.validator = punx.validate.Data_File_Validator()
+        self.validator.validate(self.hdffile)
+        
+        h5_obj = self.validator.addresses["/entry/bad_target_in_link"].h5_object
+        h5root = self.validator.addresses["/"].h5_object
+        self.assertFalse("no such item" in h5root)
+        
+        # check the link target attribute exists
+        self.assertTrue("target" in h5_obj.attrs)
+        target = h5_obj.attrs["target"]
+        # check the value of the target attribute does not exist
+        self.assertFalse(target in h5root)
+        # TODO: check that validation found this problem
+
+    def test_wrong_link_target_value(self):
+        # test target attribute value that points to wrong but existing item
+        self.setup_simple_test_file()
+        self.validator.close()
+        f = h5py.File(self.hdffile)
+        data = f["/entry/data/data"]
+        f["/entry/linked_item"] = data
+        data.attrs["target"] = f["/entry/data"].name    # points to wrong item
+        f.close()
+        self.validator = punx.validate.Data_File_Validator()
+        self.validator.validate(self.hdffile)
+
+        h5root = self.validator.addresses["/"].h5_object
+        link = h5root["/entry/linked_item"]
+        target = link.attrs["target"]
+        self.assertTrue(target in h5root)   # target value exists
+        h5_obj = h5root[target]
+        self.assertEqual(target, h5_obj.name) # target value matches target's name
+        self.assertFalse("target" in h5_obj.attrs)
+        pass
+        # TODO: check that validation found this problem
+        # TODO: another case, target could have a target attribute but does not match link@target
+
     # TODO: need to test non-compliant item names
 
 def suite(*args, **kw):

@@ -144,8 +144,7 @@ class Data_File_Validator(object):
         find all HDF5 addresses and NeXus class paths in the data file
         """
         self._group_address_catalog_(None, self.h5)
-        # TODO: attributes
-    
+
     def _group_address_catalog_(self, parent, group):
         """
         catalog this group's address and all its contents

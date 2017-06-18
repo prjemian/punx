@@ -9,7 +9,7 @@ ISSUES
     Issues will only be marked "fixed" on GitHub once this branch is merged.
     Then, this table may be removed.
 
-* [ ] #95  validate item names in the classpath dict
+* [*] #95  validate item names in the classpath dict
 * [ ] #94  lazy load NXDL details only when needed
 * [*] #93  special classpath for non-NeXus groups
 * [*] #92  add attributes to classpath
@@ -225,7 +225,18 @@ class Test_Validate(unittest.TestCase):
                 import pprint
                 pprint.pprint(self.validator.classpaths)
             self.assertTrue(k in self.validator.classpaths, k)
+        for f in self.validator.validations:
+            self.assertEqual(f.status, punx.finding.OK, str(f))
 
+        len_f = len(self.validator.validations)
+        len_cp = 0
+        for classpaths in self.validator.classpaths.values():
+            for f in classpaths:
+                len_cp += len(f.validations)
+        self.assertEqual(len_f, len_cp, "findings recorded in two places")
+
+    # TODO: need to test bad link target
+    # TODO: need to test non-compliant item names
 
 def suite(*args, **kw):
     test_suite = unittest.TestSuite()

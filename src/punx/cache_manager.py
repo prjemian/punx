@@ -214,17 +214,7 @@ def table_of_caches():
 
     """
     cm = CacheManager()
-    t = pyRestTable.Table()
-    fs = cm.find_all_file_sets()
-    t.labels = ['NXDL file set', 'type', 'cache', 'date & time', 'commit', 'path']
-    for k, v in fs.items():
-        # print(k, str(v))
-        row = [k,]
-        v.short_sha = get_short_sha(v.sha)
-        for w in 'ref_type cache last_modified short_sha path'.split():
-            row.append(str(v.__getattribute__(w)))
-        t.rows.append(row)
-    return t
+    return cm.table_of_caches()
 
 
 class CacheManager(singletons.Singleton):
@@ -346,7 +336,38 @@ class CacheManager(singletons.Singleton):
         '''
         self.source.cleanup()
         self.user.cleanup()
-   
+
+    def table_of_caches(self):
+        """
+        return a pyRestTable table describing all known file sets in both source and user caches
+        
+        :returns obj: instance of pyRestTable.Table with all known file sets
+        
+        **Example**::
+    
+            ============= ======= ====== =================== ======= ===================================
+            NXDL file set type    cache  date & time         commit  path
+            ============= ======= ====== =================== ======= ===================================
+            v3.2          tag     source 2017-01-18 23:12:44 e888dac /home/user/punx/src/punx/cache/v3.2
+            NXroot-1.0    tag     user   2016-10-24 14:58:10 e0ad63d /home/user/.config/punx/NXroot-1.0
+            master        branch  user   2016-12-20 18:30:29 85d056f /home/user/.config/punx/master
+            Schema-3.3    release user   2017-05-02 12:33:19 4aa4215 /home/user/.config/punx/Schema-3.3
+            a4fd52d       commit  user   2016-11-19 01:07:45 a4fd52d /home/user/.config/punx/a4fd52d
+            ============= ======= ====== =================== ======= ===================================
+    
+        """
+        t = pyRestTable.Table()
+        fs = self.find_all_file_sets()
+        t.labels = ['NXDL file set', 'type', 'cache', 'date & time', 'commit', 'path']
+        for k, v in fs.items():
+            # print(k, str(v))
+            row = [k,]
+            v.short_sha = get_short_sha(v.sha)
+            for w in 'ref_type cache last_modified short_sha path'.split():
+                row.append(str(v.__getattribute__(w)))
+            t.rows.append(row)
+        return t
+
 
 class Base_Cache(object):
     '''

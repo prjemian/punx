@@ -25,9 +25,6 @@ import h5py
 import tempfile
 import unittest
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src')))
-import punx, punx.validate, punx.utils
-
 
 class No_Exception(Exception): pass
 

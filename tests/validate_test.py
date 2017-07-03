@@ -46,11 +46,11 @@ class Test_Constructor_Exceptions(unittest.TestCase):
             'bad file set reference')
 
     def test_bad_file_name_detected(self):
-        v = punx.validate.Data_File_Validator(DEFAULT_NXDL_FILE_SET)
+        v = punx.validate.Data_File_Validator(ref=DEFAULT_NXDL_FILE_SET)
         self.assertRaises(punx.FileNotFound, v.validate, 'bad file name')
 
     def test_not_HDF5_file_detected(self):
-        v = punx.validate.Data_File_Validator(DEFAULT_NXDL_FILE_SET)
+        v = punx.validate.Data_File_Validator(ref=DEFAULT_NXDL_FILE_SET)
         self.assertRaises(punx.HDF5_Open_Error, v.validate, __file__)
 
 
@@ -58,7 +58,7 @@ class Test_Constructor(unittest.TestCase):
     
     def avert_exception(self, fname):
         try:
-            self.validator = punx.validate.Data_File_Validator(DEFAULT_NXDL_FILE_SET)
+            self.validator = punx.validate.Data_File_Validator(ref=DEFAULT_NXDL_FILE_SET)
             self.validator.validate(fname)
         except Exception as _exc:
             pass
@@ -87,7 +87,7 @@ class Test_Constructor(unittest.TestCase):
         f.close()
 
         self.assertRaises(No_Exception, self.avert_exception, self.hdffile)
-        self.validator = punx.validate.Data_File_Validator(DEFAULT_NXDL_FILE_SET)
+        self.validator = punx.validate.Data_File_Validator(ref=DEFAULT_NXDL_FILE_SET)
         self.validator.validate(self.hdffile)
         self.assertTrue(
             punx.utils.isHdf5FileObject(self.validator.h5), 
@@ -144,13 +144,13 @@ class Test_Validate(unittest.TestCase):
         eg["link_to_data"] = ds
         f.close()
         self.expected_item_count = 12
-        self.validator = punx.validate.Data_File_Validator(DEFAULT_NXDL_FILE_SET)
+        self.validator = punx.validate.Data_File_Validator(ref=DEFAULT_NXDL_FILE_SET)
         self.validator.validate(self.hdffile)
 
     def use_example_file(self, fname):
         path = os.path.join(os.path.dirname(punx.__file__), 'data', )
         example_file = os.path.abspath(os.path.join(path, fname))
-        self.validator = punx.validate.Data_File_Validator(DEFAULT_NXDL_FILE_SET)
+        self.validator = punx.validate.Data_File_Validator(ref=DEFAULT_NXDL_FILE_SET)
         self.validator.validate(example_file)
 
     def test_specific_hdf5_addresses_can_be_found(self):
@@ -166,7 +166,7 @@ class Test_Validate(unittest.TestCase):
         ds = other.create_dataset("comment", data="this does not need validation")
         ds.attrs["purpose"] = "testing, only"
         f.close()
-        self.validator = punx.validate.Data_File_Validator(DEFAULT_NXDL_FILE_SET)
+        self.validator = punx.validate.Data_File_Validator(ref=DEFAULT_NXDL_FILE_SET)
         self.validator.validate(self.hdffile)
 
         self.assertTrue(
@@ -249,7 +249,7 @@ class Test_Validate(unittest.TestCase):
         f["/entry/bad_target_in_link"] = data
         data.attrs["target"] = data.name + "_make_it_incorrect"
         f.close()
-        self.validator = punx.validate.Data_File_Validator(DEFAULT_NXDL_FILE_SET)
+        self.validator = punx.validate.Data_File_Validator(ref=DEFAULT_NXDL_FILE_SET)
         self.validator.validate(self.hdffile)
         
         h5_obj = self.validator.addresses["/entry/bad_target_in_link"].h5_object
@@ -272,7 +272,7 @@ class Test_Validate(unittest.TestCase):
         f["/entry/linked_item"] = data
         data.attrs["target"] = f["/entry/data"].name    # points to wrong item
         f.close()
-        self.validator = punx.validate.Data_File_Validator(DEFAULT_NXDL_FILE_SET)
+        self.validator = punx.validate.Data_File_Validator(ref=DEFAULT_NXDL_FILE_SET)
         self.validator.validate(self.hdffile)
 
         h5root = self.validator.addresses["/"].h5_object

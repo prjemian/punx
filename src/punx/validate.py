@@ -108,6 +108,15 @@ class Data_File_Validator(object):
             self.h5.close()
             self.h5 = None
     
+    def record_finding(self, v_item, key, status, comment):
+        """
+        prepare the finding object and record it
+        """
+        f = punx.finding.Finding(v_item.h5_address, key, status, comment)
+        self.validations.append(f)
+        v_item.validations[key] = f
+        return f
+    
     def validate(self, fname):
         '''
         start the validation process from the file root
@@ -128,10 +137,15 @@ class Data_File_Validator(object):
 
         # 1. check all objects in file (name is valid, ...)
         for v_list in self.classpaths.values():
-            for v in v_list:
-                self.validate_item_name(v)
+            for v_item in v_list:
+                self.validate_item_name(v_item)
 
         # 2. check all base classes against defaults
+        for k, v_item in self.addresses.items():
+            if punx.utils.isHdf5Group(v_item.h5_object) or punx.utils.isHdf5FileObject(v_item.h5_object):
+                self.validate_group(v_item)
+            else:
+                pass
 
         # 3. check application definitions
 
@@ -173,13 +187,13 @@ class Data_File_Validator(object):
             else:
                 get_subject(parent, group[item])
 
-    def validate_item_name(self, v_obj, key=None):
+    def validate_item_name(self, v_item, key=None):
         """
-        check :class:`ValidationItem` *v_obj* using *validItemName* regular expression
+        check :class:`ValidationItem` *v_item* using *validItemName* regular expression
         
         This is used for the names of groups, fields, links, and attributes.
         
-        :param obj v_obj: instance of :class:`ValidationItem`
+        :param obj v_item: instance of :class:`ValidationItem`
         :param str key: named key to search, default: None (``validItemName``)
 
         This method will test the object's name for validation,  
@@ -198,17 +212,17 @@ class Data_File_Validator(object):
         
         :see: http://download.nexusformat.org/doc/html/datarules.html?highlight=regular%20expression
         """
-        if v_obj.parent is None:
+        if v_item.parent is None:
             msg = "no name validation on the HDF5 file root node"
             logger.log(INFORMATIVE, msg)
             return
-        if "name" in v_obj.validations:
+        if "name" in v_item.validations:
             return      # do not repeat this
 
         key = key or "validItemName"
         patterns = collections.OrderedDict()
 
-        if v_obj.name == "NX_class" and v_obj.classpath.find("@") > 0:
+        if v_item.name == "NX_class" and v_item.classpath.find("@") > 0:
             nxdl = self.manager.nxdl_file_set.schema_manager.nxdl
             key = "validNXClassName"
             for i, p in enumerate(nxdl.patterns[key].re_list):
@@ -218,19 +232,17 @@ class Data_File_Validator(object):
             for k, p in patterns.items():
                 if k not in self.regexp_cache:
                     self.regexp_cache[k] = re.compile('^' + p + '$')
-                s = punx.utils.decode_byte_string(v_obj.h5_object)
+                s = punx.utils.decode_byte_string(v_item.h5_object)
                 m = self.regexp_cache[k].match(s)
                 matches = m is not None and m.string == s
-                msg = "checking %s with %s: %s" % (v_obj.h5_address, k, str(matches))
+                msg = "checking %s with %s: %s" % (v_item.h5_address, k, str(matches))
                 logger.debug(msg)
                 if matches:
                     status = punx.finding.OK
                     break
-            f = punx.finding.Finding(v_obj.h5_address, key, status, k)
-            self.validations.append(f)
-            v_obj.validations[key] = f
+            self.record_finding(v_item, key, status, k)
 
-        elif v_obj.name == "target" and v_obj.classpath.find("@") > 0:
+        elif v_item.name == "target" and v_item.classpath.find("@") > 0:
             nxdl = self.manager.nxdl_file_set.schema_manager.nxdl
             key = "validTargetName"
             for i, p in enumerate(nxdl.patterns[key].re_list):
@@ -240,17 +252,15 @@ class Data_File_Validator(object):
             for k, p in patterns.items():
                 if k not in self.regexp_cache:
                     self.regexp_cache[k] = re.compile('^' + p + '$')
-                s = punx.utils.decode_byte_string(v_obj.h5_object)
+                s = punx.utils.decode_byte_string(v_item.h5_object)
                 m = self.regexp_cache[k].match(s)
                 matches = m is not None and m.string == s
-                msg = "checking %s with %s: %s" % (v_obj.h5_address, k, str(matches))
+                msg = "checking %s with %s: %s" % (v_item.h5_address, k, str(matches))
                 logger.debug(msg)
                 if matches:
                     status = punx.finding.OK
                     break
-            f = punx.finding.Finding(v_obj.h5_address, key, status, k)
-            self.validations.append(f)
-            v_obj.validations[key] = f
+            self.record_finding(v_item, key, status, k)
             
             # TODO: this test belongs in a different test block
             if False:
@@ -258,11 +268,9 @@ class Data_File_Validator(object):
                 m = str(s) in self.addresses
                 s += {True: " exists", False: " does not exist"}[m]
                 status = punx.finding.TF_RESULT[m]
-                f = punx.finding.Finding(v_obj.h5_address, key, status, s)
-                self.validations.append(f)
-                v_obj.validations[key] = f
+                self.record_finding(v_item, key, status, s)
 
-        elif v_obj.classpath.find("@") > -1:
+        elif v_item.classpath.find("@") > -1:
             nxdl = self.manager.nxdl_file_set.schema_manager.nxdl
             key = "validItemName"
             patterns[key + "-strict"] = VALIDITEMNAME_STRICT_PATTERN
@@ -276,7 +284,7 @@ class Data_File_Validator(object):
             for k, p in patterns.items():
                 if k not in self.regexp_cache:
                     self.regexp_cache[k] = re.compile('^' + p + '$')
-                s = punx.utils.decode_byte_string(v_obj.name)
+                s = punx.utils.decode_byte_string(v_item.name)
                 m = self.regexp_cache[k].match(s)
                 matches = m is not None and m.string == s
                 msg = "checking %s with %s: %s" % (s, k, str(matches))
@@ -286,12 +294,12 @@ class Data_File_Validator(object):
                     break
             f = punx.finding.Finding(s, key, status, k)
             self.validations.append(f)
-            v_obj.validations[key] = f
+            v_item.validations[key] = f
 
-        elif (punx.utils.isHdf5Dataset(v_obj.h5_object) or
-            punx.utils.isHdf5Group(v_obj.h5_object) or
-            punx.utils.isHdf5Link(v_obj.parent, v_obj.name) or
-            punx.utils.isHdf5ExternalLink(v_obj.parent, v_obj.name)):
+        elif (punx.utils.isHdf5Dataset(v_item.h5_object) or
+            punx.utils.isHdf5Group(v_item.h5_object) or
+            punx.utils.isHdf5Link(v_item.parent, v_item.name) or
+            punx.utils.isHdf5ExternalLink(v_item.parent, v_item.name)):
             
             nxdl = self.manager.nxdl_file_set.schema_manager.nxdl
             
@@ -308,9 +316,9 @@ class Data_File_Validator(object):
             for k, p in patterns.items():
                 if k not in self.regexp_cache:
                     self.regexp_cache[k] = re.compile('^' + p + '$')
-                m = self.regexp_cache[k].match(v_obj.name)
-                matches = m is not None and m.string == v_obj.name
-                msg = "checking %s with %s: %s" % (v_obj.h5_address, k, str(matches))
+                m = self.regexp_cache[k].match(v_item.name)
+                matches = m is not None and m.string == v_item.name
+                msg = "checking %s with %s: %s" % (v_item.h5_address, k, str(matches))
                 logger.debug(msg)
                 if matches:
                     if k.endswith('strict'):
@@ -323,25 +331,42 @@ class Data_File_Validator(object):
             if status is None:
                 status = punx.finding.WARN
                 k = "valid HDF5 item name, not valid with NeXus"
-            f = punx.finding.Finding(v_obj.h5_address, key, status, k)
-            self.validations.append(f)
-            v_obj.validations[key] = f
+            self.record_finding(v_item, key, status, k)
 
-        elif v_obj.classpath == CLASSPATH_OF_NON_NEXUS_CONTENT:
-            pass
+        elif v_item.classpath == CLASSPATH_OF_NON_NEXUS_CONTENT:
+            pass    # nothing else to do here
 
         else:
             nxdl = self.manager.nxdl_file_set.schema_manager.nxdl
             # TODO:
-            f = punx.finding.Finding(
-                v_obj.h5_address, 
+            self.record_finding(
+                v_item, 
                 "name", 
                 punx.finding.TODO, 
                 "not handled yet")
-            self.validations.append(f)
-            v_obj.validations["name"] = f
 
-        pass
+        pass    # TODO: what now?
+    
+    def validate_group(self, v_item):
+        """
+        """
+        key = "NeXus_group"
+        if v_item.classpath == CLASSPATH_OF_NON_NEXUS_CONTENT:
+            self.record_finding(
+                v_item, 
+                key,
+                punx.finding.OK, 
+                "not a NeXus group")
+            #return
+        elif v_item.classpath.startswith("/NX"):
+            pass
+        elif v_item.classpath == "":
+            nx_class = "NXroot"    # handle as NXroot
+        elif v_item.classpath.startswith("@"):
+            pass    # TODO: validate NXroot attribute
+        else:
+            _aha_ = "Aha!"
+            print(_aha_, v_item)    # TODO: What could reach here? --> "/NX" not detected above!
 
 
 class ValidationItem(object):
@@ -417,6 +442,7 @@ class ValidationItem(object):
                 if punx.utils.isHdf5Group(h5_obj):
                     if "NX_class" in h5_obj.attrs:
                         nx_class = punx.utils.decode_byte_string(h5_obj.attrs["NX_class"])
+                        self.nx_class = nx_class    # only for groups
                         logger.log(INFORMATIVE, "NeXus base class: " + nx_class)
                     else:
                         logger.log(INFORMATIVE, "HDF5 group is not NeXus: " + self.h5_address)

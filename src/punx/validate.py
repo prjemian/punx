@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from blaze.expr.collections import isin
 
 #-----------------------------------------------------------------------------
 # :author:    Pete R. Jemian

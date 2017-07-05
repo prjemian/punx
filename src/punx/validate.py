@@ -369,7 +369,7 @@ class Data_File_Validator(object):
         # print(str(v_item), v_item.name, v_item.classpath)
         
         self.validate_NX_class_attribute(v_item, nx_class)
-        pass # TODO: process nx_class
+        pass # TODO
     
     def validate_NX_class_attribute(self, v_item, nx_class):
         """

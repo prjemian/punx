@@ -288,6 +288,44 @@ class Test_Validate(unittest.TestCase):
 
     # TODO: need to test non-compliant item names
 
+    def test_application_definition(self):
+        self.setup_simple_test_file()
+        self.validator.close()
+        f = h5py.File(self.hdffile)
+        other = f["/entry"].create_dataset(
+            "definition", 
+            data="NXcanSAS")
+        # TODO: add compliant contents
+        f.close()
+        self.validator = punx.validate.Data_File_Validator(ref=DEFAULT_NXDL_FILE_SET)
+        self.validator.validate(self.hdffile)
+        # TODO: assert what now?
+
+    def test_contributed_base_class(self):
+        pass    # TODO: such as NXquadrupole_magnet
+        self.setup_simple_test_file()
+        self.validator.close()
+        f = h5py.File(self.hdffile)
+        # TODO: should be under an NXinstrument group
+        group = f["/entry"].create_group("quadrupole_magnet")
+        group.attrs["NX_class"] = "NXquadrupole_magnet"
+        f.close()
+        self.validator = punx.validate.Data_File_Validator(ref=DEFAULT_NXDL_FILE_SET)
+        self.validator.validate(self.hdffile)
+
+    def test_contributed_application_definition(self):
+        self.setup_simple_test_file()
+        self.validator.close()
+        f = h5py.File(self.hdffile)
+        other = f["/entry"].create_dataset(
+            "definition", 
+            data="NXspecdata")
+        # TODO: add compliant contents
+        f.close()
+        self.validator = punx.validate.Data_File_Validator(ref=DEFAULT_NXDL_FILE_SET)
+        self.validator.validate(self.hdffile)
+        # TODO: assert what now?
+
 def suite(*args, **kw):
     test_suite = unittest.TestSuite()
     test_list = [

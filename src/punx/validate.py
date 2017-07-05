@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+from blaze.expr.collections import isin
 
 #-----------------------------------------------------------------------------
 # :author:    Pete R. Jemian
@@ -349,6 +350,7 @@ class Data_File_Validator(object):
     
     def validate_group(self, v_item):
         """
+        validate the NeXus content of a HDF5 data file group
         """
         key = "NeXus_group"
         if v_item.classpath == CLASSPATH_OF_NON_NEXUS_CONTENT:
@@ -357,16 +359,73 @@ class Data_File_Validator(object):
                 key,
                 punx.finding.OK, 
                 "not a NeXus group")
-            #return
-        elif v_item.classpath.startswith("/NX"):
-            pass
+            return
+        if v_item.classpath.startswith("/NX"):
+            nx_class = v_item.nx_class
         elif v_item.classpath == "":
             nx_class = "NXroot"    # handle as NXroot
-        elif v_item.classpath.startswith("@"):
-            pass    # TODO: validate NXroot attribute
         else:
-            _aha_ = "Aha!"
-            print(_aha_, v_item)    # TODO: What could reach here? --> "/NX" not detected above!
+            raise ValueError("unexpected: " + str(v_item))
+        # print(str(v_item), v_item.name, v_item.classpath)
+        
+        self.validate_NX_class_attribute(v_item, nx_class)
+        pass # TODO: process nx_class
+    
+    def validate_NX_class_attribute(self, v_item, nx_class):
+        """
+        validate proper use of NeXus groups
+        
+        Only known base classes (and contributed definitions intended 
+        for use as base classes) can be used as groups in a NeXus data file.
+        Application definitions are used in a different way, as an overlay 
+        on a parent NXentry or NXsubentry group, and declared in the 
+        `definition` field of that parent group.
+        """
+        known = nx_class in self.manager.classes
+        status = punx.finding.TF_RESULT[known]
+        msg = nx_class + ": recognized NXDL specification"
+        self.record_finding(v_item, "known NXDL", status, msg)
+
+        if known:
+            as_base = self.usedAsBaseClass(nx_class)
+            status = punx.finding.TF_RESULT[as_base]
+            self.manager.classes[nx_class].category
+            msg = nx_class
+            if self.manager.classes[nx_class].category == "base_classes":
+                msg += ": known NeXus base class"
+            else:
+                msg += ": known NeXus contributed definition used as base class"
+            self.record_finding(v_item, "NeXus base class", status, msg)
+
+    def usedAsBaseClass(self, nx_class):
+        """
+        returns bool: is the nx_class a base class?
+        
+        NXDL specifications in the contributed definitions directory 
+        could be intended as either a base class or an 
+        application definition.  NeXus provides no easy identifier 
+        for this difference.  The most obvious distinction between
+        them is the presence of the `definition` field 
+        in the :ref:`NXentry` group of an application definition.
+        This field is not present in base classes.
+        """
+        nxdl_def = self.manager.classes.get(nx_class, None)
+        if nxdl_def is None:
+            return False
+        if nxdl_def.category == "applications":
+            return False
+        if nxdl_def.category == "base_classes":
+            return True
+        # now, need to work at it a bit
+        # *Should* only be one NXentry group but that is not a rule.
+        if len(nxdl_def.fields) == 0 and \
+           len(nxdl_def.links) == 0 and \
+           len(nxdl_def.groups) == 1: # maybe ...
+            entry_group = nxdl_def.groups.values()[0]
+            # TODO: test entry_group.NX_class == "NXentry" but that attribute is not ready yet!
+            # assume OK
+            return "definition" not in entry_group.fields
+        return True
 
 
 class ValidationItem(object):
@@ -397,9 +456,18 @@ class ValidationItem(object):
     
     def __str__(self, *args, **kwargs):
         try:
+            import h5py._hl
+            if isinstance(self.h5_object, h5py._hl.files.File):
+                object_type = "HDF5 file root"
+            elif isinstance(self.h5_object, h5py._hl.group.Group):
+                object_type = "HDF5 group"
+            elif isinstance(self.h5_object, h5py._hl.dataset.Dataset):
+                object_type = "HDF5 dataset"
+            else:
+                object_type = type(self.h5_object)
             terms = collections.OrderedDict()
             terms["name"] = self.name
-            terms["type"] = type(self.h5_object)
+            terms["type"] = object_type
             terms["classpath"] = self.classpath
             s = ", ".join(["%s=%s" % (k, str(v)) for k, v in terms.items()])
             return "ValidationItem(" + s + ")"

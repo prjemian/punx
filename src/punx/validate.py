@@ -96,6 +96,7 @@ class Data_File_Validator(object):
         self.validations = []      # list of Finding() instances
         self.addresses = collections.OrderedDict()     # dictionary of all HDF5 address nodes in the data file
         self.classpaths = {}
+        self.validation_keys = {}
         self.regexp_cache = {}
         self.manager = punx.nxdl_manager.NXDL_Manager(ref)
 
@@ -115,6 +116,9 @@ class Data_File_Validator(object):
         f = punx.finding.Finding(v_item.h5_address, key, status, comment)
         self.validations.append(f)
         v_item.validations[key] = f
+        if key not in self.validation_keys:
+            self.validation_keys[key] = []
+        self.validation_keys[key].append(f)
         return f
     
     def validate(self, fname):
@@ -142,12 +146,15 @@ class Data_File_Validator(object):
 
         # 2. check all base classes against defaults
         for k, v_item in self.addresses.items():
-            if punx.utils.isHdf5Group(v_item.h5_object) or punx.utils.isHdf5FileObject(v_item.h5_object):
+            if punx.utils.isHdf5Group(v_item.h5_object) \
+            or punx.utils.isHdf5FileObject(v_item.h5_object):
                 self.validate_group(v_item)
-            else:
-                pass
 
         # 3. check application definitions
+        for k in ("/NXentry/definition", "/NXentry/NXsubentry/definition"):
+            if k in self.classpaths:
+                for v_item in self.classpaths[k]:
+                    self.validate_application_definition(v_item.parent)
 
         # 4. check for default plot
     
@@ -368,6 +375,17 @@ class Data_File_Validator(object):
         # print(str(v_item), v_item.name, v_item.classpath)
         
         self.validate_NX_class_attribute(v_item, nx_class)
+        # TODO: validate attributes - both HDF5-supplied & NXDL-specified
+        # TODO: validate symbols - both HDF5-supplied & NXDL-specified
+        # TODO: validate fields - both HDF5-supplied & NXDL-specified
+        # TODO: validate links - both HDF5-supplied & NXDL-specified
+        # TODO: validate groups - both HDF5-supplied & NXDL-specified
+        pass # TODO
+    
+    def validate_application_definition(self, v_item):
+        """
+        validate group as a NeXus application definition
+        """
         pass # TODO
     
     def validate_NX_class_attribute(self, v_item, nx_class):

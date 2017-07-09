@@ -374,6 +374,9 @@ class Data_File_Validator(object):
             raise ValueError("unexpected: " + str(v_item))
         # print(str(v_item), v_item.name, v_item.classpath)
         
+        # TODO: Verify that items presented in data file are valid with base class
+        # TODO: Verify that items specified in base class are compliant with file
+        
         self.validate_NX_class_attribute(v_item, nx_class)
         # TODO: validate attributes - both HDF5-supplied & NXDL-specified
         # TODO: validate symbols - both HDF5-supplied & NXDL-specified

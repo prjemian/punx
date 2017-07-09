@@ -4,7 +4,7 @@
 #-----------------------------------------------------------------------------
 # :author:    Pete R. Jemian
 # :email:     prjemian@gmail.com
-# :copyright: (c) 2016, Pete R. Jemian
+# :copyright: (c) 2016-2017, Pete R. Jemian
 #
 # Distributed under the terms of the Creative Commons Attribution 4.0 International Public License.
 #
@@ -22,16 +22,17 @@ There are two cache directories:
 * the source cache
 * the user cache
 
-Within each of these cache directories, there is a settings file
-(such as *punx.ini*) that stores the configuration of that cache 
-directory.  Also, there are a number of subdirectories, each
+Within each of these cache directories, 
+there may be one or more subdirectories, each
 containing the NeXus definitions subdirectories and files (``*.xml``, 
-``*.xsl``, & ``*.xsd``) of a specific branch, release, or commit hash
+``*.xsl``, & ``*.xsd``) of a specific branch, release, tag, or commit hash
 from the NeXus definitions repository.
 
 :source cache: contains default set of NeXus NXDL files
 :user cache: contains additional set(s) of NeXus NXDL files, installed by user
 
+The *cache_manager* calls the *github_handler* and
+is called by *schema_manager* and *nxdl_manager*.
 
 .. rubric:: Public interface
 
@@ -48,9 +49,10 @@ from the NeXus definitions repository.
    ~read_json_file
    ~write_json_file
    ~extract_from_download
+   ~table_of_caches
    ~Base_Cache
-   ~Source_Cache
-   ~User_Cache
+   ~SourceCache
+   ~UserCache
    ~NXDL_File_Set
 
 '''
@@ -58,20 +60,21 @@ from the NeXus definitions repository.
 import datetime
 import json
 import os
-from PyQt4 import QtCore
+import pyRestTable
 import shutil
-import sys
+from PyQt4 import QtCore
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import punx
-import punx.singletons
-#from punx import settings
+from punx import singletons
+from punx import github_handler
+from punx import utils
 
 
 SOURCE_CACHE_SUBDIR = u'cache'
 SOURCE_CACHE_SETTINGS_FILENAME = u'punx.ini'
 INFO_FILE_NAME = u'__github_info__.json'
 SHORT_SHA_LENGTH = 7
+logger = utils.setup_logger(__name__)
 
 
 def get_short_sha(full_sha):
@@ -105,21 +108,18 @@ def extract_from_download(grr, path):       # TODO refactor into NXDL_File_Set
     
     USAGE::
 
-        grr = punx.github_handler.GitHub_Repository_Reference()
+        grr = github_handler.GitHub_Repository_Reference()
         grr.connect_repo()
         if grr.request_info() is not None:
-            punx.cache_manager.extract_from_download(grr, cache_directory)
+            extract_from_download(grr, cache_directory)
     
-    '''
-    import io, zipfile
-    NXDL_categories = 'base_classes applications contributed_definitions'.split()
-    NXDL_file_endings_list = '.xsd .xml .xsl'.split()
+    .. 
+        autosummary::
+       
+       ~should_avoid_download
+       ~should_extract_this
 
-    msg_list = []
-    
-    download_dir_name = None     # to be learned en route
-    NXDL_refs_dir_name = os.path.join(path, grr.ref)
-    
+    '''
     def should_avoid_download(grr, path):
         '''
         decide if the download should be avoided (True: avoid, False: download)
@@ -136,14 +136,9 @@ def extract_from_download(grr, path):       # TODO refactor into NXDL_File_Set
                 info_file_name = os.path.join(path, subdir, INFO_FILE_NAME)
                 if os.path.exists(info_file_name):
                     info = read_json_file(info_file_name)
-                    if info.sha != grr.sha:
+                    if info["sha"] == grr.sha:
                         return True
         return False
-
-    if should_avoid_download(grr, path):
-        return
-    msg_list.append('downloading: ' + grr.zip_url)
-    zip_content = zipfile.ZipFile(io.BytesIO(grr.download().content))
 
     def should_extract_this(item):
         '''
@@ -154,6 +149,20 @@ def extract_from_download(grr, path):       # TODO refactor into NXDL_File_Set
                 if item.split('/')[-2] in allowed_parent_directories:
                     return True
         return False
+
+    import io, zipfile
+    NXDL_categories = 'base_classes applications contributed_definitions'.split()
+    NXDL_file_endings_list = '.xsd .xml .xsl'.split()
+
+    msg_list = []
+    
+    download_dir_name = None     # to be learned en route
+    NXDL_refs_dir_name = os.path.join(path, grr.ref)
+
+    if should_avoid_download(grr, path):
+        return
+    msg_list.append('downloading: ' + grr.zip_url)
+    zip_content = zipfile.ZipFile(io.BytesIO(grr.download().content))
 
     allowed_parent_directories = NXDL_categories
     for item in zip_content.namelist():
@@ -185,7 +194,30 @@ def extract_from_download(grr, path):       # TODO refactor into NXDL_File_Set
     return msg_list
 
 
-class CacheManager(punx.singletons.Singleton):
+def table_of_caches():
+    """
+    return a pyRestTable table describing all known file sets in both source and user caches
+    
+    :returns obj: instance of pyRestTable.Table with all known file sets
+    
+    **Example**::
+
+        ============= ======= ====== =================== ======= ===================================
+        NXDL file set type    cache  date & time         commit  path
+        ============= ======= ====== =================== ======= ===================================
+        v3.2          tag     source 2017-01-18 23:12:44 e888dac /home/user/punx/src/punx/cache/v3.2
+        NXroot-1.0    tag     user   2016-10-24 14:58:10 e0ad63d /home/user/.config/punx/NXroot-1.0
+        master        branch  user   2016-12-20 18:30:29 85d056f /home/user/.config/punx/master
+        Schema-3.3    release user   2017-05-02 12:33:19 4aa4215 /home/user/.config/punx/Schema-3.3
+        a4fd52d       commit  user   2016-11-19 01:07:45 a4fd52d /home/user/.config/punx/a4fd52d
+        ============= ======= ====== =================== ======= ===================================
+
+    """
+    cm = CacheManager()
+    return cm.table_of_caches()
+
+
+class CacheManager(singletons.Singleton):
     '''
     manager both source and user caches
     
@@ -193,7 +225,7 @@ class CacheManager(punx.singletons.Singleton):
     
         ~install_NXDL_file_set
         ~select_NXDL_file_set
-        ~file_sets
+        ~find_all_file_sets
         ~cleanup
     
     '''
@@ -203,42 +235,67 @@ class CacheManager(punx.singletons.Singleton):
         self.source = SourceCache()
         self.user = UserCache()
         
-        self.NXDL_file_sets = self.file_sets()
-        msg = 'NXDL_file_sets names = ' 
+        self.NXDL_file_sets = self.find_all_file_sets()
+        msg = ' NXDL_file_sets names = ' 
         msg += str(sorted(list(self.NXDL_file_sets.keys())))
-        punx.LOG_MESSAGE(msg, punx.DEBUG)
+        logger.debug(msg)
         try:
             self.select_NXDL_file_set()
         except KeyError:
             pass
         if self.default_file_set is None:
-            msg = 'CacheManager: no default_file_set selected yet'
-            punx.LOG_MESSAGE(msg, punx.DEBUG)
+            msg = ' CacheManager: no default_file_set selected yet'
+            logger.debug(msg)
             
         # TODO: update the .ini file as needed (remember the default_file_set value
     
     # - - - - - - - - - - - - - -
     # public
     
-    def install_NXDL_file_set(self, grr, user_cache=True, ref=None):
-        ref = ref or punx.github_handler.DEFAULT_NXDL_SET
+    def install_NXDL_file_set(self, grr, user_cache=True, ref=None, force=False):
+        """
+        using `ref` as a name, get the se of NXDL files from the NeXus GitHub
+        
+        :param obj grr: instance of :class:`GitHub_Repository_Reference`
+        :param bool user_cache: ``True``: use user cache,
+                                `` False``: use source cache (default)
+        :param str ref: name to use when requesting from GitHub,
+                        (`master`, commit hash such as `abc1234`,
+                        branch name, release name such as `v3.2`,
+                        or tag name)
+        :param bool force: update if installed is not the same SHA
+        """
+        ref = ref or github_handler.DEFAULT_NXDL_SET
         cache_obj = {True: self.user, False: self.source}[user_cache]
-        if ref not in cache_obj.file_sets():
+        fs = cache_obj.find_all_file_sets()
+        if force or ref not in fs:
             if grr.request_info(ref) is not None:
-                m = punx.cache_manager.extract_from_download(grr, cache_obj.path())
-                return m
+                if ref not in fs:
+                    logger.info(" %s not found in cache" % ref)
+                    force = True
+                    verb = "Installing"
+                else:
+                    force = ref in fs and grr.sha != fs[ref].sha
+                    if force:
+                        msg = " different SHAs - existing=" + fs[ref].sha
+                        msg += " GitHub=" + grr.sha
+                        logger.info(msg)
+                        verb = "Updating"
+                    else:
+                        logger.info(" NXDL file set: " + ref + " unchanged, not updating")
+                if force:
+                    logger.info(" " + verb + " NXDL file set: " + ref)
+                    m = extract_from_download(grr, cache_obj.path())
+                    return m
     
     def select_NXDL_file_set(self, ref=None):
         '''
         return the named self.default_file_set instance or raise KeyError exception if unknown
         '''
-        import punx.github_handler
-        msg = 'DEBUG - given ref: ' + str(ref)
-        punx.LOG_MESSAGE(msg, punx.DEBUG)
+        logger.debug(' given ref: ' + str(ref))
 
-        ref = ref or punx.github_handler.DEFAULT_NXDL_SET
-        msg = 'DEBUG - final ref: ' + str(ref)
-        punx.LOG_MESSAGE(msg, punx.DEBUG)
+        ref = ref or github_handler.DEFAULT_NXDL_SET
+        logger.debug(' final ref: ' + str(ref))
 
         if ref not in self.NXDL_file_sets:
             #msg = 'unknown NXDL file set: ' + str(ref)
@@ -246,30 +303,31 @@ class CacheManager(punx.singletons.Singleton):
             msg += ', received: ' + str(ref)
             raise KeyError(msg)
         self.default_file_set = self.NXDL_file_sets[ref]
+        logger.debug(" default file set: " + str(self.default_file_set))
         return self.default_file_set
     
     # - - - - - - - - - - - - - -
     # private
     
-    def file_sets(self):
+    def find_all_file_sets(self):
         '''
         index all NXDL file sets in both source and user caches, return a dictionary
         '''
-        fs = {k: v for k, v in self.source.file_sets().items()}
-        msg = 'DEBUG - source file set names: ' 
+        fs = {k: v for k, v in self.source.find_all_file_sets().items()}
+        msg = ' source file set names: ' 
         msg += str(sorted(list(fs.keys())))
-        punx.LOG_MESSAGE(msg, punx.DEBUG)
+        logger.debug(msg)
 
-        for k, v in self.user.file_sets().items():
+        for k, v in self.user.find_all_file_sets().items():
             if k in fs:
                 raise ValueError('user cache file set already known: ' + k)
             else:
                 fs[k] = v
                 
         self.NXDL_file_sets = fs    # remember
-        msg = 'DEBUG - all file set names: '
+        msg = ' all known file set names: '
         msg += str(sorted(list(fs.keys())))
-        punx.LOG_MESSAGE(msg, punx.DEBUG)
+        logger.debug(msg)
         return fs
     
     def cleanup(self):
@@ -278,7 +336,38 @@ class CacheManager(punx.singletons.Singleton):
         '''
         self.source.cleanup()
         self.user.cleanup()
-   
+
+    def table_of_caches(self):
+        """
+        return a pyRestTable table describing all known file sets in both source and user caches
+        
+        :returns obj: instance of pyRestTable.Table with all known file sets
+        
+        **Example**::
+    
+            ============= ======= ====== =================== ======= ===================================
+            NXDL file set type    cache  date & time         commit  path
+            ============= ======= ====== =================== ======= ===================================
+            v3.2          tag     source 2017-01-18 23:12:44 e888dac /home/user/punx/src/punx/cache/v3.2
+            NXroot-1.0    tag     user   2016-10-24 14:58:10 e0ad63d /home/user/.config/punx/NXroot-1.0
+            master        branch  user   2016-12-20 18:30:29 85d056f /home/user/.config/punx/master
+            Schema-3.3    release user   2017-05-02 12:33:19 4aa4215 /home/user/.config/punx/Schema-3.3
+            a4fd52d       commit  user   2016-11-19 01:07:45 a4fd52d /home/user/.config/punx/a4fd52d
+            ============= ======= ====== =================== ======= ===================================
+    
+        """
+        t = pyRestTable.Table()
+        fs = self.find_all_file_sets()
+        t.labels = ['NXDL file set', 'type', 'cache', 'date & time', 'commit', 'path']
+        for k, v in fs.items():
+            # print(k, str(v))
+            row = [k,]
+            v.short_sha = get_short_sha(v.sha)
+            for w in 'ref_type cache last_modified short_sha path'.split():
+                row.append(str(v.__getattribute__(w)))
+            t.rows.append(row)
+        return t
+
 
 class Base_Cache(object):
     '''
@@ -286,7 +375,7 @@ class Base_Cache(object):
     
     .. autosummary::
        
-       ~file_sets
+       ~find_all_file_sets
        ~fileName
        ~path
        ~cleanup
@@ -309,7 +398,7 @@ class Base_Cache(object):
         fn = str(self.qsettings.fileName())
         return fn
     
-    def file_sets(self):
+    def find_all_file_sets(self):
         '''
         index all NXDL file sets in this cache
         '''
@@ -317,8 +406,7 @@ class Base_Cache(object):
         if self.qsettings is None:
             raise RuntimeError('cache qsettings not defined!')
         cache_path = self.path()
-        msg = 'DEBUG - cache path: ' + str(cache_path)
-        punx.LOG_MESSAGE(msg, punx.DEBUG)
+        logger.debug(' cache path: ' + str(cache_path))
         
         for item in os.listdir(cache_path):
             if os.path.isdir(os.path.join(cache_path, item)):
@@ -351,13 +439,14 @@ class SourceCache(Base_Cache):
             # make the directory and load the default set of NXDL files
             os.mkdir(path)
             _msgs = []
-            grr = punx.github_handler.GitHub_Repository_Reference()
+            grr = github_handler.GitHub_Repository_Reference()
             grr.connect_repo()
             if grr.request_info() is not None:
                 _msgs = extract_from_download(grr, path)
         
         ini_file = os.path.abspath(os.path.join(path, SOURCE_CACHE_SETTINGS_FILENAME))
         self.qsettings = QtCore.QSettings(ini_file, QtCore.QSettings.IniFormat)
+
 
 class UserCache(Base_Cache):
     '''
@@ -399,18 +488,14 @@ class NXDL_File_Set(object):
     sha = None
     zip_url = None
     last_modified = None
-    nxdl_element_factory = None
+    #nxdl_element_factory = None
     
     # these keys are written and read to the JSON info files in each downloaded file set
     json_file_keys = 'ref ref_type sha zip_url last_modified'.split()
     
-    # TODO: consider defining the SchemaManager here (perhaps lazy load)?  see nxdl_manager for example code:  __getattribute__()
+    # TODO: #94 consider defining the SchemaManager here (perhaps lazy load)?  see nxdl_manager for example code:  __getattribute__()
     schema_manager = None
     __schema_manager_loaded__ = False
-    
-    def __init__(self):
-        import punx.nxdl_manager
-        #self.nxdl_element_factory = punx.nxdl_manager.NXDL_ElementFactory(self)
     
     def __getattribute__(self, *args, **kwargs):
         '''
@@ -421,8 +506,8 @@ class NXDL_File_Set(object):
                 and self.path is not None \
                 and os.path.exists(self.path) \
                 and not self.__schema_manager_loaded__:
-            import punx.schema_manager
-            self.schema_manager = punx.schema_manager.SchemaManager(self.path)
+            from punx import schema_manager
+            self.schema_manager = schema_manager.SchemaManager(self.path)
             self.__schema_manager_loaded__ = True
         return object.__getattribute__(self, *args, **kwargs)
     

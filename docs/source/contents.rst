@@ -23,21 +23,23 @@ Source Code
 .. autosummary::
    :nosignatures:
    
+   ~punx.nxdl_manager
+   ~punx.schema_manager
+   ~punx.cache_manager
+   ~punx.github_handler
+
+..
    ~punx.main
    ~punx.analyze
    ~punx.cache
-   ~punx.cache_manager
    ~punx.finding
-   ~punx.github_handler
    ~punx.h5structure
-   ~punx.logs
-   ~punx.nxdl_manager
    ~punx.nxdl_rules
    ~punx.nxdl_schema
    ~punx.nxdlstructure
-   ~punx.schema_manager
-   ~punx.settings
    ~punx.validate
+   ~punx.settings
+
 
 Indices and tables
 ++++++++++++++++++

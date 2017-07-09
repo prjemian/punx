@@ -30,7 +30,8 @@ class Test_Github_Handler_Module(unittest.TestCase):
                          u'v3.2', 
                          u'default release: ' + punx.github_handler.DEFAULT_RELEASE_NAME)
         self.assertEqual(punx.github_handler.DEFAULT_TAG_NAME, 
-                         u'NXroot-1.0', 
+                         # u'NXroot-1.0', 
+                         u'Schema-3.3',
                          u'default tag: ' + punx.github_handler.DEFAULT_TAG_NAME)
         self.assertEqual(punx.github_handler.DEFAULT_COMMIT_NAME, 
                          u'a4fd52d', 
@@ -48,10 +49,10 @@ class Test_Github_Handler_Module(unittest.TestCase):
         self.assertTrue(isinstance(grr, punx.github_handler.GitHub_Repository_Reference), 
                         u'correct object')
         self.assertEqual(grr.orgName, 
-                         punx.GITHUB_NXDL_ORGANIZATION, 
+                         punx.github_handler.GITHUB_NXDL_ORGANIZATION, 
                          u'organization name')
         self.assertEqual(grr.appName, 
-                         punx.GITHUB_NXDL_REPOSITORY, 
+                         punx.github_handler.GITHUB_NXDL_REPOSITORY, 
                          u'package name')
         self.assertEqual(grr._make_zip_url(), 
                          u'https://github.com/nexusformat/definitions/archive/master.zip', 
@@ -63,12 +64,15 @@ class Test_Github_Handler_Module(unittest.TestCase):
     
     def test_connected_GitHub_Repository_Reference(self):
         grr = punx.github_handler.GitHub_Repository_Reference()
-        grr.connect_repo()
+        using_creds = grr.connect_repo()
         self.assertNotEqual(grr.repo, None, u'grr.repo is not None')
+        if not using_creds:
+            return      # skip if on travis-ci
+
         self.assertTrue(isinstance(grr.repo, github.Repository.Repository), 
                         u'grr.repo is a Repository()')
-        self.assertEqual(grr.repo.name, punx.GITHUB_NXDL_REPOSITORY, 
-                         u'grr.repo.name = ' + punx.GITHUB_NXDL_REPOSITORY)
+        self.assertEqual(grr.repo.name, punx.github_handler.GITHUB_NXDL_REPOSITORY, 
+                         u'grr.repo.name = ' + punx.github_handler.GITHUB_NXDL_REPOSITORY)
         
         node = grr.get_branch()
         self.assertTrue(isinstance(node, (type(None), github.Branch.Branch)), 
@@ -137,7 +141,10 @@ class Test_Github_Handler_Module(unittest.TestCase):
     def test_Github_download_default(self):
         import punx.cache_manager
         grr = punx.github_handler.GitHub_Repository_Reference()
-        grr.connect_repo()
+        using_creds = grr.connect_repo()
+        if not using_creds:
+            return      # skip this on travis-ci
+
         node = grr.request_info()
         if node is not None:
             path = tempfile.mkdtemp()

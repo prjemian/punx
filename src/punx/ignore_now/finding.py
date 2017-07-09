@@ -2,7 +2,7 @@
 #-----------------------------------------------------------------------------
 # :author:    Pete R. Jemian
 # :email:     prjemian@gmail.com
-# :copyright: (c) 2017, Pete R. Jemian
+# :copyright: (c) 2016, Pete R. Jemian
 #
 # Distributed under the terms of the Creative Commons Attribution 4.0 International Public License.
 #
@@ -15,7 +15,7 @@ document each item during validation
 .. autosummary::
    
    ~Finding
-   ~FindingResults
+   ~CheckupResults
    ~VALID_STATUS_DICT
 
 '''
@@ -49,7 +49,7 @@ COMMENT = ValidationResultStatus('COMMENT', 'grey',      'comment from the punx 
 
 VALID_STATUS_LIST = (OK, NOTE, WARN, ERROR, TODO, UNUSED, COMMENT)    
 VALID_STATUS_DICT = {str(f): f for f in VALID_STATUS_LIST}
-'''dictionary (by names) of all available validations'''
+'''dictionary (by names) of all available findings'''
 
 TF_RESULT = {True: OK, False: ERROR}
 
@@ -62,13 +62,13 @@ class Finding(object):
     '''
     a single reported observation while validating
     
-    :param str h5_address: address of h5py item
     :param str test_name: one-word description of the test
-    :param obj status: one of: OK NOTE WARNING ERROR TODO
+    :param str h5_address: address of h5py item
+    :param int status: one of: OK NOTE WARNING ERROR TODO
     :param str comment: description
     '''
     
-    def __init__(self, h5_address, test_name, status, comment):
+    def __init__(self, test_name, h5_address, status, comment):
         if status not in VALID_STATUS_LIST:
             msg = 'unknown status value: ' + status
             raise ValueError(msg)
@@ -79,8 +79,8 @@ class Finding(object):
     
     def __str__(self, *args, **kwargs):
         try:
-            s = str(self.status)
-            s += ' ' + self.h5_address 
+            s = self.h5_address 
+            s += ' ' + str(self.status)
             s += ': ' + self.test_name
             s += ': ' + self.comment
             return s
@@ -88,16 +88,16 @@ class Finding(object):
             return object.__str__(self, *args, **kwargs)
 
 
-class FindingResults(object):
+class CheckupResults(object):
     '''
-    various validations for a single hdf5 address (absolute path)
+    various checkups for a single hdf5 address (absolute path)
     
     :param str h5_address: address of h5py item
     '''
     
     def __init__(self, h5_address):
         self.h5_address = h5_address
-        self.validations = []      # keep list of all validations for this address
+        self.findings = []      # keep list of all findings for this address
         self.classpath = ''
     
     def __str__(self, *args, **kwargs):

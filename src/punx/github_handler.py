@@ -29,26 +29,33 @@ USAGE::
 '''
 
 import os
-import sys
 
 import datetime
+import logging
 import requests
 from requests.packages.urllib3 import disable_warnings
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 import github
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import punx
-#from punx import settings
 
+
+logging.getLogger(__name__)
 
 CREDS_FILE_NAME = u'__github_creds__.txt'
 DEFAULT_BRANCH_NAME = u'master'
 DEFAULT_RELEASE_NAME = u'v3.2'
-DEFAULT_TAG_NAME = u'NXroot-1.0'
+#DEFAULT_TAG_NAME = u'NXroot-1.0'
+DEFAULT_TAG_NAME = u'Schema-3.3'
 DEFAULT_COMMIT_NAME = u'a4fd52d'
 DEFAULT_NXDL_SET = DEFAULT_RELEASE_NAME
 GITHUB_RETRY_COUNT = 3
+
+GITHUB_NXDL_ORGANIZATION = 'nexusformat'
+GITHUB_NXDL_REPOSITORY = 'definitions'
+GITHUB_NXDL_BRANCH = 'master'
+GITHUB_RETRY_COUNT = 3
+#NXDL_CACHE_SUBDIR = GITHUB_NXDL_REPOSITORY + '-' + GITHUB_NXDL_BRANCH
 
 
 def get_BasicAuth_credentials(creds_file_name = None):
@@ -91,8 +98,8 @@ class GitHub_Repository_Reference(object):
     '''
     
     def __init__(self):
-        self.orgName = punx.GITHUB_NXDL_ORGANIZATION
-        self.appName = punx.GITHUB_NXDL_REPOSITORY
+        self.orgName = GITHUB_NXDL_ORGANIZATION
+        self.appName = GITHUB_NXDL_REPOSITORY
         self.repo = None
         self.ref = None
         self.ref_type = None
@@ -105,6 +112,7 @@ class GitHub_Repository_Reference(object):
         connect with the GitHub repository
         
         :param str repo_name: name of repository in https://github.com/nexusformat (default: *definitions*)
+        :returns bool: True if using GitHub credentials
         '''
         repo_name = repo_name or self.appName
         
@@ -116,6 +124,7 @@ class GitHub_Repository_Reference(object):
             gh = github.Github(creds['user'], creds['password'])
             user = gh.get_user(self.orgName)
             self.repo = user.get_repo(repo_name)
+        return creds is not None
     
     def request_info(self, ref=None):
         '''
@@ -152,7 +161,7 @@ class GitHub_Repository_Reference(object):
 
         creds = get_BasicAuth_credentials()
         content = None
-        for _retry in range(punx.GITHUB_RETRY_COUNT):
+        for _retry in range(GITHUB_RETRY_COUNT):
             try:
                 if creds is None:
                     content = requests.get(self.zip_url, verify=False)

@@ -4,7 +4,7 @@
 #-----------------------------------------------------------------------------
 # :author:    Pete R. Jemian
 # :email:     prjemian@gmail.com
-# :copyright: (c) 2016, Pete R. Jemian
+# :copyright: (c) 2016-2017, Pete R. Jemian
 #
 # Distributed under the terms of the Creative Commons Attribution 4.0 International Public License.
 #
@@ -13,6 +13,9 @@
 
 '''
 manages the XML Schema of this project
+
+The *schema_manager* calls the *cache_manager* and
+is called by *nxdl_manager*.
 
 Public
 
@@ -40,13 +43,16 @@ Internal
 
 from __future__ import print_function
 
+import logging
 import lxml.etree
 import os
 import sys
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import punx
-import punx.singletons
+from punx import singletons
+
+
+logger = logging.getLogger(__name__)
 
 
 def strip_ns(ref):
@@ -76,8 +82,8 @@ def get_default_schema_manager():
     '''
     internal: convenience function
     '''
-    import punx.cache_manager
-    cm = punx.cache_manager.CacheManager()
+    from punx import cache_manager
+    cm = cache_manager.CacheManager()
     assert(cm is not None)
     assert(cm.default_file_set is not None)
     return cm.default_file_set.schema_manager
@@ -91,9 +97,9 @@ class SchemaManager(object):
     ns = punx.NAMESPACE_DICT
     
     def __init__(self, path=None):
-        import punx.cache_manager
+        from punx import cache_manager
         if path is None:
-            cm = punx.cache_manager.CacheManager()
+            cm = cache_manager.CacheManager()
             if cm is None or cm.default_file_set is None:
                 raise ValueError('Could not get NXDL file set from the cache')
             path = cm.default_file_set.path
@@ -164,8 +170,8 @@ class SchemaManager(object):
         if os.path.exists(self.schema_file):
             path = os.path.dirname(self.schema_file)
         else:
-            import punx.cache_manager
-            cm = punx.cache_manager.CacheManager()
+            from punx import cache_manager
+            cm = cache_manager.CacheManager()
             if cm is None or cm.default_file_set is None:
                 raise ValueError('Could not get NXDL file set from the cache')
             path = cm.default_file_set.path
@@ -188,7 +194,7 @@ class SchemaManager(object):
                     db[obj.name] = obj
 
         # re-arrange
-        units = list(db['anyUnitsAttr'].values)
+        units = list(db['anyUnitsAttr'].values or [])
         del db['anyUnitsAttr']
         del db['primitiveType']
         
@@ -247,7 +253,7 @@ class _Mixin(object):
     
     :param lxml.etree.Element xml_obj: XML element
     :param str obj_name: optional, default taken from ``xml_obj``
-    :param dict ns_dict: optional, default taken from :data:`punx.NAMESPACE_DICT`
+    :param dict ns_dict: optional, default taken from :data:`__init__.NAMESPACE_DICT`
     :param obj schema_root: optional, instance of lxml.etree._Element
     '''
     
@@ -559,7 +565,7 @@ class Schema_Type(_Mixin):
                 raise_error(subnode, 'unexpected tag=', subnode.tag)
 
 
-class _GroupParsing(punx.singletons.Singleton):
+class _GroupParsing(singletons.Singleton):
     '''
     internal: avoid a known recursion of group in a group
     '''

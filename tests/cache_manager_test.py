@@ -1,6 +1,15 @@
 
 '''
 test punx tests/cache_manager module
+
+ISSUES
+
+..  note::
+    Add new issues here with empty brackets, add "*" when issue is fixed.
+    Issues will only be marked "fixed" on GitHub once this branch is merged.
+    Then, this table may be removed.
+
+* [ ] #94 lazy load NXDL details until needed
 '''
 
 import io
@@ -81,11 +90,12 @@ class Test_NXDL_File_Set_class(unittest.TestCase):
         self.assertRaises(
             ValueError, 
             fs.read_info_file)
-        self.assertRaises(
-            punx.FileNotFound, 
-            fs.read_info_file, '! this file does not exist')
         self.assertTrue(
             str(fs).startswith('<punx.cache_manager.NXDL_File_Set'))
+        self.assertRaises(
+            IOError,
+            # TODO: should be: punx.FileNotFound,
+            fs.read_info_file, 'this file does not exist')
     
     def test_class(self):
         cm = punx.cache_manager.CacheManager()

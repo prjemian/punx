@@ -57,7 +57,7 @@ __install_requires__ = [
     'requests',
     # 'PyQt4',  
     # see: http://stackoverflow.com/questions/4628519/is-it-possible-to-require-pyqt-from-setuptools-setup-py
-    'PyGithub',
+    'PyGithub >= 1.32',
     ]
 __classifiers__ = [
      #'Development Status :: 5 - Production/Stable',
@@ -71,7 +71,7 @@ __classifiers__ = [
      'Programming Language :: Python :: 2',
      'Programming Language :: Python :: 2.7',
      'Programming Language :: Python :: 3',
-     'Programming Language :: Python :: 3.4',
+     'Programming Language :: Python :: 3.5',
      'Topic :: Scientific/Engineering',
      'Topic :: Scientific/Engineering :: Astronomy',
      'Topic :: Scientific/Engineering :: Bio-Informatics',
@@ -85,30 +85,6 @@ __classifiers__ = [
      'Topic :: Utilities',
    ]
 
-GITHUB_NXDL_ORGANIZATION        = 'nexusformat'
-GITHUB_NXDL_REPOSITORY          = 'definitions'
-GITHUB_NXDL_BRANCH              = 'master'
-GLOBAL_INI_GROUP                = '___global___'
-CACHE_SUBDIR                    = 'cache'
-SOURCE_CACHE_SETTINGS_FILENAME  = 'punx.ini'
-NXDL_CACHE_SUBDIR               = GITHUB_NXDL_REPOSITORY + '-' + GITHUB_NXDL_BRANCH
-GITHUB_RETRY_COUNT              = 3
-
-LOG_MESSAGE                     = None      # a function object, re-define as function to add text to program logs
-
-# logging level, from logging.__init__.py
-CRITICAL = 50
-FATAL = CRITICAL
-ERROR = 40
-WARNING = 30
-WARN = WARNING
-INFO = 20
-DEBUG = 10
-NOTSET = 0
-# unique to this code
-NOISY = 1
-CONSOLE_ONLY = -1
-DEFAULT_LOG_LEVEL = INFO
 
 NXDL_XML_NAMESPACE = 'http://definition.nexusformat.org/nxdl/3.1'
 XMLSCHEMA_NAMESPACE = 'http://www.w3.org/2001/XMLSchema'
@@ -116,19 +92,19 @@ NAMESPACE_DICT = {'nx': NXDL_XML_NAMESPACE,
                   'xs': XMLSCHEMA_NAMESPACE}
 
 
-class FileNotFound(Exception): 
+class FileNotFound(IOError): 
     'custom exception'
 
-class HDF5_Open_Error(Exception): 
+class HDF5_Open_Error(IOError): 
     'custom exception'
 
-class SchemaNotFound(Exception): 
+class SchemaNotFound(IOError): 
     'custom exception'
 
-class InvalidNxdlFile(Exception): 
+class InvalidNxdlFile(ValueError): 
     'custom exception'
 
-class CannotUpdateFromGithubNow(Exception): 
+class CannotUpdateFromGithubNow(IOError): 
     'custom exception'
 
 from ._version import get_versions

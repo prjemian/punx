@@ -30,13 +30,13 @@ before_script:
   - python --version
   - conda install --yes numpy h5py lxml requests pyqt=4 coverage docopt
   - pip install pyRestTable
-  - pip install PyGitHub
+  - pip install "PyGitHub>=1.32"
   - pip install coveralls
   - which coveralls
 
 # command to run tests
 script:
-  - python ./src/punx/main.py -h
+  - # python ./src/punx/main.py -h
   - # python ./src/punx/main.py update --force
   - which coverage
   - coverage run tests/

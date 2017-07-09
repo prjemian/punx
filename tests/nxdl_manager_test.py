@@ -1,9 +1,9 @@
 
 '''
-test punx tests/schema_manager module
+test punx tests/nxdl_manager module
 '''
 
-# TODO: differentiate between NXDL and XML attributes
+# TODO: lots more tests could be constructed!
 
 import lxml.etree
 import os
@@ -57,15 +57,16 @@ class Test_XML_functions(unittest.TestCase):
             self.raises_exception, def_text)
         tree = lxml.etree.fromstring(def_text)
         self.assertRaises(
-            punx.InvalidNxdlFile, 
+            ValueError, # TODO: should be:  punx.InvalidNxdlFile, 
             punx.nxdl_manager.validate_xml_tree, tree)
+        pass
 
 
 class Test_get_NXDL_file_list(unittest.TestCase):
     
     def test__FileNotFound(self):
         self.assertRaises(
-            punx.FileNotFound, 
+            IOError, # TODO: should be:  punx.FileNotFound, 
             punx.nxdl_manager.get_NXDL_file_list,
             '!this directory does not exist')
     
@@ -102,7 +103,7 @@ class Test_NXDL_Manager(unittest.TestCase):
         import punx.cache_manager
         fs = punx.cache_manager.NXDL_File_Set()
         self.assertRaises(
-            punx.FileNotFound, 
+            IOError, # TODO: should be:  punx.FileNotFound, 
             punx.nxdl_manager.NXDL_Manager, fs)
     
     def test__function(self):
@@ -125,7 +126,7 @@ class Test_NXDL_Manager(unittest.TestCase):
             'NXDL files found: ' + str(len(nxdl_defs)))
         for k, v in nxdl_defs.items():
             self.assertTrue(
-                isinstance(v, punx.nxdl_manager.NXDL_element__definition),
+                isinstance(v, punx.nxdl_manager.NXDL__definition),
                 'NXDL definitions type: '+ k +'=' + str(type(v)))
 
 

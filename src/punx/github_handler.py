@@ -78,7 +78,7 @@ def get_BasicAuth_credentials(creds_file_name = None):
     if not os.path.exists(creds_file_name):
         return
 
-    uname, pwd = open(creds_file_name, 'r').read().split()
+    uname, pwd = open(creds_file_name, 'r').read().strip().split()
     return dict(user=uname, password=pwd)
 
 

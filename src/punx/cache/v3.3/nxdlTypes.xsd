@@ -1,0 +1,523 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="http://definition.nexusformat.org/nxdl/3.1"
+	xmlns:nxdl="http://definition.nexusformat.org/nxdl/3.1" 
+	elementFormDefault="qualified">
+
+	<xs:annotation>
+		<xs:documentation>
+			..
+				NeXus - Neutron and X-ray Common Data Format
+				
+				Copyright (C) 2008-2017 NeXus International Advisory Committee (NIAC)
+				
+				This library is free software; you can redistribute it and/or
+				modify it under the terms of the GNU Lesser General Public
+				License as published by the Free Software Foundation; either
+				version 3 of the License, or (at your option) any later version.
+				
+				This library is distributed in the hope that it will be useful,
+				but WITHOUT ANY WARRANTY; without even the implied warranty of
+				MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+				Lesser General Public License for more details.
+				
+				You should have received a copy of the GNU Lesser General Public
+				License along with this library; if not, write to the Free Software
+				Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+				
+				For further information, see http://www.nexusformat.org
+		</xs:documentation>
+	</xs:annotation>
+	
+	<!--
+		anyUnitsAttr: specifies the type of content that goes into a units="" attribute
+		primitiveType: specifies the type of content that goes into a type="" attribute of a field or attribute
+		-->
+    
+	<!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+	
+	<xs:simpleType name="anyUnitsAttr">
+		<xs:annotation>
+			<xs:documentation>
+				Unit categories in NXDL specifications describe the expected type of units for a NeXus field.
+				
+				They should describe valid units consistent with
+				the manual section on NeXus units (based on UDUNITS).
+				Units are not validated by NeXus.
+			</xs:documentation>
+		</xs:annotation>
+		<xs:union memberTypes="
+			nxdl:NX_ANGLE
+			nxdl:NX_ANY
+			nxdl:NX_AREA
+			nxdl:NX_CROSS_SECTION
+			nxdl:NX_CHARGE
+			nxdl:NX_CURRENT
+			nxdl:NX_DIMENSIONLESS
+			nxdl:NX_EMITTANCE
+			nxdl:NX_ENERGY
+			nxdl:NX_FLUX
+			nxdl:NX_FREQUENCY
+			nxdl:NX_LENGTH
+			nxdl:NX_MASS
+			nxdl:NX_MASS_DENSITY
+			nxdl:NX_MOLECULAR_WEIGHT
+			nxdl:NX_PER_AREA
+			nxdl:NX_PER_LENGTH
+			nxdl:NX_PERIOD
+			nxdl:NX_POWER 
+			nxdl:NX_PRESSURE
+			nxdl:NX_PULSES
+			nxdl:NX_SCATTERING_LENGTH_DENSITY
+			nxdl:NX_SOLID_ANGLE
+			nxdl:NX_TEMPERATURE
+			nxdl:NX_TIME
+			nxdl:NX_TIME_OF_FLIGHT
+			nxdl:NX_TRANSFORMATION
+			nxdl:NX_UNITLESS
+			nxdl:NX_VOLTAGE
+			nxdl:NX_VOLUME
+			nxdl:NX_UNITLESS
+			nxdl:NX_WAVELENGTH
+			nxdl:NX_WAVENUMBER
+			" />
+	</xs:simpleType>
+	
+	<xs:simpleType name="NX_ANGLE">
+		<xs:annotation>
+			<xs:documentation>
+				units of angle, example: m
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string" />
+	</xs:simpleType>
+	
+	<xs:simpleType name="NX_ANY">
+		<xs:annotation>
+			<xs:documentation>
+				units for things like logs that aren't picky on units
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string" />
+	</xs:simpleType>
+	
+	<xs:simpleType name="NX_AREA">
+		<xs:annotation>
+			<xs:documentation>
+				units of area, example: m2 or barns
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string" />
+	</xs:simpleType>
+	
+	<xs:simpleType name="NX_CROSS_SECTION">
+		<xs:annotation>
+			<xs:documentation>
+				units of area, example: barns (alias of NX_AREA)
+			</xs:documentation>
+		</xs:annotation>
+		<xs:union memberTypes="nxdl:NX_AREA" />
+	</xs:simpleType>
+	
+	<xs:simpleType name="NX_CHARGE">
+		<xs:annotation>
+			<xs:documentation>
+				units of electrical charge, example: c
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string" />
+	</xs:simpleType>
+	
+	<xs:simpleType name="NX_CURRENT">
+		<xs:annotation>
+			<xs:documentation>
+				units of electrical current, example: A
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string" />
+	</xs:simpleType>
+	
+	<xs:simpleType name="NX_DIMENSIONLESS">
+		<xs:annotation>
+			<xs:documentation>
+				units for fields where the units cancel out, 
+				example: "" or mm/mm 
+				(NOTE: not the same as NX_UNITLESS)
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string" />
+	</xs:simpleType>
+	
+	<xs:simpleType name="NX_EMITTANCE">
+		<xs:annotation>
+			<xs:documentation>
+				units of emittance (``length * angle``) of a 
+				radiation source, example: ``nm*rad``
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string" />
+	</xs:simpleType>
+	
+	<xs:simpleType name="NX_ENERGY">
+		<xs:annotation>
+			<xs:documentation>
+				units of energy, example: J or keV
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string" />
+	</xs:simpleType>
+	
+	<xs:simpleType name="NX_FLUX">
+		<xs:annotation>
+			<xs:documentation>
+				units of flux, example: s-1 cm-2
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string" />
+	</xs:simpleType>
+	
+	<xs:simpleType name="NX_FREQUENCY">
+		<xs:annotation>
+			<xs:documentation>
+				units of frequency, example: Hz
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string" />
+	</xs:simpleType>
+	
+	<xs:simpleType name="NX_LENGTH">
+		<xs:annotation>
+			<xs:documentation>
+				units of length, example: m
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string" />
+	</xs:simpleType>
+	
+	<xs:simpleType name="NX_MASS">
+		<xs:annotation>
+			<xs:documentation>
+				units of length, example: g
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string" />
+	</xs:simpleType>
+	
+	<xs:simpleType name="NX_MASS_DENSITY">
+		<xs:annotation>
+			<xs:documentation>
+				units of mass density, example: g cm-3
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string" />
+	</xs:simpleType>
+	
+	<xs:simpleType name="NX_MOLECULAR_WEIGHT">
+		<xs:annotation>
+			<xs:documentation>
+				units of molecular weight, example: g mol-1
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string" />
+	</xs:simpleType>
+	
+	<xs:simpleType name="NX_PER_AREA">
+		<xs:annotation>
+			<xs:documentation>
+				units of length, example: m
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string" />
+	</xs:simpleType>
+	
+	<xs:simpleType name="NX_PER_LENGTH">
+		<xs:annotation>
+			<xs:documentation>
+				units of length, example: m
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string" />
+	</xs:simpleType>
+	
+	<xs:simpleType name="NX_PERIOD">
+		<xs:annotation>
+			<xs:documentation>
+				units of time, period of pulsed source, 
+				example: microseconds (alias to `NX_TIME`)
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="nxdl:NX_TIME" />
+	</xs:simpleType>
+	
+	<xs:simpleType name="NX_POWER">
+		<xs:annotation>
+			<xs:documentation>
+				units of power, example: W
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string" />
+	</xs:simpleType>
+	
+	<xs:simpleType name="NX_PRESSURE">
+		<xs:annotation>
+			<xs:documentation>
+				units of pressure, example: Pa
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string" />
+	</xs:simpleType>
+	
+	<xs:simpleType name="NX_PULSES">
+		<xs:annotation>
+			<xs:documentation>
+				units of clock pulses (alias to `NX_NUMBER`)
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="nxdl:NX_NUMBER" />
+	</xs:simpleType>
+	
+	<xs:simpleType name="NX_SCATTERING_LENGTH_DENSITY">
+		<xs:annotation>
+			<xs:documentation>
+				units of scattering length density, example: cm-2
+			</xs:documentation>
+		</xs:annotation>
+		<!-- isn't this an alias of NX_PER_AREA?  
+			Could also be alias of NX_LENGTH (cm^2/atom) -->
+		<!-- <xs:union memberTypes="nxdl:NX_PER_AREA nxdl:NX_LENGTH" /> -->
+		<xs:restriction base="xs:string" />
+	</xs:simpleType>
+	
+	<xs:simpleType name="NX_SOLID_ANGLE">
+		<xs:annotation>
+			<xs:documentation>
+				units of solid angle, example: sr | steradian
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string" />
+	</xs:simpleType>
+	
+	<xs:simpleType name="NX_TEMPERATURE">
+		<xs:annotation>
+			<xs:documentation>
+				units of temperature, example: K
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string" />
+	</xs:simpleType>
+	
+	<xs:simpleType name="NX_TIME">
+		<xs:annotation>
+			<xs:documentation>
+				units of time, example: s
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string" />
+	</xs:simpleType>
+	
+	<xs:simpleType name="NX_TIME_OF_FLIGHT">
+		<xs:annotation>
+			<xs:documentation>
+				units of (neutron) time of flight, 
+				example: s (alias to `NX_TIME`)
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="nxdl:NX_TIME" />
+	</xs:simpleType>
+	
+	<xs:simpleType name="NX_TRANSFORMATION">
+		<xs:annotation>
+			<xs:documentation>
+				units of the specified transformation
+				
+				could be any of these: ``NX_LENGTH``, ``NX_ANGLE``, or ``NX_UNITLESS``
+				
+				There will be one or more transformations defined by one or more fields
+				for each transformation.  The units type ``NX_TRANSFORMATION`` designates the
+				particular axis generating a transformation (e.g. a rotation axis or a translation
+				axis or a general axis).   ``NX_TRANSFORMATION`` designates the
+				units will be appropriate to the type of transformation,
+				indicated in the :ref:`NXtransformations` base class
+				by the ``transformation_type`` value:
+				
+				* ``NX_LENGTH`` for ``translation``
+				* ``NX_ANGLE`` for ``rotation`` 
+				* ``NX_UNITLESS`` for axes for which no transformation type is specified.
+			</xs:documentation>
+		</xs:annotation>
+		<xs:union memberTypes="
+			nxdl:NX_LENGTH 
+			nxdl:NX_ANGLE 
+			nxdl:NX_UNITLESS
+			" />
+	</xs:simpleType>
+    
+	<xs:simpleType name="NX_UNITLESS">
+		<xs:annotation>
+			<xs:documentation>
+				for fields that don't have a unit (e.g. hkl) so that they don't 
+				inherit the wrong units (NOTE: not the same as NX_DIMENSIONLESS)
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string" />
+	</xs:simpleType>
+	
+	<xs:simpleType name="NX_VOLTAGE">
+		<xs:annotation>
+			<xs:documentation>
+				units of voltage, example: V
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string" />
+	</xs:simpleType>
+	
+	<xs:simpleType name="NX_VOLUME">
+		<xs:annotation>
+			<xs:documentation>
+				units of volume, example: m3
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string" />
+	</xs:simpleType>
+	
+	<xs:simpleType name="NX_WAVELENGTH">
+		<xs:annotation>
+			<xs:documentation>
+				units of wavelength, example: angstrom
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string" />
+	</xs:simpleType>
+	
+	<xs:simpleType name="NX_WAVENUMBER">
+		<xs:annotation>
+			<xs:documentation>
+				units of wavenumber or Q, 
+				example: `angstrom-1` or `nm-1`
+			</xs:documentation>
+		</xs:annotation>
+		<!-- isn't this an alias of NX_PER_LENGTH? -->
+		<!-- <xs:union memberTypes="nxdl:NX_PER_LENGTH" /> -->
+		<xs:restriction base="xs:string" />
+	</xs:simpleType>
+	
+	<!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+
+	<xs:simpleType name="primitiveType">
+		<xs:annotation>
+			<xs:documentation>
+				Valid names for the type attribute on fields and attributes. 
+				This is an alias for NAPI (which is any valid NeXus type).
+			</xs:documentation>
+		</xs:annotation>
+		<xs:list itemType="nxdl:NAPI" />
+	</xs:simpleType>
+	
+	<xs:simpleType name="NAPI">
+		<xs:annotation>
+			<xs:documentation>any valid NeXus type</xs:documentation>
+		</xs:annotation>
+		<xs:union memberTypes="
+			nxdl:NX_CHAR
+			nxdl:NX_FLOAT
+			nxdl:NX_INT
+			nxdl:NX_UINT
+			nxdl:NX_POSINT
+			nxdl:NX_NUMBER
+			nxdl:NX_DATE_TIME
+			nxdl:NX_BOOLEAN
+			nxdl:NX_BINARY
+			nxdl:ISO8601
+			"/>
+	</xs:simpleType>
+    
+    <xs:simpleType name="NX_CHAR">
+		<xs:annotation>
+			<xs:documentation>
+				any string representation
+				
+				All strings are to be encoded in UTF-8. 
+				
+				Includes fixed-length strings, variable-length strings,
+				and string arrays.
+				
+				Some file writers write strings as a string array
+				of rank 1 and length 1.
+				Clients should be prepared to handle such strings.
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string" />
+	</xs:simpleType>
+	
+	<xs:simpleType name="NX_FLOAT">
+		<xs:annotation>
+			<xs:documentation>any representation of a floating point number</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:float" />
+	</xs:simpleType>
+	
+	<xs:simpleType name="NX_INT">
+		<xs:annotation>
+			<xs:documentation>any representation of an integer number</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:integer" />
+	</xs:simpleType>
+	
+	<xs:simpleType name="NX_UINT">
+		<xs:annotation>
+			<xs:documentation>any representation of an unsigned integer number (includes zero)</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:unsignedInt" />
+	</xs:simpleType>
+	
+	<xs:simpleType name="NX_POSINT">
+		<xs:annotation>
+			<xs:documentation>any representation of a positive integer number (greater than zero)</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:positiveInteger" />
+	</xs:simpleType>
+	
+	<xs:simpleType name="NX_NUMBER">
+		<xs:annotation>
+			<xs:documentation>any valid NeXus number representation</xs:documentation>
+		</xs:annotation>
+		<xs:union memberTypes="
+			nxdl:NX_INT 
+			nxdl:NX_UINT 
+			nxdl:NX_POSINT 
+			nxdl:NX_FLOAT
+			" />
+	</xs:simpleType>
+	
+	<xs:simpleType name="NX_DATE_TIME">
+		<xs:annotation>
+			<xs:documentation>alias for the ISO8601 date/time stamp</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="nxdl:ISO8601" />
+	</xs:simpleType>
+	
+	<xs:simpleType name="ISO8601">
+		<xs:annotation>
+			<xs:documentation>ISO8601 date/time stamp</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:dateTime" />
+	</xs:simpleType>
+	
+	<xs:simpleType name="NX_BOOLEAN">
+		<xs:annotation>
+			<xs:documentation>true/false value ( true | 1 | false | 0 )</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:boolean" />
+	</xs:simpleType>
+	
+	<xs:simpleType name="NX_BINARY">
+		<xs:annotation>
+			<xs:documentation>any representation of binary data - if text, line terminator is [CR][LF]</xs:documentation>
+		</xs:annotation>
+		<!-- TODO Is this the way to describe pure binary?  uint8, byte, hex64binary -->
+		<!-- TODO Should be a uint8 but this does not seem to be allowed.  Using xs:unsignedByte instead. -->
+		<xs:restriction base="xs:unsignedByte" />
+	</xs:simpleType>
+
+</xs:schema>

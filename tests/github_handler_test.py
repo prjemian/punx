@@ -26,9 +26,12 @@ class Test_Github_Handler_Module(unittest.TestCase):
         self.assertEqual(punx.github_handler.DEFAULT_BRANCH_NAME, 
                          u'master', 
                          u'default branch: ' + punx.github_handler.DEFAULT_BRANCH_NAME)
-        self.assertEqual(punx.github_handler.DEFAULT_RELEASE_NAME, 
+        self.assertEqual(u'v3.2', 
                          u'v3.2', 
-                         u'default release: ' + punx.github_handler.DEFAULT_RELEASE_NAME)
+                         u'release: v3.2')
+        self.assertEqual(punx.github_handler.DEFAULT_RELEASE_NAME, 
+                         u'v3.3', 
+                         u'default release: v3.3')
         self.assertEqual(punx.github_handler.DEFAULT_TAG_NAME, 
                          # u'NXroot-1.0', 
                          u'Schema-3.3',

@@ -4,7 +4,7 @@ dependencies:
   - lxml
   - numpy
   - python=2.7.*
-  - pyqt=4.*
+  - pyqt
   - requests
   - sip
   - sphinx

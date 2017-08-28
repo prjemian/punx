@@ -62,7 +62,10 @@ import json
 import os
 import pyRestTable
 import shutil
-from PyQt4 import QtCore
+try:
+    from PyQt5 import QtCore
+except ModuleNotFoundError:
+    from PyQt4 import QtCore
 
 import punx
 from punx import singletons

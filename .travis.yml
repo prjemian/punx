@@ -17,6 +17,7 @@ before_script:
   - bash miniconda.sh -b -p $HOME/miniconda
   - export PATH=$HOME/miniconda/bin:$PATH
   - export PY_ENV=travis-$TRAVIS_PYTHON_VERSION
+  - echo $PY_ENV
   - conda create -y -n $PY_ENV python=$TRAVIS_PYTHON_VERSION numpy h5py lxml requests pyqt=4 coverage docopt
   - source activate $PY_ENV
   - which pip

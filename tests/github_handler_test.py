@@ -13,7 +13,8 @@ import zipfile
 
 import github
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src')))
+SRC_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src'))
+sys.path.insert(0, SRC_PATH)
 import punx, punx.github_handler
 
 
@@ -160,9 +161,11 @@ class Test_Github_Handler_Module(unittest.TestCase):
 
 def suite(*args, **kw):
     test_suite = unittest.TestSuite()
-    test_list = [
-        Test_Github_Handler_Module,
-        ]
+    test_list = []
+    cred_file = os.path.join(SRC_PATH, 'punx', punx.github_handler.CREDS_FILE_NAME)
+    cred_file += ".skip_it"     # developer use
+    if os.path.exists(cred_file):
+        test_list.append(Test_Github_Handler_Module)
     for test_case in test_list:
         test_suite.addTest(unittest.makeSuite(test_case))
     return test_suite

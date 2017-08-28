@@ -64,7 +64,7 @@ import pyRestTable
 import shutil
 try:
     from PyQt5 import QtCore
-except ModuleNotFoundError:
+except ImportError:
     from PyQt4 import QtCore
 
 import punx

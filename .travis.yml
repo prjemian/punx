@@ -9,7 +9,7 @@ language: python
 python:
   - "2.7"
   - "3.5"
-  - "3.6"
+#  - "3.6"    TODO: requires PyQt=5
 
 before_script:
   - wget http://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
@@ -17,13 +17,12 @@ before_script:
   - bash miniconda.sh -b -p $HOME/miniconda
   - export PATH=$HOME/miniconda/bin:$PATH
   - export PY_ENV=travis-$TRAVIS_PYTHON_VERSION
-  - conda create -y -n $PY_ENV python=$TRAVIS_PYTHON_VERSION numpy h5py lxml requests coverage docopt
+  - conda create -y -n $PY_ENV python=$TRAVIS_PYTHON_VERSION pyqt=4 numpy h5py lxml requests coverage docopt
   - source activate $PY_ENV
   - which pip
   - which python
   - which conda
   - python --version
-  - conda install  pyqt=4 openssl=1.0.2l
   - pip install pyRestTable
   - pip install "PyGitHub>=1.32"
   - pip install coveralls

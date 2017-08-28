@@ -23,7 +23,8 @@ import punx
 
 
 verbose=1
-long_description = open('README.rst', 'r').read()
+README = os.path.join(os.path.dirname(__file__), 'README.rst')
+long_description = open(README, 'r').read()
 
 
 setup (

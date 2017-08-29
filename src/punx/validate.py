@@ -236,30 +236,9 @@ class Data_File_Validator(object):
         pass # TODO
     
     def validate_NX_class_attribute(self, v_item, nx_class):
-        """
-        validate proper use of NeXus groups
-        
-        Only known base classes (and contributed definitions intended 
-        for use as base classes) can be used as groups in a NeXus data file.
-        Application definitions are used in a different way, as an overlay 
-        on a parent NXentry or NXsubentry group, and declared in the 
-        `definition` field of that parent group.
-        """
-        known = nx_class in self.manager.classes
-        status = punx.finding.TF_RESULT[known]
-        msg = nx_class + ": recognized NXDL specification"
-        self.record_finding(v_item, "known NXDL", status, msg)
-
-        if known:
-            as_base = self.usedAsBaseClass(nx_class)
-            status = punx.finding.TF_RESULT[as_base]
-            self.manager.classes[nx_class].category
-            msg = nx_class
-            if self.manager.classes[nx_class].category == "base_classes":
-                msg += ": known NeXus base class"
-            else:
-                msg += ": known NeXus contributed definition used as base class"
-            self.record_finding(v_item, "NeXus base class", status, msg)
+        from .validations import nx_class_attribute
+        nx_class_attribute.validate_NX_class_attribute(
+            self, v_item, nx_class)
 
     def usedAsBaseClass(self, nx_class):
         """

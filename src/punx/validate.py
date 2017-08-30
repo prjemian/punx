@@ -210,6 +210,7 @@ class Data_File_Validator(object):
                 punx.finding.OK, 
                 "not a NeXus group")
             return
+
         if v_item.classpath.startswith("/NX"):
             nx_class = v_item.nx_class
         elif v_item.classpath == "":
@@ -219,6 +220,31 @@ class Data_File_Validator(object):
         # print(str(v_item), v_item.name, v_item.classpath)
         
         # TODO: Verify that items presented in data file are valid with base class
+        base_class = self.manager.classes[nx_class]
+        for child_name in v_item.h5_object:
+            obj = v_item.h5_object[child_name]
+            v_sub_item = self.addresses[obj.name]
+            # TODO: need an algorithm to know if item is defined in base class
+            if punx.utils.isNeXusDataset(obj):
+                t = child_name + " is"
+                if child_name not in base_class.fields:
+                    t += " not"
+                t += " defined field in " + nx_class
+                self.record_finding(
+                    v_sub_item,
+                    "field in base class",
+                    punx.finding.OK, 
+                    t)
+            elif punx.utils.isHdf5Group(obj):
+                t = child_name + " is"
+                if child_name not in base_class.groups:
+                    t += " not"
+                t += " defined group in " + nx_class
+                self.record_finding(
+                    v_sub_item,
+                    "group in base class",
+                    punx.finding.OK, 
+                    t)
         # TODO: Verify that items specified in base class are compliant with file
         
         self.validate_NX_class_attribute(v_item, nx_class)
@@ -296,26 +322,33 @@ class ValidationItem(object):
             else:
                 self.h5_address = parent.h5_address + "@" + self.name
                 self.classpath = str(parent.classpath) + "@" + self.name
+        self.object_type = self.identify_object_type()
     
     def __str__(self, *args, **kwargs):
         try:
-            import h5py._hl
-            if isinstance(self.h5_object, h5py._hl.files.File):
-                object_type = "HDF5 file root"
-            elif isinstance(self.h5_object, h5py._hl.group.Group):
-                object_type = "HDF5 group"
-            elif isinstance(self.h5_object, h5py._hl.dataset.Dataset):
-                object_type = "HDF5 dataset"
-            else:
-                object_type = type(self.h5_object)
             terms = collections.OrderedDict()
             terms["name"] = self.name
-            terms["type"] = object_type
+            terms["type"] = self.object_type
             terms["classpath"] = self.classpath
             s = ", ".join(["%s=%s" % (k, str(v)) for k, v in terms.items()])
             return "ValidationItem(" + s + ")"
         except Exception as _exc:
             return object.__str__(self, *args, **kwargs)
+    
+    def identify_object_type(self, *args, **kwargs):
+        import h5py._hl
+        if isinstance(self.h5_object, h5py._hl.files.File):
+            object_type = "HDF5 file root"
+        elif isinstance(self.h5_object, h5py._hl.group.Group):
+            object_type = "HDF5 group"
+        elif isinstance(self.h5_object, h5py._hl.dataset.Dataset):
+            object_type = "HDF5 dataset"
+        else:
+            object_type = type(self.h5_object)
+        if object_type in ("HDF5 file root", "HDF5 group", "HDF5 dataset"):
+            if punx.utils.isNeXusLink(self.h5_object):
+                object_type = "NeXus link"
+        return object_type
 
     def determine_NeXus_classpath(self):
         """

@@ -125,7 +125,7 @@ def validate_item_name(validator, v_item, key=None):
             if matches:
                 status = punx.finding.OK
                 break
-        f = punx.finding.Finding(s, key, status, k)
+        f = punx.finding.Finding(v_item.h5_address, key, status, k)
         validator.validations.append(f)
         v_item.validations[key] = f
 

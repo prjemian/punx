@@ -32,6 +32,7 @@ import h5py
 import logging
 import os
 import numpy
+import sys
 
 
 def decode_byte_string(text):
@@ -42,7 +43,7 @@ def decode_byte_string(text):
         #text = [v for v in text]
         text = text[0]
     if isinstance(text, (bytes, numpy.bytes_)):
-        text = text.decode()
+        text = text.decode(sys.stdout.encoding)
     return text
 
 

@@ -92,7 +92,7 @@ class Test_Global(unittest.TestCase):
     def test_standard(self):
         self.assertEqual(
             len(punx.finding.VALID_STATUS_LIST), 
-            7, 
+            8, 
             "number of possible finding types")
         self.assertEqual(
             len(punx.finding.VALID_STATUS_LIST), 

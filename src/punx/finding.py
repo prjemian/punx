@@ -39,15 +39,16 @@ class ValidationResultStatus(object):
         return self.key
 
 
-OK      = ValidationResultStatus('OK',      'green',     'meets NeXus specification')
-NOTE    = ValidationResultStatus('NOTE',    'palegreen', 'does not meet NeXus specification, but acceptable')
-WARN    = ValidationResultStatus('WARN',    'yellow',    'does not meet NeXus specification, not generally acceptable')
-ERROR   = ValidationResultStatus('ERROR',   'red',       'violates NeXus specification')
-TODO    = ValidationResultStatus('TODO',    'blue',      'validation not implemented yet')
-UNUSED  = ValidationResultStatus('UNUSED',  'grey',      'optional NeXus item not used in data file')
-COMMENT = ValidationResultStatus('COMMENT', 'grey',      'comment from the punx source code')
+OK       = ValidationResultStatus('OK',      'green',     'meets NeXus specification')
+NOTE     = ValidationResultStatus('NOTE',    'palegreen', 'does not meet NeXus specification, but acceptable')
+WARN     = ValidationResultStatus('WARN',    'yellow',    'does not meet NeXus specification, not generally acceptable')
+ERROR    = ValidationResultStatus('ERROR',   'red',       'violates NeXus specification')
+TODO     = ValidationResultStatus('TODO',    'blue',      'validation not implemented yet')
+UNUSED   = ValidationResultStatus('UNUSED',  'grey',      'optional NeXus item not used in data file')
+COMMENT  = ValidationResultStatus('COMMENT', 'grey',      'comment from the punx source code')
+OPTIONAL = ValidationResultStatus('OPTIONAL', 'grey',     'allowed by NeXus specification, not identified')
 
-VALID_STATUS_LIST = (OK, NOTE, WARN, ERROR, TODO, UNUSED, COMMENT)    
+VALID_STATUS_LIST = (OK, NOTE, WARN, ERROR, TODO, UNUSED, COMMENT, OPTIONAL)
 VALID_STATUS_DICT = {str(f): f for f in VALID_STATUS_LIST}
 '''dictionary (by names) of all available validations'''
 

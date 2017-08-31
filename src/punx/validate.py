@@ -201,6 +201,8 @@ class Data_File_Validator(object):
         """
         validate the NeXus content of a HDF5 data file group
         """
+        from .validations import group_items_in_base_class
+
         key = "NeXus_group"
         if v_item.classpath == CLASSPATH_OF_NON_NEXUS_CONTENT:
             self.record_finding(
@@ -220,30 +222,7 @@ class Data_File_Validator(object):
         
         # TODO: Verify that items presented in data file are valid with base class
         base_class = self.manager.classes[nx_class]
-        for child_name in v_item.h5_object:
-            obj = v_item.h5_object[child_name]
-            v_sub_item = self.addresses[obj.name]
-            # TODO: need an algorithm to know if item is defined in base class
-            if utils.isNeXusDataset(obj):
-                t = child_name + " is"
-                if child_name not in base_class.fields:
-                    t += " not"
-                t += " defined field in " + nx_class
-                self.record_finding(
-                    v_sub_item,
-                    "field in base class",
-                    finding.OK, 
-                    t)
-            elif utils.isHdf5Group(obj):
-                t = child_name + " is"
-                if child_name not in base_class.groups:
-                    t += " not"
-                t += " defined group in " + nx_class
-                self.record_finding(
-                    v_sub_item,
-                    "group in base class",
-                    finding.OK, 
-                    t)
+        group_items_in_base_class.verify(self, v_item, base_class)
         # TODO: Verify that items specified in base class are compliant with file
         
         self.validate_NX_class_attribute(v_item, nx_class)

@@ -37,8 +37,6 @@ from requests.packages.urllib3 import disable_warnings
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 import github
 
-import punx
-
 
 logging.getLogger(__name__)
 

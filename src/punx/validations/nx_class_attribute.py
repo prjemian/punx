@@ -10,7 +10,7 @@
 #-----------------------------------------------------------------------------
 
 
-import punx
+from .. import finding
 
 
 def validate_NX_class_attribute(validator, v_item, nx_class):
@@ -24,13 +24,13 @@ def validate_NX_class_attribute(validator, v_item, nx_class):
     `definition` field of that parent group.
     """
     known = nx_class in validator.manager.classes
-    status = punx.finding.TF_RESULT[known]
+    status = finding.TF_RESULT[known]
     msg = nx_class + ": recognized NXDL specification"
     validator.record_finding(v_item, "known NXDL", status, msg)
 
     if known:
         as_base = validator.usedAsBaseClass(nx_class)
-        status = punx.finding.TF_RESULT[as_base]
+        status = finding.TF_RESULT[as_base]
         validator.manager.classes[nx_class].category
         msg = nx_class
         if validator.manager.classes[nx_class].category == "base_classes":

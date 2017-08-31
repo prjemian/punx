@@ -27,10 +27,10 @@ import lxml.etree
 import os
 import six
 
-import punx
-from punx import nxdl_schema
-from punx import cache_manager
-from punx import utils
+from punx import FileNotFound, InvalidNxdlFile
+from . import nxdl_schema
+from . import cache_manager
+from . import utils
 
 
 logger = utils.setup_logger(__name__)
@@ -46,10 +46,10 @@ class NXDL_Manager(object):
     
     def __init__(self, file_set=None):
         if file_set is None:
-            cm = punx.cache_manager.CacheManager()
+            cm = cache_manager.CacheManager()
             file_set = cm.default_file_set
         elif isinstance(file_set, six.string_types):
-            cm = punx.cache_manager.CacheManager()
+            cm = cache_manager.CacheManager()
             cm.select_NXDL_file_set(file_set)
             file_set = cm.default_file_set
         assert(isinstance(file_set, cache_manager.NXDL_File_Set))
@@ -57,7 +57,7 @@ class NXDL_Manager(object):
         if file_set.path is None or not os.path.exists(file_set.path):
             msg = 'NXDL directory: ' + str(file_set.path)
             logger.error(msg)
-            raise punx.FileNotFound(msg)
+            raise FileNotFound(msg)
     
         self.nxdl_file_set = file_set
         self.nxdl_defaults = self.get_nxdl_defaults()
@@ -109,7 +109,7 @@ def get_NXDL_file_list(nxdl_dir):
     if not os.path.exists(nxdl_dir):
         msg = 'NXDL directory: ' + nxdl_dir
         logger.error(msg)
-        raise punx.FileNotFound(msg)
+        raise FileNotFound(msg)
     NXDL_categories = 'base_classes applications contributed_definitions'.split()
     nxdl_file_list = []
     for category in NXDL_categories:
@@ -136,7 +136,7 @@ def validate_xml_tree(xml_tree):
         result = schema.assertValid(xml_tree)
     except lxml.etree.DocumentInvalid as exc:
         logger.error(str(exc))
-        raise punx.InvalidNxdlFile(str(exc))
+        raise InvalidNxdlFile(str(exc))
     return result
 
 
@@ -327,17 +327,17 @@ class NXDL__definition(NXDL__Mixin):
         if self.file_name is None or not os.path.exists(self.file_name):
             msg = 'NXDL file: ' + str(self.file_name)
             logger.error(msg)
-            raise punx.FileNotFound(msg)
+            raise FileNotFound(msg)
  
         lxml_tree = lxml.etree.parse(self.file_name)
  
         try:
             validate_xml_tree(lxml_tree)
-        except punx.InvalidNxdlFile as exc:
+        except InvalidNxdlFile as exc:
             msg = 'NXDL file is not valid: ' + self.file_name
             msg += '\n' + str(exc)
             logger.error(msg)
-            raise punx.InvalidNxdlFile(msg)
+            raise InvalidNxdlFile(msg)
 
         root_node = lxml_tree.getroot()
 

@@ -39,7 +39,7 @@ def suite(*args, **kw):
         #default_plot_test,
         #external_links,
         finding_test,
-        github_handler_test,
+#         github_handler_test,
         #h5structure_test,
 #         logs_test,
         nxdl_manager_test,

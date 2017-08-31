@@ -13,11 +13,12 @@
 import re
 import collections
 
-import punx.finding
-from punx.validate import CLASSPATH_OF_NON_NEXUS_CONTENT
-from punx.validate import logger
-from punx.validate import INFORMATIVE
-from punx.validate import VALIDITEMNAME_STRICT_PATTERN
+from .. import finding
+from .. import utils
+from ..validate import CLASSPATH_OF_NON_NEXUS_CONTENT
+from ..validate import logger
+from ..validate import INFORMATIVE
+from ..validate import VALIDITEMNAME_STRICT_PATTERN
 
 
 def validate_item_name(validator, v_item, key=None):
@@ -61,17 +62,17 @@ def validate_item_name(validator, v_item, key=None):
         for i, p in enumerate(nxdl.patterns[key].re_list):
             patterns[key + "-" + str(i)] = p
 
-        status = punx.finding.ERROR
+        status = finding.ERROR
         for k, p in patterns.items():
             if k not in validator.regexp_cache:
                 validator.regexp_cache[k] = re.compile('^' + p + '$')
-            s = punx.utils.decode_byte_string(v_item.h5_object)
+            s = utils.decode_byte_string(v_item.h5_object)
             m = validator.regexp_cache[k].match(s)
             matches = m is not None and m.string == s
             msg = "checking %s with %s: %s" % (v_item.h5_address, k, str(matches))
             logger.debug(msg)
             if matches:
-                status = punx.finding.OK
+                status = finding.OK
                 break
         validator.record_finding(v_item, key, status, k)
 
@@ -81,17 +82,17 @@ def validate_item_name(validator, v_item, key=None):
         for i, p in enumerate(nxdl.patterns[key].re_list):
             patterns[key + "-" + str(i)] = p
 
-        status = punx.finding.ERROR
+        status = finding.ERROR
         for k, p in patterns.items():
             if k not in validator.regexp_cache:
                 validator.regexp_cache[k] = re.compile('^' + p + '$')
-            s = punx.utils.decode_byte_string(v_item.h5_object)
+            s = utils.decode_byte_string(v_item.h5_object)
             m = validator.regexp_cache[k].match(s)
             matches = m is not None and m.string == s
             msg = "checking %s with %s: %s" % (v_item.h5_address, k, str(matches))
             logger.debug(msg)
             if matches:
-                status = punx.finding.OK
+                status = finding.OK
                 break
         validator.record_finding(v_item, key, status, k)
         
@@ -100,7 +101,7 @@ def validate_item_name(validator, v_item, key=None):
             key = "link target"
             m = str(s) in validator.addresses
             s += {True: " exists", False: " does not exist"}[m]
-            status = punx.finding.TF_RESULT[m]
+            status = finding.TF_RESULT[m]
             validator.record_finding(v_item, key, status, s)
 
     elif v_item.classpath.find("@") > -1:
@@ -113,26 +114,26 @@ def validate_item_name(validator, v_item, key=None):
                 patterns[key + "-relaxed-" + str(i)] = p
 
         key = "name"
-        status = punx.finding.ERROR
+        status = finding.ERROR
         for k, p in patterns.items():
             if k not in validator.regexp_cache:
                 validator.regexp_cache[k] = re.compile('^' + p + '$')
-            s = punx.utils.decode_byte_string(v_item.name)
+            s = utils.decode_byte_string(v_item.name)
             m = validator.regexp_cache[k].match(s)
             matches = m is not None and m.string == s
             msg = "checking %s with %s: %s" % (s, k, str(matches))
             logger.debug(msg)
             if matches:
-                status = punx.finding.OK
+                status = finding.OK
                 break
-        f = punx.finding.Finding(v_item.h5_address, key, status, k)
+        f = finding.Finding(v_item.h5_address, key, status, k)
         validator.validations.append(f)
         v_item.validations[key] = f
 
-    elif (punx.utils.isHdf5Dataset(v_item.h5_object) or
-        punx.utils.isHdf5Group(v_item.h5_object) or
-        punx.utils.isHdf5Link(v_item.parent, v_item.name) or
-        punx.utils.isHdf5ExternalLink(v_item.parent, v_item.name)):
+    elif (utils.isHdf5Dataset(v_item.h5_object) or
+        utils.isHdf5Group(v_item.h5_object) or
+        utils.isHdf5Link(v_item.parent, v_item.name) or
+        utils.isHdf5ExternalLink(v_item.parent, v_item.name)):
         
         nxdl = validator.manager.nxdl_file_set.schema_manager.nxdl
         
@@ -156,14 +157,14 @@ def validate_item_name(validator, v_item, key=None):
             if matches:
                 try:
                     if k.endswith('strict'):
-                        status = punx.finding.OK
+                        status = finding.OK
                     else:
-                        status = punx.finding.NOTE
+                        status = finding.NOTE
                 except UnicodeDecodeError:      # TODO: see issue #37
-                    status = punx.finding.ERROR
+                    status = finding.ERROR
                 break
         if status is None:
-            status = punx.finding.WARN
+            status = finding.WARN
             k = "valid HDF5 item name, not valid with NeXus"
         validator.record_finding(v_item, key, status, k)
 
@@ -176,7 +177,7 @@ def validate_item_name(validator, v_item, key=None):
         validator.record_finding(
             v_item, 
             "name", 
-            punx.finding.TODO, 
+            finding.TODO, 
             "not handled yet")
 
     pass    # TODO: what now?

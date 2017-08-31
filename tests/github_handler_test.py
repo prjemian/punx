@@ -160,12 +160,14 @@ class Test_Github_Handler_Module(unittest.TestCase):
 
 
 def suite(*args, **kw):
+    cred_file = os.path.join(
+        SRC_PATH, 
+        'punx', 
+        punx.github_handler.CREDS_FILE_NAME)
     test_suite = unittest.TestSuite()
-    test_list = []
-    cred_file = os.path.join(SRC_PATH, 'punx', punx.github_handler.CREDS_FILE_NAME)
-    cred_file += ".skip_it"     # developer use
-    if os.path.exists(cred_file):
-        test_list.append(Test_Github_Handler_Module)
+    test_list = [
+        Test_Github_Handler_Module,
+        ]
     for test_case in test_list:
         test_suite.addTest(unittest.makeSuite(test_case))
     return test_suite

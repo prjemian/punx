@@ -33,17 +33,16 @@ import collections
 import h5py
 import logging
 import os
-import re
 
-import punx
-import punx.finding
-import punx.utils
-import punx.nxdl_manager
+from . import FileNotFound, HDF5_Open_Error
+from . import finding
+from . import utils
+from . import nxdl_manager
 
 
 SLASH = "/"
 INFORMATIVE = int((logging.INFO + logging.DEBUG)/2)
-logger = punx.utils.setup_logger(__name__)
+logger = utils.setup_logger(__name__)
 CLASSPATH_OF_NON_NEXUS_CONTENT = "non-NeXus content"
 VALIDITEMNAME_STRICT_PATTERN = r'[a-z_][a-z0-9_]*'
 
@@ -98,14 +97,14 @@ class Data_File_Validator(object):
         self.classpaths = {}
         self.validation_keys = {}
         self.regexp_cache = {}
-        self.manager = punx.nxdl_manager.NXDL_Manager(ref)
+        self.manager = nxdl_manager.NXDL_Manager(ref)
 
     
     def close(self):
         """
         close the HDF5 file (if it is open)
         """
-        if punx.utils.isHdf5FileObject(self.h5):
+        if utils.isHdf5FileObject(self.h5):
             self.h5.close()
             self.h5 = None
     
@@ -113,7 +112,7 @@ class Data_File_Validator(object):
         """
         prepare the finding object and record it
         """
-        f = punx.finding.Finding(v_item.h5_address, key, status, comment)
+        f = finding.Finding(v_item.h5_address, key, status, comment)
         self.validations.append(f)
         v_item.validations[key] = f
         if key not in self.validation_keys:
@@ -126,7 +125,7 @@ class Data_File_Validator(object):
         start the validation process from the file root
         '''
         if not os.path.exists(fname):
-            raise punx.FileNotFound(fname)
+            raise FileNotFound(fname)
         self.fname = fname
 
         if self.h5 is not None:
@@ -135,7 +134,7 @@ class Data_File_Validator(object):
             self.h5 = h5py.File(fname, 'r')
         except IOError:
             logger.error("Could not open as HDF5: " + fname)
-            raise punx.HDF5_Open_Error(fname)
+            raise HDF5_Open_Error(fname)
 
         self.build_address_catalog()
 
@@ -146,8 +145,8 @@ class Data_File_Validator(object):
 
         # 2. check all base classes against defaults
         for k, v_item in self.addresses.items():
-            if punx.utils.isHdf5Group(v_item.h5_object) \
-            or punx.utils.isHdf5FileObject(v_item.h5_object):
+            if utils.isHdf5Group(v_item.h5_object) \
+            or utils.isHdf5FileObject(v_item.h5_object):
                 self.validate_group(v_item)
 
         # 3. check application definitions
@@ -189,7 +188,7 @@ class Data_File_Validator(object):
         obj = get_subject(parent, group)
         parent = self.classpaths[obj.classpath][-1]
         for item in group:
-            if punx.utils.isHdf5Group(group[item]):
+            if utils.isHdf5Group(group[item]):
                 self._group_address_catalog_(parent, group[item])
             else:
                 get_subject(parent, group[item])
@@ -207,7 +206,7 @@ class Data_File_Validator(object):
             self.record_finding(
                 v_item, 
                 key,
-                punx.finding.OK, 
+                finding.OK, 
                 "not a NeXus group")
             return
 
@@ -225,7 +224,7 @@ class Data_File_Validator(object):
             obj = v_item.h5_object[child_name]
             v_sub_item = self.addresses[obj.name]
             # TODO: need an algorithm to know if item is defined in base class
-            if punx.utils.isNeXusDataset(obj):
+            if utils.isNeXusDataset(obj):
                 t = child_name + " is"
                 if child_name not in base_class.fields:
                     t += " not"
@@ -233,9 +232,9 @@ class Data_File_Validator(object):
                 self.record_finding(
                     v_sub_item,
                     "field in base class",
-                    punx.finding.OK, 
+                    finding.OK, 
                     t)
-            elif punx.utils.isHdf5Group(obj):
+            elif utils.isHdf5Group(obj):
                 t = child_name + " is"
                 if child_name not in base_class.groups:
                     t += " not"
@@ -243,7 +242,7 @@ class Data_File_Validator(object):
                 self.record_finding(
                     v_sub_item,
                     "group in base class",
-                    punx.finding.OK, 
+                    finding.OK, 
                     t)
         # TODO: Verify that items specified in base class are compliant with file
         
@@ -346,7 +345,7 @@ class ValidationItem(object):
         else:
             object_type = type(self.h5_object)
         if object_type in ("HDF5 file root", "HDF5 group", "HDF5 dataset"):
-            if punx.utils.isNeXusLink(self.h5_object):
+            if utils.isNeXusLink(self.h5_object):
                 object_type = "NeXus link"
         return object_type
 
@@ -383,9 +382,9 @@ class ValidationItem(object):
                 return CLASSPATH_OF_NON_NEXUS_CONTENT
 
             if not classpath.endswith(SLASH):
-                if punx.utils.isHdf5Group(h5_obj):
+                if utils.isHdf5Group(h5_obj):
                     if "NX_class" in h5_obj.attrs:
-                        nx_class = punx.utils.decode_byte_string(h5_obj.attrs["NX_class"])
+                        nx_class = utils.decode_byte_string(h5_obj.attrs["NX_class"])
                         self.nx_class = nx_class    # only for groups
                         logger.log(INFORMATIVE, "NeXus base class: " + nx_class)
                     else:

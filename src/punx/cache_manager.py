@@ -67,10 +67,10 @@ try:
 except ImportError:
     from PyQt4 import QtCore
 
-import punx
-from punx import singletons
-from punx import github_handler
-from punx import utils
+from . import __settings_organization__, __settings_package__, FileNotFound
+from . import singletons
+from . import github_handler
+from . import utils
 
 
 SOURCE_CACHE_SUBDIR = u'cache'
@@ -460,8 +460,8 @@ class UserCache(Base_Cache):
         self.qsettings = QtCore.QSettings(
             QtCore.QSettings.IniFormat, 
             QtCore.QSettings.UserScope, 
-            punx.__settings_organization__, 
-            punx.__settings_package__)
+            __settings_organization__, 
+            __settings_package__)
 
         path = self.path()
         if not os.path.exists(path):
@@ -535,7 +535,7 @@ class NXDL_File_Set(object):
 
         file_name = file_name or self.info
         if not os.path.exists(file_name):
-            raise punx.FileNotFound('info file not found: ' + file_name)
+            raise FileNotFound('info file not found: ' + file_name)
 
         self.info = file_name
         self.path = os.path.abspath(os.path.dirname(file_name))

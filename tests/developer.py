@@ -1,6 +1,6 @@
 
 '''
-validte the writer_2_1.hdf5 data file
+validate a single NeXus HDF5 data file
 
 use this to develop features of punx
 '''
@@ -12,7 +12,8 @@ import tempfile
 import unittest
 import pyRestTable
 
-TESTFILE = 'writer_2_1.hdf5'
+# TESTFILE = "writer_2_1.hdf5
+TESTFILE = "draft_1D_NXcanSAS.h5"
 
 _path = os.path.join(os.path.dirname(__file__), '..', 'src')
 if _path not in sys.path:

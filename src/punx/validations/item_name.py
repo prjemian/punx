@@ -21,6 +21,17 @@ from ..validate import INFORMATIVE
 from ..validate import VALIDITEMNAME_STRICT_PATTERN
 
 
+def isNeXusLinkSource(v_item):
+    """
+    Is v_item a NeXus link that points to itself?
+    """
+    if "target" in v_item.h5_object.attrs:
+        source_name = utils.decode_byte_string(v_item.h5_address)
+        target_name = utils.decode_byte_string(v_item.h5_object.attrs["target"])
+        return target_name == source_name
+    return False
+
+
 def validate_item_name(validator, v_item, key=None):
     """
     check :class:`ValidationItem` *v_item* using *validItemName* regular expression
@@ -76,7 +87,7 @@ def validate_item_name(validator, v_item, key=None):
                 break
         validator.record_finding(v_item, key, status, k)
 
-    elif v_item.name == "target" and v_item.classpath.find("@") > 0:
+    elif v_item.classpath.endswith("@target") and isNeXusLinkSource(v_item.parent):
         target_name = utils.decode_byte_string(v_item.h5_object)
         if target_name == v_item.parent.h5_address:
             nxdl = validator.manager.nxdl_file_set.schema_manager.nxdl
@@ -105,7 +116,7 @@ def validate_item_name(validator, v_item, key=None):
                 status = finding.TF_RESULT[m]
                 validator.record_finding(v_item, key, status, s)
 
-    elif v_item.classpath.find("@") > -1:
+    elif v_item.classpath.find("@") > -1 and isNeXusLinkSource(v_item.parent):
         nxdl = validator.manager.nxdl_file_set.schema_manager.nxdl
         key = "validItemName"
         patterns[key + "-strict"] = VALIDITEMNAME_STRICT_PATTERN

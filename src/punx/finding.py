@@ -73,6 +73,7 @@ class Finding(object):
         if status not in VALID_STATUS_LIST:
             msg = 'unknown status value: ' + status
             raise ValueError(msg)
+
         self.test_name = str(test_name)
         self.h5_address = h5_address
         self.status = status

@@ -18,6 +18,7 @@ _path = os.path.join(os.path.dirname(__file__), '..', 'src')
 if _path not in sys.path:
     sys.path.insert(0, _path)
 import punx.validate
+import punx.finding
 
 
 def reporter(validator):
@@ -27,7 +28,9 @@ def reporter(validator):
     t.addLabel("test")
     t.addLabel("comments")
     for finding in validator.validations:
-#         print(str(finding))
+        if finding.status == punx.finding.OPTIONAL:
+            # put this on if you like verbose reports
+            continue
         row = []
         row.append(finding.h5_address)
         row.append(finding.status)

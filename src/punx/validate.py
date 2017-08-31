@@ -201,7 +201,8 @@ class Data_File_Validator(object):
         """
         validate the NeXus content of a HDF5 data file group
         """
-        from .validations import group_items_in_base_class
+        from punx.validations import hdf5_group_items_in_base_class
+        from punx.validations import base_class_items_in_hdf5_group
 
         key = "NeXus_group"
         if v_item.classpath == CLASSPATH_OF_NON_NEXUS_CONTENT:
@@ -219,13 +220,12 @@ class Data_File_Validator(object):
         else:
             raise ValueError("unexpected: " + str(v_item))
         # print(str(v_item), v_item.name, v_item.classpath)
-        
-        # TODO: Verify that items presented in data file are valid with base class
-        base_class = self.manager.classes[nx_class]
-        group_items_in_base_class.verify(self, v_item, base_class)
-        # TODO: Verify that items specified in base class are compliant with file
-        
         self.validate_NX_class_attribute(v_item, nx_class)
+        
+        base_class = self.manager.classes[nx_class]
+        hdf5_group_items_in_base_class.verify(self, v_item, base_class)
+        base_class_items_in_hdf5_group.verify(self, v_item, base_class)
+        
         # TODO: validate attributes - both HDF5-supplied & NXDL-specified
         # TODO: validate symbols - both HDF5-supplied & NXDL-specified
         # TODO: validate fields - both HDF5-supplied & NXDL-specified

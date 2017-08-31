@@ -44,3 +44,10 @@ def verify(validator, v_item, base_class):
                 "group in base class",
                 finding.OK, 
                 t)
+
+        else:
+            validator.record_finding(
+                v_sub_item,
+                "unhandled: group_items_in_base_class",
+                finding.TODO, 
+                "TODO: ")

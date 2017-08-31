@@ -204,8 +204,8 @@ class Data_File_Validator(object):
         """
         validate the NeXus content of a HDF5 data file group
         """
-        from punx.validations import hdf5_group_items_in_base_class
-        from punx.validations import base_class_items_in_hdf5_group
+        from .validations import hdf5_group_items_in_base_class
+        from .validations import base_class_items_in_hdf5_group
 
         key = "NeXus_group"
         if v_item.classpath == CLASSPATH_OF_NON_NEXUS_CONTENT:

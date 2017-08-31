@@ -218,7 +218,14 @@ class Data_File_Validator(object):
         elif v_item.classpath == "":
             nx_class = "NXroot"    # handle as NXroot
         else:
+            # self.record_finding(
+            #     v_item, 
+            #     key,
+            #     finding.OK, 
+            #     "not a NeXus group")
+            # return
             raise ValueError("unexpected: " + str(v_item))
+
         # print(str(v_item), v_item.name, v_item.classpath)
         self.validate_NX_class_attribute(v_item, nx_class)
         
@@ -364,8 +371,12 @@ class ValidationItem(object):
                 if utils.isHdf5Group(h5_obj):
                     if "NX_class" in h5_obj.attrs:
                         nx_class = utils.decode_byte_string(h5_obj.attrs["NX_class"])
-                        self.nx_class = nx_class    # only for groups
-                        logger.log(INFORMATIVE, "NeXus base class: " + nx_class)
+                        if nx_class.startswith("NX"):
+                            self.nx_class = nx_class    # only for groups
+                            logger.log(INFORMATIVE, "NeXus base class: " + nx_class)
+                        else:
+                            logger.log(INFORMATIVE, "HDF5 group is not NeXus: " + self.h5_address)
+                            return CLASSPATH_OF_NON_NEXUS_CONTENT
                     else:
                         logger.log(INFORMATIVE, "HDF5 group is not NeXus: " + self.h5_address)
                         return CLASSPATH_OF_NON_NEXUS_CONTENT

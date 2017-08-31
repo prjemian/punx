@@ -21,15 +21,23 @@ from ..validate import INFORMATIVE
 from ..validate import VALIDITEMNAME_STRICT_PATTERN
 
 
-def isNeXusLinkSource(v_item):
+LINK_TARGET = "target"
+LINK_SOURCE = "source"
+NOT_LINKED = "not linked"
+
+
+def target_source_or_notlinked(v_item):
     """
-    Is v_item a NeXus link that points to itself?
+    Is v_item a link target, link source, or not linked?
     """
     if "target" in v_item.h5_object.attrs:
         source_name = utils.decode_byte_string(v_item.h5_address)
         target_name = utils.decode_byte_string(v_item.h5_object.attrs["target"])
-        return target_name == source_name
-    return False
+        if target_name == source_name:
+            return LINK_SOURCE
+        else:
+            return LINK_TARGET
+    return NOT_LINKED
 
 
 def validate_item_name(validator, v_item, key=None):
@@ -67,7 +75,7 @@ def validate_item_name(validator, v_item, key=None):
     key = key or "validItemName"
     patterns = collections.OrderedDict()
 
-    if v_item.name == "NX_class" and v_item.classpath.find("@") > 0:
+    if v_item.h5_address.endswith("@NX_class"):
         nxdl = validator.manager.nxdl_file_set.schema_manager.nxdl
         key = "validNXClassName"
         for i, p in enumerate(nxdl.patterns[key].re_list):
@@ -87,27 +95,28 @@ def validate_item_name(validator, v_item, key=None):
                 break
         validator.record_finding(v_item, key, status, k)
 
-    elif v_item.classpath.endswith("@target") and isNeXusLinkSource(v_item.parent):
-        target_name = utils.decode_byte_string(v_item.h5_object)
-        if target_name == v_item.parent.h5_address:
-            nxdl = validator.manager.nxdl_file_set.schema_manager.nxdl
-            key = "validTargetName"
-            for i, p in enumerate(nxdl.patterns[key].re_list):
-                patterns[key + "-" + str(i)] = p
-    
-            status = finding.ERROR
-            for k, p in patterns.items():
-                if k not in validator.regexp_cache:
-                    validator.regexp_cache[k] = re.compile('^' + p + '$')
-                m = validator.regexp_cache[k].match(target_name)
-                matches = m is not None and m.string == target_name
-                msg = "checking %s with %s: %s" % (v_item.h5_address, k, str(matches))
-                logger.debug(msg)
-                if matches:
-                    status = finding.OK
-                    break
-            validator.record_finding(v_item, key, status, k)
-            
+    elif v_item.classpath.find("@") > -1:       # attribute
+        tsn = target_source_or_notlinked(v_item.parent)
+        if tsn == LINK_TARGET:
+            target_name = utils.decode_byte_string(v_item.h5_object)
+            if target_name == v_item.parent.h5_address:
+                nxdl = validator.manager.nxdl_file_set.schema_manager.nxdl
+                key = "validTargetName"
+                for i, p in enumerate(nxdl.patterns[key].re_list):
+                    patterns[key + "-" + str(i)] = p
+        
+                status = finding.ERROR
+                for k, p in patterns.items():
+                    if k not in validator.regexp_cache:
+                        validator.regexp_cache[k] = re.compile('^' + p + '$')
+                    m = validator.regexp_cache[k].match(target_name)
+                    matches = m is not None and m.string == target_name
+                    msg = "checking %s with %s: %s" % (v_item.h5_address, k, str(matches))
+                    logger.debug(msg)
+                    if matches:
+                        status = finding.OK
+                        break
+                validator.record_finding(v_item, key, status, k)
             # TODO: this test belongs in a different test block
             if False:
                 key = "link target"
@@ -116,31 +125,31 @@ def validate_item_name(validator, v_item, key=None):
                 status = finding.TF_RESULT[m]
                 validator.record_finding(v_item, key, status, s)
 
-    elif v_item.classpath.find("@") > -1 and isNeXusLinkSource(v_item.parent):
-        nxdl = validator.manager.nxdl_file_set.schema_manager.nxdl
-        key = "validItemName"
-        patterns[key + "-strict"] = VALIDITEMNAME_STRICT_PATTERN
-        if key in nxdl.patterns:
-            expression_list = nxdl.patterns[key].re_list
-            for i, p in enumerate(expression_list):
-                patterns[key + "-relaxed-" + str(i)] = p
-
-        key = "name"
-        status = finding.ERROR
-        for k, p in patterns.items():
-            if k not in validator.regexp_cache:
-                validator.regexp_cache[k] = re.compile('^' + p + '$')
-            s = utils.decode_byte_string(v_item.name)
-            m = validator.regexp_cache[k].match(s)
-            matches = m is not None and m.string == s
-            msg = "checking %s with %s: %s" % (s, k, str(matches))
-            logger.debug(msg)
-            if matches:
-                status = finding.OK
-                break
-        f = finding.Finding(v_item.h5_address, key, status, k)
-        validator.validations.append(f)
-        v_item.validations[key] = f
+        elif tsn in (LINK_SOURCE, NOT_LINKED):
+            nxdl = validator.manager.nxdl_file_set.schema_manager.nxdl
+            key = "validItemName"
+            patterns[key + "-strict"] = VALIDITEMNAME_STRICT_PATTERN
+            if key in nxdl.patterns:
+                expression_list = nxdl.patterns[key].re_list
+                for i, p in enumerate(expression_list):
+                    patterns[key + "-relaxed-" + str(i)] = p
+    
+            key = "name"
+            status = finding.ERROR
+            for k, p in patterns.items():
+                if k not in validator.regexp_cache:
+                    validator.regexp_cache[k] = re.compile('^' + p + '$')
+                s = utils.decode_byte_string(v_item.name)
+                m = validator.regexp_cache[k].match(s)
+                matches = m is not None and m.string == s
+                msg = "checking %s with %s: %s" % (s, k, str(matches))
+                logger.debug(msg)
+                if matches:
+                    status = finding.OK
+                    break
+            f = finding.Finding(v_item.h5_address, key, status, k)
+            validator.validations.append(f)
+            v_item.validations[key] = f
 
     elif (utils.isHdf5Dataset(v_item.h5_object) or
         utils.isHdf5Group(v_item.h5_object) or

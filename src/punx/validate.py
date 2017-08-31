@@ -156,6 +156,9 @@ class Data_File_Validator(object):
                     self.validate_application_definition(v_item.parent)
 
         # 4. check for default plot
+        c = "need to validate existence of default plot"
+        obj = self.addresses["/"]
+        self.record_finding(obj, "NeXus default plot", finding.TODO, c)
     
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     
@@ -232,19 +235,41 @@ class Data_File_Validator(object):
         base_class = self.manager.classes[nx_class]
         hdf5_group_items_in_base_class.verify(self, v_item, base_class)
         base_class_items_in_hdf5_group.verify(self, v_item, base_class)
-        
+
         # TODO: validate attributes - both HDF5-supplied & NXDL-specified
         # TODO: validate symbols - both HDF5-supplied & NXDL-specified
         # TODO: validate fields - both HDF5-supplied & NXDL-specified
         # TODO: validate links - both HDF5-supplied & NXDL-specified
-        # TODO: validate groups - both HDF5-supplied & NXDL-specified
         pass # TODO
-    
+        c = nx_class + ": more validations needed"
+        self.record_finding(v_item, "NeXus base class", finding.TODO, c)
+
     def validate_application_definition(self, v_item):
         """
         validate group as a NeXus application definition
         """
-        pass # TODO
+        appl_def_name = utils.decode_byte_string(v_item.h5_object["definition"].value)
+        key = "NeXus application definition"
+
+        known = appl_def_name in self.manager.classes
+        status = finding.TF_RESULT[known]
+        msg = appl_def_name + ": recognized NXDL specification"
+        self.record_finding(v_item, "known NXDL", status, msg)
+
+        msg = appl_def_name
+        if self.manager.classes[appl_def_name].category == "applications":
+            msg += ": known NeXus application definition"
+        elif self.manager.classes[appl_def_name].category == "contributed":
+            msg += ": known NeXus contributed definition used as application definition"
+        else:
+            status = finding.ERROR
+            msg += ": unknown application definition"
+        self.record_finding(v_item, key, status, msg)
+
+        c = appl_def_name + ": more validations needed"
+        self.record_finding(v_item, key, finding.TODO, c)
+
+        # TODO: 
     
     def validate_NX_class_attribute(self, v_item, nx_class):
         from .validations import nx_class_attribute

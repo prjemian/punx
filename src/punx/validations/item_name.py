@@ -77,32 +77,33 @@ def validate_item_name(validator, v_item, key=None):
         validator.record_finding(v_item, key, status, k)
 
     elif v_item.name == "target" and v_item.classpath.find("@") > 0:
-        nxdl = validator.manager.nxdl_file_set.schema_manager.nxdl
-        key = "validTargetName"
-        for i, p in enumerate(nxdl.patterns[key].re_list):
-            patterns[key + "-" + str(i)] = p
-
-        status = finding.ERROR
-        for k, p in patterns.items():
-            if k not in validator.regexp_cache:
-                validator.regexp_cache[k] = re.compile('^' + p + '$')
-            s = utils.decode_byte_string(v_item.h5_object)
-            m = validator.regexp_cache[k].match(s)
-            matches = m is not None and m.string == s
-            msg = "checking %s with %s: %s" % (v_item.h5_address, k, str(matches))
-            logger.debug(msg)
-            if matches:
-                status = finding.OK
-                break
-        validator.record_finding(v_item, key, status, k)
-        
-        # TODO: this test belongs in a different test block
-        if False:
-            key = "link target"
-            m = str(s) in validator.addresses
-            s += {True: " exists", False: " does not exist"}[m]
-            status = finding.TF_RESULT[m]
-            validator.record_finding(v_item, key, status, s)
+        target_name = utils.decode_byte_string(v_item.h5_object)
+        if target_name == v_item.parent.h5_address:
+            nxdl = validator.manager.nxdl_file_set.schema_manager.nxdl
+            key = "validTargetName"
+            for i, p in enumerate(nxdl.patterns[key].re_list):
+                patterns[key + "-" + str(i)] = p
+    
+            status = finding.ERROR
+            for k, p in patterns.items():
+                if k not in validator.regexp_cache:
+                    validator.regexp_cache[k] = re.compile('^' + p + '$')
+                m = validator.regexp_cache[k].match(target_name)
+                matches = m is not None and m.string == target_name
+                msg = "checking %s with %s: %s" % (v_item.h5_address, k, str(matches))
+                logger.debug(msg)
+                if matches:
+                    status = finding.OK
+                    break
+            validator.record_finding(v_item, key, status, k)
+            
+            # TODO: this test belongs in a different test block
+            if False:
+                key = "link target"
+                m = str(s) in validator.addresses
+                s += {True: " exists", False: " does not exist"}[m]
+                status = finding.TF_RESULT[m]
+                validator.record_finding(v_item, key, status, s)
 
     elif v_item.classpath.find("@") > -1:
         nxdl = validator.manager.nxdl_file_set.schema_manager.nxdl

@@ -26,18 +26,18 @@ LINK_SOURCE = "source"
 NOT_LINKED = "not linked"
 
 
-def target_source_or_notlinked(v_item):
+def isNeXusLinkTarget(v_item):
     """
-    Is v_item a link target, link source, or not linked?
+    Is v_item a NeXus link target?
+    
+    It is a "target" if its HDF5 address does not match the target value.
+    It is a "source" if its HDF5 address matches the target attribute value.
     """
     if "target" in v_item.h5_object.attrs:
         source_name = utils.decode_byte_string(v_item.h5_address)
         target_name = utils.decode_byte_string(v_item.h5_object.attrs["target"])
-        if target_name == source_name:
-            return LINK_SOURCE
-        else:
-            return LINK_TARGET
-    return NOT_LINKED
+        return target_name != source_name
+    return False    # no @target attribute at all
 
 
 def validate_item_name(validator, v_item, key=None):
@@ -93,63 +93,36 @@ def validate_item_name(validator, v_item, key=None):
             if matches:
                 status = finding.OK
                 break
-        validator.record_finding(v_item, key, status, k)
+        validator.record_finding(v_item, key, status, "pattern: " + p)
 
-    elif v_item.classpath.find("@") > -1:       # attribute
-        tsn = target_source_or_notlinked(v_item.parent)
-        if tsn == LINK_TARGET:
-            target_name = utils.decode_byte_string(v_item.h5_object)
-            if target_name == v_item.parent.h5_address:
-                nxdl = validator.manager.nxdl_file_set.schema_manager.nxdl
-                key = "validTargetName"
-                for i, p in enumerate(nxdl.patterns[key].re_list):
-                    patterns[key + "-" + str(i)] = p
-        
-                status = finding.ERROR
-                for k, p in patterns.items():
-                    if k not in validator.regexp_cache:
-                        validator.regexp_cache[k] = re.compile('^' + p + '$')
-                    m = validator.regexp_cache[k].match(target_name)
-                    matches = m is not None and m.string == target_name
-                    msg = "checking %s with %s: %s" % (v_item.h5_address, k, str(matches))
-                    logger.debug(msg)
-                    if matches:
-                        status = finding.OK
-                        break
-                validator.record_finding(v_item, key, status, k)
-            # TODO: this test belongs in a different test block
-            if False:
-                key = "link target"
-                m = str(s) in validator.addresses
-                s += {True: " exists", False: " does not exist"}[m]
-                status = finding.TF_RESULT[m]
-                validator.record_finding(v_item, key, status, s)
+    # attribute
+    elif v_item.classpath.find("@") > -1 and not isNeXusLinkTarget(v_item.parent):
+        # Do not validate the attributes of linked items.
+        # They will be validated with the source item.
+        nxdl = validator.manager.nxdl_file_set.schema_manager.nxdl
+        key = "validItemName"
+        patterns["strict pattern: " + VALIDITEMNAME_STRICT_PATTERN] = VALIDITEMNAME_STRICT_PATTERN
+        if key in nxdl.patterns:
+            expression_list = nxdl.patterns[key].re_list
+            for p in expression_list:
+                patterns["relaxed pattern: " + p] = p
 
-        elif tsn in (LINK_SOURCE, NOT_LINKED):
-            nxdl = validator.manager.nxdl_file_set.schema_manager.nxdl
-            key = "validItemName"
-            patterns[key + "-strict"] = VALIDITEMNAME_STRICT_PATTERN
-            if key in nxdl.patterns:
-                expression_list = nxdl.patterns[key].re_list
-                for i, p in enumerate(expression_list):
-                    patterns[key + "-relaxed-" + str(i)] = p
-    
-            key = "name"
-            status = finding.ERROR
-            for k, p in patterns.items():
-                if k not in validator.regexp_cache:
-                    validator.regexp_cache[k] = re.compile('^' + p + '$')
-                s = utils.decode_byte_string(v_item.name)
-                m = validator.regexp_cache[k].match(s)
-                matches = m is not None and m.string == s
-                msg = "checking %s with %s: %s" % (s, k, str(matches))
-                logger.debug(msg)
-                if matches:
-                    status = finding.OK
-                    break
-            f = finding.Finding(v_item.h5_address, key, status, k)
-            validator.validations.append(f)
-            v_item.validations[key] = f
+        key = "validItemName"
+        status = finding.ERROR
+        for k, p in patterns.items():
+            if k not in validator.regexp_cache:
+                validator.regexp_cache[k] = re.compile('^' + p + '$')
+            s = utils.decode_byte_string(v_item.name)
+            m = validator.regexp_cache[k].match(s)
+            matches = m is not None and m.string == s
+            msg = "checking %s with %s: %s" % (s, k, str(matches))
+            logger.debug(msg)
+            if matches:
+                status = finding.OK
+                break
+        f = finding.Finding(v_item.h5_address, key, status, k)
+        validator.validations.append(f)
+        v_item.validations[key] = f
 
     elif (utils.isHdf5Dataset(v_item.h5_object) or
         utils.isHdf5Group(v_item.h5_object) or
@@ -159,14 +132,14 @@ def validate_item_name(validator, v_item, key=None):
         nxdl = validator.manager.nxdl_file_set.schema_manager.nxdl
         
         # build the regular expression patterns to match
-        patterns["validItemName-strict"] = VALIDITEMNAME_STRICT_PATTERN
+        patterns["strict pattern: " + VALIDITEMNAME_STRICT_PATTERN] = VALIDITEMNAME_STRICT_PATTERN
         if key in nxdl.patterns:
             expression_list = nxdl.patterns[key].re_list
-            for i, p in enumerate(expression_list):
-                patterns["validItemName-relaxed-" + str(i)] = p
+            for p in expression_list:
+                patterns["relaxed pattern: " + p] = p
         
         # check against patterns until a match is found
-        key = "name"
+        key = "validItemName"
         status = None
         for k, p in patterns.items():
             if k not in validator.regexp_cache:
@@ -197,7 +170,7 @@ def validate_item_name(validator, v_item, key=None):
         # TODO:
         validator.record_finding(
             v_item, 
-            "name", 
+            "validItemName", 
             finding.TODO, 
             "not handled yet")
 

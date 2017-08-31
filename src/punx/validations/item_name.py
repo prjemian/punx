@@ -75,7 +75,7 @@ def validate_item_name(validator, v_item, key=None):
     key = key or "validItemName"
     patterns = collections.OrderedDict()
 
-    if v_item.h5_address.endswith("@NX_class"):
+    if v_item.h5_address is not None and v_item.h5_address.endswith("@NX_class"):
         nxdl = validator.manager.nxdl_file_set.schema_manager.nxdl
         key = "validNXClassName"
         for i, p in enumerate(nxdl.patterns[key].re_list):

@@ -18,10 +18,30 @@ def verify(validator, v_item, base_class):
     """
     Verify items presented in group (of data file) with base class NXDL
     """
+    # verify this group's attributes
+    for k, v in v_item.h5_object.attrs.items():
+        k = utils.decode_byte_string(k)
+        known = k in base_class.attributes
+        status = finding.OK
+        c = "known"
+        if not known:
+            c = "unknown"
+        c += ": " + base_class.title + "@" + k
+        a_item = validator.addresses[v_item.h5_address + "@" + k]
+        validator.record_finding(a_item, "known attribute", status, c)
+        
+        if known:
+            validator.record_finding(
+                a_item, 
+                "TODO: known attribute", 
+                finding.TODO, 
+                "test more")
+
+    # verify this group's children
     for child_name in v_item.h5_object:
         obj = v_item.h5_object[child_name]
         v_sub_item = validator.addresses[obj.name]
-        # TODO: need an algorithm to know if item is defined in base class
+        # TODO: need an algorithm to know if v_item is defined in base class
 
         if utils.isNeXusDataset(obj):
             t = child_name + " is"

@@ -21,21 +21,78 @@ def verify(validator, v_item, base_class):
     # verify this group's attributes
     for k, v in sorted(v_item.h5_object.attrs.items()):
         k = utils.decode_byte_string(k)
+        v = utils.decode_byte_string(v)
         known = k in base_class.attributes
         status = finding.OK
         c = "known"
-        if not known:
+        if not known and k != "NX_class":
+            # NX_class is a special case since it is not defined in the nxdl.xsd Schema
             c = "unknown"
         c += ": " + base_class.title + "@" + k
         a_item = validator.addresses[v_item.h5_address + "@" + k]
         validator.record_finding(a_item, "known attribute", status, c)
         
-        if known:
-            validator.record_finding(
-                a_item, 
-                "TODO: known attribute", 
-                finding.TODO, 
-                "test more")
+        if not known:   # ignore details of the unknown
+            return
+
+        spec = base_class.attributes[k]
+
+        if len(spec.enumerations) > 0:
+            match = v in spec.enumerations
+            status = finding.TF_RESULT[match]
+            if match:
+                c = "found"
+            else:
+                c = "not found"
+            c += ": " + v
+            test_name = "attribute value enumeration"
+            validator.record_finding(a_item, test_name, status, c)
+            # TODO: ...
+
+        # TODO: if spec.xml_attributes["deprecated"]
+        
+        def child_exists(test_name, v, v_item, a_item):
+            found = v in v_item.h5_object
+            if found:
+                status = finding.OK
+                c = "found"
+            else:
+                status = finding.WARN
+                c = "not found"
+            c += ": " + v_item.h5_address
+            if not c.endswith("/"):
+                c += "/"
+            c += v
+            validator.record_finding(a_item, test_name, status, c)
+        
+        if k == "default" and v_item.classpath in ("", "/NXentry", "/NXentry/NXsubentry"):
+            test_name = "value of @default"
+            child_exists(test_name, v, v_item, a_item)
+
+        elif k == "signal":
+            test_name = "value of @signal"
+            child_exists(test_name, v, v_item, a_item)
+
+        elif k == "units":
+            pass
+
+        elif k == "target":
+            test_name = "value of @target"
+            found = v in v_item.manager.addresses
+            if found:
+                status = finding.OK
+                c = "found"
+            else:
+                status = finding.ERROR
+                c = "not found"
+            c += ": " + v_item.h5_address + "/@target = " + v
+            validator.record_finding(a_item, test_name, status, c)
+
+        elif k == "axes":
+            pass
+
+        elif k == "something else":
+            pass
 
     # verify this group's children
     for child_name in v_item.h5_object:

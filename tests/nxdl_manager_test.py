@@ -128,6 +128,16 @@ class Test_NXDL_Manager(unittest.TestCase):
             self.assertTrue(
                 isinstance(v, punx.nxdl_manager.NXDL__definition),
                 'NXDL definitions type: '+ k +'=' + str(type(v)))
+    
+    def test_expected_attributes(self):
+        import punx.cache_manager
+
+        cm = punx.cache_manager.CacheManager()
+        nxdl_defs = punx.nxdl_manager.NXDL_Manager().classes
+        self.assertTrue("NXroot" in nxdl_defs)
+        self.assertTrue("NX_class" in nxdl_defs["NXroot"].attributes)
+        self.assertTrue("NXentry" in nxdl_defs)
+        self.assertFalse("NX_class" in nxdl_defs["NXentry"].attributes)
 
 
 def suite(*args, **kw):

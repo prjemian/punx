@@ -23,15 +23,17 @@ def verify(validator, v_item, base_class):
         test = "NXDL field in data file"
         f = finding.OK
         found = field_name in v_item.h5_object
-        t = 'field \"' + field_name + '\"'
         if found:
-            t + " appears"
+            c = "found"
         else:
             # TODO: check if name is flexible
-            t += " does not appear"
+            c = "not found"
             f = finding.OPTIONAL
-        t += " in " + v_item.h5_address
-        validator.record_finding(v_item, test, f, t)
+        c += ": " + v_item.h5_address
+        if not c.endswith("/"):
+            c += "/"
+        c += field_name
+        validator.record_finding(v_item, test, f, c)
 
     for group_name in sorted(base_class.groups.keys()):
         test = "NXDL group in data file"

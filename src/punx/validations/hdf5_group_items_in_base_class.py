@@ -19,7 +19,7 @@ def verify(validator, v_item, base_class):
     Verify items presented in group (of data file) with base class NXDL
     """
     # verify this group's attributes
-    for k, v in v_item.h5_object.attrs.items():
+    for k, v in sorted(v_item.h5_object.attrs.items()):
         k = utils.decode_byte_string(k)
         known = k in base_class.attributes
         status = finding.OK

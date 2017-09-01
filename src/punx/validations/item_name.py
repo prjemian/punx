@@ -21,6 +21,7 @@ from ..validate import INFORMATIVE
 from ..validate import VALIDITEMNAME_STRICT_PATTERN
 
 
+TEST_NAME = "validItemName"
 LINK_TARGET = "target"
 LINK_SOURCE = "source"
 NOT_LINKED = "not linked"
@@ -93,7 +94,7 @@ def validate_item_name(validator, v_item, key=None):
             if matches:
                 status = finding.OK
                 break
-        validator.record_finding(v_item, key, status, "pattern: " + p)
+        validator.record_finding(v_item, TEST_NAME, status, "pattern: " + p)
 
     # attribute
     elif v_item.classpath.find("@") > -1 and not isNeXusLinkTarget(v_item.parent):
@@ -120,7 +121,7 @@ def validate_item_name(validator, v_item, key=None):
             if matches:
                 status = finding.OK
                 break
-        f = finding.Finding(v_item.h5_address, key, status, k)
+        f = finding.Finding(v_item.h5_address, TEST_NAME, status, k)
         validator.validations.append(f)
         v_item.validations[key] = f
 
@@ -160,7 +161,7 @@ def validate_item_name(validator, v_item, key=None):
         if status is None:
             status = finding.WARN
             k = "valid HDF5 item name, not valid with NeXus"
-        validator.record_finding(v_item, key, status, k)
+        validator.record_finding(v_item, TEST_NAME, status, k)
 
     elif v_item.classpath == CLASSPATH_OF_NON_NEXUS_CONTENT:
         pass    # nothing else to do here
@@ -170,7 +171,7 @@ def validate_item_name(validator, v_item, key=None):
         # TODO:
         validator.record_finding(
             v_item, 
-            "validItemName", 
+            TEST_NAME, 
             finding.TODO, 
             "not handled yet")
 

@@ -12,9 +12,9 @@ import tempfile
 import unittest
 import pyRestTable
 
-# TESTFILE = "writer_2_1.hdf5"            # simple, with links
+TESTFILE = "writer_2_1.hdf5"            # simple, with links
 # TESTFILE = "draft_1D_NXcanSAS.h5"       # incorrect @NX_class attributes
-TESTFILE = "example_01_1D_I_Q.h5"       # NXcanSAS
+# TESTFILE = "example_01_1D_I_Q.h5"       # NXcanSAS
 
 _path = os.path.join(os.path.dirname(__file__), '..', 'src')
 if _path not in sys.path:

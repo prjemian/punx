@@ -73,9 +73,6 @@ def verify(validator, v_item, base_class):
             test_name = "value of @signal"
             child_exists(test_name, v, v_item, a_item)
 
-        elif k == "units":
-            pass
-
         elif k == "target":
             test_name = "value of @target"
             found = v in v_item.manager.addresses
@@ -91,8 +88,12 @@ def verify(validator, v_item, base_class):
         elif k == "axes":
             pass
 
-        elif k == "something else":
-            pass
+        else:
+            test_name = "value of @" + k
+            status = finding.TODO
+            c = "TODO: need to validate"
+            c += ": @" + k + " = " + v
+            validator.record_finding(a_item, test_name, status, c)
 
     # verify this group's children
     for child_name in v_item.h5_object:

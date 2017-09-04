@@ -14,6 +14,21 @@ from .. import finding
 from .. import utils
 
 
+def child_exists(validator, test_name, v, v_item, a_item):
+    found = v in v_item.h5_object
+    if found:
+        status = finding.OK
+        c = "found"
+    else:
+        status = finding.ERROR
+        c = "not found"
+    c += ": " + v_item.h5_address
+    if not c.endswith("/"):
+        c += "/"
+    c += v
+    validator.record_finding(a_item, test_name, status, c)
+
+
 def verify(validator, v_item, base_class):
     """
     Verify items presented in group (of data file) with base class NXDL
@@ -33,7 +48,7 @@ def verify(validator, v_item, base_class):
         validator.record_finding(a_item, "known attribute", status, c)
         
         if not known:   # ignore details of the unknown
-            return
+            continue
 
         spec = base_class.attributes[k]
 
@@ -51,27 +66,16 @@ def verify(validator, v_item, base_class):
 
         # TODO: if spec.xml_attributes["deprecated"]
         
-        def child_exists(test_name, v, v_item, a_item):
-            found = v in v_item.h5_object
-            if found:
-                status = finding.OK
-                c = "found"
-            else:
-                status = finding.WARN
-                c = "not found"
-            c += ": " + v_item.h5_address
-            if not c.endswith("/"):
-                c += "/"
-            c += v
-            validator.record_finding(a_item, test_name, status, c)
-        
-        if k == "default" and v_item.classpath in ("", "/NXentry", "/NXentry/NXsubentry"):
+        # @default attribute points to child group in these classpaths
+        if k == "default" and v_item.classpath in ("", 
+                                                   "/NXentry", 
+                                                   "/NXentry/NXsubentry"):
             test_name = "value of @default"
-            child_exists(test_name, v, v_item, a_item)
+            child_exists(validator, test_name, v, v_item, a_item)
 
         elif k == "signal":
             test_name = "value of @signal"
-            child_exists(test_name, v, v_item, a_item)
+            child_exists(validator, test_name, v, v_item, a_item)
 
         elif k == "target":
             test_name = "value of @target"

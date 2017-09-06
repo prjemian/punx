@@ -432,13 +432,13 @@ class Test_Default_Plot(unittest.TestCase):
     def test_method2_pass(self):
         self.setup_simple_test_file()
 
-    def xtest_method2_fail(self):
+    def test_method2_fail(self):
         self.setup_simple_test_file()
 
-    def xtest_method1_pass(self):
+    def test_method1_pass(self):
         self.setup_simple_test_file()
 
-    def xtest_method1_fail(self):
+    def test_method1_fail(self):
         self.setup_simple_test_file()
 
 

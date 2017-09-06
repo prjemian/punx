@@ -97,9 +97,11 @@ def validate_item_name(validator, v_item, key=None):
         validator.record_finding(v_item, TEST_NAME, status, "pattern: " + p)
 
     # attribute
-    elif v_item.classpath.find("@") > -1 and not isNeXusLinkTarget(v_item.parent):
+    elif v_item.classpath.find("@") > -1 and isNeXusLinkTarget(v_item.parent):
         # Do not validate the attributes of linked items.
         # They will be validated with the source item.
+        pass
+    elif v_item.classpath.find("@") > -1:
         nxdl = validator.manager.nxdl_file_set.schema_manager.nxdl
         key = "validItemName"
         patterns["strict pattern: " + VALIDITEMNAME_STRICT_PATTERN] = VALIDITEMNAME_STRICT_PATTERN

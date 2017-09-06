@@ -130,7 +130,7 @@ class Test_Validate(unittest.TestCase):
         os.remove(self.hdffile)
         self.hdffile = None
 
-    def setup_simple_test_file(self):
+    def setup_simple_test_file(self, create_validator=True):
         f = h5py.File(self.hdffile)
         f.attrs["default"] = "entry"
         eg = f.create_group("entry")
@@ -144,8 +144,9 @@ class Test_Validate(unittest.TestCase):
         eg["link_to_data"] = ds
         f.close()
         self.expected_item_count = 12
-        self.validator = punx.validate.Data_File_Validator(ref=DEFAULT_NXDL_FILE_SET)
-        self.validator.validate(self.hdffile)
+        if create_validator:
+            self.validator = punx.validate.Data_File_Validator(ref=DEFAULT_NXDL_FILE_SET)
+            self.validator.validate(self.hdffile)
 
     def use_example_file(self, fname):
         path = os.path.join(os.path.dirname(punx.__file__), 'data', )
@@ -158,8 +159,7 @@ class Test_Validate(unittest.TestCase):
         self.assertEqual(len(self.validator.addresses), self.expected_item_count)
 
     def test_non_nexus_group(self):
-        self.setup_simple_test_file()
-        self.validator.close()
+        self.setup_simple_test_file(create_validator=False)
         f = h5py.File(self.hdffile)
         other = f["/entry"].create_group("other")
         other.attrs["intentions"] = "good"
@@ -247,8 +247,7 @@ class Test_Validate(unittest.TestCase):
 
     def test_bad_link_target_value(self):
         # target attribute value points to non-existing item
-        self.setup_simple_test_file()
-        self.validator.close()
+        self.setup_simple_test_file(create_validator=False)
         f = h5py.File(self.hdffile)
         data = f["/entry/data/data"]
         f["/entry/bad_target_in_link"] = data
@@ -270,8 +269,7 @@ class Test_Validate(unittest.TestCase):
 
     def test_wrong_link_target_value(self):
         # test target attribute value that points to wrong but existing item
-        self.setup_simple_test_file()
-        self.validator.close()
+        self.setup_simple_test_file(create_validator=False)
         f = h5py.File(self.hdffile)
         data = f["/entry/data/data"]
         f["/entry/linked_item"] = data
@@ -294,8 +292,7 @@ class Test_Validate(unittest.TestCase):
     # TODO: need to test non-compliant item names
 
     def test_application_definition(self):
-        self.setup_simple_test_file()
-        self.validator.close()
+        self.setup_simple_test_file(create_validator=False)
         f = h5py.File(self.hdffile)
         other = f["/entry"].create_dataset(
             "definition", 
@@ -308,8 +305,7 @@ class Test_Validate(unittest.TestCase):
 
     def test_contributed_base_class(self):
         pass    # TODO: such as NXquadrupole_magnet
-        self.setup_simple_test_file()
-        self.validator.close()
+        self.setup_simple_test_file(create_validator=False)
         f = h5py.File(self.hdffile)
         # TODO: should be under an NXinstrument group
         group = f["/entry"].create_group("quadrupole_magnet")
@@ -319,8 +315,7 @@ class Test_Validate(unittest.TestCase):
         self.validator.validate(self.hdffile)
 
     def test_contributed_application_definition(self):
-        self.setup_simple_test_file()
-        self.validator.close()
+        self.setup_simple_test_file(create_validator=False)
         f = h5py.File(self.hdffile)
         other = f["/entry"].create_dataset(
             "definition", 

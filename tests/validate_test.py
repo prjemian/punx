@@ -331,12 +331,81 @@ class Test_Validate(unittest.TestCase):
         self.validator.validate(self.hdffile)
         # TODO: assert what now?
 
+
+class Test_Default_Plot(unittest.TestCase):
+
+    def setUp(self):
+        # create the test file
+        tfile = tempfile.NamedTemporaryFile(suffix='.hdf5', delete=False)
+        tfile.close()
+        self.hdffile = tfile.name
+        self.validator = None
+     
+    def tearDown(self):
+        if self.validator is not None:
+            self.validator.close()
+            self.validator.h5 = None
+            self.validator = None
+        os.remove(self.hdffile)
+        self.hdffile = None
+
+    def setup_simple_test_file(self):
+        f = h5py.File(self.hdffile)
+        eg = f.create_group("entry")
+        eg.attrs["NX_class"] = "NXentry"
+        dg = eg.create_group("data")
+        dg.attrs["NX_class"] = "NXdata"
+        ds = dg.create_dataset("y", data=[1, 2, 3.14])
+        ds = dg.create_dataset("x", data=[1, 2, 3.14])
+        ds.attrs["units"] = "arbitrary"
+        f.close()
+        self.expected_item_count = 12
+        self.validator = punx.validate.Data_File_Validator(ref=DEFAULT_NXDL_FILE_SET)
+        self.validator.validate(self.hdffile)
+
+    def test_method3_pass(self):
+        self.setup_simple_test_file()
+        self.validator.close()
+        self.validator = None
+        f = h5py.File(self.hdffile, "r+")
+        f.attrs["default"] = "entry"
+        f["/entry"].attrs["default"] = "data"
+        f["/entry/data"].attrs["signal"] = "y"
+        f.close()
+        self.validator = punx.validate.Data_File_Validator(ref=DEFAULT_NXDL_FILE_SET)
+        self.validator.validate(self.hdffile)
+
+    def test_method3_fail(self):
+        self.setup_simple_test_file()
+        self.validator.close()
+        self.validator = None
+        f = h5py.File(self.hdffile)
+        f.attrs["default"] = "entry"
+        f["/entry"].attrs["default"] = "will not be found"
+        f.close()
+        self.validator = punx.validate.Data_File_Validator(ref=DEFAULT_NXDL_FILE_SET)
+        self.validator.validate(self.hdffile)
+
+    def test_method2_pass(self):
+        self.setup_simple_test_file()
+
+    def test_method2_fail(self):
+        self.setup_simple_test_file()
+
+    def test_method1_pass(self):
+        self.setup_simple_test_file()
+
+    def test_method1_fail(self):
+        self.setup_simple_test_file()
+
+
 def suite(*args, **kw):
     test_suite = unittest.TestSuite()
     test_list = [
-        Test_Constructor,
-        Test_Constructor_Exceptions,
-        Test_Validate,
+#         Test_Constructor,
+#         Test_Constructor_Exceptions,
+#         Test_Validate,
+        Test_Default_Plot,
         ]
     for test_case in test_list:
         test_suite.addTest(unittest.makeSuite(test_case))

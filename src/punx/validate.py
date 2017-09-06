@@ -124,6 +124,8 @@ class Data_File_Validator(object):
         '''
         start the validation process from the file root
         '''
+        from .validations import default_plot
+
         if not os.path.exists(fname):
             raise FileNotFound(fname)
         self.fname = fname
@@ -156,9 +158,7 @@ class Data_File_Validator(object):
                     self.validate_application_definition(v_item.parent)
 
         # 4. check for default plot
-        c = "need to validate existence of default plot"
-        obj = self.addresses["/"]
-        self.record_finding(obj, "NeXus default plot", finding.TODO, c)
+        default_plot.verify(self)
     
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     

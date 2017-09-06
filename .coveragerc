@@ -14,3 +14,4 @@ omit =
 	versioneer.py
 	src/punx/_version.py
 	src/punx/github_handler.py
+	tests/github_handler_test.py

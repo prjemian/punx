@@ -445,9 +445,9 @@ class Test_Default_Plot(unittest.TestCase):
 def suite(*args, **kw):
     test_suite = unittest.TestSuite()
     test_list = [
-#         Test_Constructor,
-#         Test_Constructor_Exceptions,
-#         Test_Validate,
+        Test_Constructor,
+        Test_Constructor_Exceptions,
+        Test_Validate,
         Test_Default_Plot,
         ]
     for test_case in test_list:

@@ -50,6 +50,11 @@ def main():
     validator = punx.validate.Data_File_Validator()
     validator.validate(test_file)
     reporter(validator)
+
+    tf = "chopper.nxs"
+    test_file = os.path.join(_path, 'punx', 'data', tf)
+    validator.validate(test_file)
+    reporter(validator)
     pass
 
 

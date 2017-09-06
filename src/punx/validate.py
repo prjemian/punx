@@ -92,13 +92,15 @@ class Data_File_Validator(object):
 
     def __init__(self, ref=None):
         self.h5 = None
+        self.__init_local__()
+        self.manager = nxdl_manager.NXDL_Manager(ref)
+
+    def __init_local__(self):
         self.validations = []      # list of Finding() instances
         self.addresses = collections.OrderedDict()     # dictionary of all HDF5 address nodes in the data file
         self.classpaths = {}
         self.validation_keys = {}
         self.regexp_cache = {}
-        self.manager = nxdl_manager.NXDL_Manager(ref)
-
     
     def close(self):
         """
@@ -138,6 +140,7 @@ class Data_File_Validator(object):
             logger.error("Could not open as HDF5: " + fname)
             raise HDF5_Open_Error(fname)
 
+        self.__init_local__()
         self.build_address_catalog()
 
         # 1. check all objects in file (name is valid, ...)
@@ -232,17 +235,21 @@ class Data_File_Validator(object):
         # print(str(v_item), v_item.name, v_item.classpath)
         self.validate_NX_class_attribute(v_item, nx_class)
         
-        base_class = self.manager.classes[nx_class]
-        hdf5_group_items_in_base_class.verify(self, v_item, base_class)
-        base_class_items_in_hdf5_group.verify(self, v_item, base_class)
-
-        # TODO: validate attributes - both HDF5-supplied & NXDL-specified
-        # TODO: validate symbols - both HDF5-supplied & NXDL-specified
-        # TODO: validate fields - both HDF5-supplied & NXDL-specified
-        # TODO: validate links - both HDF5-supplied & NXDL-specified
-        pass # TODO
-        c = nx_class + ": more validations needed"
-        self.record_finding(v_item, "NeXus base class", finding.TODO, c)
+        base_class = self.manager.classes.get(nx_class)
+        if base_class is None:
+            c = "unknown NeXus base class: " + nx_class
+            self.record_finding(v_item, "NeXus base class", finding.ERROR, c)
+        else:
+            hdf5_group_items_in_base_class.verify(self, v_item, base_class)
+            base_class_items_in_hdf5_group.verify(self, v_item, base_class)
+    
+            # TODO: validate attributes - both HDF5-supplied & NXDL-specified
+            # TODO: validate symbols - both HDF5-supplied & NXDL-specified
+            # TODO: validate fields - both HDF5-supplied & NXDL-specified
+            # TODO: validate links - both HDF5-supplied & NXDL-specified
+            pass # TODO
+            c = nx_class + ": more validations needed"
+            self.record_finding(v_item, "NeXus base class", finding.TODO, c)
 
     def validate_application_definition(self, v_item):
         """

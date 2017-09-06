@@ -39,14 +39,13 @@ def verify(validator, v_item, base_class):
         test = "NXDL group in data file"
         f = finding.OK
         found = group_name in v_item.h5_object
-        t = 'group \"' + group_name + '\"'
         if found:
-            t + " appears"
+            t = "found: "
         else:
             # TODO: check if name is flexible
-            t += " does not appear"
+            t = "not found: "
             f = finding.OPTIONAL
-        t += " in " + v_item.h5_address
+        t += " in " + v_item.h5_address + "/" + group_name
         validator.record_finding(v_item, test, f, t)
 
     for link_name, link_obj in base_class.links.items():

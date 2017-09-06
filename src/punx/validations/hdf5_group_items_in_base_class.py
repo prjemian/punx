@@ -106,10 +106,11 @@ def verify(validator, v_item, base_class):
         # TODO: need an algorithm to know if v_item is defined in base class
 
         if utils.isNeXusDataset(obj):
-            t = child_name + " is"
-            if child_name not in base_class.fields:
-                t += " not"
-            t += " defined field in " + base_class.title
+            if child_name in base_class.fields:
+                t = "defined: "
+            else:
+                t = "not defined: "
+            t += base_class.title + "/" + child_name
             validator.record_finding(
                 v_sub_item,
                 "field in base class",
@@ -117,10 +118,11 @@ def verify(validator, v_item, base_class):
                 t)
 
         elif utils.isHdf5Group(obj):
-            t = child_name + " is"
-            if child_name not in base_class.groups:
-                t += " not"
-            t += " defined group in " + base_class.title
+            if child_name in base_class.groups:
+                t = "defined: "
+            else:
+                t = "not defined: "
+            t += base_class.title + "/" + child_name
             validator.record_finding(
                 v_sub_item,
                 "group in base class",

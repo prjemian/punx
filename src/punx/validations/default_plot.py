@@ -22,99 +22,107 @@ def verify(validator):
     obj = validator.addresses["/"]
     status = finding.TODO
     
-    if method3(validator):
-        c = "found by method 3"
+    addr = default_plot_v3(validator)
+    if addr is not None:
+        c = "found by v3: " + addr
         status = finding.OK
-    elif method2(validator):
-        c = "found by method 2"
+    elif default_plot_v2(validator):
+        c = "found by v2"
         status = finding.OK
-    elif method1(validator):
-        c = "found by method 1"
+    elif default_plot_v1(validator):
+        c = "found by v1"
         status = finding.OK
     else:
-        c = "not found"
+        c = "complete path from root not found"
         status = finding.NOTE
     validator.record_finding(obj, "NeXus default plot", status, c)
 
 
-def method3(validator):
-    # the default plot is described on one of these classpaths
-    # to be valid, at least one of these paths must result in plottable data
-    def pointed_item_exists(validator, v_item, pointer):
-        if v_item.parent is None:
-            return False
-        if pointer not in v_item.parent.h5_object:
-            status = finding.ERROR
-            c = "incorrect %s=%s" % (path, pointer) 
-            validator.record_finding(v_item, test_name, status, c)
-            return False
-        return True
-    def join_path_part(path, part):
-        path = path.split("@")[0]
-        if part.startswith("NX"):
-            path += "/"
-        path += part
-        return path
+def default_plot_v3(validator):
+    """
+    return the HDF5 address of the v3 default plottable data or None
+    
+    :see: http://download.nexusformat.org/doc/html/datarules.html#version-3
+    """
+    # The default plot is described only at classpath: /NXentry/NXdata@signal
+    # This must result in plottable data..
+    # Assume the attribute values are tested elsewhere
     def build_h5_address(v_item, pointer):
-        addr = v_item.parent.h5_address
+        if isinstance(v_item.h5_object, str):
+            parent = v_item.parent or v_item
+            addr = parent.h5_object.name
+        else:
+            addr = v_item.h5_object.name
         if not addr.endswith("/"):
             addr += "/"
         addr += utils.decode_byte_string(pointer)
         return addr
+    def attribute_points_at_target(validator, v_item, attribute_name, v_target):
+        pointer = v_item.h5_object.attrs.get(attribute_name)
+        if pointer is None:
+            return False
+        addr = build_h5_address(v_item, pointer)
+        if addr not in v_item.h5_object:
+            return False
+        return v_target == addr
 
-    test_name = "NeXus default plot, method 3"
-    possible_classpath_templates = [
-        "@default/NXentry@default/NXdata@signal",
-        "/NXentry@default/NXdata@signal",
-        "/NXentry/NXdata@signal",
-        ]
+    test_name = "NeXus default plot v3"
+    short_list = list(validator.classpaths.get("/NXentry/NXdata@signal", []))
+    # TODO: why not look at every NXdata@signal?
+
+    final_list = []
+    for v_item in short_list:
+        # check existence of @default attributes, as well
+        root, entry, data = v_item.h5_address.split("@")[0].split("/")
+        nxdata = validator.addresses["/" + entry + "/" + data]
+        nxentry = validator.addresses["/" + entry]
+        nxroot = validator.addresses["/"]
+        signal_h5_addr = build_h5_address(nxdata, nxdata.h5_object.attrs["signal"])
+        t1 = attribute_points_at_target(validator, nxroot, "default", nxentry.h5_address)
+        t2 = attribute_points_at_target(validator, nxentry, "default", nxdata.h5_address)
+        t3 = attribute_points_at_target(validator, nxdata, "signal", signal_h5_addr)
+        t4 = utils.isNeXusDataset(validator.addresses[signal_h5_addr].h5_object)
+        if t3 and t4:
+            status = finding.OK
+            c = "correct default plot setup in /NXentry/NXdata"
+            validator.record_finding(v_item, test_name + ", NXdata@signal", status, c)
+            status = True   # the minimal satisfaction
+        if t1 and t2 and t3 and t4:
+            # this is the NIAC2014 test
+            final_list.append(v_item)
+    
+    # TODO: could also test /NXentry/NXdata@axes
+    if len(final_list) == 1:
+        status = finding.OK
+        c = "default plot setup in /NXentry/NXdata"
+        validator.record_finding(v_item, test_name, status, c)
+        return v_item.h5_address
+
+
+def default_plot_v2(validator):
+    """
+    return the HDF5 address of the v2 default plottable data or None
+    
+    :see: http://download.nexusformat.org/doc/html/datarules.html#version-2
+    """
     status = False
-    for cp in possible_classpath_templates:  # each classpath template
-        # TODO: possible refactor
-        # Why not leave validation of @default and @signal to other parts of this code?
-        # Here assume they have already been tested, and just use.
-        # Avoids redundant testing of these attributes.
-        path = ""
-        valid_classpath = False
-        for part in cp.split("/"):      # check each part of the path template
-            path = join_path_part(path, part)
-            valid_subpaths_count = 0
-            for v_item in validator.classpaths.get(path, []):
-                # get the attribute's value and verify it points to an existing item
-                pointer = v_item.h5_object
-                if not pointed_item_exists(validator, v_item, pointer):
-                    continue
-                addr = build_h5_address(v_item, pointer)
-                # TODO: report on valid subpaths
-                valid_subpaths_count += 1
-            if valid_subpaths_count < 1:
-                break       # TODO: should only keep the valid paths
-
-            if utils.isNeXusDataset(validator.addresses[addr].h5_object):
-                status = finding.OK
-                c = "classpath=%s  signal=%s" % (cp, pointer) 
-                validator.record_finding(v_item, test_name, status, c)
-                valid_classpath = True
-
-        if not valid_classpath:
-            break
-        pass    # TODO: W-I-P
-
-    return status
-
-
-def method2(validator):
-    possible_classpaths = [
-        "/NXentry/NXdata/*@signal",
-        "/NXdata/*@signal",
-        ]
-    status = False
-    test_name = "NeXus default plot, method 2"
+    test_name = "NeXus default plot v2"
+    short_list = []
+    for k, v in validator.classpaths.items():
+        if k.endswith("@signal"):
+            for v_item in v:
+                if utils.isNeXusDataset(v_item.h5_object):
+                    short_list.append(v_item)
     
     return status
 
 
-def method1(validator):
+def default_plot_v1(validator):
+    """
+    return the HDF5 address of the v1 default plottable data or None
+    
+    :see: http://download.nexusformat.org/doc/html/datarules.html#version-1
+    """
     status = False
-    test_name = "NeXus default plot, method 1"
+    test_name = "NeXus default plot v1"
     return status

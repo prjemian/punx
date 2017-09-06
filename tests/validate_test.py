@@ -344,7 +344,7 @@ class Test_Default_Plot(unittest.TestCase):
     def tearDown(self):
         if self.validator is not None:
             self.validator.close()
-            self.validator.h5 = None
+#             self.validator.h5 = None
             self.validator = None
         os.remove(self.hdffile)
         self.hdffile = None
@@ -359,14 +359,19 @@ class Test_Default_Plot(unittest.TestCase):
         ds = dg.create_dataset("x", data=[1, 2, 3.14])
         ds.attrs["units"] = "arbitrary"
         f.close()
-        self.expected_item_count = 12
-        self.validator = punx.validate.Data_File_Validator(ref=DEFAULT_NXDL_FILE_SET)
-        self.validator.validate(self.hdffile)
+    
+    def locate_findings_by_test_name(self, test_name, status = None):
+        status = status or punx.finding.OK
+        flist = []
+        # walk through the list of findings
+        for f in self.validator.validations:
+            if f.test_name == test_name:
+                if f.status == status:
+                    flist.append(f)
+        return flist
 
     def test_method3_pass(self):
         self.setup_simple_test_file()
-        self.validator.close()
-        self.validator = None
         f = h5py.File(self.hdffile, "r+")
         f.attrs["default"] = "entry"
         f["/entry"].attrs["default"] = "data"
@@ -374,28 +379,66 @@ class Test_Default_Plot(unittest.TestCase):
         f.close()
         self.validator = punx.validate.Data_File_Validator(ref=DEFAULT_NXDL_FILE_SET)
         self.validator.validate(self.hdffile)
+        flist = self.locate_findings_by_test_name("NeXus default plot")
+        self.assertEqual(len(flist), 1)
+        flist = self.locate_findings_by_test_name("NeXus default plot v3")
+        self.assertEqual(len(flist), 1)
+        flist = self.locate_findings_by_test_name("NeXus default plot v3, NXdata@signal")
+        self.assertEqual(len(flist), 1)
+
+    def test_method3_pass_multi(self):
+        self.setup_simple_test_file()
+        f = h5py.File(self.hdffile, "r+")
+        f.attrs["default"] = "entry"
+        f["/entry"].attrs["default"] = "data"
+        f["/entry/data"].attrs["signal"] = "y"
+        eg = f["/entry"]
+        dg = eg.create_group("data2")
+        dg.attrs["NX_class"] = "NXdata"
+        dg.attrs["signal"] = "moss"
+        ds = dg.create_dataset("turtle", data=[1, 2, 3.14])
+        ds = dg.create_dataset("moss", data=[1, 2, 3.14])
+        eg = f.create_group("entry2")
+        eg.attrs["NX_class"] = "NXentry"
+        eg.attrs["default"] = "data3"
+        dg = eg.create_group("data3")
+        dg.attrs["NX_class"] = "NXdata"
+        dg.attrs["signal"] = "u"
+        dg.create_dataset("u", data=[1, 2, 3.14])
+        f.close()
+        self.validator = punx.validate.Data_File_Validator(ref=DEFAULT_NXDL_FILE_SET)
+        self.validator.validate(self.hdffile)
+        flist = self.locate_findings_by_test_name("NeXus default plot")
+        self.assertEqual(len(flist), 1)
+        flist = self.locate_findings_by_test_name("NeXus default plot v3")
+        self.assertEqual(len(flist), 1)
+        flist = self.locate_findings_by_test_name("NeXus default plot v3, NXdata@signal")
+        self.assertEqual(len(flist), 3)
 
     def test_method3_fail(self):
         self.setup_simple_test_file()
-        self.validator.close()
-        self.validator = None
         f = h5py.File(self.hdffile)
         f.attrs["default"] = "entry"
         f["/entry"].attrs["default"] = "will not be found"
         f.close()
         self.validator = punx.validate.Data_File_Validator(ref=DEFAULT_NXDL_FILE_SET)
         self.validator.validate(self.hdffile)
+        test_name = "NeXus default plot"
+        flist = self.locate_findings_by_test_name(test_name)
+        self.assertEqual(len(flist), 0)
+        flist = self.locate_findings_by_test_name(test_name, punx.finding.NOTE)
+        self.assertEqual(len(flist), 1)
 
     def test_method2_pass(self):
         self.setup_simple_test_file()
 
-    def test_method2_fail(self):
+    def xtest_method2_fail(self):
         self.setup_simple_test_file()
 
-    def test_method1_pass(self):
+    def xtest_method1_pass(self):
         self.setup_simple_test_file()
 
-    def test_method1_fail(self):
+    def xtest_method1_fail(self):
         self.setup_simple_test_file()
 
 

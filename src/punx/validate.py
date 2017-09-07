@@ -247,7 +247,6 @@ class Data_File_Validator(object):
             # TODO: validate symbols - both HDF5-supplied & NXDL-specified
             # TODO: validate fields - both HDF5-supplied & NXDL-specified
             # TODO: validate links - both HDF5-supplied & NXDL-specified
-            pass # TODO
             c = nx_class + ": more validations needed"
             self.record_finding(v_item, "NeXus base class", finding.TODO, c)
 
@@ -349,7 +348,7 @@ class ValidationItem(object):
             terms["classpath"] = self.classpath
             s = ", ".join(["%s=%s" % (k, str(v)) for k, v in terms.items()])
             return "ValidationItem(" + s + ")"
-        except Exception as _exc:
+        except Exception:
             return object.__str__(self, *args, **kwargs)
     
     def identify_object_type(self, *args, **kwargs):
@@ -396,7 +395,7 @@ class ValidationItem(object):
 
             classpath = str(self.parent.classpath)
             if classpath == CLASSPATH_OF_NON_NEXUS_CONTENT:
-                logger.log(INFORMATIVE, "%s is not NeXus content" % h5_obj.name)
+                logger.log(INFORMATIVE, "%s is not NeXus content", h5_obj.name)
                 return CLASSPATH_OF_NON_NEXUS_CONTENT
 
             if not classpath.endswith(SLASH):

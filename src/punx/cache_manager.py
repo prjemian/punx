@@ -274,7 +274,7 @@ class CacheManager(singletons.Singleton):
         if force or ref not in fs:
             if grr.request_info(ref) is not None:
                 if ref not in fs:
-                    logger.info(" %s not found in cache" % ref)
+                    logger.info(" %s not found in cache", ref)
                     force = True
                     verb = "Installing"
                 else:
@@ -285,9 +285,9 @@ class CacheManager(singletons.Singleton):
                         logger.info(msg)
                         verb = "Updating"
                     else:
-                        logger.info(" NXDL file set: " + ref + " unchanged, not updating")
+                        logger.info(" NXDL file set: %s unchanged, not updating", ref)
                 if force:
-                    logger.info(" " + verb + " NXDL file set: " + ref)
+                    logger.info(" %s NXDL file set: %s", verb, ref)
                     m = extract_from_download(grr, cache_obj.path())
                     return m
     
@@ -441,11 +441,10 @@ class SourceCache(Base_Cache):
         if not os.path.exists(path):
             # make the directory and load the default set of NXDL files
             os.mkdir(path)
-            _msgs = []
             grr = github_handler.GitHub_Repository_Reference()
             grr.connect_repo()
             if grr.request_info() is not None:
-                _msgs = extract_from_download(grr, path)
+                extract_from_download(grr, path)
         
         ini_file = os.path.abspath(os.path.join(path, SOURCE_CACHE_SETTINGS_FILENAME))
         self.qsettings = QtCore.QSettings(ini_file, QtCore.QSettings.IniFormat)

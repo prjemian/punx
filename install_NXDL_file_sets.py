@@ -6,7 +6,6 @@ manage (report and/or install) NeXus NXDL file sets
 """
 
 import os, sys
-from collections import OrderedDict
 import logging
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), 'src')))

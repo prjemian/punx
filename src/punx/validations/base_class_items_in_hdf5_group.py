@@ -11,7 +11,7 @@
 
 
 from .. import finding
-from .. import utils
+# from .. import utils
 
 
 def verify(validator, v_item, base_class):
@@ -49,4 +49,4 @@ def verify(validator, v_item, base_class):
         validator.record_finding(v_item, test, f, t)
 
     for link_name, link_obj in base_class.links.items():
-        pass
+        pass    # TODO: complete

@@ -31,7 +31,7 @@ def validate_NX_class_attribute(validator, v_item, nx_class):
     if known:
         as_base = validator.usedAsBaseClass(nx_class)
         status = finding.TF_RESULT[as_base]
-        validator.manager.classes[nx_class].category
+        # ??? validator.manager.classes[nx_class].category
         msg = nx_class
         if validator.manager.classes[nx_class].category == "base_classes":
             msg += ": known NeXus base class"

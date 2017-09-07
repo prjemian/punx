@@ -72,8 +72,9 @@ class NXDL_Manager(object):
 
             logger.debug(definition)
             for j in "attributes groups fields links".split():
-                for _k, v in sorted(definition.__getattribute__(j).items()):
-                    logger.debug(v)
+                dd = definition.__getattribute__(j)
+                for k in sorted(dd.keys()):
+                    logger.debug(dd[k])
             for v in sorted(definition.symbols):
                 logger.debug("symbol: " + v)
             logger.debug("-"*50)
@@ -614,7 +615,7 @@ def main():
                 row.append(n)
             t.addRow(row)
             print(t)
-        except:
+        except Exception:
             pass
 
         print(manager)

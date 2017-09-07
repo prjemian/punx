@@ -46,7 +46,6 @@ from __future__ import print_function
 import logging
 import lxml.etree
 import os
-import sys
 from . import NAMESPACE_DICT, FileNotFound, InvalidNxdlFile
 from . import singletons
 
@@ -453,7 +452,7 @@ class Schema_Attribute(_Mixin):
                 s += ' = '
                 s += ' | '.join(self.enum)
             return s
-        except:
+        except Exception:
             return _Mixin.__str__(self, *args, **kwargs)
 
 

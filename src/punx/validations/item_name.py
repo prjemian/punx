@@ -177,4 +177,4 @@ def validate_item_name(validator, v_item, key=None):
             finding.TODO, 
             "not handled yet")
 
-    pass    # TODO: what now?
+    # TODO: what now?

@@ -86,7 +86,7 @@ class Finding(object):
             s += ': ' + self.test_name
             s += ': ' + self.comment
             return s
-        except Exception as _exc:
+        except Exception:
             return object.__str__(self, *args, **kwargs)
 
 

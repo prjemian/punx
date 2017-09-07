@@ -365,13 +365,14 @@ class Test_Default_Plot(unittest.TestCase):
                     flist.append(f)
         return flist
 
-    def test_method3_pass(self):
+    def test_default_plot_v3_pass(self):
         self.setup_simple_test_file()
         f = h5py.File(self.hdffile, "r+")
         f.attrs["default"] = "entry"
         f["/entry"].attrs["default"] = "data"
         f["/entry/data"].attrs["signal"] = "y"
         f.close()
+
         self.validator = punx.validate.Data_File_Validator(ref=DEFAULT_NXDL_FILE_SET)
         self.validator.validate(self.hdffile)
         flist = self.locate_findings_by_test_name("NeXus default plot")
@@ -381,7 +382,7 @@ class Test_Default_Plot(unittest.TestCase):
         flist = self.locate_findings_by_test_name("NeXus default plot v3, NXdata@signal")
         self.assertEqual(len(flist), 1)
 
-    def test_method3_pass_multi(self):
+    def test_default_plot_v3_pass_multi(self):
         self.setup_simple_test_file()
         f = h5py.File(self.hdffile, "r+")
         f.attrs["default"] = "entry"
@@ -401,6 +402,7 @@ class Test_Default_Plot(unittest.TestCase):
         dg.attrs["signal"] = "u"
         dg.create_dataset("u", data=[1, 2, 3.14])
         f.close()
+
         self.validator = punx.validate.Data_File_Validator(ref=DEFAULT_NXDL_FILE_SET)
         self.validator.validate(self.hdffile)
         flist = self.locate_findings_by_test_name("NeXus default plot")
@@ -410,12 +412,13 @@ class Test_Default_Plot(unittest.TestCase):
         flist = self.locate_findings_by_test_name("NeXus default plot v3, NXdata@signal")
         self.assertEqual(len(flist), 3)
 
-    def test_method3_fail(self):
+    def test_default_plot_v3_fail(self):
         self.setup_simple_test_file()
         f = h5py.File(self.hdffile)
         f.attrs["default"] = "entry"
         f["/entry"].attrs["default"] = "will not be found"
         f.close()
+
         self.validator = punx.validate.Data_File_Validator(ref=DEFAULT_NXDL_FILE_SET)
         self.validator.validate(self.hdffile)
         test_name = "NeXus default plot"
@@ -424,16 +427,45 @@ class Test_Default_Plot(unittest.TestCase):
         flist = self.locate_findings_by_test_name(test_name, punx.finding.NOTE)
         self.assertEqual(len(flist), 1)
 
-    def test_method2_pass(self):
+    def test_default_plot_v2_pass(self):
         self.setup_simple_test_file()
 
-    def test_method2_fail(self):
+    def test_default_plot_v2_fail_no_signal(self):
         self.setup_simple_test_file()
 
-    def test_method1_pass(self):
+        self.validator = punx.validate.Data_File_Validator(ref=DEFAULT_NXDL_FILE_SET)
+        self.validator.validate(self.hdffile)
+        test_name = "NeXus default plot"
+        flist = self.locate_findings_by_test_name(test_name)
+        self.assertEqual(len(flist), 0)
+        flist = self.locate_findings_by_test_name(test_name, punx.finding.NOTE)
+        self.assertEqual(len(flist), 1)
+
+    def test_default_plot_v2_fail_multi_signal(self):
+        self.setup_simple_test_file()
+        f = h5py.File(self.hdffile)
+        f["/entry/data/x"].attrs["signal"] = 1
+        f["/entry/data/y"].attrs["signal"] = 1
+        f.close()
+
+        self.validator = punx.validate.Data_File_Validator(ref=DEFAULT_NXDL_FILE_SET)
+        self.validator.validate(self.hdffile)
+        test_name = "NeXus default plot"
+        flist = self.locate_findings_by_test_name(test_name)
+        self.assertEqual(len(flist), 0)
+        flist = self.locate_findings_by_test_name(test_name, punx.finding.NOTE)
+        self.assertEqual(len(flist), 1)
+        test_name = "NeXus default plot v2, @signal=1"
+        flist = self.locate_findings_by_test_name(test_name)
+        self.assertEqual(len(flist), 2)
+        test_name = "NeXus default plot v2, multiple @signal=1"
+        flist = self.locate_findings_by_test_name(test_name, punx.finding.ERROR)
+        self.assertEqual(len(flist), 1)
+
+    def test_default_plot_v1_pass(self):
         self.setup_simple_test_file()
 
-    def test_method1_fail(self):
+    def test_default_plot_v1_fail(self):
         self.setup_simple_test_file()
 
 

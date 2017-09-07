@@ -10,6 +10,7 @@
 #-----------------------------------------------------------------------------
 
 
+import collections
 import re
 
 from .. import finding
@@ -20,19 +21,18 @@ from ..validate import logger
 def verify(validator):
     c = "need to validate existence of default plot"
     obj = validator.addresses["/"]
-    status = finding.TODO
+    status = None
     
-    addr = default_plot_v3(validator)
-    if addr is not None:
-        c = "found by v3: " + addr
-        status = finding.OK
-    elif default_plot_v2(validator):
-        c = "found by v2"
-        status = finding.OK
-    elif default_plot_v1(validator):
-        c = "found by v1"
-        status = finding.OK
-    else:
+    methods = collections.OrderedDict()
+    methods["v3"] = default_plot_v3
+    methods["v2"] = default_plot_v2
+    methods["v1"] = default_plot_v1
+    for k, method in methods.items():
+        addr = method(validator)
+        if addr is not None:
+            c = "found by %s: %s" % (k, addr)
+            status = finding.OK
+    if status is None:
         c = "complete path from root not found"
         status = finding.NOTE
     validator.record_finding(obj, "NeXus default plot", status, c)
@@ -86,7 +86,6 @@ def default_plot_v3(validator):
             status = finding.OK
             c = "correct default plot setup in /NXentry/NXdata"
             validator.record_finding(v_item, test_name + ", NXdata@signal", status, c)
-            status = True   # the minimal satisfaction
         if t1 and t2 and t3 and t4:
             # this is the NIAC2014 test
             final_list.append(v_item)
@@ -105,16 +104,44 @@ def default_plot_v2(validator):
     
     :see: http://download.nexusformat.org/doc/html/datarules.html#version-2
     """
-    status = False
     test_name = "NeXus default plot v2"
-    short_list = []
+    review_dict = {}
     for k, v in validator.classpaths.items():
         if k.endswith("@signal"):
             for v_item in v:
-                if utils.isNeXusDataset(v_item.h5_object):
-                    short_list.append(v_item)
-    
-    return status
+                if utils.isNeXusDataset(v_item.parent.h5_object):
+                    signal = str(v_item.h5_object)
+                    if signal == "1":
+                        status = finding.OK
+                        c = "found field with @signal=1: " + v_item.h5_address
+                        validator.record_finding(
+                            v_item, 
+                            test_name + ", @signal=1", 
+                            status, 
+                            c)
+
+                        gparent = v_item.parent.parent
+                        group_name = gparent.h5_address
+                        if group_name not in review_dict:
+                            review_dict[group_name] = []
+                        review_dict[group_name].append(v_item)
+
+    addr = None
+    for group_name, v_item_list in review_dict.items():
+        if len(v_item_list) == 1:
+            addr = v_item_list[0].parent.h5_address
+            status = finding.OK
+            c = "found plottable data: " + v_item_list[0].h5_address
+            validator.record_finding(v_item_list[0], test_name, status, c)
+        elif len(v_item_list) > 1:
+            status = finding.ERROR
+            c = "multiple fields found with @signal=1 in: " + group_name
+            validator.record_finding(
+                v_item_list[0].parent.parent, 
+                test_name + ", multiple @signal=1", 
+                status, 
+                c)
+    return addr
 
 
 def default_plot_v1(validator):
@@ -123,6 +150,4 @@ def default_plot_v1(validator):
     
     :see: http://download.nexusformat.org/doc/html/datarules.html#version-1
     """
-    status = False
     test_name = "NeXus default plot v1"
-    return status

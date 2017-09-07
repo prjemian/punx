@@ -48,6 +48,8 @@ is called by *schema_manager* and *nxdl_manager*.
    ~get_short_sha
    ~read_json_file
    ~write_json_file
+   ~should_extract_this
+   ~should_avoid_download
    ~extract_from_download
    ~table_of_caches
    ~Base_Cache
@@ -105,6 +107,38 @@ def read_json_file(filename):
     return json.loads(open(filename, 'r').read())
 
 
+def should_extract_this(item, NXDL_file_endings_list, allowed_parent_directories):
+    '''
+    decide if this item should be extracted from the ZIP download
+    '''
+    for ending in NXDL_file_endings_list:
+        if item.endswith(ending):
+            if item.split('/')[-2] in allowed_parent_directories:
+                return True
+    return False
+
+
+def should_avoid_download(grr, path):
+    '''
+    decide if the download should be avoided (True: avoid, False: download)
+    '''
+    names = []
+    names.append(grr.appName + '-' + grr.sha)
+    names.append(grr.orgName + '-' + grr.appName + '-' + grr.sha)
+    short_sha = get_short_sha(grr.sha)
+    names.append(grr.appName + '-' + short_sha)
+    names.append(grr.orgName + '-' + short_sha + '-' + grr.sha)
+    names.append(grr.ref)
+    for subdir in names:
+        if subdir in os.listdir(path):
+            info_file_name = os.path.join(path, subdir, INFO_FILE_NAME)
+            if os.path.exists(info_file_name):
+                info = read_json_file(info_file_name)
+                if info["sha"] == grr.sha:
+                    return True
+    return False
+
+
 def extract_from_download(grr, path):       # TODO refactor into NXDL_File_Set
     '''
     download & extract NXDL files from ``grr`` into a subdirectory of ``path``
@@ -115,44 +149,8 @@ def extract_from_download(grr, path):       # TODO refactor into NXDL_File_Set
         grr.connect_repo()
         if grr.request_info() is not None:
             extract_from_download(grr, cache_directory)
-    
-    .. 
-        autosummary::
-       
-       ~should_avoid_download
-       ~should_extract_this
 
     '''
-    def should_avoid_download(grr, path):
-        '''
-        decide if the download should be avoided (True: avoid, False: download)
-        '''
-        names = []
-        names.append(grr.appName + '-' + grr.sha)
-        names.append(grr.orgName + '-' + grr.appName + '-' + grr.sha)
-        short_sha = get_short_sha(grr.sha)
-        names.append(grr.appName + '-' + short_sha)
-        names.append(grr.orgName + '-' + short_sha + '-' + grr.sha)
-        names.append(grr.ref)
-        for subdir in names:
-            if subdir in os.listdir(path):
-                info_file_name = os.path.join(path, subdir, INFO_FILE_NAME)
-                if os.path.exists(info_file_name):
-                    info = read_json_file(info_file_name)
-                    if info["sha"] == grr.sha:
-                        return True
-        return False
-
-    def should_extract_this(item):
-        '''
-        decide if this item should be extracted from the ZIP download
-        '''
-        for ending in NXDL_file_endings_list:
-            if item.endswith(ending):
-                if item.split('/')[-2] in allowed_parent_directories:
-                    return True
-        return False
-
     import io, zipfile
     NXDL_categories = 'base_classes applications contributed_definitions'.split()
     NXDL_file_endings_list = '.xsd .xml .xsl'.split()
@@ -173,7 +171,7 @@ def extract_from_download(grr, path):       # TODO refactor into NXDL_File_Set
             root_name = item.split('/')[0]
             download_dir_name = os.path.join(path, root_name)
             allowed_parent_directories.append(root_name)
-        if should_extract_this(item):
+        if should_extract_this(item, NXDL_file_endings_list, allowed_parent_directories):
             zip_content.extract(item, path)
             msg_list.append( 'extracted: ' + item )
 

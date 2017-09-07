@@ -76,7 +76,7 @@ def default_plot_v3(validator):
     final_list = []
     for v_item in short_list:
         # check existence of @default attributes, as well
-        _root, entry, data = v_item.h5_address.split("@")[0].split("/")
+        _root, entry, data = v_item.h5_address.split("@")[0].split("/") # noqa
         nxdata = validator.addresses["/" + entry + "/" + data]
         nxentry = validator.addresses["/" + entry]
         nxroot = validator.addresses["/"]
@@ -148,10 +148,10 @@ def default_plot_v2(validator):
     return addr
 
 
-def default_plot_v1(validator):
+def default_plot_v1(validator):     # noqa
     """
     return the HDF5 address of the v1 default plottable data or None
     
     :see: http://download.nexusformat.org/doc/html/datarules.html#version-1
     """
-    test_name = "NeXus default plot v1"
+    test_name = "NeXus default plot v1"  # noqa

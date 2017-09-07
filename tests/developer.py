@@ -51,11 +51,10 @@ def main():
     validator.validate(test_file)
     reporter(validator)
 
-    tf = "chopper.nxs"
-    test_file = os.path.join(_path, 'punx', 'data', tf)
-    validator.validate(test_file)
-    reporter(validator)
-    pass
+#     tf = "chopper.nxs"
+#     test_file = os.path.join(_path, 'punx', 'data', tf)
+#     validator.validate(test_file)
+#     reporter(validator)
 
 
 if __name__ == "__main__":

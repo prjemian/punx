@@ -19,11 +19,16 @@ ignore-paths:
   - src/punx/cache
   - src/punx/data
   - src/punx/ignore_now
+  - versioneer.py
+  - src/punx/_version.py
 ignore-patterns:
   - ^example/doc_.*\.py$
   - (^|/)docs(/|$)
-  - ^versioneer\.py$
-  - ^src/punx/_version\.py$
 python-targets:
   - 2
   - 3
+pylint:
+  disable:
+    - unused-argument
+    - arguments-differ
+    - protected-access

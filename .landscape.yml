@@ -2,11 +2,6 @@ doc-warnings: true
 test-warnings: false
 strictness: medium
 max-line-length: 120
-uses:
-  - requests
-  - coverage
-  - docopt
-  - coveralls
 autodetect: true
 requirements:
   - pyRestTable
@@ -15,6 +10,10 @@ requirements:
   - numpy
   - h5py
   - lxml
+  - requests
+  - coverage
+  - docopt
+  - coveralls
 ignore-paths:
   - docs
 ignore-patterns:

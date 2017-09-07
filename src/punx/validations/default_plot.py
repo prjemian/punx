@@ -10,15 +10,16 @@
 #-----------------------------------------------------------------------------
 
 
+"validate the setup identifying the default plot"
+
 import collections
-import re
 
 from .. import finding
 from .. import utils
-from ..validate import logger
 
 
 def verify(validator):
+    "entry function of this module"
     c = "need to validate existence of default plot"
     obj = validator.addresses["/"]
     status = None
@@ -48,6 +49,7 @@ def default_plot_v3(validator):
     # This must result in plottable data..
     # Assume the attribute values are tested elsewhere
     def build_h5_address(v_item, pointer):
+        "create the HDF5 address"
         if isinstance(v_item.h5_object, str):
             parent = v_item.parent or v_item
             addr = parent.h5_object.name
@@ -57,7 +59,8 @@ def default_plot_v3(validator):
             addr += "/"
         addr += utils.decode_byte_string(pointer)
         return addr
-    def attribute_points_at_target(validator, v_item, attribute_name, v_target):
+    def attribute_points_at_target(v_item, attribute_name, v_target):
+        "test if attribute value actually points at target"
         pointer = v_item.h5_object.attrs.get(attribute_name)
         if pointer is None:
             return False
@@ -73,14 +76,14 @@ def default_plot_v3(validator):
     final_list = []
     for v_item in short_list:
         # check existence of @default attributes, as well
-        root, entry, data = v_item.h5_address.split("@")[0].split("/")
+        _root, entry, data = v_item.h5_address.split("@")[0].split("/")
         nxdata = validator.addresses["/" + entry + "/" + data]
         nxentry = validator.addresses["/" + entry]
         nxroot = validator.addresses["/"]
         signal_h5_addr = build_h5_address(nxdata, nxdata.h5_object.attrs["signal"])
-        t1 = attribute_points_at_target(validator, nxroot, "default", nxentry.h5_address)
-        t2 = attribute_points_at_target(validator, nxentry, "default", nxdata.h5_address)
-        t3 = attribute_points_at_target(validator, nxdata, "signal", signal_h5_addr)
+        t1 = attribute_points_at_target(nxroot, "default", nxentry.h5_address)
+        t2 = attribute_points_at_target(nxentry, "default", nxdata.h5_address)
+        t3 = attribute_points_at_target(nxdata, "signal", signal_h5_addr)
         t4 = utils.isNeXusDataset(validator.addresses[signal_h5_addr].h5_object)
         if t3 and t4:
             status = finding.OK
@@ -92,6 +95,7 @@ def default_plot_v3(validator):
     
     # TODO: could also test /NXentry/NXdata@axes
     if len(final_list) == 1:
+        v_item = final_list[0]
         status = finding.OK
         c = "default plot setup in /NXentry/NXdata"
         validator.record_finding(v_item, test_name, status, c)

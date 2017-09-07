@@ -47,5 +47,7 @@ NOTE: project is under initial construction
       
    .. image:: http://depsy.org/api/package/pypi/punx/badge.svg
       :target: http://depsy.org/package/python/punx
+      :alt: Depsy (impact)
    .. image:: https://badges.gitter.im/punx-nexus/Lobby.svg
       :target: https://gitter.im/punx-nexus/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
+      :alt: gitter (chat)

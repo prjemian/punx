@@ -26,8 +26,13 @@ NOTE: project is under initial construction
 
    .. image:: https://travis-ci.org/prjemian/punx.svg?branch=master
       :target: https://travis-ci.org/prjemian/punx
+      :alt: Unit Testing
    .. image:: https://coveralls.io/repos/github/prjemian/punx/badge.svg?branch=master
       :target: https://coveralls.io/github/prjemian/punx?branch=master
+      :alt: Code Coverage
+   .. image:: https://landscape.io/github/prjemian/punx/master/landscape.svg?style=plastic
+      :target: https://landscape.io/github/prjemian/punx/master
+      :alt: Code Health
 
 :release badges:
       

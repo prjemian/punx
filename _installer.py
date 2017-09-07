@@ -1,13 +1,11 @@
 #!/usr/bin/env python
 
 
-"""
-manage (report and/or install) NeXus NXDL file sets 
-"""
+"manage (report and/or install) NeXus NXDL file sets "
 
-import os, sys
-import install_NXDL_file_sets
 import logging
+import sys
+import install_NXDL_file_sets
 
 
 DEFAULT_LOGGING_LEVEL = logging.DEBUG   # report everything logged from DEBUG

@@ -41,6 +41,10 @@ def isNeXusLinkTarget(v_item):
     return False    # no @target attribute at all
 
 
+# TODO: need a validItemName_relaxed function
+# will call from attribute module
+# to validate @target attribute values
+
 def validate_item_name(validator, v_item, key=None):
     """
     check :class:`ValidationItem` *v_item* using *validItemName* regular expression

@@ -131,8 +131,8 @@ def default_plot_v2(validator):
                         review_dict[group_name].append(v_item)
                     else:
                         status = finding.WARN
-                        c = "found field with @signal=" + signal
-                        c += ": " + v_item.h5_address
+                        c = "found field with @signal!=1: " + v_item.h5_address
+                        c += "=" + signal
                         validator.record_finding(
                             v_item, 
                             test_name + ", @signal!=1", 

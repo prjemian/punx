@@ -429,6 +429,22 @@ class Test_Default_Plot(unittest.TestCase):
 
     def test_default_plot_v2_pass(self):
         self.setup_simple_test_file()
+        f = h5py.File(self.hdffile)
+        f["/entry/data/x"].attrs["signal"] = 1
+        f["/entry/data/y"].attrs["signal"] = 2
+        f.close()
+
+        self.validator = punx.validate.Data_File_Validator(ref=DEFAULT_NXDL_FILE_SET)
+        self.validator.validate(self.hdffile)
+        test_name = "NeXus default plot"
+        flist = self.locate_findings_by_test_name(test_name)
+        self.assertEqual(len(flist), 1)
+        flist = self.locate_findings_by_test_name(test_name + " v2")
+        self.assertEqual(len(flist), 1)
+        flist = self.locate_findings_by_test_name(
+            test_name + " v2, @signal!=1", 
+            punx.finding.WARN)
+        self.assertEqual(len(flist), 1)
 
     def test_default_plot_v2_fail_no_signal(self):
         self.setup_simple_test_file()

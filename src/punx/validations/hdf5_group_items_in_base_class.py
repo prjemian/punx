@@ -9,8 +9,6 @@
 # The full license is in the file LICENSE.txt, distributed with this software.
 #-----------------------------------------------------------------------------
 
-# pylint:disable=cyclic-import
-
 from .. import finding
 from .. import utils
 

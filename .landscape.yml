@@ -34,3 +34,4 @@ pylint:
     - unused-argument
     - arguments-differ
     - protected-access
+    - cyclic-import

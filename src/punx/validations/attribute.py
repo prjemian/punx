@@ -127,6 +127,28 @@ def signal_handler(validator, v_item):
 def target_handler(validator, v_item):
     """validate @target"""
     target = utils.decode_byte_string(v_item.h5_object)
+    
+    if not target.startswith("/"):
+        status = finding.ERROR
+        c = "value be must absolute HDF5 address, start with \"/\""
+        validator.record_finding(v_item, TEST_NAME, status, c)
+        return
+    addr = ""
+    for p in target[1:].split("/"):
+        k = item_name.validItemName_match_key(validator, p)
+        if k is None:
+            status = finding.ERROR
+            c = "value must match with a NeXus validItemName"
+            validator.record_finding(v_item, TEST_NAME, status, c)
+            return
+        else:
+            addr += "/" + p
+            if addr not in validator.h5:
+                status = finding.ERROR
+                c = "partial HDF5 address not found in file: " + addr
+                validator.record_finding(v_item, TEST_NAME, status, c)
+                return
+    
     test = target in validator.h5
     status = finding.TF_RESULT[test]
     c = {True: "found", False: "not found"}[test]

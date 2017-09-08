@@ -396,11 +396,14 @@ class ValidationItem(object):
                         @signal = data
                         data: NX_NUMBER
         
-        The HDF5 address of the plottable data is: ``/entry/data/data``.
-        The NeXus class path is: ``/NXentry/NXdata/data
-        
         For the "signal" attribute of this HDF5 address: ``/entry/data``,
-        the NeXus class path is: ``/NXentry/NXdata@signal
+        its NeXus class path is: ``/NXentry/NXdata@signal``
+        
+        The ``@signal`` attribute has the value of ``data`` which means
+        that the local field named ``data`` is the plottable data.
+        
+        The HDF5 address of the plottable data is: ``/entry/data/data``,
+        its NeXus class path is: ``/NXentry/NXdata/data
         """
         if self.name == SLASH:
             return ""

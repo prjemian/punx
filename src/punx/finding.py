@@ -9,7 +9,7 @@
 # The full license is in the file LICENSE.txt, distributed with this software.
 #-----------------------------------------------------------------------------
 
-'''
+"""
 document each item during validation
 
 .. autosummary::
@@ -18,17 +18,20 @@ document each item during validation
    ~FindingResults
    ~VALID_STATUS_DICT
 
-'''
+"""
+
+
+import hashlib
 
 
 class ValidationResultStatus(object):
-    '''
+    """
     summary result of a Finding
     
     :param str key: short name
     :param str color: suggested color for GUI
     :param str description: one-line summary
-    '''
+    """
     
     def __init__(self, key, color, description):
         self.key = key
@@ -50,7 +53,7 @@ OPTIONAL = ValidationResultStatus('OPTIONAL', 'grey',     'allowed by NeXus spec
 
 VALID_STATUS_LIST = (OK, NOTE, WARN, ERROR, TODO, UNUSED, COMMENT, OPTIONAL)
 VALID_STATUS_DICT = {str(f): f for f in VALID_STATUS_LIST}
-'''dictionary (by names) of all available validations'''
+"""dictionary (by names) of all available validations"""
 
 TF_RESULT = {True: OK, False: ERROR}
 
@@ -60,14 +63,14 @@ TF_RESULT = {True: OK, False: ERROR}
 
 
 class Finding(object):
-    '''
+    """
     a single reported observation while validating
     
     :param str h5_address: address of h5py item
-    :param str test_name: one-word description of the test
-    :param obj status: one of: OK NOTE WARNING ERROR TODO
+    :param str test_name: short description of the test
+    :param obj status: one of: OK NOTE WARN ERROR TODO COMMENT OPTIONAL UNUSED
     :param str comment: description
-    '''
+    """
     
     def __init__(self, h5_address, test_name, status, comment):
         if status not in VALID_STATUS_LIST:
@@ -78,7 +81,8 @@ class Finding(object):
         self.h5_address = h5_address
         self.status = status
         self.comment = comment
-    
+        self.md5 = self.make_md5
+
     def __str__(self, *args, **kwargs):
         try:
             s = str(self.status)
@@ -88,19 +92,36 @@ class Finding(object):
             return s
         except Exception:
             return object.__str__(self, *args, **kwargs)
+    
+    def make_md5(self):
+        "make a unique hash for this finding"
+        h = hashlib.md5()
+        h.update(bytes(self.h5_address))
+        h.update(b"\n")
+        h.update(bytes(self.test_name))
+        return h.hexdigest()
 
 
 class FindingResults(object):
-    '''
+    """
     various validations for a single hdf5 address (absolute path)
     
     :param str h5_address: address of h5py item
-    '''
+    """
     
     def __init__(self, h5_address):
         self.h5_address = h5_address
-        self.validations = []      # keep list of all validations for this address
-        self.classpath = ''
+        self.validations = {}      # keep list of all validations for this address
     
     def __str__(self, *args, **kwargs):
         return self.h5_address
+    
+    def add(self, f):
+        """add a finding"""
+        if f.h5_address != self.h5_address:
+            msg = "Finding at %s does not match %s" % (f.h5_address, self.h5_address)
+            raise KeyError(msg)
+        if f.test_name in self.validations:
+            msg = "Duplicate test: %s" % str(f)
+            raise KeyError(msg)
+        self.validations[f.test_name] = f

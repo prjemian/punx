@@ -42,15 +42,15 @@ class ValidationResultStatus(object):
     def __str__(self, *args, **kwargs):
         return self.key
 
-
-OK       = ValidationResultStatus('OK',           100, 'green',     'meets NeXus specification')
-NOTE     = ValidationResultStatus('NOTE',          80, 'palegreen', 'does not meet NeXus specification, but acceptable')
-WARN     = ValidationResultStatus('WARN',          20, 'yellow',    'does not meet NeXus specification, not generally acceptable')
-ERROR    = ValidationResultStatus('ERROR', -100000000, 'red',       'violates NeXus specification')
-TODO     = ValidationResultStatus('TODO',           0, 'blue',      'validation not implemented yet')
-UNUSED   = ValidationResultStatus('UNUSED',         0, 'grey',      'optional NeXus item not used in data file')
-COMMENT  = ValidationResultStatus('COMMENT',        0, 'grey',      'comment from the punx source code')
-OPTIONAL = ValidationResultStatus('OPTIONAL',     100, 'grey',      'allowed by NeXus specification, not identified')
+VERY_BAD = -1.0e10
+OK       = ValidationResultStatus('OK',         1.0, 'green',     'meets NeXus specification')
+NOTE     = ValidationResultStatus('NOTE',        .8, 'palegreen', 'does not meet NeXus specification, but acceptable')
+WARN     = ValidationResultStatus('WARN',        .2, 'yellow',    'does not meet NeXus specification, not generally acceptable')
+ERROR    = ValidationResultStatus('ERROR', VERY_BAD, 'red',       'violates NeXus specification')
+TODO     = ValidationResultStatus('TODO',         0, 'blue',      'validation not implemented yet')
+UNUSED   = ValidationResultStatus('UNUSED',       0, 'grey',      'optional NeXus item not used in data file')
+COMMENT  = ValidationResultStatus('COMMENT',      0, 'grey',      'comment from the punx source code')
+OPTIONAL = ValidationResultStatus('OPTIONAL',   1.0, 'grey',      'allowed by NeXus specification, not identified')
 
 VALID_STATUS_LIST = (OK, NOTE, WARN, ERROR, TODO, UNUSED, COMMENT, OPTIONAL)
 VALID_STATUS_DICT = {str(f): f for f in VALID_STATUS_LIST}

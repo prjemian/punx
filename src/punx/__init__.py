@@ -94,19 +94,19 @@ NAMESPACE_DICT = {'nx': NXDL_XML_NAMESPACE,
 
 
 class FileNotFound(IOError): 
-    'custom exception'
+    """custom exception"""
 
 class HDF5_Open_Error(IOError): 
-    'custom exception'
+    """custom exception"""
 
 class SchemaNotFound(IOError): 
     'custom exception'
 
 class InvalidNxdlFile(ValueError): 
-    'custom exception'
+    """custom exception"""
 
 class CannotUpdateFromGithubNow(IOError): 
-    'custom exception'
+    """custom exception"""
 
 from ._version import get_versions
 __version__ = get_versions()['version']

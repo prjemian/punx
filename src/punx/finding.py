@@ -95,7 +95,7 @@ class Finding(object):
             return object.__str__(self, *args, **kwargs)
     
     def make_md5(self):
-        "make a unique hash for this finding"
+        """make a unique hash for this finding"""
         h = hashlib.md5()
         h.update(bytes(self.h5_address))
         h.update(b"\n")

@@ -81,6 +81,7 @@ def get_BasicAuth_credentials(creds_file_name = None):
 
 
 class GitHub_Repository_Reference(object):
+    
     """
     all information necessary to describe and download a repository branch, release, tag, or SHA hash
     
@@ -178,16 +179,14 @@ class GitHub_Repository_Reference(object):
         return content
 
     def _make_zip_url(self, ref=DEFAULT_BRANCH_NAME):
-        'create the download URL for the ``ref``'
+        """create the download URL for the ``ref``"""
         url = u'https://github.com/'
         url += u'/'.join([self.orgName, self.appName, u'archive', ref])
         url += u'.zip'
         return url
     
     def _get_last_modified(self):
-        """
-        get the ``last_modified`` date from the SHA's commit
-        """
+        """get the ``last_modified`` date from the SHA's commit"""
         if self.sha is not None:
             commit = self.repo.get_commit(self.sha)
             mod_date_time = commit.last_modified    # Tue, 20 Dec 2016 18:30:29 GMT

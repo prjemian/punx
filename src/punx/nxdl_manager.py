@@ -37,9 +37,8 @@ logger = utils.setup_logger(__name__)
 
 
 class NXDL_Manager(object):
-    """
-    the NXDL classes found in ``nxdl_dir``
-    """
+    
+    """the NXDL classes found in ``nxdl_dir``"""
 
     nxdl_file_set = None
     nxdl_defaults = None
@@ -92,6 +91,7 @@ class NXDL_Manager(object):
         return s
 
     def get_nxdl_defaults(self):
+        """ """
         schema_file = os.path.join(
             self.nxdl_file_set.path, 
             nxdl_schema.NXDL_XSD_NAME)
@@ -142,6 +142,7 @@ def validate_xml_tree(xml_tree):
 
 
 class NXDL__Mixin(object):
+    
     """
     base class for each NXDL structure
     """
@@ -159,10 +160,12 @@ class NXDL__Mixin(object):
         raise NotImplementedError('must override parse_nxdl_xml() in subclass')
 
     def parse_xml_attributes(self, defaults):
+        """ """
         for k, v in sorted(defaults.attributes.items()):
             self.xml_attributes[k] = v
     
     def parse_attributes(self, xml_node):
+        """ """
         ns = nxdl_schema.get_xml_namespace_dictionary()
         manager = self.nxdl_definition.nxdl_manager
         nxdl_defaults = manager.nxdl_defaults
@@ -184,6 +187,7 @@ class NXDL__Mixin(object):
             self.attributes[obj.name] = obj
     
     def parse_fields(self, xml_node):
+        """ """
         ns = nxdl_schema.get_xml_namespace_dictionary()
         manager = self.nxdl_definition.nxdl_manager
         nxdl_defaults = manager.nxdl_defaults
@@ -200,6 +204,7 @@ class NXDL__Mixin(object):
             self.fields[obj.name] = obj
     
     def parse_groups(self, xml_node):
+        """ """
         ns = nxdl_schema.get_xml_namespace_dictionary()
         manager = self.nxdl_definition.nxdl_manager
         nxdl_defaults = manager.nxdl_defaults
@@ -216,6 +221,7 @@ class NXDL__Mixin(object):
             self.groups[obj.name] = obj
     
     def parse_links(self, xml_node):
+        """ """
         ns = nxdl_schema.get_xml_namespace_dictionary()
         manager = self.nxdl_definition.nxdl_manager
         nxdl_defaults = manager.nxdl_defaults
@@ -233,6 +239,7 @@ class NXDL__Mixin(object):
             self.links[obj.name] = obj
 
     def parse_symbols(self, xml_node):
+        """ """
         ns = nxdl_schema.get_xml_namespace_dictionary()
         manager = self.nxdl_definition.nxdl_manager
         nxdl_defaults = manager.nxdl_defaults
@@ -244,6 +251,7 @@ class NXDL__Mixin(object):
                 self.symbols += obj.symbols
     
     def ensure_unique_name(self, obj):
+        """ """
         name_list = []
         for k in 'groups fields links'.split():
             name_list += list(self.__getattribute__(k).keys())
@@ -262,6 +270,7 @@ class NXDL__Mixin(object):
 
 
 class NXDL__definition(NXDL__Mixin):
+    
     """
     contents of a *definition* element in a NXDL XML file
     
@@ -301,6 +310,7 @@ class NXDL__definition(NXDL__Mixin):
         return s
 
     def _init_defaults_from_schema(self, nxdl_defaults):
+        """ """
         # definition is special: it has structure of a group AND a symbols table
 
         self.minOccurs = 0
@@ -315,6 +325,8 @@ class NXDL__definition(NXDL__Mixin):
     def set_file(self, fname):
         """
         self.category: base_classes | applications | contributed_definitions
+        
+        determine the category of this NXDL
         """
         self.file_name = fname
         assert(os.path.exists(fname))
@@ -322,9 +334,7 @@ class NXDL__definition(NXDL__Mixin):
         self.category = os.path.split(os.path.dirname(fname))[-1]
 
     def parse_nxdl_xml(self):
-        """
-        parse the XML content
-        """
+        """parse the XML content"""
         if self.file_name is None or not os.path.exists(self.file_name):
             msg = 'NXDL file: ' + str(self.file_name)
             logger.error(msg)
@@ -351,8 +361,11 @@ class NXDL__definition(NXDL__Mixin):
 
 
 class NXDL__attribute(NXDL__Mixin):
+    
     """
     contents of a *attribute* structure (XML element) in a NXDL XML file
+    
+    ~parse_nxdl_xml
     """
 
     def __init__(self, nxdl_definition, nxdl_defaults=None, *args, **kwds):
@@ -388,6 +401,7 @@ class NXDL__attribute(NXDL__Mixin):
                     self.enumerations.append(v)
 
 class NXDL__dim(NXDL__Mixin):
+    
     """
     contents of a *dim* structure (XML element) in a NXDL XML file
     """
@@ -397,6 +411,7 @@ class NXDL__dim(NXDL__Mixin):
         self._init_defaults_from_schema(nxdl_defaults)
     
     def _init_defaults_from_schema(self, nxdl_defaults):
+        """ """
         self.parse_xml_attributes(nxdl_defaults.field.components["dimensions"].components["dim"])
 
     def parse_nxdl_xml(self, xml_node):
@@ -409,6 +424,7 @@ class NXDL__dim(NXDL__Mixin):
 
 
 class NXDL__dimensions(NXDL__Mixin):
+    
     """
     contents of a *dimensions* structure (XML element) in a NXDL XML file
     """
@@ -439,6 +455,7 @@ class NXDL__dimensions(NXDL__Mixin):
 
 
 class NXDL__field(NXDL__Mixin):
+    
     """
     contents of a *field* structure (XML element) in a NXDL XML file
     """
@@ -457,9 +474,7 @@ class NXDL__field(NXDL__Mixin):
         self.assign_defaults()
     
     def parse_nxdl_xml(self, xml_node):
-        """
-        parse the XML content
-        """
+        """parse the XML content"""
         self.name = xml_node.attrib['name']
 
         self.parse_attributes(xml_node)
@@ -478,6 +493,7 @@ class NXDL__field(NXDL__Mixin):
             self.enumerations.append(node.attrib.get("value"))
 
 class NXDL__group(NXDL__Mixin):
+    
     """
     contents of a *group* structure (XML element) in a NXDL XML file
     """
@@ -497,9 +513,7 @@ class NXDL__group(NXDL__Mixin):
         self.assign_defaults()
     
     def parse_nxdl_xml(self, xml_node):
-        """
-        parse the XML content
-        """
+        """parse the XML content"""
         self.name = xml_node.attrib.get('name', xml_node.attrib['type'][2:])
 
         self.parse_attributes(xml_node)
@@ -509,6 +523,7 @@ class NXDL__group(NXDL__Mixin):
 
 
 class NXDL__link(NXDL__Mixin):
+    
     """
     contents of a *link* structure (XML element) in a NXDL XML file
     
@@ -530,14 +545,13 @@ class NXDL__link(NXDL__Mixin):
         self.target = None
     
     def parse_nxdl_xml(self, xml_node):
-        """
-        parse the XML content
-        """
+        """parse the XML content"""
         self.name = xml_node.attrib['name']
         self.target = xml_node.attrib.get('target')
 
 
 class NXDL__symbols(NXDL__Mixin):
+    
     """
     contents of a *symbols* structure (XML element) in a NXDL XML file
     
@@ -557,9 +571,7 @@ class NXDL__symbols(NXDL__Mixin):
         self.symbols = []
 
     def parse_nxdl_xml(self, symbols_node):
-        """
-        parse the XML content
-        """
+        """parse the XML content"""
         for node in symbols_node:
             if isinstance(node, lxml.etree._Comment):
                 continue
@@ -569,57 +581,57 @@ class NXDL__symbols(NXDL__Mixin):
                 nm = node.attrib.get('name')
                 if nm is not None:
                     self.symbols.append(nm)
-
-
-def main():
-    from punx import cache_manager
-    cm = cache_manager.CacheManager()
-    cm.select_NXDL_file_set("master")
-    if cm is not None and cm.default_file_set is not None:
-        manager = NXDL_Manager(cm.default_file_set)
-        counts_keys = 'attributes fields groups links symbols'.split()
-        total_counts = {k: 0 for k in counts_keys}
-        
-        try:
-            def count_group(g, counts):
-                for k in counts_keys:
-                    if hasattr(g, k):
-                        n = len(g.__getattribute__(k))
-                        if n > 0:
-                            counts[k] += n
-                for group in g.groups.values():
-                    counts = count_group(group, counts)
-                return counts
-
-            import pyRestTable
-            t = pyRestTable.Table()
-            t.labels = 'class category'.split() + counts_keys
-            for v in manager.classes.values():
-                row = [v.title, v.category]
-                counts = {k: 0 for k in counts_keys}
-                counts = count_group(v, counts)
-                for k in counts_keys:
-                    n = counts[k]
-                    total_counts[k] += n
-                    if n == 0:
-                        n = ""
-                    row.append(n)
-                t.addRow(row)
-            
-            t.addRow(["TOTAL", "-"*4] + ["-"*4 for k in counts_keys])
-            row = [len(manager.classes), 3]
-            for k in counts_keys:
-                n = total_counts[k]
-                if n == 0:
-                    n = ""
-                row.append(n)
-            t.addRow(row)
-            print(t)
-        except Exception:
-            pass
-
-        print(manager)
-
-
-if __name__ == '__main__':
-    main()
+# 
+# 
+# def main():
+#     from punx import cache_manager
+#     cm = cache_manager.CacheManager()
+#     cm.select_NXDL_file_set("master")
+#     if cm is not None and cm.default_file_set is not None:
+#         manager = NXDL_Manager(cm.default_file_set)
+#         counts_keys = 'attributes fields groups links symbols'.split()
+#         total_counts = {k: 0 for k in counts_keys}
+#         
+#         try:
+#             def count_group(g, counts):
+#                 for k in counts_keys:
+#                     if hasattr(g, k):
+#                         n = len(g.__getattribute__(k))
+#                         if n > 0:
+#                             counts[k] += n
+#                 for group in g.groups.values():
+#                     counts = count_group(group, counts)
+#                 return counts
+# 
+#             import pyRestTable
+#             t = pyRestTable.Table()
+#             t.labels = 'class category'.split() + counts_keys
+#             for v in manager.classes.values():
+#                 row = [v.title, v.category]
+#                 counts = {k: 0 for k in counts_keys}
+#                 counts = count_group(v, counts)
+#                 for k in counts_keys:
+#                     n = counts[k]
+#                     total_counts[k] += n
+#                     if n == 0:
+#                         n = ""
+#                     row.append(n)
+#                 t.addRow(row)
+#             
+#             t.addRow(["TOTAL", "-"*4] + ["-"*4 for k in counts_keys])
+#             row = [len(manager.classes), 3]
+#             for k in counts_keys:
+#                 n = total_counts[k]
+#                 if n == 0:
+#                     n = ""
+#                 row.append(n)
+#             t.addRow(row)
+#             print(t)
+#         except Exception:
+#             pass
+# 
+#         print(manager)
+# 
+# 
+# if __name__ == '__main__':
+#     main()

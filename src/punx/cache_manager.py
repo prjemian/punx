@@ -85,6 +85,8 @@ logger = utils.setup_logger(__name__)
 def get_short_sha(full_sha):
     """
     return the first few unique characters of the git commit hash (SHA)
+    
+    :param str full_sha: hash code from Github
     """
     return full_sha[:min(SHORT_SHA_LENGTH, len(full_sha))]
 
@@ -110,6 +112,8 @@ def read_json_file(filename):
 def should_extract_this(item, NXDL_file_endings_list, allowed_parent_directories):
     """
     decide if this item should be extracted from the ZIP download
+    
+    :return bool:
     """
     for ending in NXDL_file_endings_list:
         if item.endswith(ending):
@@ -121,6 +125,8 @@ def should_extract_this(item, NXDL_file_endings_list, allowed_parent_directories
 def should_avoid_download(grr, path):
     """
     decide if the download should be avoided (True: avoid, False: download)
+    
+    :return bool:
     """
     names = []
     names.append(grr.appName + '-' + grr.sha)
@@ -219,6 +225,7 @@ def table_of_caches():
 
 
 class CacheManager(singletons.Singleton):
+
     """
     manager both source and user caches
     
@@ -292,6 +299,8 @@ class CacheManager(singletons.Singleton):
     def select_NXDL_file_set(self, ref=None):
         """
         return the named self.default_file_set instance or raise KeyError exception if unknown
+    
+        :return obj:
         """
         logger.debug(' given ref: ' + str(ref))
 
@@ -367,6 +376,7 @@ class CacheManager(singletons.Singleton):
 
 
 class Base_Cache(object):
+    
     """
     provides comon methods to get the QSettings path and file name
     
@@ -419,6 +429,7 @@ class Base_Cache(object):
 
     
 class SourceCache(Base_Cache):
+    
     """manage the source directory cache of NXDL files"""
 
     def __init__(self):
@@ -439,6 +450,7 @@ class SourceCache(Base_Cache):
 
 
 class UserCache(Base_Cache):
+    
     """manage the user directory cache of NXDL files"""
 
     def __init__(self):
@@ -464,6 +476,7 @@ class UserCache(Base_Cache):
 
 
 class NXDL_File_Set(object):
+    
     """describe a single set of NXDL files"""
     
     path = None

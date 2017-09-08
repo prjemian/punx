@@ -88,6 +88,7 @@ def get_default_schema_manager():
 
 
 class SchemaManager(object):
+    
     """
     describes the XML Schema for the NeXus NXDL definitions files
     """
@@ -200,6 +201,7 @@ class SchemaManager(object):
 
 
 class Schema_pattern(object):
+    
     """
     describe the regular expression patterns ofr names of NeXus things
     """
@@ -212,6 +214,7 @@ class Schema_pattern(object):
 
 
 class Schema_nxdlType(object):
+    
     """
     one of the types defined in the file *nxdlTypes.xsd*
     """
@@ -246,6 +249,7 @@ class Schema_nxdlType(object):
 
 
 class _Mixin(object):
+    
     """
     common code for NXDL Rules classes below
     
@@ -333,6 +337,7 @@ class _Mixin(object):
 
 
 class Schema_Root(_Mixin):
+    
     """
     root element of the nxdl.xsd file
     
@@ -399,7 +404,9 @@ class Schema_Root(_Mixin):
                 msg = 'unhandled tag in ``definitionType``: '
                 raise_error(node, msg, node.tag)
 
-class Schema_Attribute(_Mixin): 
+
+class Schema_Attribute(_Mixin):
+    
     """
     xs:attribute element
     
@@ -456,7 +463,8 @@ class Schema_Attribute(_Mixin):
             return _Mixin.__str__(self, *args, **kwargs)
 
 
-class Schema_Element(_Mixin): 
+class Schema_Element(_Mixin):
+    
     """
     xs:element
     
@@ -505,7 +513,8 @@ class Schema_Element(_Mixin):
                 type_obj.copy_to(self)
 
 
-class Schema_Type(_Mixin): 
+class Schema_Type(_Mixin):
+    
     """
     a named NXDL structure type (such as groupGroup)
     
@@ -564,6 +573,7 @@ class Schema_Type(_Mixin):
 
 
 class _GroupParsing(singletons.Singleton):
+    
     """
     internal: avoid a known recursion of group in a group
     """
@@ -571,7 +581,8 @@ class _GroupParsing(singletons.Singleton):
     started = False
 
 
-class _Recursion(_Mixin): 
+class _Recursion(_Mixin):
+    
     """
     internal: an element used in recursion, such as child group of group
     
@@ -582,6 +593,6 @@ class _Recursion(_Mixin):
         _Mixin.__init__(self, None, obj_name=obj_name, ns_dict=None)
 
 
-if __name__ == '__main__':
-    sm = SchemaManager()
-    _breakpoint = True
+# if __name__ == '__main__':
+#     sm = SchemaManager()
+#     _breakpoint = True

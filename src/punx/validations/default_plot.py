@@ -10,7 +10,7 @@
 #-----------------------------------------------------------------------------
 
 
-"validate the setup identifying the default plot"
+"""validate the setup identifying the default plot"""
 
 import collections
 
@@ -19,7 +19,7 @@ from .. import utils
 
 
 def verify(validator):
-    "entry function of this module"
+    """entry function of this module"""
     c = "need to validate existence of default plot"
     obj = validator.addresses["/"]
     status = None

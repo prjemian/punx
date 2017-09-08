@@ -48,6 +48,7 @@ VALIDITEMNAME_STRICT_PATTERN = r'[a-z_][a-z0-9_]*'
 
 
 class Data_File_Validator(object):
+    
     """
     manage the validation of a NeXus HDF5 data file
     
@@ -132,9 +133,7 @@ class Data_File_Validator(object):
             return total, count, float(total)/count
 
     def validate(self, fname):
-        '''
-        start the validation process from the file root
-        '''
+        """start the validation process from the file root"""
         from .validations import default_plot
 
         if not os.path.exists(fname):
@@ -328,9 +327,8 @@ class Data_File_Validator(object):
 
 
 class ValidationItem(object):
-    """
-    HDF5 data file object for validation
-    """
+    
+    """HDF5 data file object for validation"""
     
     def __init__(self, parent, obj, attribute_name=None):
         assert(isinstance(parent, (ValidationItem, type(None))))

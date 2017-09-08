@@ -55,9 +55,7 @@ NXDL_TEST_FILE = os.path.join(os.path.dirname(__file__), 'cache', 'v3.2', NXDL_X
 
 
 def get_xml_namespace_dictionary():
-    """
-    return the NeXus XML namespace dictionary
-    """
+    """return the NeXus XML namespace dictionary"""
     return dict(      # TODO: generalize this
         nx="http://definition.nexusformat.org/nxdl/3.1",
         xs="http://www.w3.org/2001/XMLSchema",
@@ -65,9 +63,7 @@ def get_xml_namespace_dictionary():
 
 
 def get_named_parent_node(xml_node):
-    """
-    return the closest XML ancestor node with a ``name`` attribute or the schema node
-    """
+    """return closest XML ancestor node with a ``name`` attribute or the schema node"""
     parent = xml_node.getparent()
     if 'name' not in parent.attrib and not parent.tag.endswith('}schema'):
         parent = get_named_parent_node(parent)
@@ -75,9 +71,7 @@ def get_named_parent_node(xml_node):
 
 
 def get_reference_keys(xml_node):
-    """
-    reference an xml_node in the catalog: ``catalog[section][line]``
-    """
+    """reference an xml_node in the catalog: ``catalog[section][line]``"""
     section = xml_node.tag.split('}')[-1]
     line = 'Line %d' % xml_node.sourceline
     return section, line
@@ -106,11 +100,14 @@ def render_class_str(obj):
 
 class NXDL_schema__Mixin(object):
     
+    """ """
+    
     def __str__(self, *args, **kwargs):
         return render_class_str(self)
 
 
 class NXDL_schema__attribute(NXDL_schema__Mixin):
+    
     """
     node matches XPath query: ``//xs:attribute``
     
@@ -195,6 +192,7 @@ class NXDL_schema__attribute(NXDL_schema__Mixin):
 
 
 class NXDL_schema__attributeGroup(NXDL_schema__Mixin):
+    
     """
     node matches XPath query: ``/xs:schema/xs:attributeGroup``
     
@@ -223,6 +221,7 @@ class NXDL_schema__attributeGroup(NXDL_schema__Mixin):
 
 
 class NXDL_schema_complexType(NXDL_schema__Mixin):
+    
     """
     node matches XPath query: ``/xs:schema/xs:complexType``
     
@@ -318,6 +317,7 @@ class NXDL_schema_complexType(NXDL_schema__Mixin):
 
 
 class NXDL_schema__element(NXDL_schema__Mixin):
+    
     """a complete description of a specific NXDL xs:element node"""
     
     def __init__(self):
@@ -352,6 +352,7 @@ class NXDL_schema__element(NXDL_schema__Mixin):
 
 
 class NXDL_schema__group(NXDL_schema__Mixin):
+    
     """
     node matches XPath query: ``//xs:group``
     
@@ -384,6 +385,7 @@ class NXDL_schema__group(NXDL_schema__Mixin):
 
 
 class NXDL_schema_named_simpleType(NXDL_schema__Mixin):
+    
     """
     node matches XPath query: ``/xs:schema/xs:simpleType``
     
@@ -423,6 +425,7 @@ class NXDL_schema_named_simpleType(NXDL_schema__Mixin):
 
 
 class NXDL_item_catalog(object):
+    
     """
     content from the NeXus XML Schema (``nxdl.xsd``)
     
@@ -491,6 +494,7 @@ class NXDL_item_catalog(object):
         apply_substitutions(self.definition_element, self.db)
     
     def add_to_catalog(self, node, obj, key=None):
+        """ """
         section, line = get_reference_keys(node)
         section = key or section
         if section not in self.db:
@@ -556,6 +560,7 @@ class NXDL_item_catalog(object):
 
 
 class NXDL_Summary(object):
+    
     """
     provide an easy interface for the nxdl_manager
     
@@ -617,6 +622,7 @@ class NXDL_Summary(object):
 
 
 def print_tree(obj, level=0):
+    """ """
     indent = ' '*4*level
     k = type(obj).__name__.split('_')[-1]
     count = 1
@@ -648,11 +654,11 @@ def print_tree(obj, level=0):
     return count, db
 
 
-def issue_67_main():
-    summary = NXDL_Summary(NXDL_TEST_FILE)
-    count, db = print_tree(summary.definition)
-    print(count, db)
-
-
-if __name__ == '__main__':
-    issue_67_main()
+# def issue_67_main():
+#     summary = NXDL_Summary(NXDL_TEST_FILE)
+#     count, db = print_tree(summary.definition)
+#     print(count, db)
+# 
+# 
+# if __name__ == '__main__':
+#     issue_67_main()

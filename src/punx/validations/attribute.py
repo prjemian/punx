@@ -157,7 +157,17 @@ def target_handler(validator, v_item):
 
 
 def units_handler(validator, v_item):
-    """validate @units"""
+    """
+    validate @units
+    
+    :see: https://bitbucket.org/cfpython/cfunits-python
+    :see: https://pypi.python.org/pypi/cfunits/1.5.1
+    
+    But, cfunits is not ready for Python3
+    Requires a python version from 2.6 up to, but not including, 3.0.
+    
+    :see: https://github.com/SciTools/cf_units/pull/22
+    """
     generic_handler(validator, v_item)
 
 

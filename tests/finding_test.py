@@ -99,7 +99,6 @@ def suite(*args, **kw):
     test_list = [
         Test_ValidationResultStatus,
         Test_Finding,
-        Test_FindingResults,
         Test_Global,
         ]
     for test_case in test_list:

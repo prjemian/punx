@@ -82,7 +82,7 @@ class Finding(object):
         self.h5_address = h5_address
         self.status = status
         self.comment = comment
-        self.md5 = self.make_md5
+        self.key = self.make_md5
 
     def __str__(self, *args, **kwargs):
         try:

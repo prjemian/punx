@@ -99,7 +99,6 @@ class Data_File_Validator(object):
         self.validations = []      # list of Finding() instances
         self.addresses = collections.OrderedDict()     # dictionary of all HDF5 address nodes in the data file
         self.classpaths = {}
-        self.validation_keys = {}
         self.regexp_cache = {}
     
     def close(self):
@@ -117,9 +116,6 @@ class Data_File_Validator(object):
         f = finding.Finding(v_item.h5_address, key, status, comment)
         self.validations.append(f)
         v_item.validations[key] = f
-        if key not in self.validation_keys:
-            self.validation_keys[key] = []
-        self.validation_keys[key].append(f)
         return f
     
     def validate(self, fname):

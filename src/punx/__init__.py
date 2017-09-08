@@ -1,6 +1,6 @@
 # -*- coding: iso-8859-1 -*-
 
-'''
+"""
 Python Utilities for NeXus HDF5 files
 
 .. autosummary::
@@ -10,7 +10,7 @@ Python Utilities for NeXus HDF5 files
    ~SchemaNotFound
 
 
-'''
+"""
 
 #-----------------------------------------------------------------------------
 # :author:    Pete R. Jemian

@@ -11,7 +11,7 @@
 # The full license is in the file LICENSE.txt, distributed with this software.
 #-----------------------------------------------------------------------------
 
-'''
+"""
 manages the XML Schema of this project
 
 The *schema_manager* calls the *cache_manager* and
@@ -38,7 +38,7 @@ Internal
    ~_GroupParsing
    ~_Recursion
 
-'''
+"""
 
 
 from __future__ import print_function
@@ -54,32 +54,32 @@ logger = logging.getLogger(__name__)
 
 
 def strip_ns(ref):
-    '''
+    """
     strip the namespace prefix from ``ref``
     
     :param str ref: one word, colon delimited string, such as *nx:groupGroup*
     :returns str: the part to the right of the last colon
-    '''
+    """
     return ref.split(':')[-1]
 
 
 def raise_error(node, text, obj):
-    '''
+    """
     standard *ValueError* exception handling
     
     :param obj node: instance of 
     :param str text: label for ``obj``
     :param str obj: value
-    '''
+    """
     msg = 'line ' + str(node.sourceline)
     msg += ': ' + text + str(obj)
     raise ValueError(msg)
 
 
 def get_default_schema_manager():
-    '''
+    """
     internal: convenience function
-    '''
+    """
     from punx import cache_manager
     cm = cache_manager.CacheManager()
     assert(cm is not None)
@@ -88,9 +88,9 @@ def get_default_schema_manager():
 
 
 class SchemaManager(object):
-    '''
+    """
     describes the XML Schema for the NeXus NXDL definitions files
-    '''
+    """
     
     ns = NAMESPACE_DICT
     
@@ -128,9 +128,9 @@ class SchemaManager(object):
         del self.lxml_tree
 
     def parse_nxdl_patterns(self):
-        '''
+        """
         get regexp patterns for validItemName, validNXClassName, & validTargetName from nxdl.xsd
-        '''
+        """
         db = {}
         for node in self.lxml_root.xpath('xs:simpleType', namespaces=self.ns):
             key = node.attrib['name']
@@ -162,9 +162,9 @@ class SchemaManager(object):
         return db
 
     def parse_nxdlTypes(self):
-        '''
+        """
         get the allowed data types and unit types from nxdlTypes.xsd
-        '''
+        """
         if os.path.exists(self.schema_file):
             path = os.path.dirname(self.schema_file)
         else:
@@ -200,9 +200,9 @@ class SchemaManager(object):
 
 
 class Schema_pattern(object):
-    '''
+    """
     describe the regular expression patterns ofr names of NeXus things
-    '''
+    """
     
     def __init__(self):
         self.base = 'token'
@@ -212,9 +212,9 @@ class Schema_pattern(object):
 
 
 class Schema_nxdlType(object):
-    '''
+    """
     one of the types defined in the file *nxdlTypes.xsd*
-    '''
+    """
     
     def __init__(self, xml_obj, ns_dict=None, schema_root=None):
         self.name = xml_obj.attrib.get('name')
@@ -246,14 +246,14 @@ class Schema_nxdlType(object):
 
 
 class _Mixin(object):
-    '''
+    """
     common code for NXDL Rules classes below
     
     :param lxml.etree.Element xml_obj: XML element
     :param str obj_name: optional, default taken from ``xml_obj``
     :param dict ns_dict: optional, default taken from :data:`__init__.NAMESPACE_DICT`
     :param obj schema_root: optional, instance of lxml.etree._Element
-    '''
+    """
     
     def __init__(self, xml_obj, obj_name=None, ns_dict=None, schema_root=None):
         self.name = obj_name or xml_obj.attrib.get('name')
@@ -261,13 +261,13 @@ class _Mixin(object):
         self.lxml_root = schema_root
     
     def get_named_node(self, tag, attribute, value):
-        '''
+        """
         return a named node from the XML Schema
         
         :param str tag: XML Schema tag (such as "complexType") to match
         :param str attribute: attribute name to match
         :param str value: attribute value to match
-        '''
+        """
         if self.lxml_root is None:
             raise ValueError
         root = self.lxml_root
@@ -282,28 +282,28 @@ class _Mixin(object):
         return node_list[0]
     
     def copy_to(self, target):
-        '''
+        """
         copy results into target object
         
         :param obj target: instance of _Mixin, such as Schema_Element
-        '''
+        """
         for k, v in self.attrs.items():
             target.attrs[k] = v
         for k, v in self.children.items():
             target.children[k] = v
 
     def parse_attribute(self, node):
-        ''' '''
+        """ """
         obj = Schema_Attribute(node, schema_root=self.lxml_root)
         self.attrs[obj.name] = obj
 
     def parse_attributeGroup(self, node):
-        ''' '''
+        """ """
         obj = Schema_Type(node.attrib.get('ref'), schema_root=self.lxml_root)
         obj.copy_to(self)
 
     def parse_complexContent(self, node):
-        ''' '''
+        """ """
         for subnode in node:
             if subnode.tag.endswith('}extension'):
                 ref = subnode.attrib.get('base')
@@ -327,20 +327,20 @@ class _Mixin(object):
                 raise_error(subnode, 'unexpected tag=', subnode.tag)
 
     def parse_group(self, node):
-        ''' '''
+        """ """
         obj = Schema_Type(node.attrib.get('ref'), schema_root=self.lxml_root)
         obj.copy_to(self)
 
 
 class Schema_Root(_Mixin):
-    '''
+    """
     root element of the nxdl.xsd file
     
     :param lxml.etree.Element xml_obj: XML element
     :param str obj_name: optional, default taken from ``xml_obj``
     :param dict ns_dict: optional, default taken from :data:`NAMESPACE_DICT`
     :param obj schema_root: optional, instance of lxml.etree._Element
-    '''
+    """
 
     attrs = {}
     children = {}
@@ -385,9 +385,9 @@ class Schema_Root(_Mixin):
             self.schema_types.update(self.children)
 
     def parse_sequence(self, seq_node):
-        '''
+        """
         parse the sequence used in the root element
-        '''
+        """
         for node in seq_node:
             if node.tag.endswith('}element'):
                 obj = Schema_Element(node, schema_root=self.lxml_root)
@@ -400,14 +400,14 @@ class Schema_Root(_Mixin):
                 raise_error(node, msg, node.tag)
 
 class Schema_Attribute(_Mixin): 
-    '''
+    """
     xs:attribute element
     
     :param lxml.etree.Element xml_obj: XML element
     :param str obj_name: optional, default taken from ``xml_obj``
     :param dict ns_dict: optional, default taken from :data:`NAMESPACE_DICT`
     :param obj schema_root: optional, instance of lxml.etree._Element
-    '''
+    """
     
     def __init__(self, xml_obj, obj_name=None, ns_dict=None, schema_root=None):
         assert(xml_obj is not None)
@@ -457,7 +457,7 @@ class Schema_Attribute(_Mixin):
 
 
 class Schema_Element(_Mixin): 
-    '''
+    """
     xs:element
     
     :param lxml.etree.Element xml_obj: XML element
@@ -467,7 +467,7 @@ class Schema_Element(_Mixin):
     
     :see: http://download.nexusformat.org/doc/html/nxdl.html
     :see: http://download.nexusformat.org/doc/html/nxdl_desc.html#nxdl-elements
-    '''
+    """
     
     def __init__(self, xml_obj, obj_name=None, ns_dict=None, schema_root=None):
         _Mixin.__init__(
@@ -506,7 +506,7 @@ class Schema_Element(_Mixin):
 
 
 class Schema_Type(_Mixin): 
-    '''
+    """
     a named NXDL structure type (such as groupGroup)
     
     :param str ref: name of NXDL structure type (such as ``groupGroup``)
@@ -515,7 +515,7 @@ class Schema_Type(_Mixin):
     
     :see: http://download.nexusformat.org/doc/html/nxdl.html
     :see: http://download.nexusformat.org/doc/html/nxdl_desc.html#nxdl-data-types-internal
-    '''
+    """
     
     def __init__(self, ref, tag = '*', schema_root=None):
         # _Mixin.__init__(self, xml_obj)
@@ -548,7 +548,7 @@ class Schema_Type(_Mixin):
                 raise_error(node, 'unexpected tag=', node.tag)
 
     def parse_sequence(self, node):
-        ''' '''
+        """ """
         for subnode in node:
             if subnode.tag.endswith('}element'):
                 obj = Schema_Element(subnode, schema_root=self.lxml_root)
@@ -564,19 +564,19 @@ class Schema_Type(_Mixin):
 
 
 class _GroupParsing(singletons.Singleton):
-    '''
+    """
     internal: avoid a known recursion of group in a group
-    '''
+    """
     
     started = False
 
 
 class _Recursion(_Mixin): 
-    '''
+    """
     internal: an element used in recursion, such as child group of group
     
     :param str obj_name: optional, default taken from ``xml_obj``
-    '''
+    """
     
     def __init__(self, obj_name):
         _Mixin.__init__(self, None, obj_name=obj_name, ns_dict=None)

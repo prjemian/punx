@@ -9,7 +9,7 @@
 # The full license is in the file LICENSE.txt, distributed with this software.
 #-----------------------------------------------------------------------------
 
-'''
+"""
 utility routines
 
 .. autosummary::
@@ -26,7 +26,7 @@ utility routines
    ~isNeXusLink
    ~setup_logger
 
-'''
+"""
 
 import h5py
 import logging
@@ -36,9 +36,9 @@ import sys
 
 
 def decode_byte_string(text):
-    '''
+    """
     in python3, HDF5 attributes can be byte strings or numpy.ndarray strings
-    '''
+    """
     if isinstance(text, (numpy.ndarray)):
         #text = [v for v in text]
         text = text[0]
@@ -48,22 +48,22 @@ def decode_byte_string(text):
 
 
 def isHdf5FileObject(obj):
-    '''is `obj` an HDF5 File?'''
+    """is `obj` an HDF5 File?"""
     return isinstance(obj, h5py.File)
 
 
 def isHdf5Group(obj):
-    '''is `obj` an HDF5 Group?'''
+    """is `obj` an HDF5 Group?"""
     return isinstance(obj, h5py.Group) and not isHdf5FileObject(obj)
 
 
 def isHdf5Dataset(obj):
-    '''is `obj` an HDF5 Dataset?'''
+    """is `obj` an HDF5 Dataset?"""
     return isinstance(obj, h5py.Dataset)
 
 
 def isHdf5Link(parent, objname):
-    '''is `parent[objname]` an HDF5 Link?'''
+    """is `parent[objname]` an HDF5 Link?"""
     if isHdf5Group(parent) or isHdf5FileObject(parent):
         details = parent.get(objname, getlink=True)
         return isinstance(details, h5py.HardLink)
@@ -71,7 +71,7 @@ def isHdf5Link(parent, objname):
 
 
 def isHdf5ExternalLink(parent, objname):
-    '''
+    """
     is `parent[objname]` an HDF5 ExternalLink?
     
     Tricky to detect this one.
@@ -81,7 +81,7 @@ def isHdf5ExternalLink(parent, objname):
     
     Note: In the external link object, there are
     two attributes: ``@filename`` and ``@path``.
-    '''
+    """
     if isHdf5Group(parent) or isHdf5FileObject(parent):
         details = parent.get(objname, getclass=True, getlink=True)
         # The ``isinstance(details, h5py.ExternalLink)``
@@ -93,9 +93,7 @@ def isHdf5ExternalLink(parent, objname):
 
 
 def isNeXusFile(filename):
-    '''
-    is `filename` is a NeXus HDF5 file?
-    '''
+    """is `filename` is a NeXus HDF5 file?"""
     if not os.path.exists(filename):
         return None
     
@@ -110,7 +108,7 @@ def isNeXusFile(filename):
 
 
 def isNeXusGroup(obj, NXtype):
-    '''is `obj` a NeXus group?'''
+    """is `obj` a NeXus group?"""
     nxclass = None
     if isHdf5Group(obj):
         nxclass = obj.attrs.get('NX_class', None)
@@ -121,12 +119,12 @@ def isNeXusGroup(obj, NXtype):
 
 
 def isNeXusDataset(obj):
-    '''is `obj` a NeXus dataset?'''
+    """is `obj` a NeXus dataset?"""
     return isHdf5Dataset(obj)
 
 
 def isNeXusLink(obj):
-    '''is `obj` linked to another NeXus item?'''
+    """is `obj` linked to another NeXus item?"""
     target = decode_byte_string(obj.attrs.get('target', ''))
     return len(target) > 0 and target != obj.name
 

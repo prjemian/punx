@@ -11,7 +11,7 @@
 # The full license is in the file LICENSE.txt, distributed with this software.
 #-----------------------------------------------------------------------------
 
-'''
+"""
 manages the NXDL cache directories of this project
 
 A key component necessary to validate both NeXus data files and 
@@ -57,7 +57,7 @@ is called by *schema_manager* and *nxdl_manager*.
    ~UserCache
    ~NXDL_File_Set
 
-'''
+"""
 
 import datetime
 import json
@@ -83,34 +83,34 @@ logger = utils.setup_logger(__name__)
 
 
 def get_short_sha(full_sha):
-    '''
+    """
     return the first few unique characters of the git commit hash (SHA)
-    '''
+    """
     return full_sha[:min(SHORT_SHA_LENGTH, len(full_sha))]
 
 
 def write_json_file(filename, obj):
-    '''
+    """
     write the structured ``obj`` to the JSON file ``file_name``
     
     :see: https://docs.python.org/3.5/library/json.html#json.dumps
-    '''
+    """
     open(filename, 'w').write(json.dumps(obj, indent=2))
 
 
 def read_json_file(filename):
-    '''
+    """
     read a structured object from the JSON file ``file_name``
     
     :see: https://docs.python.org/3.5/library/json.html#json.loads
-    '''
+    """
     return json.loads(open(filename, 'r').read())
 
 
 def should_extract_this(item, NXDL_file_endings_list, allowed_parent_directories):
-    '''
+    """
     decide if this item should be extracted from the ZIP download
-    '''
+    """
     for ending in NXDL_file_endings_list:
         if item.endswith(ending):
             if item.split('/')[-2] in allowed_parent_directories:
@@ -119,9 +119,9 @@ def should_extract_this(item, NXDL_file_endings_list, allowed_parent_directories
 
 
 def should_avoid_download(grr, path):
-    '''
+    """
     decide if the download should be avoided (True: avoid, False: download)
-    '''
+    """
     names = []
     names.append(grr.appName + '-' + grr.sha)
     names.append(grr.orgName + '-' + grr.appName + '-' + grr.sha)
@@ -140,7 +140,7 @@ def should_avoid_download(grr, path):
 
 
 def extract_from_download(grr, path):       # TODO refactor into NXDL_File_Set
-    '''
+    """
     download & extract NXDL files from ``grr`` into a subdirectory of ``path``
     
     USAGE::
@@ -150,7 +150,7 @@ def extract_from_download(grr, path):       # TODO refactor into NXDL_File_Set
         if grr.request_info() is not None:
             extract_from_download(grr, cache_directory)
 
-    '''
+    """
     import io, zipfile
     NXDL_categories = 'base_classes applications contributed_definitions'.split()
     NXDL_file_endings_list = '.xsd .xml .xsl'.split()
@@ -219,7 +219,7 @@ def table_of_caches():
 
 
 class CacheManager(singletons.Singleton):
-    '''
+    """
     manager both source and user caches
     
     .. autosummary::
@@ -229,7 +229,7 @@ class CacheManager(singletons.Singleton):
         ~find_all_file_sets
         ~cleanup
     
-    '''
+    """
     
     def __init__(self):
         self.default_file_set = None
@@ -290,9 +290,9 @@ class CacheManager(singletons.Singleton):
                     return m
     
     def select_NXDL_file_set(self, ref=None):
-        '''
+        """
         return the named self.default_file_set instance or raise KeyError exception if unknown
-        '''
+        """
         logger.debug(' given ref: ' + str(ref))
 
         ref = ref or github_handler.DEFAULT_NXDL_SET
@@ -311,9 +311,7 @@ class CacheManager(singletons.Singleton):
     # private
     
     def find_all_file_sets(self):
-        '''
-        index all NXDL file sets in both source and user caches, return a dictionary
-        '''
+        """return dictionary of all NXDL file sets in both source & user caches"""
         fs = {k: v for k, v in self.source.find_all_file_sets().items()}
         msg = ' source file set names: ' 
         msg += str(sorted(list(fs.keys())))
@@ -332,9 +330,7 @@ class CacheManager(singletons.Singleton):
         return fs
     
     def cleanup(self):
-        '''
-        removes any temporary directories
-        '''
+        """removes any temporary directories"""
         self.source.cleanup()
         self.user.cleanup()
 
@@ -371,7 +367,7 @@ class CacheManager(singletons.Singleton):
 
 
 class Base_Cache(object):
-    '''
+    """
     provides comon methods to get the QSettings path and file name
     
     .. autosummary::
@@ -381,28 +377,26 @@ class Base_Cache(object):
        ~path
        ~cleanup
     
-    '''
+    """
     
     qsettings = None
     is_temporary_directory = False
 
     def path(self):
-        'directory containing the QSettings file'
+        """directory containing the QSettings file"""
         if self.qsettings is None:
             raise RuntimeError('cache qsettings not defined!')
         return os.path.dirname(self.fileName())
 
     def fileName(self):
-        'full path of  the QSettings file'
+        """full path of the QSettings file"""
         if self.qsettings is None:
             raise RuntimeError('cache qsettings not defined!')
         fn = str(self.qsettings.fileName())
         return fn
     
     def find_all_file_sets(self):
-        '''
-        index all NXDL file sets in this cache
-        '''
+        """index all NXDL file sets in this cache"""
         fs = {}
         if self.qsettings is None:
             raise RuntimeError('cache qsettings not defined!')
@@ -418,18 +412,14 @@ class Base_Cache(object):
         return fs
     
     def cleanup(self):
-        '''
-        removes any temporary directories
-        '''
+        """removes any temporary directories"""
         if self.is_temporary_directory:
             os.removedirs(self.path())
             self.is_temporary_directory = False
 
     
 class SourceCache(Base_Cache):
-    '''
-    manage the source directory cache of NXDL files
-    '''
+    """manage the source directory cache of NXDL files"""
 
     def __init__(self):
         path = os.path.abspath(
@@ -449,9 +439,7 @@ class SourceCache(Base_Cache):
 
 
 class UserCache(Base_Cache):
-    '''
-    manage the user directory cache of NXDL files
-    '''
+    """manage the user directory cache of NXDL files"""
 
     def __init__(self):
         self.qsettings = QtCore.QSettings(
@@ -476,9 +464,7 @@ class UserCache(Base_Cache):
 
 
 class NXDL_File_Set(object):
-    '''
-    describe a single set of NXDL files
-    '''
+    """describe a single set of NXDL files"""
     
     path = None
     cache = None
@@ -499,9 +485,7 @@ class NXDL_File_Set(object):
     __schema_manager_loaded__ = False
     
     def __getattribute__(self, *args, **kwargs):
-        '''
-        implement lazy load of definition content
-        '''
+        """implement lazy load of definition content"""
         if len(args) == 1 \
                 and args[0] == 'schema_manager' \
                 and self.path is not None \

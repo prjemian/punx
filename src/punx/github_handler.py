@@ -11,7 +11,7 @@
 # The full license is in the file LICENSE.txt, distributed with this software.
 #-----------------------------------------------------------------------------
 
-'''
+"""
 manages the communications with GitHub
 
 
@@ -26,7 +26,7 @@ USAGE::
     if grr.request_info(u'v3.2') is not None:
         d = grr.download()
 
-'''
+"""
 
 import os
 
@@ -57,7 +57,7 @@ GITHUB_RETRY_COUNT = 3
 
 
 def get_BasicAuth_credentials(creds_file_name = None):
-    '''
+    """
     get the Github Basic Authentication credentials from a local file
         
     GitHub requests can use *Basic Authentication* if the 
@@ -69,7 +69,7 @@ def get_BasicAuth_credentials(creds_file_name = None):
     If found, the file is parsed for ``username password`` 
     as shown below.  Be sure to make the file
     readable only by the user and not others.
-    '''
+    """
     if creds_file_name is None:
         path = os.path.dirname(__file__)
         creds_file_name = os.path.join(path, CREDS_FILE_NAME)
@@ -81,7 +81,7 @@ def get_BasicAuth_credentials(creds_file_name = None):
 
 
 class GitHub_Repository_Reference(object):
-    '''
+    """
     all information necessary to describe and download a repository branch, release, tag, or SHA hash
     
     ROUTINES
@@ -93,7 +93,7 @@ class GitHub_Repository_Reference(object):
         ~download
     
     :see: https://github.com/PyGithub/PyGithub/tree/master/github
-    '''
+    """
     
     def __init__(self):
         self.orgName = GITHUB_NXDL_ORGANIZATION
@@ -106,12 +106,12 @@ class GitHub_Repository_Reference(object):
         self.last_modified = None
     
     def connect_repo(self, repo_name=None):
-        '''
+        """
         connect with the GitHub repository
         
         :param str repo_name: name of repository in https://github.com/nexusformat (default: *definitions*)
         :returns bool: True if using GitHub credentials
-        '''
+        """
         repo_name = repo_name or self.appName
         
         creds = get_BasicAuth_credentials()
@@ -125,7 +125,7 @@ class GitHub_Repository_Reference(object):
         return creds is not None
     
     def request_info(self, ref=None):
-        '''
+        """
         request download information about ``ref``
         
         :param str ref: name of branch, release, tag, or SHA hash (default: *v3.2*)
@@ -138,7 +138,7 @@ class GitHub_Repository_Reference(object):
         * hash (83ce630): https://github.com/nexusformat/definitions/archive/83ce630.zip
         * release (v3.2): see hash c0b9500
         * tag (NXcanSAS-1.0): see hash 83ce630
-        '''
+        """
         ref = ref or DEFAULT_NXDL_SET
         if self.repo is None:
             raise ValueError('call connect_repo() first')
@@ -150,9 +150,9 @@ class GitHub_Repository_Reference(object):
         return node
     
     def download(self):
-        '''
+        """
         download the NXDL definitions described by ``ref``
-        '''
+        """
         _msg = u'disabling warnings about GitHub self-signed https certificates'
         #requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
         disable_warnings(InsecureRequestWarning)
@@ -185,9 +185,9 @@ class GitHub_Repository_Reference(object):
         return url
     
     def _get_last_modified(self):
-        '''
+        """
         get the ``last_modified`` date from the SHA's commit
-        '''
+        """
         if self.sha is not None:
             commit = self.repo.get_commit(self.sha)
             mod_date_time = commit.last_modified    # Tue, 20 Dec 2016 18:30:29 GMT
@@ -196,11 +196,11 @@ class GitHub_Repository_Reference(object):
             self.last_modified = str(mod_date_time)
 
     def get_branch(self, ref=DEFAULT_BRANCH_NAME):
-        '''
+        """
         learn the download information about the named branch
         
         :param str ref: name of branch in repository
-        '''
+        """
         try:
             node = self.repo.get_branch(ref)
             self.ref = ref
@@ -213,11 +213,11 @@ class GitHub_Repository_Reference(object):
             return None
             
     def get_release(self, ref=DEFAULT_RELEASE_NAME):
-        '''
+        """
         learn the download information about the named release
         
         :param str ref: name of release in repository
-        '''
+        """
         try:
             node = self.repo.get_release(ref)
             self.get_tag(node.tag_name)
@@ -228,11 +228,11 @@ class GitHub_Repository_Reference(object):
             return None
     
     def get_tag(self, ref=DEFAULT_TAG_NAME):
-        '''
+        """
         learn the download information about the named tag
         
         :param str ref: name of tag in repository
-        '''
+        """
         try:
             for tag in self.repo.get_tags():
                 if tag.name == ref:
@@ -247,11 +247,11 @@ class GitHub_Repository_Reference(object):
             return None
     
     def get_commit(self, ref=DEFAULT_COMMIT_NAME):
-        '''
+        """
         learn the download information about the referenced commit
         
         :param str ref: name of SHA hash, first unique characters are sufficient, usually 7 or less
-        '''
+        """
         try:
             node = self.repo.get_commit(ref)
             self.ref = ref

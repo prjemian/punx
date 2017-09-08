@@ -12,13 +12,13 @@
 #-----------------------------------------------------------------------------
 
 
-'''
+"""
 Load and/or document the structure of a NeXus NXDL class specification
 
 The *nxdl_manager* calls the *schema_manager* and
 is called by *____tba_____*.
 
-'''
+"""
 
 from __future__ import print_function
 
@@ -37,9 +37,9 @@ logger = utils.setup_logger(__name__)
 
 
 class NXDL_Manager(object):
-    '''
+    """
     the NXDL classes found in ``nxdl_dir``
-    '''
+    """
 
     nxdl_file_set = None
     nxdl_defaults = None
@@ -100,13 +100,13 @@ class NXDL_Manager(object):
 
 
 def get_NXDL_file_list(nxdl_dir):
-    '''
+    """
     return a list of all NXDL files in the ``nxdl_dir``
     
     The list is sorted by NXDL category 
     (base_classes, applications, contributed_definitions)
     and then alphabetically within each category.
-    '''
+    """
     if not os.path.exists(nxdl_dir):
         msg = 'NXDL directory: ' + nxdl_dir
         logger.error(msg)
@@ -126,11 +126,11 @@ def get_NXDL_file_list(nxdl_dir):
 
 
 def validate_xml_tree(xml_tree):
-    '''
+    """
     validate an NXDL XML file against the NeXus NXDL XML Schema file
 
     :param str xml_file_name: name of XML file
-    '''
+    """
     from punx import schema_manager
     schema = schema_manager.get_default_schema_manager().lxml_schema
     try:
@@ -262,11 +262,11 @@ class NXDL__Mixin(object):
 
 
 class NXDL__definition(NXDL__Mixin):
-    '''
+    """
     contents of a *definition* element in a NXDL XML file
     
     :param str path: absolute path to NXDL definitions directory (has nxdl.xsd)
-    '''
+    """
 
     def __init__(self, nxdl_manager=None, *args, **kwds):
         self.nxdl_definition = self
@@ -351,9 +351,9 @@ class NXDL__definition(NXDL__Mixin):
 
 
 class NXDL__attribute(NXDL__Mixin):
-    '''
+    """
     contents of a *attribute* structure (XML element) in a NXDL XML file
-    '''
+    """
 
     def __init__(self, nxdl_definition, nxdl_defaults=None, *args, **kwds):
         NXDL__Mixin.__init__(self, nxdl_definition)
@@ -388,9 +388,9 @@ class NXDL__attribute(NXDL__Mixin):
                     self.enumerations.append(v)
 
 class NXDL__dim(NXDL__Mixin):
-    '''
+    """
     contents of a *dim* structure (XML element) in a NXDL XML file
-    '''
+    """
     
     def __init__(self, nxdl_definition, nxdl_defaults=None, *args, **kwds):
         NXDL__Mixin.__init__(self, nxdl_definition)
@@ -409,9 +409,9 @@ class NXDL__dim(NXDL__Mixin):
 
 
 class NXDL__dimensions(NXDL__Mixin):
-    '''
+    """
     contents of a *dimensions* structure (XML element) in a NXDL XML file
-    '''
+    """
     
     def __init__(self, nxdl_definition, nxdl_defaults=None, *args, **kwds):
         NXDL__Mixin.__init__(self, nxdl_definition)
@@ -439,9 +439,9 @@ class NXDL__dimensions(NXDL__Mixin):
 
 
 class NXDL__field(NXDL__Mixin):
-    '''
+    """
     contents of a *field* structure (XML element) in a NXDL XML file
-    '''
+    """
     
     def __init__(self, nxdl_definition, nxdl_defaults=None, *args, **kwds):
         NXDL__Mixin.__init__(self, nxdl_definition)
@@ -478,9 +478,9 @@ class NXDL__field(NXDL__Mixin):
             self.enumerations.append(node.attrib.get("value"))
 
 class NXDL__group(NXDL__Mixin):
-    '''
+    """
     contents of a *group* structure (XML element) in a NXDL XML file
-    '''
+    """
     
     def __init__(self, nxdl_definition, nxdl_defaults=None, *args, **kwds):
         NXDL__Mixin.__init__(self, nxdl_definition)
@@ -509,7 +509,7 @@ class NXDL__group(NXDL__Mixin):
 
 
 class NXDL__link(NXDL__Mixin):
-    '''
+    """
     contents of a *link* structure (XML element) in a NXDL XML file
     
     example from NXmonopd::
@@ -521,7 +521,7 @@ class NXDL__link(NXDL__Mixin):
             <doc>Link to data in /NXentry/NXinstrument/NXdetector</doc>
         </link>
 
-    '''
+    """
 
     def __init__(self, nxdl_definition, nxdl_defaults=None, *args, **kwds):
         NXDL__Mixin.__init__(self, nxdl_definition)
@@ -538,7 +538,7 @@ class NXDL__link(NXDL__Mixin):
 
 
 class NXDL__symbols(NXDL__Mixin):
-    '''
+    """
     contents of a *symbols* structure (XML element) in a NXDL XML file
     
     example from NXcrystal::
@@ -549,7 +549,7 @@ class NXDL__symbols(NXDL__Mixin):
         <symbol name="i"><doc>number of wavelengths</doc></symbol>
       </symbols>
     
-    '''
+    """
 
     def __init__(self, nxdl_definition, nxdl_defaults=None, *args, **kwds):
         NXDL__Mixin.__init__(self, nxdl_definition)

@@ -12,7 +12,7 @@
 #-----------------------------------------------------------------------------
 
 
-'''
+"""
 Read the NeXus XML Schema
 
 .. autosummary::
@@ -39,7 +39,7 @@ NXDL structures.  These internal structures are used:
 
 Note there is a recursion within :class:`NXDL_schema__group`
 since a *group* may contain a child *group*.
-'''
+"""
 
 from __future__ import print_function
 
@@ -55,9 +55,9 @@ NXDL_TEST_FILE = os.path.join(os.path.dirname(__file__), 'cache', 'v3.2', NXDL_X
 
 
 def get_xml_namespace_dictionary():
-    '''
+    """
     return the NeXus XML namespace dictionary
-    '''
+    """
     return dict(      # TODO: generalize this
         nx="http://definition.nexusformat.org/nxdl/3.1",
         xs="http://www.w3.org/2001/XMLSchema",
@@ -65,9 +65,9 @@ def get_xml_namespace_dictionary():
 
 
 def get_named_parent_node(xml_node):
-    '''
+    """
     return the closest XML ancestor node with a ``name`` attribute or the schema node
-    '''
+    """
     parent = xml_node.getparent()
     if 'name' not in parent.attrib and not parent.tag.endswith('}schema'):
         parent = get_named_parent_node(parent)
@@ -75,18 +75,24 @@ def get_named_parent_node(xml_node):
 
 
 def get_reference_keys(xml_node):
-    '''
+    """
     reference an xml_node in the catalog: ``catalog[section][line]``
-    '''
+    """
     section = xml_node.tag.split('}')[-1]
     line = 'Line %d' % xml_node.sourceline
     return section, line
 
 
 def render_class_str(obj):
-    '''
-    for use in classes: ``def __str__(self): return render_class_str(self)``
-    '''
+    """
+    useful optimization for classes
+    
+    USAGE::
+    
+        def __str__(self): 
+            return render_class_str(self)
+    
+    """
     excluded = (list, dict)
     msg = '%s(' % type(obj).__name__
     l = []
@@ -105,7 +111,7 @@ class NXDL_schema__Mixin(object):
 
 
 class NXDL_schema__attribute(NXDL_schema__Mixin):
-    '''
+    """
     node matches XPath query: ``//xs:attribute``
     
     xml_node is ``xs:attribute``
@@ -157,7 +163,7 @@ class NXDL_schema__attribute(NXDL_schema__Mixin):
     The XPath query for ``//xs:attribute`` from the root node will 
     pick up all of these.  It will be necessary to walk through the 
     parent nodes to determine where each should be applied.
-    '''
+    """
     
     def __init__(self):
         self.name = None
@@ -170,11 +176,11 @@ class NXDL_schema__attribute(NXDL_schema__Mixin):
         self.nxdl_attributes = {}
     
     def parse(self, xml_node):
-        '''
+        """
         read the attribute node content from the XML Schema
         
         xml_node is xs:attribute
-        '''
+        """
         assert(xml_node.tag.endswith('}attribute'))
         ns = get_xml_namespace_dictionary()
 
@@ -189,22 +195,22 @@ class NXDL_schema__attribute(NXDL_schema__Mixin):
 
 
 class NXDL_schema__attributeGroup(NXDL_schema__Mixin):
-    '''
+    """
     node matches XPath query: ``/xs:schema/xs:attributeGroup``
     
     xml_node is ``xs:attributeGroup``
-    '''
+    """
     
     def __init__(self):
         self.name = None
         self.children = []
     
     def parse(self, xml_node):
-        '''
+        """
         read the attributeGroup node content from the XML Schema
         
         xml_node is xs:attributeGroup
-        '''
+        """
         assert(xml_node.tag.endswith('}attributeGroup'))
         ns = get_xml_namespace_dictionary()
 
@@ -217,20 +223,18 @@ class NXDL_schema__attributeGroup(NXDL_schema__Mixin):
 
 
 class NXDL_schema_complexType(NXDL_schema__Mixin):
-    '''
+    """
     node matches XPath query: ``/xs:schema/xs:complexType``
     
     xml_node is ``xs:complexType``
-    '''
+    """
     
     def __init__(self):
         self.children = []
         self.name = None
     
     def parse(self, xml_node, catalog):
-        '''
-        read the element node content from the XML Schema
-        '''
+        """read the element node content from the XML Schema"""
         assert(xml_node.tag.endswith('}complexType'))
         ns = get_xml_namespace_dictionary()
 
@@ -244,51 +248,41 @@ class NXDL_schema_complexType(NXDL_schema__Mixin):
             attributeGroup = self._parse_attributeGroup,
             )
 
-        element_list = '''sequence complexContent 
-                          group attribute attributeGroup'''.split()
+        element_list = """sequence complexContent 
+                          group attribute attributeGroup""".split()
         for element_type in element_list:
             for node in xml_node.xpath('xs:'+element_type, namespaces=ns):
                 tag = node.tag.split('}')[-1]
                 handlers[tag](node, catalog)
     
     def _parse_attribute(self, xml_node, catalog):
-        '''
-        parse a xs:attribute node
-        '''
+        """parse a xs:attribute node"""
         assert(xml_node.tag.endswith('}attribute'))
         section, line = get_reference_keys(xml_node)
         obj = catalog[section][line]
         self.children.append(obj)
     
     def _parse_attributeGroup(self, xml_node, catalog):
-        '''
-        parse a xs:attributeGroup node
-        '''
+        """parse a xs:attributeGroup node"""
         assert(xml_node.tag.endswith('}attributeGroup'))
         ref = xml_node.attrib['ref'].split(':')[-1]
         obj = catalog['schema'][ref]
         self.children += obj.children
     
     def _parse_complexContent(self, xml_node, catalog):
-        '''
-        parse a xs:complexContent node
-        '''
+        """parse a xs:complexContent node"""
         assert(xml_node.tag.endswith('}complexContent'))
         self._parse_extension(xml_node[0], catalog)
     
     def _parse_element(self, xml_node, catalog):
-        '''
-        parse a xs:element node
-        '''
+        """parse a xs:element node"""
         assert(xml_node.tag.endswith('}element'))
         section, line = get_reference_keys(xml_node)
         obj = catalog[section][line]
         self.children.append(obj)
     
     def _parse_extension(self, xml_node, catalog):
-        '''
-        parse a xs:extension node
-        '''
+        """parse a xs:extension node"""
         assert(xml_node.tag.endswith('}extension'))
         ns = get_xml_namespace_dictionary()
 
@@ -304,18 +298,14 @@ class NXDL_schema_complexType(NXDL_schema__Mixin):
             self._parse_attribute(node, catalog)
     
     def _parse_group(self, xml_node, catalog):
-        '''
-        parse a xs:group node
-        '''
+        """parse a xs:group node"""
         assert(xml_node.tag.endswith('}group'))
         section, line = get_reference_keys(xml_node)
         obj = catalog[section][line]
         self.children.append(obj)
     
     def _parse_sequence(self, xml_node, catalog):
-        '''
-        parse a xs:sequence node
-        '''
+        """parse a xs:sequence node"""
         assert(xml_node.tag.endswith('}sequence'))
         ns = get_xml_namespace_dictionary()
 
@@ -328,9 +318,7 @@ class NXDL_schema_complexType(NXDL_schema__Mixin):
 
 
 class NXDL_schema__element(NXDL_schema__Mixin):
-    '''
-    a complete description of a specific NXDL xs:element node
-    '''
+    """a complete description of a specific NXDL xs:element node"""
     
     def __init__(self):
         self.children = []
@@ -340,9 +328,7 @@ class NXDL_schema__element(NXDL_schema__Mixin):
         self.maxOccurs = None
     
     def parse(self, xml_node):
-        '''
-        read the element node content from the XML Schema
-        '''
+        """read the element node content from the XML Schema"""
         assert(xml_node.tag.endswith('}element'))
         ns = get_xml_namespace_dictionary()
 
@@ -366,11 +352,11 @@ class NXDL_schema__element(NXDL_schema__Mixin):
 
 
 class NXDL_schema__group(NXDL_schema__Mixin):
-    '''
+    """
     node matches XPath query: ``//xs:group``
     
     xml_node is ``xs:group``
-    '''
+    """
 
     def __init__(self):
         self.children = []
@@ -380,9 +366,7 @@ class NXDL_schema__group(NXDL_schema__Mixin):
         self.maxOccurs = None
     
     def parse(self, xml_node):
-        '''
-        read the element node content from the XML Schema
-        '''
+        """read the element node content from the XML Schema"""
         assert(xml_node.tag.endswith('}group'))
         ns = get_xml_namespace_dictionary()
 
@@ -400,11 +384,11 @@ class NXDL_schema__group(NXDL_schema__Mixin):
 
 
 class NXDL_schema_named_simpleType(NXDL_schema__Mixin):
-    '''
+    """
     node matches XPath query: ``/xs:schema/xs:simpleType``
     
     xml_node is ``xs:simpleType``
-    '''
+    """
     
     def __init__(self):
         self.children = []
@@ -415,9 +399,7 @@ class NXDL_schema_named_simpleType(NXDL_schema__Mixin):
         #self.enums = []
     
     def parse(self, xml_node):
-        '''
-        read the attribute node content from the XML Schema
-        '''
+        """read the attribute node content from the XML Schema"""
         assert(xml_node.tag.endswith('}simpleType'))
         ns = get_xml_namespace_dictionary()
 
@@ -441,7 +423,7 @@ class NXDL_schema_named_simpleType(NXDL_schema__Mixin):
 
 
 class NXDL_item_catalog(object):
-    '''
+    """
     content from the NeXus XML Schema (``nxdl.xsd``)
     
     EXAMPLE:
@@ -450,7 +432,7 @@ class NXDL_item_catalog(object):
         catalog = NXDL_item_catalog(nxdl_xsd_file_name)
         definition = catalog.definition_element
     
-    '''
+    """
     
     def __init__(self, nxdl_file_name):
         self.db = {}
@@ -574,7 +556,7 @@ class NXDL_item_catalog(object):
 
 
 class NXDL_Summary(object):
-    '''
+    """
     provide an easy interface for the nxdl_manager
     
     USAGE::
@@ -583,7 +565,7 @@ class NXDL_Summary(object):
         ...
         summary.simpleType['validItemName'].patterns
     
-    '''
+    """
     
     def __init__(self, nxdl_xsd_file_name):
         self.definition = None

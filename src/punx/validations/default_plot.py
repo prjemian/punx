@@ -34,8 +34,8 @@ def verify(validator):
             c = "found by %s: %s" % (k, addr)
             status = finding.OK
     if status is None:
-        c = "complete path from root not found"
-        status = finding.NOTE
+        c = "no default plot described"
+        status = finding.ERROR
     validator.record_finding(obj, "NeXus default plot", status, c)
 
 
@@ -73,7 +73,8 @@ def default_plot_v3(validator):
     short_list = list(validator.classpaths.get("/NXentry/NXdata@signal", []))
     # TODO: why not look at every NXdata@signal?
 
-    final_list = []
+    h5_address = None
+    niac2014_path = []
     for v_item in short_list:
         # check existence of @default attributes, as well
         _root, entry, data = v_item.h5_address.split("@")[0].split("/") # noqa
@@ -89,17 +90,20 @@ def default_plot_v3(validator):
             status = finding.OK
             c = "correct default plot setup in /NXentry/NXdata"
             validator.record_finding(v_item, test_name + ", NXdata@signal", status, c)
+            h5_address = signal_h5_addr
         if t1 and t2 and t3 and t4:
             # this is the NIAC2014 test
-            final_list.append(v_item)
+            niac2014_path.append(v_item)
     
     # TODO: could also test /NXentry/NXdata@axes
-    if len(final_list) == 1:
-        v_item = final_list[0]
+    if len(niac2014_path) == 1:
+        v_item = niac2014_path[0]
         status = finding.OK
         c = "default plot setup in /NXentry/NXdata"
-        validator.record_finding(v_item, test_name, status, c)
+        validator.record_finding(v_item, test_name + " NIAC2014", status, c)
         return v_item.h5_address
+    
+    return h5_address
 
 
 def default_plot_v2(validator):

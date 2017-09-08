@@ -375,9 +375,12 @@ class Test_Default_Plot(unittest.TestCase):
 
         self.validator = punx.validate.Data_File_Validator(ref=DEFAULT_NXDL_FILE_SET)
         self.validator.validate(self.hdffile)
+        sum, count, score = self.validator.finding_score()
+        self.assertGreater(count, 0, "items counted for scoring")
+
         flist = self.locate_findings_by_test_name("NeXus default plot")
         self.assertEqual(len(flist), 1)
-        flist = self.locate_findings_by_test_name("NeXus default plot v3")
+        flist = self.locate_findings_by_test_name("NeXus default plot v3 NIAC2014")
         self.assertEqual(len(flist), 1)
         flist = self.locate_findings_by_test_name("NeXus default plot v3, NXdata@signal")
         self.assertEqual(len(flist), 1)
@@ -405,9 +408,13 @@ class Test_Default_Plot(unittest.TestCase):
 
         self.validator = punx.validate.Data_File_Validator(ref=DEFAULT_NXDL_FILE_SET)
         self.validator.validate(self.hdffile)
+        sum, count, score = self.validator.finding_score()
+        self.assertGreater(count, 0, "items counted for scoring")
+        self.assertGreater(sum, 0, "scoring detects no error")
+
         flist = self.locate_findings_by_test_name("NeXus default plot")
         self.assertEqual(len(flist), 1)
-        flist = self.locate_findings_by_test_name("NeXus default plot v3")
+        flist = self.locate_findings_by_test_name("NeXus default plot v3 NIAC2014")
         self.assertEqual(len(flist), 1)
         flist = self.locate_findings_by_test_name("NeXus default plot v3, NXdata@signal")
         self.assertEqual(len(flist), 3)
@@ -421,10 +428,14 @@ class Test_Default_Plot(unittest.TestCase):
 
         self.validator = punx.validate.Data_File_Validator(ref=DEFAULT_NXDL_FILE_SET)
         self.validator.validate(self.hdffile)
+        sum, count, score = self.validator.finding_score()
+        self.assertGreater(count, 0, "items counted for scoring")
+        self.assertLess(sum, 0, "scoring detects error(s)")
+
         test_name = "NeXus default plot"
         flist = self.locate_findings_by_test_name(test_name)
         self.assertEqual(len(flist), 0)
-        flist = self.locate_findings_by_test_name(test_name, punx.finding.NOTE)
+        flist = self.locate_findings_by_test_name(test_name, punx.finding.ERROR)
         self.assertEqual(len(flist), 1)
 
     def test_default_plot_v2_pass(self):
@@ -436,6 +447,10 @@ class Test_Default_Plot(unittest.TestCase):
 
         self.validator = punx.validate.Data_File_Validator(ref=DEFAULT_NXDL_FILE_SET)
         self.validator.validate(self.hdffile)
+        sum, count, score = self.validator.finding_score()
+        self.assertGreater(count, 0, "items counted for scoring")
+        self.assertGreater(sum, 0, "scoring detects no error")
+
         test_name = "NeXus default plot"
         flist = self.locate_findings_by_test_name(test_name)
         self.assertEqual(len(flist), 1)
@@ -451,10 +466,14 @@ class Test_Default_Plot(unittest.TestCase):
 
         self.validator = punx.validate.Data_File_Validator(ref=DEFAULT_NXDL_FILE_SET)
         self.validator.validate(self.hdffile)
+        sum, count, score = self.validator.finding_score()
+        self.assertGreater(count, 0, "items counted for scoring")
+        self.assertLess(sum, 0, "scoring detects error(s)")
+
         test_name = "NeXus default plot"
         flist = self.locate_findings_by_test_name(test_name)
         self.assertEqual(len(flist), 0)
-        flist = self.locate_findings_by_test_name(test_name, punx.finding.NOTE)
+        flist = self.locate_findings_by_test_name(test_name, punx.finding.ERROR)
         self.assertEqual(len(flist), 1)
 
     def test_default_plot_v2_fail_multi_signal(self):
@@ -466,10 +485,14 @@ class Test_Default_Plot(unittest.TestCase):
 
         self.validator = punx.validate.Data_File_Validator(ref=DEFAULT_NXDL_FILE_SET)
         self.validator.validate(self.hdffile)
+        sum, count, score = self.validator.finding_score()
+        self.assertGreater(count, 0, "items counted for scoring")
+        self.assertLess(sum, 0, "scoring detects error(s)")
+
         test_name = "NeXus default plot"
         flist = self.locate_findings_by_test_name(test_name)
         self.assertEqual(len(flist), 0)
-        flist = self.locate_findings_by_test_name(test_name, punx.finding.NOTE)
+        flist = self.locate_findings_by_test_name(test_name, punx.finding.ERROR)
         self.assertEqual(len(flist), 1)
         test_name = "NeXus default plot v2, @signal=1"
         flist = self.locate_findings_by_test_name(test_name)

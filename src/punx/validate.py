@@ -118,6 +118,19 @@ class Data_File_Validator(object):
         v_item.validations[key] = f
         return f
     
+    def finding_score(self):
+        """provide a numerical score for the set of findings"""
+        sum = 0
+        count = 0
+        for f in self.validations:
+            if f.status not in (finding.COMMENT, finding.UNUSED, finding.TODO):
+                sum += f.status.value
+                count += 1
+        if count == 0:
+            return sum, count, 0
+        else:
+            return sum, count, float(sum)/count
+
     def validate(self, fname):
         '''
         start the validation process from the file root

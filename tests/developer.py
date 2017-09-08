@@ -43,6 +43,7 @@ def reporter(validator):
         row.append(finding.comment)
         t.addRow(row)
     print(t)
+    print("sum=%d count=%d  score=%f" % validator.finding_score())
 
 
 def main():

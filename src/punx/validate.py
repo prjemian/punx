@@ -156,6 +156,7 @@ class Data_File_Validator(object):
         for v_list in self.classpaths.values():
             for v_item in v_list:
                 self.validate_item_name(v_item)
+                self.validate_attribute(v_item)
 
         # 2. check all base classes against defaults
         for k, v_item in self.addresses.items():
@@ -211,6 +212,10 @@ class Data_File_Validator(object):
     def validate_item_name(self, v_item, key=None):
         from .validations import item_name
         item_name.validate_item_name(self, v_item, key)
+
+    def validate_attribute(self, v_item):
+        from .validations import attribute
+        attribute.verify(self, v_item)
 
     def validate_group(self, v_item):
         """

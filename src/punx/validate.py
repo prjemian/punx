@@ -120,16 +120,16 @@ class Data_File_Validator(object):
     
     def finding_score(self):
         """provide a numerical score for the set of findings"""
-        sum = 0
+        score= 0
         count = 0
         for f in self.validations:
             if f.status not in (finding.COMMENT, finding.UNUSED, finding.TODO):
-                sum += f.status.value
+                score += f.status.value
                 count += 1
         if count == 0:
-            return sum, count, 0
+            return score, count, 0
         else:
-            return sum, count, float(sum)/count
+            return score, count, float(score)/count
 
     def validate(self, fname):
         '''

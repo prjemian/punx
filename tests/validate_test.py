@@ -238,13 +238,6 @@ class Test_Validate(unittest.TestCase):
         for f in self.validator.validations:
             self.assertTrue(f.status in acceptable_status, str(f))
 
-#         len_f = len(self.validator.validations)
-#         len_cp = 0
-#         for classpaths in self.validator.classpaths.values():
-#             for f in classpaths:
-#                 len_cp += len(f.validations)
-#         self.assertEqual(len_f, len_cp, "findings recorded in two places")
-
     def test_bad_link_target_value(self):
         # target attribute value points to non-existing item
         self.setup_simple_test_file(create_validator=False)

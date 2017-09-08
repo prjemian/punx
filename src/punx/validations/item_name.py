@@ -123,7 +123,7 @@ def validate_item_name(validator, v_item, key=None):
             if matches:
                 status = finding.OK
                 break
-        f = finding.Finding(v_item.h5_address, TEST_NAME, status, k)
+        f = finding.Finding(v_item.h5_address, TEST_NAME, status, k)    # noqa
         validator.validations.append(f)
         v_item.validations[key] = f
 

@@ -48,5 +48,5 @@ def verify(validator, v_item, base_class):
         t += " in " + v_item.h5_address + "/" + group_name
         validator.record_finding(v_item, test, f, t)
 
-    for link_name, link_obj in base_class.links.items():
+    for link_name, link_obj in base_class.links.items():        # noqa
         pass    # TODO: complete

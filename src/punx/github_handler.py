@@ -159,7 +159,7 @@ class GitHub_Repository_Reference(object):
 
         creds = get_BasicAuth_credentials()
         content = None
-        for _retry in range(GITHUB_RETRY_COUNT):
+        for _retry in range(GITHUB_RETRY_COUNT):        # noqa
             try:
                 if creds is None:
                     content = requests.get(self.zip_url, verify=False)

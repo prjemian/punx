@@ -129,6 +129,15 @@ def default_plot_v2(validator):
                         if group_name not in review_dict:
                             review_dict[group_name] = []
                         review_dict[group_name].append(v_item)
+                    else:
+                        status = finding.WARN
+                        c = "found field with @signal=" + signal
+                        c += ": " + v_item.h5_address
+                        validator.record_finding(
+                            v_item, 
+                            test_name + ", @signal!=1", 
+                            status, 
+                            c)
 
     addr = None
     for group_name, v_item_list in review_dict.items():

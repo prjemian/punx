@@ -22,6 +22,7 @@ ignore-paths:
   - versioneer.py
   - src/punx/_version.py
   - install_NXDL_file_sets.py
+  - _installer.py
 ignore-patterns:
   - ^example/doc_.*\.py$
   - (^|/)docs(/|$)

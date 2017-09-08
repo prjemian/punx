@@ -123,7 +123,7 @@ class Data_File_Validator(object):
         total= 0
         count = 0
         for f in self.validations:
-            if f.status not in (finding.COMMENT, finding.UNUSED, finding.TODO):
+            if f.status.value != 0:
                 total += f.status.value
                 count += 1
         if count == 0:
@@ -211,7 +211,7 @@ class Data_File_Validator(object):
 
     def validate_item_name(self, v_item, key=None):
         from .validations import item_name
-        item_name.validate_item_name(self, v_item, key)
+        item_name.verify(self, v_item, key)
 
     def validate_attribute(self, v_item):
         from .validations import attribute

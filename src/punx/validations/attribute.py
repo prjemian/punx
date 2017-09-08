@@ -11,6 +11,7 @@
 
 from .. import finding
 from .. import utils
+from . import item_name
 
 
 TEST_NAME = "attribute value"
@@ -100,7 +101,18 @@ def signal_handler(validator, v_item):
             c = "@signal=" + str(signal)
         validator.record_finding(v_item, TEST_NAME, status, c)
     elif utils.isHdf5Group(v_item.parent.h5_object):
-        # TODO: signal must obey validItemName relaxed
+        k = item_name.validItemName_match_key(validator, signal)
+        test_name = "valid name @signal=" + signal
+        if k is None:
+            status = finding.ERROR
+            k = "not a valid NeXus name"
+        else:
+            if k.startswith("strict"):
+                status = finding.OK
+            else:
+                status = finding.NOTE
+        validator.record_finding(v_item, test_name, status, k)
+
         test = signal in v_item.parent.h5_object
         status = finding.TF_RESULT[test]
         c = {True: "found", False: "not found"}[test]

@@ -13,7 +13,16 @@ from .. import finding
 from .. import utils
 
 
+def verify(validator, v_item, base_class):
+    """
+    Verify items presented in group (of data file) with base class NXDL
+    """
+    verify_group_attributes(validator, v_item, base_class)
+    verify_group_children(validator, v_item, base_class)
+
+
 def child_exists(validator, test_name, v, v_item, a_item):
+    """Is v a child of v_item?"""
     found = v in v_item.h5_object
     if found:
         status = finding.OK
@@ -28,11 +37,8 @@ def child_exists(validator, test_name, v, v_item, a_item):
     validator.record_finding(a_item, test_name, status, c)
 
 
-def verify(validator, v_item, base_class):
-    """
-    Verify items presented in group (of data file) with base class NXDL
-    """
-    # verify this group's attributes
+def verify_group_attributes(validator, v_item, base_class):
+    """verify the group's attributes"""
     for k, v in sorted(v_item.h5_object.attrs.items()):
         k = utils.decode_byte_string(k)
         v = utils.decode_byte_string(v)
@@ -98,7 +104,10 @@ def verify(validator, v_item, base_class):
             c += ": @" + k + " = " + v
             validator.record_finding(a_item, test_name, status, c)
 
-    # verify this group's children
+
+
+def verify_group_children(validator, v_item, base_class):
+    """verify the group's children (groups, fields)"""
     for child_name in v_item.h5_object:
         obj = v_item.h5_object[child_name]
         v_sub_item = validator.addresses[obj.name]

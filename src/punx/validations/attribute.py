@@ -29,9 +29,11 @@ def verify(validator, v_item):
     special_handlers = {
         "NX_class": nxclass_handler,
         "target": target_handler,
+        "default": generic_handler,
         "signal": signal_handler,
         "axes": generic_handler,
         "axis": generic_handler,
+        "primary": generic_handler,
         "units": units_handler,
         }
 

@@ -33,8 +33,9 @@ class ValidationResultStatus(object):
     :param str description: one-line summary
     """
     
-    def __init__(self, key, color, description):
+    def __init__(self, key, value, color, description):
         self.key = key
+        self.value = value
         self.color = color
         self.description = description
     
@@ -42,14 +43,14 @@ class ValidationResultStatus(object):
         return self.key
 
 
-OK       = ValidationResultStatus('OK',      'green',     'meets NeXus specification')
-NOTE     = ValidationResultStatus('NOTE',    'palegreen', 'does not meet NeXus specification, but acceptable')
-WARN     = ValidationResultStatus('WARN',    'yellow',    'does not meet NeXus specification, not generally acceptable')
-ERROR    = ValidationResultStatus('ERROR',   'red',       'violates NeXus specification')
-TODO     = ValidationResultStatus('TODO',    'blue',      'validation not implemented yet')
-UNUSED   = ValidationResultStatus('UNUSED',  'grey',      'optional NeXus item not used in data file')
-COMMENT  = ValidationResultStatus('COMMENT', 'grey',      'comment from the punx source code')
-OPTIONAL = ValidationResultStatus('OPTIONAL', 'grey',     'allowed by NeXus specification, not identified')
+OK       = ValidationResultStatus('OK',           100, 'green',     'meets NeXus specification')
+NOTE     = ValidationResultStatus('NOTE',          80, 'palegreen', 'does not meet NeXus specification, but acceptable')
+WARN     = ValidationResultStatus('WARN',          20, 'yellow',    'does not meet NeXus specification, not generally acceptable')
+ERROR    = ValidationResultStatus('ERROR', -100000000, 'red',       'violates NeXus specification')
+TODO     = ValidationResultStatus('TODO',           0, 'blue',      'validation not implemented yet')
+UNUSED   = ValidationResultStatus('UNUSED',         0, 'grey',      'optional NeXus item not used in data file')
+COMMENT  = ValidationResultStatus('COMMENT',        0, 'grey',      'comment from the punx source code')
+OPTIONAL = ValidationResultStatus('OPTIONAL',     100, 'grey',      'allowed by NeXus specification, not identified')
 
 VALID_STATUS_LIST = (OK, NOTE, WARN, ERROR, TODO, UNUSED, COMMENT, OPTIONAL)
 VALID_STATUS_DICT = {str(f): f for f in VALID_STATUS_LIST}
@@ -100,28 +101,3 @@ class Finding(object):
         h.update(b"\n")
         h.update(bytes(self.test_name))
         return h.hexdigest()
-
-
-class FindingResults(object):
-    """
-    various validations for a single hdf5 address (absolute path)
-    
-    :param str h5_address: address of h5py item
-    """
-    
-    def __init__(self, h5_address):
-        self.h5_address = h5_address
-        self.validations = {}      # keep list of all validations for this address
-    
-    def __str__(self, *args, **kwargs):
-        return self.h5_address
-    
-    def add(self, f):
-        """add a finding"""
-        if f.h5_address != self.h5_address:
-            msg = "Finding at %s does not match %s" % (f.h5_address, self.h5_address)
-            raise KeyError(msg)
-        if f.test_name in self.validations:
-            msg = "Duplicate test: %s" % str(f)
-            raise KeyError(msg)
-        self.validations[f.test_name] = f

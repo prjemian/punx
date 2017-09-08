@@ -78,15 +78,6 @@ class Test_Finding(unittest.TestCase):
         self.assertEqual(f.status, punx.finding.OK, "assigned OK finding")
 
 
-class Test_FindingResults(unittest.TestCase):
- 
-    def test_standard(self):
-        r = punx.finding.FindingResults("h5_address")
-        self.assertTrue(isinstance(r, punx.finding.FindingResults))
-        self.assertEqual(r.h5_address, "h5_address", "assigned h5_address")
-        self.assertEqual(str(r), "h5_address", "default str representation")
-
-
 class Test_Global(unittest.TestCase):
 
     def test_standard(self):

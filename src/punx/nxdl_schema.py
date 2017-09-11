@@ -652,13 +652,3 @@ def print_tree(obj, level=0):
                 c, d = print_tree(child, level+1)
                 count = keep_stats(count, db, c, d)
     return count, db
-
-
-# def issue_67_main():
-#     summary = NXDL_Summary(NXDL_TEST_FILE)
-#     count, db = print_tree(summary.definition)
-#     print(count, db)
-# 
-# 
-# if __name__ == '__main__':
-#     issue_67_main()

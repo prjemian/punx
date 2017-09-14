@@ -599,11 +599,26 @@ class Test_Default_Plot(unittest.TestCase):
         self.setup_simple_test_file()
 
 
+class Test_Example_data(unittest.TestCase):
+    
+    def setUp(self):
+        self.path = os.path.abspath(os.path.dirname(punx.__file__))
+        self.path = os.path.join(self.path, "data")
+
+    def test_Data_Q(self):
+        self.hdffile = os.path.join(self.path, "Data_Q.h5")
+        self.validator = punx.validate.Data_File_Validator(ref=DEFAULT_NXDL_FILE_SET)
+        self.validator.validate(self.hdffile)
+
+        # TODO: assert that /entry/data@axes has NOT been defined properly
+
+
 def suite(*args, **kw):
     test_suite = unittest.TestSuite()
     test_list = [
         Test_Constructor,
         Test_Constructor_Exceptions,
+        Test_Example_data,
         Test_Validate,
         Test_Default_Plot,
         ]

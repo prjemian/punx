@@ -107,11 +107,63 @@ class Test_Constructor(unittest.TestCase):
 
 class Test_Changing_NXDL_Rules(unittest.TestCase):
 
+    def setUp(self):
+        # create the test file
+        tfile = tempfile.NamedTemporaryFile(suffix='.hdf5', delete=False)
+        tfile.close()
+        self.hdffile = tfile.name
+        self.validator = None
+     
+    def tearDown(self):
+        if self.validator is not None:
+            self.validator.close()
+            self.validator = None
+        os.remove(self.hdffile)
+        self.hdffile = None
+
     def test_tba(self):
-        # TODO: (#91) test something that is defined in 
-        #       one NXDL file set but not another,
-        #       such as: NXdata group not required after NIAC2016
-        assertTrue(True)
+        """
+        check for changes in NXDL rules
+
+        (#91) test something that is defined in 
+        one NXDL file set but not another,
+        such as: NXdata group not required after NIAC2016
+        """
+        # minimal test file
+        f = h5py.File(self.hdffile)
+        eg = f.create_group(u"entry")
+        eg.attrs[u"NX_class"] = u"NXentry"
+        eg.create_dataset(u"title", data=u"NXdata group not provided")
+        f.close()
+
+        refs = dict(nxdata_required=u"v3.2", nxdata_not_required=u"v3.3")
+        self.validator = {}
+        
+        ref = refs["nxdata_required"]
+        try:
+            self.validator = punx.validate.Data_File_Validator(ref=ref)
+        except KeyError:
+            msg = u"NXDL rule set %s not installed, cannot test" % ref
+            self.assertTrue(False, msg)
+        self.validator.validate(self.hdffile)
+        self.assertTrue(u"NXentry/NXdata" not in self.validator.classpaths)
+        entry = self.validator.addresses[u"/entry"].validations
+        # TODO: look in "entry" for Finding with ERROR because NXdata is required
+        found = [v for v in entry if v == punx.finding.ERROR]
+        self.assertEqual(len(found), 1, "ERROR located")  # FIXME: test is not robust
+        self.validator.close()
+
+        ref = refs["nxdata_not_required"]
+        try:
+            self.validator = punx.validate.Data_File_Validator(ref=ref)
+        except KeyError:
+            msg = u"NXDL rule set %s not installed, cannot test" % ref
+            self.assertTrue(False, msg)
+        self.validator.validate(self.hdffile)
+        self.assertTrue(u"NXentry/NXdata" not in self.validator.classpaths)
+        entry = self.validator.addresses[u"/entry"].validations
+        # TODO: look in "entry" for absence of Finding with ERROR because NXdata is not required
+        pass
 
 
 class Test_Validate(unittest.TestCase):
@@ -504,10 +556,11 @@ class Test_Default_Plot(unittest.TestCase):
 def suite(*args, **kw):
     test_suite = unittest.TestSuite()
     test_list = [
-        Test_Constructor,
-        Test_Constructor_Exceptions,
-        Test_Validate,
-        Test_Default_Plot,
+#         Test_Constructor,
+#         Test_Constructor_Exceptions,
+#         Test_Validate,
+#         Test_Default_Plot,
+        Test_Changing_NXDL_Rules,
         ]
     for test_case in test_list:
         test_suite.addTest(unittest.makeSuite(test_case))

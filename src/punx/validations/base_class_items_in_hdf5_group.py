@@ -34,7 +34,7 @@ def verify(validator, v_item, base_class):
         c += field_name
         validator.record_finding(v_item, test, f, c)
 
-    for group_name in sorted(base_class.groups.keys()):
+    for group_name, group_object in sorted(base_class.groups.items()):
         test = "NXDL group in data file"
         f = finding.OK
         found = group_name in v_item.h5_object
@@ -46,6 +46,11 @@ def verify(validator, v_item, base_class):
             f = finding.OPTIONAL
         t += " in " + v_item.h5_address + "/" + group_name
         validator.record_finding(v_item, test, f, t)
+        
+        if "minOccurs" in group_object.attributes:
+            minOccurs = group_object.attributes["minOccurs"]
+            required = minOccurs in (1, "1")
+            pass        # FIXME: report if required item is present, name could be flexible
 
     for link_name, link_obj in base_class.links.items():        # noqa
         pass    # TODO: complete

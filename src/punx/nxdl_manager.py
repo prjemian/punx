@@ -517,6 +517,9 @@ class NXDL__group(NXDL__Mixin):
         self.name = xml_node.attrib.get('name', xml_node.attrib['type'][2:])
 
         self.parse_attributes(xml_node)
+        for k, v in xml_node.attrib.items():
+            if k not in ("name", "type"):
+                self.attributes[k] = v   # FIXME: should be NXDL__attribute instance
         self.parse_groups(xml_node)
         self.parse_fields(xml_node)
         self.parse_links(xml_node)

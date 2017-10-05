@@ -33,6 +33,7 @@ def verify(validator):
         if addr is not None:
             c = "found by %s: %s" % (k, addr)
             status = finding.OK
+            break       # no need to look further
     if status is None:
         c = "no default plot described"
         status = finding.ERROR

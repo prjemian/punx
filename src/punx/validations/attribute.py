@@ -31,7 +31,7 @@ def verify(validator, v_item):
         "target": target_handler,
         "default": generic_handler,
         "signal": signal_handler,
-        "axes": generic_handler,
+        "axes": axes_handler,
         "axis": generic_handler,
         "primary": generic_handler,
         "units": units_handler,
@@ -65,6 +65,20 @@ def isBaseClassNXDL(nxdl):
         definition = nxentry.fields.get("definition")
         return definition is None
     return False
+
+
+def axes_handler(validator, v_item):
+    """
+    validate @axes
+    """
+    axes_attr = v_item.h5_object
+    # if this is not an array, make it axes_attr_array
+    
+    # TODO: need to know shape of signal data
+    # TODO: compare len(axes_attr_array) with range of signal data
+    # TODO: check each value of array that is a validItemName and points to actual local field
+
+    generic_handler(validator, v_item)
 
 
 def nxclass_handler(validator, v_item):

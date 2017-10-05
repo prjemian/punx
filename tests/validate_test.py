@@ -392,6 +392,104 @@ class Test_Validate(unittest.TestCase):
         self.validator.validate(self.hdffile)
         # TODO: assert what now?
 
+    def test_axes_attribute_1D__pass(self):
+        f = h5py.File(self.hdffile)
+        f.attrs["default"] = "entry"
+
+        eg = f.create_group("entry")
+        eg.attrs["NX_class"] = "NXentry"
+        eg.attrs["default"] = "data"
+
+        dg = eg.create_group("data")
+        dg.attrs["NX_class"] = "NXdata"
+        dg.attrs["signal"] = "data"
+
+        vec = [1, 2, 3.14]
+        ds = dg.create_dataset("data", data=vec)
+        ds.attrs["units"] = "arbitrary"
+
+        ds = dg.create_dataset("x", data=vec)
+        ds.attrs["units"] = "m"
+
+        dg.attrs["axes"] = "x"
+        dg.attrs["x_indices"] = [0]
+
+        f.close()
+
+        self.validator = punx.validate.Data_File_Validator(ref=DEFAULT_NXDL_FILE_SET)
+        self.validator.validate(self.hdffile)
+
+        # TODO: assert that @axes has been defined properly
+        # TODO: assert that @x_indices has been defined properly
+    
+    def test_axes_attribute_2D__pass(self):
+        f = h5py.File(self.hdffile)
+        f.attrs["default"] = "entry"
+
+        eg = f.create_group("entry")
+        eg.attrs["NX_class"] = "NXentry"
+        eg.attrs["default"] = "data"
+
+        dg = eg.create_group("data")
+        dg.attrs["NX_class"] = "NXdata"
+        dg.attrs["signal"] = "data"
+
+        vec = [1, 2, 3.14]
+        ds = dg.create_dataset("data", data=[vec, vec, vec])
+        ds.attrs["units"] = "arbitrary"
+
+        ds = dg.create_dataset("x", data=vec)
+        ds.attrs["units"] = "m"
+
+        ds = dg.create_dataset("y", data=vec)
+        ds.attrs["units"] = "mm"
+
+        dg.attrs["axes"] = ["x", "y"]
+        dg.attrs["x_indices"] = [0]
+        dg.attrs["y_indices"] = [1]
+
+        f.close()
+
+        self.validator = punx.validate.Data_File_Validator(ref=DEFAULT_NXDL_FILE_SET)
+        self.validator.validate(self.hdffile)
+
+        # TODO: assert that @axes has been defined properly
+        # TODO: assert that @x_indices has been defined properly
+        # TODO: assert that @y_indices has been defined properly
+
+    def test_axes_attribute_2D__fail(self):
+        f = h5py.File(self.hdffile)
+        f.attrs["default"] = "entry"
+
+        eg = f.create_group("entry")
+        eg.attrs["NX_class"] = "NXentry"
+        eg.attrs["default"] = "data"
+
+        dg = eg.create_group("data")
+        dg.attrs["NX_class"] = "NXdata"
+        dg.attrs["signal"] = "data"
+
+        vec = [1, 2, 3.14]
+        ds = dg.create_dataset("data", data=[vec, vec, vec])
+        ds.attrs["units"] = "arbitrary"
+
+        ds = dg.create_dataset("x", data=vec)
+        ds.attrs["units"] = "m"
+
+        ds = dg.create_dataset("y", data=vec)
+        ds.attrs["units"] = "mm"
+
+        dg.attrs["axes"] = ["x,y"]
+        dg.attrs["x_indices"] = [0]
+        dg.attrs["y_indices"] = [1]
+
+        f.close()
+
+        self.validator = punx.validate.Data_File_Validator(ref=DEFAULT_NXDL_FILE_SET)
+        self.validator.validate(self.hdffile)
+
+        # TODO: assert that @axes has NOT been defined properly
+
 
 class Test_Default_Plot(unittest.TestCase):
 
@@ -574,11 +672,26 @@ class Test_Default_Plot(unittest.TestCase):
         self.setup_simple_test_file()
 
 
+class Test_Example_data(unittest.TestCase):
+    
+    def setUp(self):
+        self.path = os.path.abspath(os.path.dirname(punx.__file__))
+        self.path = os.path.join(self.path, "data")
+
+    def test_Data_Q(self):
+        self.hdffile = os.path.join(self.path, "Data_Q.h5")
+        self.validator = punx.validate.Data_File_Validator(ref=DEFAULT_NXDL_FILE_SET)
+        self.validator.validate(self.hdffile)
+
+        # TODO: assert that /entry/data@axes has NOT been defined properly
+
+
 def suite(*args, **kw):
     test_suite = unittest.TestSuite()
     test_list = [
 #         Test_Constructor,
 #         Test_Constructor_Exceptions,
+#         Test_Example_data,
 #         Test_Validate,
 #         Test_Default_Plot,
         Test_Changing_NXDL_Rules,

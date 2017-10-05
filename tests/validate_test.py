@@ -121,13 +121,34 @@ class Test_Changing_NXDL_Rules(unittest.TestCase):
         os.remove(self.hdffile)
         self.hdffile = None
 
-    def test_tba(self):
+    def test_NXdata_requirement_or_optional(self):
         """
         check for changes in NXDL rules
 
         (#91) test something that is defined in 
         one NXDL file set but not another,
         such as: NXdata group not required after NIAC2016
+        
+        Before v3.2, part of the NXentry definition read::
+        
+            <group type="NXdata" minOccurs="1">
+                <doc>The required data group</doc>
+            </group>
+        
+        With v3.2 and after, the same part was changed to::
+        
+            <group type="NXdata">
+                <doc>
+                    The data group
+                </doc>
+            </group>
+        
+        note:  v3.1.0 had a much simpler version::
+        
+            <group type="NXdata" />
+        
+        It was stated only in the manual that NXdata 
+        was required.  Not suitable for automated validation.
         """
         # minimal test file
         f = h5py.File(self.hdffile)
@@ -136,7 +157,7 @@ class Test_Changing_NXDL_Rules(unittest.TestCase):
         eg.create_dataset(u"title", data=u"NXdata group not provided")
         f.close()
 
-        refs = dict(nxdata_required=u"v3.2", nxdata_not_required=u"v3.3")
+        refs = dict(nxdata_required=u"a4fd52d", nxdata_not_required=u"v3.3")
         self.validator = {}
         
         ref = refs["nxdata_required"]

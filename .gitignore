@@ -6,6 +6,9 @@ src/punx/__github_creds__.txt
 # local NXDL source cache (to be packaged with sdist)
 #src/punx/cache/*
 
+# eclipse/PyDev
+.pydevproject
+
 # C extensions
 *.so
 

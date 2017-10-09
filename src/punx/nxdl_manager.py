@@ -176,6 +176,7 @@ class NXDL__Mixin(object):
 
             if self.nxdl_definition.category in ('applications', ):
                 # handle contributed definitions as base classes (for now, minOccurs = 0)
+                # TODO: test for hasattr(base class, "definition")
                 obj.xml_attributes['optional'].default_value = False
 
             # Does a default already exist?

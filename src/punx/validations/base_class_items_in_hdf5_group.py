@@ -47,10 +47,14 @@ def verify(validator, v_item, base_class):
         t += " in " + v_item.h5_address + "/" + group_name
         validator.record_finding(v_item, test, f, t)
         
-        if "minOccurs" in group_object.attributes:
-            minOccurs = group_object.attributes["minOccurs"]
-            required = minOccurs in (1, "1")
-            pass        # FIXME: report if required item is present, name could be flexible
+        #---------- this code is in the wrong place: to nxdl_manager -----
+        minOccurs = 0
+        if hasattr(base_class, "definition"):   # application definition
+            minOccurs = 1
+        minOccurs = int(group_object.attributes.get("minOccurs", minOccurs))
+        group_object.minOccurs = minOccurs
+        #---------------------------------------------------------
+        pass        # FIXME: report if required item is present, name could be flexible
 
     for link_name, link_obj in base_class.links.items():        # noqa
         pass    # TODO: complete

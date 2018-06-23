@@ -327,9 +327,9 @@ class CacheManager(singletons.Singleton):
         logger.debug(msg)
 
         for k, v in self.user.find_all_file_sets().items():
-            if k in fs:
-                raise ValueError('user cache file set already known: ' + k)
-            else:
+            if k not in fs:
+            #     raise ValueError('user cache file set already known: ' + k)
+            # else:
                 fs[k] = v
                 
         self.NXDL_file_sets = fs    # remember

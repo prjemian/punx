@@ -1,7 +1,7 @@
 {
   "# description": "NXDL files downloaded from GitHub repository", 
   "zip_url": "https://api.github.com/repos/nexusformat/definitions/zipball/v3.3", 
-  "# written": "2017-07-14 08:23:21.673000", 
+  "# written": "2017-07-21 23:31:25.148918", 
   "sha": "9285af9c80ff5bc4e908ee8aae300f974dda7d38", 
   "last_modified": "2017-07-12 17:41:13", 
   "ref_type": "release", 

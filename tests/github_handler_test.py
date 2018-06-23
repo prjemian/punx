@@ -17,6 +17,8 @@ SRC_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src'))
 sys.path.insert(0, SRC_PATH)
 import punx, punx.github_handler
 
+CANONICAL_RELEASE = u'v3.3'
+
 
 class Test_Github_Handler_Module(unittest.TestCase):
     
@@ -27,9 +29,9 @@ class Test_Github_Handler_Module(unittest.TestCase):
         self.assertEqual(punx.github_handler.DEFAULT_BRANCH_NAME, 
                          u'master', 
                          u'default branch: ' + punx.github_handler.DEFAULT_BRANCH_NAME)
-        self.assertEqual(u'v3.2', 
-                         u'v3.2', 
-                         u'release: v3.2')
+        self.assertEqual(u'v3.3', 
+                         u'v3.3', 
+                         u'release: v3.3')
         self.assertEqual(punx.github_handler.DEFAULT_RELEASE_NAME, 
                          u'v3.3', 
                          u'default release: v3.3')
@@ -93,11 +95,11 @@ class Test_Github_Handler_Module(unittest.TestCase):
         node = grr.get_release()
         self.assertTrue(isinstance(node, (type(None), github.GitRelease.GitRelease)), 
                         u'grr.get_release() returns ' + str(type(node)))
-        node = grr.request_info(u'v3.2')
+        node = grr.request_info(CANONICAL_RELEASE)
         self.assertTrue(isinstance(node, (type(None), github.GitRelease.GitRelease)), 
-                        u'grr.request_info("v3.2") returns a Release()')
+                        u'grr.request_info("{}") returns a Release()'.format(CANONICAL_RELEASE))
         if node is not None:
-            self.assertEqual(grr.ref, u'v3.2', u'ref: ' + grr.ref)
+            self.assertEqual(grr.ref, CANONICAL_RELEASE, u'ref: ' + grr.ref)
             self.assertEqual(grr.ref_type, u'release', u'ref_type: ' + grr.ref_type)
             self.assertNotEqual(grr.sha, None, u'sha: ' + grr.sha)
             self.assertNotEqual(grr.zip_url, None, u'zip_url: ' + grr.zip_url)

@@ -42,12 +42,12 @@ class ValidationResultStatus(object):
     def __str__(self, *args, **kwargs):
         return self.key
 
-VERY_BAD = -1.0e10
+VERY_BAD = -10000000
 OK       = ValidationResultStatus('OK',         100, 'green',     'meets NeXus specification')
 NOTE     = ValidationResultStatus('NOTE',        80, 'palegreen', 'does not meet NeXus specification, but acceptable')
 WARN     = ValidationResultStatus('WARN',        20, 'yellow',    'does not meet NeXus specification, not generally acceptable')
 ERROR    = ValidationResultStatus('ERROR', VERY_BAD, 'red',       'violates NeXus specification')
-TODO     = ValidationResultStatus('TODO',         5, 'blue',      'validation not implemented yet')
+TODO     = ValidationResultStatus('TODO',        50, 'blue',      'validation not implemented yet')
 UNUSED   = ValidationResultStatus('UNUSED',       0, 'grey',      'optional NeXus item not used in data file')
 COMMENT  = ValidationResultStatus('COMMENT',      0, 'grey',      'comment from the punx source code')
 OPTIONAL = ValidationResultStatus('OPTIONAL',    99, 'grey',      'allowed by NeXus specification, not identified')

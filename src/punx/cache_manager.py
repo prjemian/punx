@@ -307,7 +307,7 @@ class CacheManager(singletons.Singleton):
         def sorter(value):
             return self.NXDL_file_sets[value].last_modified
 
-        if len(self.NXDL_file_sets) > 0:
+        if ref is None and len(self.NXDL_file_sets) > 0:
             ref = ref or sorted(self.NXDL_file_sets, key=sorter, reverse=True)[0]
         ref = ref or github_handler.DEFAULT_NXDL_SET
         logger.debug(' final ref: ' + str(ref))

@@ -65,11 +65,11 @@ class Test_CacheManager_class(unittest.TestCase):
                 u'the default NXDL file set is in the cache')
             cm.cleanup()
     
-    def test_default_file_set(self):
+    def test_selected_file_set(self):
         import punx.github_handler
         cm = punx.cache_manager.CacheManager()
         if cm is not None:
-            fs = cm.select_NXDL_file_set()
+            fs = cm.select_NXDL_file_set(punx.github_handler.DEFAULT_NXDL_SET)
             self.assertEqual(fs.ref, punx.github_handler.DEFAULT_NXDL_SET, u'ref: ' + fs.ref)
             self.assertEqual(fs.cache, u'source', u'in source cache: ' + fs.cache)
             cm.cleanup()

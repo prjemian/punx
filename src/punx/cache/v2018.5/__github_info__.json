@@ -1,0 +1,9 @@
+{
+  "# description": "NXDL files downloaded from GitHub repository", 
+  "zip_url": "https://api.github.com/repos/nexusformat/definitions/zipball/v2018.5", 
+  "# written": "2018-06-24 12:57:20.657454", 
+  "sha": "a3045fd7ff0029adc811d9ed92f42ad51007f32d", 
+  "last_modified": "2018-05-15 16:34:19", 
+  "ref_type": "release", 
+  "ref": "v2018.5"
+}

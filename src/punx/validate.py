@@ -20,6 +20,7 @@ PUBLIC
 .. autosummary::
    
    ~Data_File_Validator
+   ~print_report
 
 INTERNAL
 
@@ -33,6 +34,7 @@ import collections
 import h5py
 import logging
 import os
+import pyRestTable
 
 from . import FileNotFound, HDF5_Open_Error
 from . import finding
@@ -165,6 +167,47 @@ class Data_File_Validator(object):
             summary[f.status] += 1
         return summary
 
+    def print_report(self):
+        """
+        print a validation report
+        """
+        print("data file: " + self.fname)
+        print("NeXus definitions ({}): {}, dated {}, sha={}\n".format(
+            self.manager.nxdl_file_set.ref_type,
+            self.manager.nxdl_file_set.ref,
+            self.manager.nxdl_file_set.last_modified,
+            self.manager.nxdl_file_set.sha,
+            ))
+    
+        print("findings")
+        t = pyRestTable.Table()
+        for label in "address status test comments".split():
+            t.addLabel(label)
+        for f in self.validations:
+            if f.status == finding.OPTIONAL:
+                continue    # enable if you like verbose reports
+            row = []
+            row.append(f.h5_address)
+            row.append(f.status)
+            row.append(f.test_name)
+            row.append(f.comment)
+            t.addRow(row)
+        print(t)
+    
+        summary = self.finding_summary()
+        t = pyRestTable.Table()
+        for label in "status count description (value)".split():
+            t.addLabel(label)
+        for s, c in summary.items():
+            row = [s.key, c, s.description, s.value]
+            t.addRow(row)
+        t.addRow(["", "--", "", ""])
+        t.addRow(["TOTAL", sum(summary.values()), "", ""])
+        print("\nsummary statistics")
+        print(t)
+        total, count, average = self.finding_score()
+        print("<value>/finding=%f  count=%d  sum(finding values)=%f" % (average, count, total))
+
     def validate(self, fname):
         """start the validation process from the file root"""
         from .validations import default_plot
@@ -270,12 +313,6 @@ class Data_File_Validator(object):
         elif v_item.classpath == "":
             nx_class = "NXroot"    # handle as NXroot
         else:
-            # self.record_finding(
-            #     v_item, 
-            #     key,
-            #     finding.OK, 
-            #     "not a NeXus group")
-            # return
             raise ValueError("unexpected: " + str(v_item))
 
         # print(str(v_item), v_item.name, v_item.classpath)

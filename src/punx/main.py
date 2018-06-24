@@ -60,9 +60,10 @@ import sys
 from .__init__ import __version__, __package_name__, __url__
 #from .__init__ import LOG_MESSAGE, DEFAULT_LOG_LEVEL, DEBUG, NOISY, CRITICAL, ERROR
 from .__init__ import FileNotFound, HDF5_Open_Error, SchemaNotFound
-#from . import finding
 from . import finding
 # import logs
+from . import cache_manager
+from . import github_handler
 
 
 CONSOLE_LOGGING_DEFAULT_CHOICE = '__console__'
@@ -167,9 +168,40 @@ def func_tree(args):
         print('\n'.join(report or ''))
 
 
+def _install(cm, grr, ref, use_user_cache = True, force = False):
+    """
+    Install or update the named NXDL file reference
+    """
+    force = force or ref == "master"    # always update from the master branch
+
+    msg = " install_NXDL_file_set(ref=%s, force=%s, user_cache=%s)"
+    msg = msg % (ref, str(force), str(use_user_cache))
+    #logging.info(msg)
+
+    m = cm.install_NXDL_file_set(
+        grr, 
+        user_cache=use_user_cache, 
+        ref=ref,
+        force = force)
+    if isinstance(m, list):
+        print(str(m[-1]))
+
+
 def func_update(args):
-    import cache
-    cache.update_NXDL_Cache(force_update=args.force)
+    # import cache
+    # cache.update_NXDL_Cache(force_update=args.force)
+    cm = cache_manager.CacheManager()
+    print(cm.table_of_caches())
+
+    if args.try_to_install_or_update:
+        grr = github_handler.GitHub_Repository_Reference()
+        grr.connect_repo()
+        cm.find_all_file_sets()
+        
+        for ref in args.file_set_list:
+            _install(cm, grr, ref, force=args.force)
+        
+        print(cm.table_of_caches())
 
 
 def func_validate(args):
@@ -351,11 +383,12 @@ def parse_command_line_arguments():
                         dest='show_attributes',
                         help='Do not print attributes of HDF5 file structure')
     help_text = 'maximum number of array items to be shown'
-    p_tree.add_argument('-m', '--max_array_items',
-                       default=5,
-                       type=int,
-                       #choices=range(1,51),
-                       help=help_text)
+    p_tree.add_argument(
+        '-m', '--max_array_items',
+        default=5,
+        type=int,
+        #choices=range(1,51),
+        help=help_text)
     add_logging_argument(p_tree)
 
 
@@ -363,10 +396,27 @@ def parse_command_line_arguments():
     help_text = 'update the local cache of NeXus definitions'
     p_update = subcommand.add_parser('update', help=help_text)
     p_update.set_defaults(func=func_update)
-    p_update.add_argument('-f', '--force', 
-                               action='store_true', 
-                               default=False, 
-                               help='force update (if GitHub available)')
+
+    help_text = "name(s) of reference NeXus NXDL file set"
+    help_text += " (GitHub tag, hash, version, or 'master')"
+    help_text += " -- default master"
+    p_update.add_argument(
+        '-r', '--file_set_list',
+        default=["master", ],
+        nargs='*',
+        help=help_text)
+
+    p_update.add_argument("-i", "--install",
+        action='store_false', 
+        default=True,
+        dest='try_to_install_or_update',
+        help='Do not install (or update) -- default True')
+
+    p_update.add_argument(
+        '-f', '--force', 
+        action='store_true', 
+        default=False, 
+        help='force update (if GitHub available)')
     add_logging_argument(p_update)
 
 

@@ -304,6 +304,11 @@ class CacheManager(singletons.Singleton):
         """
         logger.debug(' given ref: ' + str(ref))
 
+        def sorter(value):
+            return self.NXDL_file_sets[value].last_modified
+
+        if len(self.NXDL_file_sets) > 0:
+            ref = ref or sorted(self.NXDL_file_sets, key=sorter, reverse=True)[0]
         ref = ref or github_handler.DEFAULT_NXDL_SET
         logger.debug(' final ref: ' + str(ref))
 
@@ -323,7 +328,7 @@ class CacheManager(singletons.Singleton):
         """return dictionary of all NXDL file sets in both source & user caches"""
         fs = {k: v for k, v in self.source.find_all_file_sets().items()}
         msg = ' source file set names: ' 
-        msg += str(sorted(list(fs.keys())))
+        msg += str(sorted(list(fs.keys()))) 
         logger.debug(msg)
 
         for k, v in self.user.find_all_file_sets().items():

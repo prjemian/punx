@@ -120,7 +120,13 @@ class Data_File_Validator(object):
         return f
     
     def finding_score(self):
-        """provide a numerical score for the set of findings"""
+        """
+        return a numerical score for the set of findings
+        
+        count: number of findings
+        total: sum of status values for all findings
+        score: total / count -- average status / finding
+        """
         total= 0
         count = 0
         for f in self.validations:
@@ -131,6 +137,33 @@ class Data_File_Validator(object):
             return total, count, 0
         else:
             return total, count, float(total)/count
+    
+    def finding_summary(self, report_statuses=None):
+        """
+        return a summary dictionary of the count of findings by status
+
+        summary statistics
+        ======= ===== ===========================================================
+        status  count description                                                
+        ======= ===== ===========================================================
+        OK      10    meets NeXus specification                                  
+        NOTE    1     does not meet NeXus specification, but acceptable          
+        WARN    0     does not meet NeXus specification, not generally acceptable
+        ERROR   0     violates NeXus specification                               
+        TODO    3     validation not implemented yet                             
+        UNUSED  2     optional NeXus item not used in data file                  
+        COMMENT 0     comment from the punx source code                          
+        --      --    --                                                         
+        TOTAL   16    --                                                         
+        ======= ===== ===========================================================
+        """
+        report_statuses = report_statuses or finding.VALID_STATUS_LIST
+        summary = collections.OrderedDict()
+        for status in report_statuses:
+            summary[status] = 0
+        for f in self.validations:
+            summary[f.status] += 1
+        return summary
 
     def validate(self, fname):
         """start the validation process from the file root"""

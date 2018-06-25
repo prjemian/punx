@@ -20,7 +20,7 @@ main user interface file
 
 ::
 
-    usage: punx [-h] [-v] {hierarchy,show,tree,update,validate} ...
+    usage: punx [-h] [-v] {demonstrate,tree,update,validate} ...
     
     Python Utilities for NeXus HDF5 files URL: http://punx.readthedocs.io
     v0.0.1+4.gff00892.dirty
@@ -68,8 +68,6 @@ logging.basicConfig(
 from .__init__ import __version__, __package_name__, __url__
 from .__init__ import FileNotFound, HDF5_Open_Error, SchemaNotFound
 from . import finding
-from . import cache_manager
-from . import github_handler
 from . import utils
 
 logger = utils.setup_logger(__name__, logging.INFO)
@@ -191,6 +189,9 @@ def _install(cm, grr, ref, use_user_cache = True, force = False):
 
 
 def func_update(args):
+    from . import cache_manager
+    from . import github_handler
+
     cm = cache_manager.CacheManager()
     print(cm.table_of_caches())
 
@@ -206,54 +207,43 @@ def func_update(args):
 
 
 def func_validate(args):
-    import validate
+    from . import validate
 
     if args.infile.endswith('.nxdl.xml'):
         result = validate.validate_xml(args.infile)
         if result is None:
             print(args.infile, ' validates')
-    else:
-        try:
-            validator = validate.Data_File_Validator(args.infile)
-        except FileNotFound:
-            exit_message('File not found: ' + args.infile)
-        except HDF5_Open_Error:
-            exit_message('Could not open as HDF5: ' + args.infile)
-        except SchemaNotFound as _exc:
-            exit_message(str(_exc))
-    
-        # determine which findings are to be reported
-        report_choices, trouble = [], []
-        for c in args.report.upper().split(','):
-            if c in finding.VALID_STATUS_DICT:
-                report_choices.append(finding.VALID_STATUS_DICT[c])
-            else:
-                trouble.append(c)
-        if len(trouble) > 0:
-            msg = 'invalid choice(s) for *--report* option: '
-            msg += ','.join(trouble)
-            msg += '\n'
-            msg += '\t' + 'available choices: '
-            msg += ','.join(sorted(finding.VALID_STATUS_DICT.keys()))
-            exit_message(msg)
+        return
 
+    validator = validate.Data_File_Validator()
+
+    # determine which findings are to be reported
+    report_choices, trouble = [], []
+    for c in args.report.upper().split(','):
+        if c in finding.VALID_STATUS_DICT:
+            report_choices.append(finding.VALID_STATUS_DICT[c])
+        else:
+            trouble.append(c)
+    if len(trouble) > 0:
+        msg = 'invalid choice(s) for *--report* option: '
+        msg += ','.join(trouble)
+        msg += '\n'
+        msg += '\t' + 'available choices: '
+        msg += ','.join(sorted(finding.VALID_STATUS_DICT.keys()))
+        exit_message(msg)
+
+    try:
         # run the validation
-        validator.validate()
+        validator.validate(args.infile)
+    except FileNotFound:
+        exit_message('File not found: ' + args.infile)
+    except HDF5_Open_Error:
+        exit_message('Could not open as HDF5: ' + args.infile)
+    except SchemaNotFound as _exc:
+        exit_message(str(_exc))
 
-        # report the findings from the validation
-        import cache
-        qset = cache.qsettings()
-        print('Validate file ' + os.path.basename(validator.fname))
-        print(':NXDL cache: ' + cache.get_nxdl_dir())
-        print(':NXDL GIT sha: ' + qset.getKey('git_sha'))
-        print(':NXDL GIT date/time: ' + qset.getKey('git_time'))
-        print(':validation results shown: ' + ' '.join(sorted(map(str, report_choices))))
-        print('')
-        print('Validation findings')
-        print(validator.report_findings(report_choices))
-        
-        print('summary statistics')
-        print(validator.report_findings_summary())
+    # report the findings from the validation
+    validator.print_report()
 
 
 class MyArgumentParser(argparse.ArgumentParser):
@@ -319,35 +309,12 @@ def parse_command_line_arguments():
         '--version', 
         action='version', 
         version=__version__)
-    
-#     def add_logging_argument(subp):
-#         '''
-#         common code to add option for logging program output
-#         '''
-#         import logging
-#         help_text = 'log output to file (default: no log file)'
-#         subp.add_argument('-l', '--logfile',
-#                        default=CONSOLE_LOGGING_DEFAULT_CHOICE,
-#                        nargs='?',
-#                        help=help_text)
-#         
-#         level = DEFAULT_LOG_LEVEL
-#         help_text = 'logging interest level (%d - %d), default=%d (%s)'
-#         help_text = help_text % (NOISY,
-#                                  CRITICAL,
-#                                  DEFAULT_LOG_LEVEL,
-#                                  logging.getLevelName(level)
-#                                  )
-#         subp.add_argument('-i', '--interest',
-#                        default=level,
-#                        type=int,
-#                        #choices=range(1,51),
-#                        help=help_text)
 
     # TODO: issue #9, stretch goal: GUI for any of this
-    # p.add_argument('-g', 
-    #                     '--gui', 
-    #                     help='graphical user interface (TBA)')
+    # p.add_argument(
+    #     '-g', 
+    #     '--gui', 
+    #     help='graphical user interface (TBA)')
 
     subcommand = p.add_subparsers(title='subcommand', description='valid subcommands',)
     
@@ -378,11 +345,12 @@ def parse_command_line_arguments():
     p_tree = subcommand.add_parser('tree', help=help_text)
     p_tree.set_defaults(func=func_tree)
     p_tree.add_argument('infile', help="HDF5 or NXDL file name")
-    p_tree.add_argument('-a', 
-                        action='store_false', 
-                        default=True,
-                        dest='show_attributes',
-                        help='Do not print attributes of HDF5 file structure')
+    p_tree.add_argument(
+        '-a', 
+        action='store_false', 
+        default=True,
+        dest='show_attributes',
+        help='Do not print attributes of HDF5 file structure')
     help_text = 'maximum number of array items to be shown'
     p_tree.add_argument(
         '-m', '--max_array_items',

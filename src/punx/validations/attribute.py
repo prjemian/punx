@@ -109,7 +109,7 @@ def signal_handler(validator, v_item):
     """
     signal = utils.decode_byte_string(v_item.h5_object)
     if utils.isNeXusDataset(v_item.parent.h5_object):
-        if int(signal) == 1:    # could error if signal is other text!
+        if str(signal).isdigit() and int(signal) == 1:    # could error if signal is other text!
             status = finding.OK
             c = "found plottable data marker"
         else:

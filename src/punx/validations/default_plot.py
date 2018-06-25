@@ -36,7 +36,12 @@ def verify(validator):
             break       # no need to look further
     if status is None:
         c = "no default plot described"
-        status = finding.ERROR
+        default_plot_optional_date = "2016-11-19 01:07:45"  # commit: a4fd52d
+        if validator.manager.nxdl_file_set.last_modified < default_plot_optional_date:
+            status = finding.ERROR
+        else:
+            status = finding.OK
+            
     validator.record_finding(obj, "NeXus default plot", status, c)
 
 

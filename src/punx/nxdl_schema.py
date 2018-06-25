@@ -46,6 +46,7 @@ from __future__ import print_function
 import lxml.etree
 import os
 
+from . import utils
 
 logger = utils.setup_logger(__name__)
 

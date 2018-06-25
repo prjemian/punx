@@ -47,6 +47,7 @@ import lxml.etree
 import os
 from . import NAMESPACE_DICT, FileNotFound, InvalidNxdlFile
 from . import singletons
+from . import utils
 
 
 logger = utils.setup_logger(__name__)

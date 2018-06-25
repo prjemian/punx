@@ -42,7 +42,7 @@ setup (
     platforms        = 'any',
     install_requires = punx.__install_requires__,
     package_dir      = {'': 'src'},
-    packages         = ['punx', ],
+    packages         = ['punx', 'punx/validations', ],
     #packages=find_packages(),
     package_data     = {
         'punx': [

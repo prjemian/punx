@@ -43,12 +43,11 @@ since a *group* may contain a child *group*.
 
 from __future__ import print_function
 
-import logging
 import lxml.etree
 import os
 
 
-logger = logging.getLogger(__name__)
+logger = utils.setup_logger(__name__)
 
 NXDL_XSD_NAME = 'nxdl.xsd'
 NXDL_TEST_FILE = os.path.join(os.path.dirname(__file__), 'cache', 'v3.3', NXDL_XSD_NAME)

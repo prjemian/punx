@@ -31,14 +31,15 @@ USAGE::
 import os
 
 import datetime
-import logging
 import requests
 from requests.packages.urllib3 import disable_warnings
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 import github
 
+from . import utils
 
-logging.getLogger(__name__)
+
+logger = utils.setup_logger(__name__)
 
 CREDS_FILE_NAME = u'__github_creds__.txt'
 DEFAULT_BRANCH_NAME = u'master'

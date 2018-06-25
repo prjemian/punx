@@ -54,20 +54,25 @@ main user interface file
 '''
 
 import argparse
+import logging
 import os
 import sys
 
+logging.basicConfig(
+    level=logging.INFO, 
+    # level=logging.DEBUG, 
+    format='[%(levelname)s %(asctime)s.%(msecs)03d %(name)s:%(lineno)d] %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S') 
+
+
 from .__init__ import __version__, __package_name__, __url__
-#from .__init__ import LOG_MESSAGE, DEFAULT_LOG_LEVEL, DEBUG, NOISY, CRITICAL, ERROR
 from .__init__ import FileNotFound, HDF5_Open_Error, SchemaNotFound
 from . import finding
-# import logs
 from . import cache_manager
 from . import github_handler
+from . import utils
 
-
-CONSOLE_LOGGING_DEFAULT_CHOICE = '__console__'
-
+logger = utils.setup_logger(__name__, logging.INFO)
 
 # :see: https://docs.python.org/2/library/argparse.html#sub-commands
 # obvious 1st implementations are h5structure and update
@@ -81,11 +86,9 @@ def exit_message(msg, status=None, exit_code=1):
     :param int status: 0 - 50 (default: ERROR = 40)
     :param int exit_code: 0: no error, 1: error (default)
     '''
-#     if status is None:
-#         status = ERROR
-#     LOG_MESSAGE(msg, status)
-#     if LOG_MESSAGE != logs.to_console:
-#         print(msg)
+    if status is None:
+        status = ERROR
+    logging.info("{} -- {}".format(msg, status))
     exit(exit_code)
 
 
@@ -174,9 +177,9 @@ def _install(cm, grr, ref, use_user_cache = True, force = False):
     """
     force = force or ref == "master"    # always update from the master branch
 
-    msg = " install_NXDL_file_set(ref=%s, force=%s, user_cache=%s)"
-    msg = msg % (ref, str(force), str(use_user_cache))
-    #logging.info(msg)
+    msg = "install_NXDL_file_set(ref={}, force={}, user_cache={})".format(
+        ref, force, use_user_cache)
+    logger.info(msg)
 
     m = cm.install_NXDL_file_set(
         grr, 
@@ -188,8 +191,6 @@ def _install(cm, grr, ref, use_user_cache = True, force = False):
 
 
 def func_update(args):
-    # import cache
-    # cache.update_NXDL_Cache(force_update=args.force)
     cm = cache_manager.CacheManager()
     print(cm.table_of_caches())
 
@@ -319,17 +320,17 @@ def parse_command_line_arguments():
         action='version', 
         version=__version__)
     
-    def add_logging_argument(subp):
-        '''
-        common code to add option for logging program output
-        '''
-        import logging
-        help_text = 'log output to file (default: no log file)'
-        subp.add_argument('-l', '--logfile',
-                       default=CONSOLE_LOGGING_DEFAULT_CHOICE,
-                       nargs='?',
-                       help=help_text)
-        
+#     def add_logging_argument(subp):
+#         '''
+#         common code to add option for logging program output
+#         '''
+#         import logging
+#         help_text = 'log output to file (default: no log file)'
+#         subp.add_argument('-l', '--logfile',
+#                        default=CONSOLE_LOGGING_DEFAULT_CHOICE,
+#                        nargs='?',
+#                        help=help_text)
+#         
 #         level = DEFAULT_LOG_LEVEL
 #         help_text = 'logging interest level (%d - %d), default=%d (%s)'
 #         help_text = help_text % (NOISY,
@@ -353,7 +354,7 @@ def parse_command_line_arguments():
     
     ### subcommand: demo
     p_demo = subcommand.add_parser('demonstrate', help='demonstrate HDF5 file validation')
-    add_logging_argument(p_demo)
+    # TODO: add_logging_argument(p_demo)
     p_demo.set_defaults(func=func_demo)
 
 
@@ -389,7 +390,7 @@ def parse_command_line_arguments():
         type=int,
         #choices=range(1,51),
         help=help_text)
-    add_logging_argument(p_tree)
+    # TODO: add_logging_argument(p_tree)
 
 
     ### subcommand: update
@@ -417,7 +418,7 @@ def parse_command_line_arguments():
         action='store_true', 
         default=False, 
         help='force update (if GitHub available)')
-    add_logging_argument(p_update)
+    # TODO: add_logging_argument(p_update)
 
 
     ### subcommand: validate
@@ -428,36 +429,14 @@ def parse_command_line_arguments():
     help_text = 'select which validation findings to report, choices: '
     help_text += reporting_choices
     p_validate.add_argument('--report', default=reporting_choices, help=help_text)
-    add_logging_argument(p_validate)
+    # TODO: add_logging_argument(p_validate)
 
     return p.parse_args()
-
-
-#     def interceptor_logfile(args):
-#         '''
-#         special handling for subcommands with a *logfile* option
-#         '''
-#         if 'logfile' in args:
-#             if args.logfile == CONSOLE_LOGGING_DEFAULT_CHOICE:
-#                 DEFAULT_LOG_LEVEL = args.interest
-#                 LOG_MESSAGE = logs.to_console
-#                 LOG_MESSAGE('logging output to console only', DEBUG)
-#             else:
-#                 lo = NOISY
-#                 hi = CRITICAL
-#                 args.interest = max(lo, min(hi, args.interest))
-#                 _log = logs.Logger(log_file=args.logfile, level=args.interest)
-#             LOG_MESSAGE('sys.argv: ' + ' '.join(sys.argv), DEBUG)
-#             LOG_MESSAGE('args: ' + str(args), DEBUG)
 
 
 def main():
     print("\n!!!\n!!!WARNING: this program is not ready for distribution.\n!!!\n")
     args = parse_command_line_arguments()
-    
-    # special handling for logging program output
-    # TODO: interceptor_logfile(args)
-
     args.func(args)
 
 

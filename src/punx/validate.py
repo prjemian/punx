@@ -44,9 +44,9 @@ from . import nxdl_manager
 
 SLASH = "/"
 INFORMATIVE = int((logging.INFO + logging.DEBUG)/2)
-logger = utils.setup_logger(__name__)
 CLASSPATH_OF_NON_NEXUS_CONTENT = "non-NeXus content"
 VALIDITEMNAME_STRICT_PATTERN = r'[a-z_][a-z0-9_]*'
+logger = utils.setup_logger(__name__)
 
 
 class Data_File_Validator(object):

@@ -43,14 +43,13 @@ Internal
 
 from __future__ import print_function
 
-import logging
 import lxml.etree
 import os
 from . import NAMESPACE_DICT, FileNotFound, InvalidNxdlFile
 from . import singletons
 
 
-logger = logging.getLogger(__name__)
+logger = utils.setup_logger(__name__)
 
 
 def strip_ns(ref):

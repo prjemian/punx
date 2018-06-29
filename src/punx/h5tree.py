@@ -4,7 +4,7 @@
 #-----------------------------------------------------------------------------
 # :author:    Pete R. Jemian
 # :email:     prjemian@gmail.com
-# :copyright: (c) 2014-2017, Pete R. Jemian
+# :copyright: (c) 2014-2018, Pete R. Jemian
 #
 # Distributed under the terms of the Creative Commons Attribution 4.0 International Public License.
 #
@@ -12,33 +12,47 @@
 #-----------------------------------------------------------------------------
 
 """
-Command line tool to print the structure of an HDF5 file (deprecated, planned for deletion, see docs)
+Describe the tree structure of any HDF5 file
 
-DEPRECATION NOTICE:
+PUBLIC
 
-The *h5toText* code in *spec2nexus* is being replaced by the same 
-capability in the *punx* project. [#]_
-Once the *punx* project is ready for initial release, the
-*h5toText* code will be removed from *sxpec2nexus*.
+.. autosummary::
 
-.. [#] *punx* `structure`: http://punx.readthedocs.io/en/latest/structure.html#structure
+    ~Hdf5TreeView
 
+INTERNAL
+
+note:  Some of these might be available from `.utils`
+TODO: check if we can replace these
+
+.. autosummary::
+
+    ~isNeXusFile
+    ~isNeXusFile_ByNXdataAttrs
+    ~isNeXusFile_ByAxes
+    ~isNeXusFile_ByAxisAttr
+    ~isNeXusGroup
+    ~isNeXusDataset
+    ~isNeXusLink
+    ~_get_group_niac2014
 """
-
-__url__ = 'http://spec2nexus.readthedocs.org/en/latest/h5toText.html'
 
 import os       #@UnusedImport
 import sys      #@UnusedImport
 import h5py
 import numpy
 
+from . import utils
 
-class H5toText(object):
+
+class Hdf5TreeView(object):
     
     """
+    Describe the tree structure of any HDF5 file
+    
     Example usage showing default display::
     
-        mc = H5toText(filename)
+        mc = Hdf5TreeView(filename)
         mc.array_items_shown = 5
         show_attributes = False
         txt = mc.report(show_attributes)
@@ -68,9 +82,9 @@ class H5toText(object):
         txt = self.filename
         if self.isNeXus:
             txt += " : NeXus data file"
-        structure = self._renderGroup(f, txt, indentation = "")
+        tree_string_list = self._renderGroup(f, txt, indentation = "")
         f.close()
-        return structure
+        return tree_string_list
 
     def _renderGroup(self, obj, name, indentation = "  "):
         """return a [formatted_string] with the contents of the group"""
@@ -101,14 +115,14 @@ class H5toText(object):
                 value = obj.get(itemname)
                 if isNeXusLink(value):
                     s += self._renderLinkedObject(value, itemname, indentation+"  ")
-                elif isHdf5Group(value) or isHdf5File(value):
+                elif utils.isHdf5Group(value) or utils.isHdf5FileObject(value):
                     groups.append(value)
                     # TODO: report external group links in the right place
                     # The problem is the link file and path need to be fed into the
                     # next call to _renderGroup().  No such design exists now for that. 
-                elif isHdf5Dataset(value):
+                elif utils.isHdf5Dataset(value):
                     s += self._renderDataset(value, itemname, indentation+"  ")
-                    if isHdf5ExternalLink(linkref):
+                    if utils.isHdf5ExternalLink(obj, linkref):      # TODO: is obj the "parent"
                         # When "classref" is defined, then external data is available
                         fmt = '%s    %s = %s'
                         s += [ fmt % (indentation, '@file', linkref.filename) ]
@@ -309,6 +323,7 @@ def _get_group_niac2014(parent, attribute, nxclass_name):
         return False
     return group
 
+
 def isNeXusFile_ByNXdataAttrs(filename):
     """
     is `filename` is a NeXus HDF5 file?
@@ -330,7 +345,7 @@ def isNeXusFile_ByNXdataAttrs(filename):
     """
     try:
         f = h5py.File(filename, 'r')
-        if not isHdf5File(f):
+        if not utils.isHdf5FileObject(f):
             f.close()
             return False
         
@@ -383,7 +398,7 @@ def isNeXusFile_ByAxes(filename):
     """
     try:
         f = h5py.File(filename, 'r')
-        if not isHdf5File(f):
+        if not utils.isHdf5FileObject(f):
             f.close()
             return False
         for node0 in f.values():
@@ -418,7 +433,7 @@ def isNeXusFile_ByAxisAttr(filename):
 def isNeXusGroup(obj, NXtype):
     """is `obj` a NeXus group?"""
     nxclass = None
-    if isHdf5Group(obj):
+    if utils.isHdf5Group(obj):
         nxclass = obj.attrs.get('NX_class', None)
         if isinstance(nxclass, numpy.ndarray):
             nxclass = nxclass[0]
@@ -427,93 +442,10 @@ def isNeXusGroup(obj, NXtype):
 
 def isNeXusDataset(obj):
     """is `obj` a NeXus dataset?"""
-    return isHdf5Dataset(obj)
+    return utils.isHdf5Dataset(obj)
 
 
 def isNeXusLink(obj):
     """is `obj` linked to another NeXus item?"""
     target = obj.attrs.get('target', '')
     return len(target) > 0 and target != obj.name
-
-
-def isHdf5File(obj):
-    """is `obj` an HDF5 File?"""
-    return isinstance(obj, h5py.File)
-
-
-def isHdf5Group(obj):
-    """is `obj` an HDF5 Group?"""
-    return isinstance(obj, h5py.Group)
-
-
-def isHdf5Dataset(obj):
-    """is `obj` an HDF5 Dataset?"""
-    return isinstance(obj, h5py.Dataset)
-
-
-def isHdf5Link(obj):
-    """is `obj` an HDF5 Link?"""
-    return isinstance(obj, h5py.HardLink)
-
-
-def isHdf5ExternalLink(obj):
-    """is `obj` an HDF5 ExternalLink?"""
-    return isinstance(obj, h5py.ExternalLink)
-
-
-def do_filelist(filelist, limit=5, show_attributes=True):
-    """
-    interpret and print the structure of a list of HDF5 files
-    
-    :param [str] filelist: one or more file names to be interpreted
-    :param int limit: maximum number of array items to be shown (default = 5)
-    """
-    for item in filelist:
-        mc = H5toText(item)
-        mc.array_items_shown = limit
-        print('\n'.join(mc.report(show_attributes) or ''))
-
-
-def main():
-    """standard command-line interface"""
-    import argparse
-    from spec2nexus._version import get_versions
-    version = get_versions()['version']
-    NUM_DISPLAYED_DEFAULT = 5
-    NUM_DISPLAYED_MIN = 3
-    doc = __doc__.strip().splitlines()[0]
-    doc += '\n  URL: ' + __url__
-    doc += '\n  v' + version
-    parser = argparse.ArgumentParser(prog='h5toText', description=doc)
-    parser.add_argument('infile', 
-                        action='store', 
-                        nargs='+', 
-                        help="HDF5 data file name(s)")
-    msg =  "limit number of displayed array items to NUM_DISPLAYED"
-    msg += " (must be >=%d or 'None')" % NUM_DISPLAYED_MIN
-    msg += ", default = %s" % str(NUM_DISPLAYED_DEFAULT)
-    parser.add_argument('-n', 
-                        action='store', 
-                        dest='num_displayed', 
-                        help=msg, 
-                        default=str(NUM_DISPLAYED_DEFAULT))
-    parser.add_argument('-a', 
-                        action='store_false', 
-                        default=True,
-                        dest='show_attributes',
-                        help='Do not print attributes')
-    parser.add_argument('-v', 
-                        '--version', 
-                        action='version', 
-                        version=version)
-    cmd_args = parser.parse_args()
-
-    if cmd_args.num_displayed.lower() == "none":
-        limit = None
-    else:
-        limit = max(NUM_DISPLAYED_MIN, int(cmd_args.num_displayed))
-    do_filelist(cmd_args.infile, limit, cmd_args.show_attributes)
-
-
-if __name__ == '__main__':
-    main()

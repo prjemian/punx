@@ -124,10 +124,10 @@ def func_demo(args):
     del args.report
 
     print('console> punx tree ' + args.infile)
-    import h5structure
-    mc = h5structure.h5structure(args.infile)
+    import h5_to_tree
+    mc = h5_to_tree.Hdf5TreeView(args.infile)
     #    :param bool show_attributes: display attributes in output
-    show_attributes=True
+    show_attributes=True    # TODO: command line option?
     mc.array_items_shown = 5
     print('\n'.join(mc.report(show_attributes)))
 
@@ -150,20 +150,15 @@ def func_tree(args):
         nxdl = nxdlstructure.NX_definition(args.infile)
         print(nxdl.render())
     else:
-        import h5structure
-        
-        #    :param int limit: maximum number of array items to be shown (default = 5)
-        limit = args.max_array_items
-        #    :param bool show_attributes: display attributes in output
-        show_attributes=True
+        import h5_to_tree
 
         try:
-            mc = h5structure.h5structure(os.path.abspath(args.infile))
+            mc = h5_to_tree.Hdf5TreeView(os.path.abspath(args.infile))
         except FileNotFound:
             exit_message('File not found: ' + args.infile)
-        mc.array_items_shown = limit
+        mc.array_items_shown = args.max_array_items
         try:
-            report = mc.report(show_attributes)
+            report = mc.report(args.show_attributes)
         except HDF5_Open_Error:
             exit_message('Could not open as HDF5: ' + args.infile)
         print('\n'.join(report or ''))
@@ -359,6 +354,11 @@ def parse_command_line_arguments():
         #choices=range(1,51),
         help=help_text)
     # TODO: add_logging_argument(p_tree)
+
+
+    ### subcommand: structure
+    help_text = 'structure command deprecated.  Use tree'
+    p_tree = subcommand.add_parser('structure', help=help_text)
 
 
     ### subcommand: update

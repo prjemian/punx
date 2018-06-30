@@ -14,8 +14,6 @@
 """
 Describe the tree structure of any HDF5 file
 
-PUBLIC
-
 .. autosummary::
 
     ~Hdf5TreeView
@@ -106,7 +104,7 @@ class Hdf5TreeView(object):
                     # next call to _renderGroup().  No such design exists now for that. 
                 elif utils.isHdf5Dataset(value):
                     s += self._renderDataset(value, itemname, indentation+"  ")
-                    if utils.isHdf5ExternalLink(linkref):      # TODO: is obj the "parent"
+                    if utils.isHdf5ExternalLink(obj, linkref):      # TODO: is obj the "parent"
                         # When "classref" is defined, then external data is available
                         fmt = '%s    %s = %s'
                         s += [ fmt % (indentation, '@file', linkref.filename) ]

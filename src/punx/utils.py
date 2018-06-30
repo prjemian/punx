@@ -64,10 +64,11 @@ def isHdf5Dataset(obj):
 
 def isHdf5Link(obj):
     """is `obj` an HDF5 Link?"""
-    if isHdf5Group(obj.parent) or isHdf5FileObject(obj.parent):
-        details = obj.parent.get(obj.name, getlink=True)
-        return isinstance(details, h5py.HardLink)
-    return isinstance(obj, h5py.HardLink)
+#     if isHdf5Group(obj.parent) or isHdf5FileObject(obj.parent):
+#         details = obj.parent.get(obj.name, getlink=True)
+#         return isinstance(details, h5py.HardLink)
+    details = obj.parent.get(obj.name, getlink=True)
+    return isinstance(details, h5py.HardLink)
 
 
 def isHdf5ExternalLink(parent, obj):
@@ -82,7 +83,7 @@ def isHdf5ExternalLink(parent, obj):
     Note: In the external link object, there are
     two attributes: ``@filename`` and ``@path``.
     """
-    if isHdf5Group(parent) or isHdf5FileObject(parent):
+    if (isHdf5Group(parent) or isHdf5FileObject(parent)) and hasattr(obj, "file"):
         return parent.file != obj.file
     return False
 

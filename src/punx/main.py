@@ -322,91 +322,91 @@ def parse_command_line_arguments():
     
     
     ### subcommand: demo
-    p_demo = subcommand.add_parser('demonstrate', help='demonstrate HDF5 file validation')
-    # TODO: add_logging_argument(p_demo)
-    p_demo.set_defaults(func=func_demo)
+    p_sub = subcommand.add_parser('demonstrate', help='demonstrate HDF5 file validation')
+    # TODO: add_logging_argument(p_sub)
+    p_sub.set_defaults(func=func_demo)
 
 
 #     ### subcommand: hierarchy
 #     # TODO: issue #1 & #10
 #     help_text = 'show NeXus base class hierarchy from a given base class'
-#     p_hierarchy = subcommand.add_parser('hierarchy',  help=help_text)
-#     p_hierarchy.set_defaults(func=func_hierarchy)
-#     #p_hierarchy.add_argument('something', type=bool, help='something help_text')
+#     p_sub = subcommand.add_parser('hierarchy',  help=help_text)
+#     p_sub.set_defaults(func=func_hierarchy)
+#     #p_sub.add_argument('something', type=bool, help='something help_text')
 
 
     ### subcommand: show
 #     # TODO: issue #11
-#     p_show = subcommand.add_parser('show', help='show program information (about the cache)')
-#     p_show.set_defaults(func=func_show)
-#     # p_show.add_argument('details', type=bool, help='details help_text')
+#     p_sub = subcommand.add_parser('show', help='show program information (about the cache)')
+#     p_sub.set_defaults(func=func_show)
+#     # p_sub.add_argument('details', type=bool, help='details help_text')
 
 
     ### subcommand: tree
     help_text = 'show tree structure of HDF5 or NXDL file'
-    p_tree = subcommand.add_parser('tree', help=help_text)
-    p_tree.set_defaults(func=func_tree)
-    p_tree.add_argument('infile', help="HDF5 or NXDL file name")
-    p_tree.add_argument(
+    p_sub = subcommand.add_parser('tree', help=help_text)
+    p_sub.set_defaults(func=func_tree)
+    p_sub.add_argument('infile', help="HDF5 or NXDL file name")
+    p_sub.add_argument(
         '-a', 
         action='store_false', 
         default=True,
         dest='show_attributes',
         help='Do not print attributes of HDF5 file structure')
     help_text = 'maximum number of array items to be shown'
-    p_tree.add_argument(
+    p_sub.add_argument(
         '-m', '--max_array_items',
         default=5,
         type=int,
         #choices=range(1,51),
         help=help_text)
-    # TODO: add_logging_argument(p_tree)
+    # TODO: add_logging_argument(p_sub)
 
 
     ### subcommand: structure
     help_text = 'structure command deprecated.  Use ``tree`` instead'
-    p_tree = subcommand.add_parser('structure', help=help_text)
-    p_tree.set_defaults(func=func_structure)
-    p_tree.add_argument('infile', help="HDF5 or NXDL file name")
+    p_sub = subcommand.add_parser('structure', help=help_text)
+    p_sub.set_defaults(func=func_structure)
+    p_sub.add_argument('infile', help="HDF5 or NXDL file name")
 
 
     ### subcommand: update
     help_text = 'update the local cache of NeXus definitions'
-    p_update = subcommand.add_parser('update', help=help_text)
-    p_update.set_defaults(func=func_update)
+    p_sub = subcommand.add_parser('update', help=help_text)
+    p_sub.set_defaults(func=func_update)
 
     help_text = "name(s) of reference NeXus NXDL file set"
     help_text += " (GitHub tag, hash, version, or 'master')"
     help_text += " -- default master"
-    p_update.add_argument(
+    p_sub.add_argument(
         '-r', '--file_set_list',
         default=["master", ],
         nargs='*',
         help=help_text)
 
-    p_update.add_argument("-i", "--install",
+    p_sub.add_argument("-i", "--install",
         action='store_false', 
         default=True,
         dest='try_to_install_or_update',
         help='Do not install (or update) -- default True')
 
-    p_update.add_argument(
+    p_sub.add_argument(
         '-f', '--force', 
         action='store_true', 
         default=False, 
         help='force update (if GitHub available)')
-    # TODO: add_logging_argument(p_update)
+    # TODO: add_logging_argument(p_sub)
 
 
     ### subcommand: validate
-    p_validate = subcommand.add_parser('validate', help='validate a NeXus file')
-    p_validate.add_argument('infile', help="HDF5 or NXDL file name")
-    p_validate.set_defaults(func=func_validate)
+    p_sub = subcommand.add_parser('validate', help='validate a NeXus file')
+    p_sub.add_argument('infile', help="HDF5 or NXDL file name")
+    p_sub.set_defaults(func=func_validate)
     reporting_choices = ','.join(sorted(finding.VALID_STATUS_DICT.keys()))
     help_text = 'select which validation findings to report, choices: '
     help_text += reporting_choices
-    p_validate.add_argument('--report', default=reporting_choices, help=help_text)
-    # TODO: add_logging_argument(p_validate)
+    p_sub.add_argument('--report', default=reporting_choices, help=help_text)
+    # TODO: add_logging_argument(p_sub)
 
     return p.parse_args()
 

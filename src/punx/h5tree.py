@@ -28,7 +28,6 @@ from . import utils
 
 
 class Hdf5TreeView(object):
-    
     """
     Describe the tree structure of any HDF5 file
     

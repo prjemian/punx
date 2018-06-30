@@ -93,7 +93,7 @@ class Hdf5TreeView(object):
         if len(nxclass) > 0:
             if isinstance(nxclass, numpy.ndarray):      # attribute reported as DATATYPE SIMPLE
                 nxclass = nxclass[0]                    # convert as if DATATYPE SCALAR
-            nxclass = ":" + nxclass
+            nxclass = ":" + str(nxclass)
         s += [ indentation + name + nxclass ]
         s += self._renderAttributes(obj, indentation)
         # show datasets and links next
@@ -141,7 +141,7 @@ class Hdf5TreeView(object):
         """return a [formatted_string] with any attributes"""
         s = []
         if self.show_attributes:
-            for name, value in obj.attrs.iteritems():
+            for name, value in obj.attrs.items():       # FIXME: for name, value in obj.attrs.iteritems():
                 s.append("%s  @%s = %s" % (indentation, name, str(value)))
         return s
 

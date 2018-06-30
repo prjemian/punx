@@ -124,8 +124,8 @@ def func_demo(args):
     del args.report
 
     print('console> punx tree ' + args.infile)
-    import h5_to_tree
-    mc = h5_to_tree.Hdf5TreeView(args.infile)
+    from . import h5tree
+    mc = h5tree.Hdf5TreeView(args.infile)
     #    :param bool show_attributes: display attributes in output
     show_attributes=True    # TODO: command line option?
     mc.array_items_shown = 5
@@ -150,10 +150,10 @@ def func_tree(args):
         nxdl = nxdlstructure.NX_definition(args.infile)
         print(nxdl.render())
     else:
-        import h5_to_tree
+        from . import h5tree
 
         try:
-            mc = h5_to_tree.Hdf5TreeView(os.path.abspath(args.infile))
+            mc = h5tree.Hdf5TreeView(os.path.abspath(args.infile))
         except FileNotFound:
             exit_message('File not found: ' + args.infile)
         mc.array_items_shown = args.max_array_items

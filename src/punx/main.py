@@ -118,6 +118,7 @@ def func_demo(args):
     path = os.path.dirname(__file__)
     args.infile = os.path.abspath(os.path.join(path, 'data', 'writer_1_3.hdf5'))
 
+    print("")
     print('console> punx validate ' + args.infile)
     args.report = ','.join(sorted(finding.VALID_STATUS_DICT.keys()))
     func_validate(args)
@@ -142,6 +143,12 @@ def func_hierarchy(args):
 def func_show(args):
     print('still in development -- not implemented yet')
     print(args)
+
+
+def func_structure(args):
+    msg = 'structure command deprecated.  Use ``tree`` instead'
+    print(ValueError(msg))
+    sys.exit(1)
 
 
 def func_tree(args):
@@ -357,8 +364,10 @@ def parse_command_line_arguments():
 
 
     ### subcommand: structure
-    help_text = 'structure command deprecated.  Use tree'
+    help_text = 'structure command deprecated.  Use ``tree`` instead'
     p_tree = subcommand.add_parser('structure', help=help_text)
+    p_tree.set_defaults(func=func_structure)
+    p_tree.add_argument('infile', help="HDF5 or NXDL file name")
 
 
     ### subcommand: update

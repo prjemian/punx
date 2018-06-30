@@ -2,7 +2,7 @@
 #-----------------------------------------------------------------------------
 # :author:    Pete R. Jemian
 # :email:     prjemian@gmail.com
-# :copyright: (c) 2017, Pete R. Jemian
+# :copyright: (c) 2017-2018, Pete R. Jemian
 #
 # Distributed under the terms of the Creative Commons Attribution 4.0 International Public License.
 #
@@ -62,15 +62,15 @@ def isHdf5Dataset(obj):
     return isinstance(obj, h5py.Dataset)
 
 
-def isHdf5Link(parent, objname):
-    """is `parent[objname]` an HDF5 Link?"""
-    if isHdf5Group(parent) or isHdf5FileObject(parent):
-        details = parent.get(objname, getlink=True)
+def isHdf5Link(obj):
+    """is `obj` an HDF5 Link?"""
+    if isHdf5Group(obj.parent) or isHdf5FileObject(obj.parent):
+        details = obj.parent.get(obj.name, getlink=True)
         return isinstance(details, h5py.HardLink)
-    return False
+    return isinstance(obj, h5py.HardLink)
 
 
-def isHdf5ExternalLink(parent, objname):
+def isHdf5ExternalLink(parent, obj):
     """
     is `parent[objname]` an HDF5 ExternalLink?
     
@@ -83,13 +83,18 @@ def isHdf5ExternalLink(parent, objname):
     two attributes: ``@filename`` and ``@path``.
     """
     if isHdf5Group(parent) or isHdf5FileObject(parent):
-        details = parent.get(objname, getclass=True, getlink=True)
-        # The ``isinstance(details, h5py.ExternalLink)``
-        # function does not identify the 
-        # superclass of ``details`` properly, so we look 
-        # at the result from ``type()``
-        return str(details).find(".ExternalLink") > 0
+        return parent.file != obj.file
     return False
+
+
+def __isHdf5ExternalLink(obj):
+    """is `obj` an HDF5 ExternalLink?"""
+    if isHdf5Group(obj.parent) or isHdf5FileObject(obj.parent):
+        thing = isinstance(obj, h5py.ExternalLink)
+        details = obj.parent.get(obj.name, getclass=True, getlink=True)
+        return obj.file != obj.parent.file
+        # return str(details).find(".ExternalLink") > 0
+    return isinstance(obj, h5py.ExternalLink)
 
 
 def isNeXusFile(filename):

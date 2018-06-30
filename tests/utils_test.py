@@ -90,7 +90,7 @@ class Test_HDF5_Tests(unittest.TestCase):
         f = h5py.File(self.hfile)
         ds = f.create_dataset("name", data=1.0)
         f["/link"] = f["/name"]
-        self.assertTrue(punx.utils.isHdf5Link(f, "/link"))
+        self.assertTrue(punx.utils.isHdf5Link(f["/link"]))
         f.close()
  
     def test_isHdf5ExternalLink(self):
@@ -104,10 +104,11 @@ class Test_HDF5_Tests(unittest.TestCase):
  
         f2 = h5py.File(self.hfile)
         f2["/link"] = h5py.ExternalLink(f1_name, "/name")
-        self.assertTrue(punx.utils.isHdf5ExternalLink(f2, "/link"))
+        link = f2["/link"]
+        self.assertTrue(punx.utils.isHdf5ExternalLink(f2, link))
 
         os.remove(f1_name)
-        self.assertTrue(punx.utils.isHdf5ExternalLink(f2, "/link"))
+        self.assertTrue(punx.utils.isHdf5ExternalLink(f2, link))
         f2.close()
 
 

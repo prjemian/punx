@@ -19,22 +19,6 @@ PUBLIC
 .. autosummary::
 
     ~Hdf5TreeView
-
-INTERNAL
-
-note:  Some of these might be available from `.utils`
-TODO: check if we can replace these
-
-.. autosummary::
-
-    ~isNeXusFile
-    ~isNeXusFile_ByNXdataAttrs
-    ~isNeXusFile_ByAxes
-    ~isNeXusFile_ByAxisAttr
-    ~isNeXusGroup
-    ~isNeXusDataset
-    ~isNeXusLink
-    ~_get_group_niac2014
 """
 
 import os       #@UnusedImport
@@ -68,7 +52,7 @@ class Hdf5TreeView(object):
         self.show_attributes = True
         if os.path.exists(filename):
             self.filename = filename
-            self.isNeXus = isNeXusFile(filename)
+            self.isNeXus = utils.isNeXusFile(filename)
 
     def report(self, show_attributes=True):
         """
@@ -113,7 +97,7 @@ class Hdf5TreeView(object):
                 s += [ fmt % (indentation, '@path', linkref.path) ]
             else:
                 value = obj.get(itemname)
-                if isNeXusLink(value):
+                if utils.isNeXusLink(value):
                     s += self._renderLinkedObject(value, itemname, indentation+"  ")
                 elif utils.isHdf5Group(value) or utils.isHdf5FileObject(value):
                     groups.append(value)
@@ -122,7 +106,7 @@ class Hdf5TreeView(object):
                     # next call to _renderGroup().  No such design exists now for that. 
                 elif utils.isHdf5Dataset(value):
                     s += self._renderDataset(value, itemname, indentation+"  ")
-                    if utils.isHdf5ExternalLink(obj, linkref):      # TODO: is obj the "parent"
+                    if utils.isHdf5ExternalLink(linkref):      # TODO: is obj the "parent"
                         # When "classref" is defined, then external data is available
                         fmt = '%s    %s = %s'
                         s += [ fmt % (indentation, '@file', linkref.filename) ]
@@ -270,182 +254,3 @@ class Hdf5TreeView(object):
             s += ("\n" + indentation + '  ').join( r )
             s += "\n" + indentation + "]"
         return s
-
-
-def isNeXusFile(filename):
-    """
-    is `filename` is a NeXus HDF5 file?
-    
-    Tests if ``filename`` adheres to either
-    "Associating plottable data using attributes applied to the **NXdata** group" 
-    (needs URL - NeXus manual is not yet ready to provide it)
-    or
-    "Associating plottable data by name using the ``axes`` attribute"
-    (needs URL - again, from NeXus manual)
-    or
-    "Associating plottable data by dimension number using the ``axis`` attribute"
-    (needs URL - again, from NeXus manual)
-    """
-    if not os.path.exists(filename):
-        return None
-    m1 = isNeXusFile_ByNXdataAttrs
-    m2 = isNeXusFile_ByAxes
-    m3 = isNeXusFile_ByAxisAttr
-    # shorter method names to make next line readable
-    return m1(filename) or m2(filename) or m3(filename)
-
-
-def _get_group_niac2014(parent, attribute, nxclass_name):
-    """
-    supports the NIAC2014method:
-    
-    Search parent for the group named by the attribute
-    (with fallback if the attribute is not defined to picking *any*
-    group that has the same nxclass_name).
-    """
-    group = parent.attrs.get(attribute, None)
-    if group in parent:
-        group = parent[group]
-    else:
-        # Expect that some data files will not write these attributes.
-        # Find *any* HDF5 group that has its @NX_class attribute set to ``nxclass_name``.
-        for node0 in parent.values():
-            # TODO: verify
-            # Does this search ALL POSSIBLE {nxclass_name} groups for 
-            # at least one compliance or just the first one it finds?
-            if isNeXusGroup(node0, nxclass_name):
-                group = node0
-                break
-        if group is None:
-            return False
-        
-    if not isNeXusGroup(group, nxclass_name):
-        return False
-    return group
-
-
-def isNeXusFile_ByNXdataAttrs(filename):
-    """
-    is `filename` is a NeXus HDF5 file?
-    
-    This is the "NIAC2014" method.
-    In short, verify these NeXus classpaths exist::
-    
-        /@default={entry_group}
-        /{entry_group}:NXentry/@default={data_group}
-        /{entry_group}:NXentry/{data_group}:NXdata
-        /{entry_group}:NXentry/{data_group}:NXdata/@signal={signal_dataset}
-        /{entry_group}:NXentry/{data_group}:NXdata/{signal_dataset}
-        /{entry_group}:NXentry/{data_group}:NXdata/@axes=["{axes_dataset1}", ...]
-        /{entry_group}:NXentry/{data_group}:NXdata/@{axes_dataset1}_indices=int[]
-        ...
-    
-    where curly braces (``{`` and ``}``) denote that the enclosed name
-    is defined in the data file.
-    """
-    try:
-        f = h5py.File(filename, 'r')
-        if not utils.isHdf5FileObject(f):
-            f.close()
-            return False
-        
-        # find the NXentry group
-        nxentry = _get_group_niac2014(f, 'default', 'NXentry')
-        if nxentry is None:
-            return False
-        
-        # find the NXdata group
-        nxdata = _get_group_niac2014(nxentry, 'default', 'NXdata')
-        if nxdata is None:
-            return False        # no compliant NXdata group identified
-        
-        # find the signal dataset
-        signal = nxdata.attrs.get('signal', None)
-        if signal not in nxdata:
-            return False        # no valid signal attribute
-        ds_signal = nxdata[signal]
-        if isinstance(ds_signal, numpy.ndarray):
-            ds_signal = ds_signal[0]                # TODO: why?
-        if not isNeXusDataset(ds_signal):
-            return False        # that HDF5 object is not a NeXus dataset
-        
-        # Tests for nxdata.attrs['axes'] and nxdata.attrs['{axisname}_indices'] 
-        # cannot be robust since we expect some clients simply will not write these.
-
-        f.close()
-        return True
-    except Exception as _exc:
-        pass    # ignore any Exceptions, they mean that result stays "False"
-    return False
-
-
-def isNeXusFile_ByAxes(filename):
-    """
-    is `filename` is a NeXus HDF5 file?
-
-    This has been, to date, the most common method in NeXus to define the default plot.
-    
-    In short, verify this NeXus classpath exists::
-    
-        /NXentry/NXdata/dataset/@signal=1
-    
-    Tests for the existence of any NXentry group 
-    containing any NXdata group containing a single dataset 
-    with signal=1 attribute (allows either integer or text representation).
-    This is the minimum requirement for a NeXus data file.
-    
-    This method ignores any exceptions incurred.
-    """
-    try:
-        f = h5py.File(filename, 'r')
-        if not utils.isHdf5FileObject(f):
-            f.close()
-            return False
-        for node0 in f.values():
-            if not isNeXusGroup(node0, 'NXentry'):
-                continue
-            for node1 in node0.values():
-                if not isNeXusGroup(node1, 'NXdata'):
-                    continue
-                signal1_count = 0   # count datasets with signal=1 attribute
-                for node2 in node1.values():
-                    if isNeXusDataset(node2) and node2.attrs.get('signal', None) in (1, '1'):
-                        signal1_count += 1
-                if signal1_count == 1:  # ensure only 1 is defined
-                    return True
-        f.close()
-    except:
-        pass    # ignore any Exceptions, they mean that result stays "False"
-    return False
-
-
-def isNeXusFile_ByAxisAttr(filename):
-    """
-    is `filename` is a NeXus HDF5 file?
-    
-    This is the oldest method in NeXus to define the default plot.
-    
-    NOTE: **Not implemented yet!**
-    """
-    return False    # TODO: implement this method
-
-
-def isNeXusGroup(obj, NXtype):
-    """is `obj` a NeXus group?"""
-    nxclass = None
-    if utils.isHdf5Group(obj):
-        nxclass = obj.attrs.get('NX_class', None)
-        if isinstance(nxclass, numpy.ndarray):
-            nxclass = nxclass[0]
-    return nxclass == str(NXtype)
-
-
-def isNeXusDataset(obj):
-    """is `obj` a NeXus dataset?"""
-    return utils.isHdf5Dataset(obj)
-
-
-def isNeXusLink(obj):
-    """is `obj` linked to another NeXus item?"""
-    target = obj.attrs.get('target', '')
-    return len(target) > 0 and target != obj.name

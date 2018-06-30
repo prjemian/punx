@@ -153,10 +153,17 @@ def func_structure(args):
 
 def func_tree(args):
     if args.infile.endswith('.nxdl.xml'):
-        # TODO: why not just use the XSLT transformation?
-        import nxdlstructure
-        nxdl = nxdlstructure.NX_definition(args.infile)
-        print(nxdl.render())
+        from . import nxdltree
+
+        try:
+            mc = nxdltree.NxdlTreeView(os.path.abspath(args.infile))
+        except FileNotFound:
+            exit_message('File not found: ' + args.infile)
+        except Exception as exc:
+            exit_message(str(exc))
+        report = mc.report(args.show_attributes)
+        print('\n'.join(report or ''))
+
     else:
         from . import h5tree
 

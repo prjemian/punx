@@ -21,6 +21,9 @@ Describe the tree structure of a NXDL XML file
 
 
 import os
+from lxml import etree
+
+from . import cache_manager
 
 
 class NxdlTreeView(object):
@@ -29,19 +32,19 @@ class NxdlTreeView(object):
     
     Example usage showing default display::
     
-        mc = NxdlTreeView(filename)
+        mc = NxdlTreeView(nxdl_file_name)
         mc.array_items_shown = 5
         show_attributes = False
         txt = mc.report(show_attributes)
     """
 
-    def __init__(self, filename):
-        """store filename and test if file is NeXus HDF5"""
-        self.requested_filename = filename
-        self.filename = None
+    def __init__(self, nxdl_file):
+        """store nxdl_file and test if file is NeXus HDF5"""
+        self.requested_nxdl_file = nxdl_file
+        self.nxdl_file = None
         self.show_attributes = True
-        if os.path.exists(filename):
-            self.filename = filename
+        if os.path.exists(nxdl_file):
+            self.nxdl_file = nxdl_file
             self.nxdl_category = self._determine_category_()
 
     def report(self, show_attributes=True):
@@ -50,14 +53,15 @@ class NxdlTreeView(object):
         
         The work of parsing the data file is done in this method.
         """
-        result = []
+        cm = cache_manager.CacheManager()
+        file_set = cm.default_file_set
 
-        # TODO: implement
-        xslt_file = os.path.join(file_set, self.nxdl_category, "nxdlformat.xsl")
+        xslt_file = os.path.join(file_set.path, self.nxdl_category, "nxdlformat.xsl")
         if not os.path.exists(xslt_file):
-            msg = ""        # TODO:
-            raise ValueError(msg)
+            raise ValueError('XSLT file not found: ' + xslt_file)
         
+        text = self._xslt_(xslt_file)
+        result = text.splitlines()
         return result
     
     def _determine_category_(self):
@@ -70,8 +74,13 @@ class NxdlTreeView(object):
         * contributed_definition
         * None
         """
-        # TODO:
         category = None
+
+        doc = lxml.etree.parse(self.nxdl_file)
+        root = doc.getroot()
+
+        # TODO: read the category from the NXDL file: /definition@category
+
         return category
 
     def _xslt_(self, xslt_file):
@@ -85,5 +94,5 @@ class NxdlTreeView(object):
         '''
         # TODO: instead of a file, use an internal stream, such as StringIO
         output_xml_file = os.path.splitext(xslt_file)[0] + os.extsep + 'html'
-        utils.xslt_transformation(xslt_file, self.filename, output_xml_file)
+        utils.xslt_transformation(xslt_file, self.nxdl_file, output_xml_file)
         # TODO: return the stream

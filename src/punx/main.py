@@ -153,6 +153,7 @@ def func_structure(args):
 
 def func_tree(args):
     if args.infile.endswith('.nxdl.xml'):
+        # TODO: why not just use the XSLT transformation?
         import nxdlstructure
         nxdl = nxdlstructure.NX_definition(args.infile)
         print(nxdl.render())

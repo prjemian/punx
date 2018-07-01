@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+from IPython.lib.pretty import pretty
 
 #-----------------------------------------------------------------------------
 # :author:    Pete R. Jemian
@@ -21,7 +22,7 @@ Describe the tree structure of a NXDL XML file
 
 
 import os
-from lxml import etree
+import lxml.etree
 
 from . import cache_manager
 
@@ -61,7 +62,11 @@ class NxdlTreeView(object):
             raise ValueError('XSLT file not found: ' + xslt_file)
         
         text = self._xslt_(xslt_file)
-        result = text.splitlines()
+        result = [
+            "file: " + self.nxdl_file,
+            "XSLT: " + xslt_file,
+            ]
+        result += text.splitlines()
         return result
     
     def _determine_category_(self):
@@ -74,14 +79,25 @@ class NxdlTreeView(object):
         * contributed_definition
         * None
         """
-        category = None
+        xref = dict(
+            application = "applications",
+            base = "base_classes",
+            contributed = "contributed_definitions",
+            )
 
-        doc = lxml.etree.parse(self.nxdl_file)
+        doc = __parse_xml__(self.nxdl_file)
         root = doc.getroot()
-
-        # TODO: read the category from the NXDL file: /definition@category
-
-        return category
+        category = root.get("category")
+        if category is None:
+            msg = "missing category attribute in NXDL file: " + self.nxdl_file
+            raise ValueError(msg)
+        path = xref.get(category)
+        if path is None:
+            msg = "unknown category (%s) in NXDL file: %s" % (
+                category, self.nxdl_file
+                )
+            raise ValueError(msg)
+        return path
 
     def _xslt_(self, xslt_file):
         '''
@@ -92,7 +108,40 @@ class NxdlTreeView(object):
             abcdefg.xsl + xml_data  --> abcdefg.html
         
         '''
-        # TODO: instead of a file, use an internal stream, such as StringIO
-        output_xml_file = os.path.splitext(xslt_file)[0] + os.extsep + 'html'
-        utils.xslt_transformation(xslt_file, self.nxdl_file, output_xml_file)
-        # TODO: return the stream
+        buf = xslt_transformation(xslt_file, self.nxdl_file)
+        return buf
+
+
+def xslt_transformation(xslt_file, src_xml_file):
+    '''
+    return the transform of an XML file using an XSLT
+
+    :param str xslt_file: name of XSLT file
+    :param str src_xml_file: name of XML file
+    '''
+    src_doc = __parse_xml__(src_xml_file)
+    if src_doc is None:
+        return
+
+    xslt_doc = __parse_xml__(xslt_file)
+    if xslt_doc is None:
+        return
+
+    transform = lxml.etree.XSLT(xslt_doc)
+    result_doc = transform(src_doc)
+    _r = str(result_doc)
+    
+    return _r
+
+
+def __parse_xml__(xml_file_name):
+    '''
+    common handler for lxml.etree.parse to catch certain exceptions
+    '''
+    try:
+        src_doc = lxml.etree.parse(xml_file_name)
+    except (IOError, lxml.etree.XMLSyntaxError) as _exc:
+        msg = 'problem with ' + xml_file_name + ': ' + str(_exc)
+        # FIXME: logMessage(msg)
+        return
+    return src_doc

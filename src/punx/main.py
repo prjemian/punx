@@ -70,6 +70,7 @@ from .__init__ import FileNotFound, HDF5_Open_Error, SchemaNotFound
 from . import finding
 from . import utils
 
+ERROR = 40
 logger = utils.setup_logger(__name__, logging.INFO)
 
 # :see: https://docs.python.org/2/library/argparse.html#sub-commands
@@ -124,6 +125,7 @@ def func_demo(args):
     func_validate(args)
     del args.report
 
+    print("")
     print('console> punx tree ' + args.infile)
     from . import h5tree
     mc = h5tree.Hdf5TreeView(args.infile)

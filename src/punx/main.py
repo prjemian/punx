@@ -104,7 +104,8 @@ def func_demo(args):
 
     .. index:: cache update
 
-    If you get an error message that looks like this one (line breaks added here for clarity::
+    If you get an error message that looks like this one 
+    (line breaks added here for clarity)::
 
         punx.cache.FileNotFound: file does not exist:
         /Users/<username>/.config/punx/definitions-master/nxdl.xsd
@@ -130,7 +131,7 @@ def func_demo(args):
     from . import h5tree
     mc = h5tree.Hdf5TreeView(args.infile)
     #    :param bool show_attributes: display attributes in output
-    show_attributes=True    # TODO: command line option?
+    show_attributes=True
     mc.array_items_shown = 5
     print('\n'.join(mc.report(show_attributes)))
 

@@ -490,6 +490,19 @@ class Test_Validate(unittest.TestCase):
 
         # TODO: assert that @axes has NOT been defined properly
 
+    def test_item_names(self):
+        """issue #104: test non-compliant item names"""
+        with h5py.File(self.hdffile) as f:
+            eg = f.create_group(u"entry")
+            eg.attrs[u"NX_class"] = u"NXentry"
+            eg.create_dataset(u"titl:e", data=u"item name is not compliant")
+
+        self.validator = punx.validate.Data_File_Validator(ref=DEFAULT_NXDL_FILE_SET)
+        self.validator.validate(self.hdffile)
+        sum, count, score = self.validator.finding_score()
+        self.assertGreater(count, 0, "items counted for scoring")
+        self.assertLess(sum, 0, "scoring detects error(s)")
+
 
 class Test_Default_Plot(unittest.TestCase):
 

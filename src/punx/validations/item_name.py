@@ -172,7 +172,7 @@ def handle_groups_and_fields(validator, v_item):
     try:
         k = validItemName_match_key(validator, v_item.name)
         if k is None:
-            status = finding.WARN
+            status = finding.ERROR
             k = "valid HDF5 item name, not valid with NeXus"
         elif k.startswith("strict"):
             status = finding.OK

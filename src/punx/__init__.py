@@ -30,7 +30,7 @@ if _path not in sys.path:
 
 __author__    = 'Pete R. Jemian'
 __email__     = 'prjemian@gmail.com'
-__copyright__ = '2017, Pete R. Jemian'
+__copyright__ = '2017-2018, Pete R. Jemian'
 
 __package_name__ = 'punx'
 

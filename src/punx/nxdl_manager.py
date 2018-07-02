@@ -4,7 +4,7 @@
 #-----------------------------------------------------------------------------
 # :author:    Pete R. Jemian
 # :email:     prjemian@gmail.com
-# :copyright: (c) 2017, Pete R. Jemian
+# :copyright: (c) 2017-2018, Pete R. Jemian
 #
 # Distributed under the terms of the Creative Commons Attribution 4.0 International Public License.
 #
@@ -27,7 +27,7 @@ import lxml.etree
 import os
 import six
 
-from punx import FileNotFound, InvalidNxdlFile
+from .__init__ import FileNotFound, InvalidNxdlFile
 from . import nxdl_schema
 from . import cache_manager
 from . import utils

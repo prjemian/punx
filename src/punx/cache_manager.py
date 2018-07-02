@@ -4,7 +4,7 @@
 #-----------------------------------------------------------------------------
 # :author:    Pete R. Jemian
 # :email:     prjemian@gmail.com
-# :copyright: (c) 2016-2017, Pete R. Jemian
+# :copyright: (c) 2016-2018, Pete R. Jemian
 #
 # Distributed under the terms of the Creative Commons Attribution 4.0 International Public License.
 #
@@ -69,7 +69,7 @@ try:
 except ImportError:
     from PyQt4 import QtCore
 
-from . import __settings_organization__, __settings_package__, FileNotFound
+from .__init__ import __settings_organization__, __settings_package__, FileNotFound
 from . import singletons
 from . import github_handler
 from . import utils

@@ -4,7 +4,7 @@
 #-----------------------------------------------------------------------------
 # :author:    Pete R. Jemian
 # :email:     prjemian@gmail.com
-# :copyright: (c) 2017, Pete R. Jemian
+# :copyright: (c) 2017-2018, Pete R. Jemian
 #
 # Distributed under the terms of the Creative Commons Attribution 4.0 International Public License.
 #
@@ -179,11 +179,18 @@ class Data_File_Validator(object):
             self.manager.nxdl_file_set.sha,
             ))
     
+        def sort_validations(f):
+            value = f.h5_address
+            value += " %3d" % -f.status.value       # sort from best to worst
+            value += " " + f.status.description
+            value = value.replace("@", " @")        # keep attributes with group or dataset
+            return value
+
         print("findings")
         t = pyRestTable.Table()
         for label in "address status test comments".split():
             t.addLabel(label)
-        for f in self.validations:
+        for f in sorted(self.validations, key=sort_validations):
             if f.status == finding.OPTIONAL:
                 continue    # enable if you like verbose reports
             row = []

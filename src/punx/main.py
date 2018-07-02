@@ -426,7 +426,8 @@ def main():
     print("\n!!!\n!!!WARNING: this program is not ready for distribution.\n!!!\n")
     args = parse_command_line_arguments()
     if not hasattr(args, "func"):
-        print("ERROR: must specify a subcommand -- try 'punx -h' for help")
+        print("ERROR: must specify a subcommand -- for help, type:")
+        print("%s -h" % sys.argv[0])
         sys.exit(1)
     args.func(args)
 

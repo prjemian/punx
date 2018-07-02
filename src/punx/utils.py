@@ -43,7 +43,7 @@ def decode_byte_string(text):
         #text = [v for v in text]
         text = text[0]
     if isinstance(text, (bytes, numpy.bytes_)):
-        text = text.decode(sys.stdout.encoding)
+        text = text.decode(sys.stdout.encoding or "utf8")
     return text
 
 

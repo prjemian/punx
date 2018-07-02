@@ -226,11 +226,14 @@ class Hdf5TreeView(object):
         def __render(obj, rank, key, indents):
             if rank == 1:
                 item = obj[key]
-            else:
+            elif rank < 4:
                 # this replaces a lot of code: if rank == ...
                 indices = ', '.join( [str(key)] + (':'*(rank-1)).split() )
                 part = eval('obj[%s]' % indices)
                 item = self._renderNdArray(part, indents + '  ')    # recursion
+            else:
+                item = "rank=%d" % (rank-1)
+                
             return item
 
         shape = obj.shape

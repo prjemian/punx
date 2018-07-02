@@ -344,64 +344,8 @@ class Data_File_Validator(object):
         """
         validate group as a NeXus application definition
         """
-        # TODO: move this code to validations/ subdir
-        ad_name = utils.decode_byte_string(v_item.h5_object["definition"].value)
-        key = "NeXus application definition"
-
-        ad = self.manager.classes.get(ad_name)
-        status = finding.TF_RESULT[ad is not None]
-        msg = ad_name + ": recognized NXDL specification"
-        self.record_finding(v_item, "known NXDL", status, msg)
-        if ad is None:
-            return
-
-        msg = ad_name
-        if ad.category == "applications":
-            msg += ": known NeXus application definition"
-        elif ad.category == "contributed":
-            msg += ": known NeXus contributed definition used as application definition"
-        else:
-            status = finding.ERROR
-            msg += ": unknown application definition"
-        self.record_finding(v_item, key, status, msg)
-
-        c = ad_name + ": more validations needed"
-        self.record_finding(v_item, key, finding.TODO, c)
-
-        # TODO: groups, attributes, links, type, ...
-        ad_entry = list(ad.groups.values())[0]   # only 1 at this level of the application definition (ad)
-        for field, spec in ad_entry.fields.items():
-            
-            msg = "%s:%s" % (ad_name, field)
-            h5_obj = v_item.h5_object.get(field)
-            status = finding.TF_RESULT[h5_obj is not None]
-            if h5_obj is None:
-                msg += " not"
-            msg += " found"
-            v_obj = ValidationItem(v_item, h5_obj)
-            self.record_finding(v_obj, "NXDL field", status, msg)
-            
-            if len(spec.enumerations) > 0:
-                found = False
-                for enum in spec.enumerations:
-                    found = enum == utils.decode_byte_string(h5_obj.value)
-                    if found:
-                        break
-                msg = "%s:%s" % (ad_name, field)
-                required = spec.xml_attributes["minOccurs"].default_value == 1  # TODO: is this right?
-                if required:
-                    msg += " (required)"
-                else:
-                    msg += " (optional)"
-                status = finding.TF_RESULT[found]
-                if found:
-                    msg += " has expected value: " + enum
-                else:
-                    msg += " does not have value: " + " | ".join(spec.enumerations)
-                self.record_finding(v_obj, "NXDL field enumerations", status, msg)
-            
-            # TODO: attributes, xml_attributes, dimensions, ...
-            
+        from .validations import application_definition
+        application_definition.verify(self, v_item)
     
     def validate_NX_class_attribute(self, v_item, nx_class):
         from .validations import nx_class_attribute
@@ -543,8 +487,3 @@ class ValidationItem(object):
                     nx_class = self.name
                 classpath += SLASH + nx_class
             return classpath
-
-
-if __name__ == '__main__':
-    print("Start this module using:  python main.py validate ...")
-    exit(0)

@@ -74,7 +74,7 @@ class Hdf5TreeView(object):
         if len(nxclass) > 0:
             if isinstance(nxclass, numpy.ndarray):      # attribute reported as DATATYPE SIMPLE
                 nxclass = nxclass[0]                    # convert as if DATATYPE SCALAR
-            nxclass = ":" + str(nxclass)
+            nxclass = ":" + utils.decode_byte_string(nxclass)
         s += [ indentation + name + nxclass ]
         s += self._renderAttributes(obj, indentation)
         # show datasets and links next
@@ -90,8 +90,8 @@ class Hdf5TreeView(object):
             if classref is None:
                 s += [ '%s  %s: external file missing' % (indentation, itemname) ]
                 fmt = '%s    %s = %s'
-                s += [ fmt % (indentation, '@file', linkref.filename) ]
-                s += [ fmt % (indentation, '@path', linkref.path) ]
+                s += [ fmt % (indentation, '@file', utils.decode_byte_string(linkref.filename)) ]
+                s += [ fmt % (indentation, '@path', utils.decode_byte_string(linkref.path)) ]
             else:
                 value = obj.get(itemname)
                 if utils.isNeXusLink(value):
@@ -106,8 +106,8 @@ class Hdf5TreeView(object):
                     if utils.isHdf5ExternalLink(obj, linkref):      # TODO: is obj the "parent"
                         # When "classref" is defined, then external data is available
                         fmt = '%s    %s = %s'
-                        s += [ fmt % (indentation, '@file', linkref.filename) ]
-                        s += [ fmt % (indentation, '@path', linkref.path) ]
+                        s += [ fmt % (indentation, '@file', utils.decode_byte_string(linkref.filename)) ]
+                        s += [ fmt % (indentation, '@path', utils.decode_byte_string(linkref.path)) ]
                 else:
                     msg = "unidentified %s: %s, %s", itemname, repr(classref), repr(linkref)
                     raise Exception(msg)
@@ -123,7 +123,7 @@ class Hdf5TreeView(object):
         s = []
         if self.show_attributes:
             for name, value in obj.attrs.items():       # FIXME: for name, value in obj.attrs.iteritems():
-                s.append("%s  @%s = %s" % (indentation, name, str(value)))
+                s.append("%s  @%s = %s" % (indentation, name, utils.decode_byte_string(value)))
         return s
 
     def _renderLinkedObject(self, obj, name, indentation = "  "):
@@ -139,15 +139,15 @@ class Hdf5TreeView(object):
         if self.isNeXus:
             if "target" in dset.attrs:
                 if dset.attrs['target'] != dset.name:
-                    return ["%s%s --> %s" % (indentation, name, dset.attrs['target'])]
+                    return ["%s%s --> %s" % (indentation, name, utils.decode_byte_string(dset.attrs['target']))]
         txType = self._renderDsType(dset)
         txShape = self._renderDsShape(dset)
         s = []
         if dset.dtype.kind == 'S':
             if isinstance(dset.value, numpy.ndarray):
-                value = " = %s" % dset.value[0]
+                value = " = %s" % utils.decode_byte_string(dset.value[0])
             else:
-                value = " = %s" % str(dset.value)
+                value = " = %s" % utils.decode_byte_string(dset.value)
             s += [ "%s%s:%s%s" % (indentation, name, txType, value) ]
             s += self._renderAttributes(dset, indentation)
             # dset.dtype.kind == 'S', nchar = dset.dtype.itemsize
@@ -167,12 +167,12 @@ class Hdf5TreeView(object):
                 if len(dset.shape) < 2:
                     # show the array inline with the field
                     s += [ "%s%s:%s%s = %s" % (
-                            indentation, name, txType, txShape, value) ]
+                            indentation, name, txType, txShape, utils.decode_byte_string(value)) ]
                 else:
                     # show multi-D arrays different
                     s += [ "%s%s:%s%s = __array" % (
                             indentation, name, txType, txShape) ]
-                    s += [ "%s  %s = %s" % (indentation, "__array", value) ]
+                    s += [ "%s  %s = %s" % (indentation, "__array", utils.decode_byte_string(value)) ]
             else:
                 s += [ "%s%s:%s%s = [ ... ]" % (
                         indentation, name, txType, txShape) ]

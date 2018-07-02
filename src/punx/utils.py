@@ -67,6 +67,8 @@ def isHdf5Link(obj):
 #     if isHdf5Group(obj.parent) or isHdf5FileObject(obj.parent):
 #         details = obj.parent.get(obj.name, getlink=True)
 #         return isinstance(details, h5py.HardLink)
+    if not hasattr(obj, "parent"):
+        return False
     details = obj.parent.get(obj.name, getlink=True)
     return isinstance(details, h5py.HardLink)
 

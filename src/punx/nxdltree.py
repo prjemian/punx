@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from IPython.lib.pretty import pretty
 
 #-----------------------------------------------------------------------------
 # :author:    Pete R. Jemian

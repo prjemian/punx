@@ -7,8 +7,8 @@ Validation : :mod:`validate`
 .. index:: severity
 
 The process of validation compares each item in an HDF5 data file 
-and compares it with standards to check that the item is valid
-within that standard.  Each test is assigned a result, a
+and compares it with the NeXus standards to check that the item is valid
+within that standard.  Each test is assigned a *finding* result, a
 :class:`~punx.finding.Severity` object, with values and meanings
 as shown in the table below.
 
@@ -30,10 +30,19 @@ the NeXus Definition Language (NXDL) files [#]_.
 
 The *color* is a suggestion for use in a GUI.
 
+Numerical values are associated with each finding value.
+The sum of these values is averaged to produce a numerical
+indication of the validation of the file against the NeXus standard.
+An average of 100 indicates that the file meets the NeXus 
+specification for every validation test applied.
+An average that is less than zero indicates that the
+file contains content that is not valid with the NeXus standard.
+
+
 NeXus HDF5 Data Files
 ---------------------
 
-NeXus data files are HDF5 and are validated against the suite of NXDL files
+NeXus data files are HDF5 [#]_ and are validated against the suite of NXDL files
 using tools provided by this package.  The strategy is to compare the structure
 of the HDF file with the structure of the NXDL file(s) as specified by the
 ``NX_class`` attributes of the various HDF groups in the data file.
@@ -52,6 +61,9 @@ See the GitHub repository [#]_ for this file.
 
 .. [#] NeXus Class Definitions (NXDL files):
    http://download.nexusformat.org/doc/html/classes/index.html
+
+.. [#] HDF5: 
+   https://support.hdfgroup.org/HDF5/
 
 .. [#] NeXus GitHub Definitions repository:
    https://github.com/nexusformat/definitions

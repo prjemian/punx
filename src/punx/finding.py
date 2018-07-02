@@ -15,7 +15,6 @@ document each item during validation
 .. autosummary::
    
    ~Finding
-   ~FindingResults
    ~VALID_STATUS_DICT
 
 """

@@ -20,7 +20,6 @@ PUBLIC
 .. autosummary::
    
    ~Data_File_Validator
-   ~print_report
 
 INTERNAL
 
@@ -82,6 +81,7 @@ class Data_File_Validator(object):
        
        ~close
        ~validate
+       ~print_report
 
     INTERNAL METHODS
 
@@ -381,7 +381,7 @@ class Data_File_Validator(object):
         application definition.  NeXus provides no easy identifier 
         for this difference.  The most obvious distinction between
         them is the presence of the `definition` field 
-        in the :ref:`NXentry` group of an application definition.
+        in the `NXentry` group of an application definition.
         This field is not present in base classes.
         """
         nxdl_def = self.manager.classes.get(nx_class, None)
@@ -478,7 +478,7 @@ class ValidationItem(object):
         that the local field named ``data`` is the plottable data.
         
         The HDF5 address of the plottable data is: ``/entry/data/data``,
-        its NeXus class path is: ``/NXentry/NXdata/data
+        its NeXus class path is: ``/NXentry/NXdata/data``
         """
         if self.name == SLASH:
             return ""

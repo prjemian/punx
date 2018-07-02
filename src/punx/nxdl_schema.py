@@ -115,8 +115,7 @@ class NXDL_schema__attribute(NXDL_schema__Mixin):
 
     a complete description of a specific NXDL attribute element
     
-    notes on attributes
-    -------------------
+    NOTES ON ATTRIBUTES
     
     In nxdl.xsd, "attributeType" is used by fieldType and groupGroup to define
     the NXDL "attribute" element used in fields and groups, respectively.
@@ -220,7 +219,7 @@ class NXDL_schema__attributeGroup(NXDL_schema__Mixin):
             self.children.append(obj)
 
 
-class NXDL_schema_complexType(NXDL_schema__Mixin):
+class NXDL_schema__complexType(NXDL_schema__Mixin):
     
     """
     node matches XPath query: ``/xs:schema/xs:complexType``
@@ -518,7 +517,7 @@ class NXDL_item_catalog(object):
         # only look at root node children: 'xs:complexType', not '//xs:complexType' 
         for node in root.xpath('xs:complexType', namespaces=self.ns):
             if 'name' in node.attrib:
-                obj = NXDL_schema_complexType()
+                obj = NXDL_schema__complexType()
                 obj.parse(node, self.db)
                 self.add_to_catalog(node, obj, key = 'schema')
                 self.db['schema'][obj.name] = obj     # for cross-reference

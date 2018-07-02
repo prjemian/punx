@@ -12,6 +12,7 @@ Production
 Development
 ***********
 
+:0.2.0: 2018-07-02 -- first tag after major refactor (#72, #105)
 :0.1.9: 2017-07-09 -- last tag before major refactor (#72), no changes here since 2017-03-31
 :0.1.8: 2017-03-12 -- package .json file in the cache file sets
 :0.1.7: 2017-03-11 -- NeXus def 3.2 bundled into repo now

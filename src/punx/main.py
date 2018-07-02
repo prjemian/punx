@@ -43,7 +43,6 @@ main user interface file
    ~main
    ~MyArgumentParser
    ~parse_command_line_arguments
-   ~interceptor_logfile
    ~func_demo
    ~func_hierarchy
    ~func_show
@@ -137,6 +136,7 @@ def func_demo(args):
 
 
 def func_hierarchy(args):
+    "not implemented yet"
     url = 'http://punx.readthedocs.io/en/latest/analyze.html'
     print('A chart of the NeXus hierarchy is in the **punx** documentation.')
     print('see: ' + url)
@@ -144,17 +144,20 @@ def func_hierarchy(args):
 
 
 def func_show(args):
+    "not implemented yet"
     print('still in development -- not implemented yet')
     print(args)
 
 
 def func_structure(args):
+    "deprecated subcommand"
     msg = 'structure command deprecated.  Use ``tree`` instead'
     print(ValueError(msg))
     sys.exit(1)
 
 
 def func_tree(args):
+    """print the tree structure"""
     if args.infile.endswith('.nxdl.xml'):
         from . import nxdltree
 
@@ -202,6 +205,7 @@ def _install(cm, grr, ref, use_user_cache = True, force = False):
 
 
 def func_update(args):
+    """update or install versions of the NeXus definitions"""
     from . import cache_manager
     from . import github_handler
 
@@ -220,6 +224,8 @@ def func_update(args):
 
 
 def func_validate(args):
+    """
+    """
     from . import validate
 
     if args.infile.endswith('.nxdl.xml'):

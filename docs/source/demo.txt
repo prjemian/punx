@@ -1,41 +1,75 @@
-console> punx validate C:\Users\shoun\Apps\Anaconda\lib\site-packages\punx\data\writer_1_3.hdf5
-Validation findings
-:file: writer_1_3.hdf5
-:validation results shown:  COMMENT, ERROR, NOTE, OK, TODO, UNUSED, WARN
-==================== ============================ ====== ====================================================
-address              validation                   status comment(s)
-==================== ============================ ====== ====================================================
-/                    @NX_class assumed            OK     file root: NXroot
-/Scan                validItemName                NOTE   relaxed re: [A-Za-z_][\w_]*
-/Scan@NX_class       @NX_class known              OK     NXentry is known
-/Scan/data           validItemName-strict         OK     strict re: [a-z_][a-z0-9_]*
-/Scan/data@NX_class  @NX_class known              OK     NXdata is known
-/Scan/data/counts    NXdata@ignoreExtraFields     OK     field ignored due to group attribute setting
-/Scan/data/two_theta NXdata@ignoreExtraFields     OK     field ignored due to group attribute setting
-/Scan/data           NXDL review: NXdata          TODO   validate with NXdata specification (incomplete)
-/Scan                NXDL review: NXentry         TODO   validate with NXentry specification (incomplete)
-/                    NXDL review: NXroot          TODO   validate with NXroot specification (incomplete)
-/Scan/data/counts    NXdata group default plot v3 OK     NXdata@signal = counts
-/Scan/data/counts    NeXus default plot v3        OK     NeXus data file default plot: /NXentry/NXdata@signal
-==================== ============================ ====== ====================================================
+console> punx validate /home/mintadmin/Documents/eclipse/punx/src/punx/data/writer_1_3.hdf5
+data file: /home/mintadmin/Documents/eclipse/punx/src/punx/data/writer_1_3.hdf5
+NeXus definitions (release): v2018.5, dated 2018-05-15 16:34:19, sha=a3045fd7ff0029adc811d9ed92f42ad51007f32d
+
+findings
+============================ ====== ==================================== =============================================
+address                      status test                                 comments                                     
+============================ ====== ==================================== =============================================
+/                            TODO   NeXus base class                     NXroot: more validations needed              
+/                            OK     known NXDL                           NXroot: recognized NXDL specification        
+/                            OK     NeXus base class                     NXroot: known NeXus base class               
+/                            OK     NeXus default plot                   found by v3: /Scan/data/counts               
+/Scan                        TODO   NeXus base class                     NXentry: more validations needed             
+/Scan                        OK     group in base class                  not defined: NXroot/Scan                     
+/Scan                        OK     known NXDL                           NXentry: recognized NXDL specification       
+/Scan                        OK     NeXus base class                     NXentry: known NeXus base class              
+/Scan                        OK     NXDL group in data file              found:  in /Scan/data                        
+/Scan                        NOTE   validItemName                        relaxed pattern: [A-Za-z_][\w_]*             
+/Scan@NX_class               OK     validItemName                        pattern: NX.+                                
+/Scan@NX_class               OK     attribute value                      recognized NXDL base class: NXentry          
+/Scan@NX_class               OK     known attribute                      known: NXentry@NX_class                      
+/Scan/data                   TODO   NeXus base class                     NXdata: more validations needed              
+/Scan/data                   OK     validItemName                        strict pattern: [a-z_][a-z0-9_]*             
+/Scan/data                   OK     group in base class                  defined: NXentry/data                        
+/Scan/data                   OK     known NXDL                           NXdata: recognized NXDL specification        
+/Scan/data                   OK     NeXus base class                     NXdata: known NeXus base class               
+/Scan/data@NX_class          OK     validItemName                        pattern: NX.+                                
+/Scan/data@NX_class          OK     attribute value                      recognized NXDL base class: NXdata           
+/Scan/data@NX_class          OK     known attribute                      known: NXdata@NX_class                       
+/Scan/data@axes              TODO   attribute value                      implement                                    
+/Scan/data@axes              OK     validItemName                        strict pattern: [a-z_][a-z0-9_]*             
+/Scan/data@axes              OK     known attribute                      known: NXdata@axes                           
+/Scan/data@signal            OK     validItemName                        strict pattern: [a-z_][a-z0-9_]*             
+/Scan/data@signal            OK     valid name @signal=counts            strict pattern: [a-z_][a-z0-9_]*             
+/Scan/data@signal            OK     attribute value                      found: @signal=counts                        
+/Scan/data@signal            OK     known attribute                      known: NXdata@signal                         
+/Scan/data@signal            OK     value of @signal                     found: /Scan/data/counts                     
+/Scan/data@signal            OK     NeXus default plot v3, NXdata@signal correct default plot setup in /NXentry/NXdata
+/Scan/data@two_theta_indices TODO   attribute value                      implement                                    
+/Scan/data@two_theta_indices OK     validItemName                        strict pattern: [a-z_][a-z0-9_]*             
+/Scan/data@two_theta_indices OK     known attribute                      unknown: NXdata@two_theta_indices            
+/Scan/data/counts            OK     validItemName                        strict pattern: [a-z_][a-z0-9_]*             
+/Scan/data/counts            OK     field in base class                  not defined: NXdata/counts                   
+/Scan/data/counts@units      TODO   attribute value                      implement                                    
+/Scan/data/counts@units      OK     validItemName                        strict pattern: [a-z_][a-z0-9_]*             
+/Scan/data/two_theta         OK     validItemName                        strict pattern: [a-z_][a-z0-9_]*             
+/Scan/data/two_theta         OK     field in base class                  not defined: NXdata/two_theta                
+/Scan/data/two_theta@units   TODO   attribute value                      implement                                    
+/Scan/data/two_theta@units   OK     validItemName                        strict pattern: [a-z_][a-z0-9_]*             
+============================ ====== ==================================== =============================================
+
 
 summary statistics
-======= ===== ===========================================================
-status  count description
-======= ===== ===========================================================
-OK      8     meets NeXus specification
-NOTE    1     does not meet NeXus specification, but acceptable
-WARN    0     does not meet NeXus specification, not generally acceptable
-ERROR   0     violates NeXus specification
-TODO    3     validation not implemented yet
-UNUSED  0     optional NeXus item not used in data file
-COMMENT 0     comment from the punx source code
---      --    --
-TOTAL   12    --
-======= ===== ===========================================================
+======== ===== =========================================================== =========
+status   count description                                                 (value)  
+======== ===== =========================================================== =========
+OK       33    meets NeXus specification                                   100      
+NOTE     1     does not meet NeXus specification, but acceptable           75       
+WARN     0     does not meet NeXus specification, not generally acceptable 25       
+ERROR    0     violates NeXus specification                                -10000000
+TODO     7     validation not implemented yet                              0        
+UNUSED   0     optional NeXus item not used in data file                   0        
+COMMENT  0     comment from the punx source code                           0        
+OPTIONAL 38    allowed by NeXus specification, not identified              99       
+         --                                                                         
+TOTAL    79                                                                         
+======== ===== =========================================================== =========
 
-console> punx structure C:\Users\shoun\Apps\Anaconda\lib\site-packages\punx\data\writer_1_3.hdf5
-C:\Users\shoun\Apps\Anaconda\lib\site-packages\punx\data\writer_1_3.hdf5 : NeXus data file
+<value>/finding=99.125000  count=72  sum(finding values)=7137.000000
+
+console> punx tree /home/mintadmin/Documents/eclipse/punx/src/punx/data/writer_1_3.hdf5
+/home/mintadmin/Documents/eclipse/punx/src/punx/data/writer_1_3.hdf5 : NeXus data file
   Scan:NXentry
     @NX_class = NXentry
     data:NXdata

@@ -11,26 +11,28 @@ command line help
 .. code-block:: console
 
    console> punx -h
-   punx -h
-   usage: punx [-h] [-v] {demo,hierarchy,structure,update,validate} ...
+   usage: punx [-h] [-v] {demonstrate,tree,structure,update,validate} ...
    
-   Python Utilities for NeXus HDF5 files URL: http://punx.readthedocs.io
-   v0+unknown
+   Python Utilities for NeXus HDF5 files version: 0.1.9+261.gfcaf00d.dirty URL:
+   http://punx.readthedocs.io
    
    optional arguments:
      -h, --help            show this help message and exit
      -v, --version         show program's version number and exit
    
-   subcommands:
+   subcommand:
      valid subcommands
    
-     {demonstrate,structure,update,validate}
+     {demonstrate,tree,structure,update,validate}
        demonstrate         demonstrate HDF5 file validation
-       structure           show structure of HDF5 or NXDL file
+       tree                show tree structure of HDF5 or NXDL file
+       structure           structure command deprecated. Use ``tree`` instead
        update              update the local cache of NeXus definitions
        validate            validate a NeXus file
    
-   http://punx.readthedocs.io
+   Note: It is only necessary to use the first two (or more) characters of any
+   subcommand, enough that the abbreviation is unique. Such as: ``demonstrate``
+   can be abbreviated to ``demo`` or even ``de``.
 
 Subcommands
 ***********
@@ -56,7 +58,7 @@ subcommand                    brief description
 ============================  ====================================================
 :ref:`demonstrate <demo>`     demonstrate HDF5 file validation
 :ref:`hierarchy <hierarchy>`  show NeXus base class hierarch
-:ref:`structure <structure>`  show structure of HDF5 or NXDL file
+:ref:`tree <tree>`            show tree structure of HDF5 or NXDL file
 :ref:`update <update>`        update the local cache of NeXus definitions
 :ref:`validate <validate>`    validate a NeXus file
 ============================  ====================================================
@@ -65,27 +67,21 @@ and the *<other parameters>* are desribed by the help for each subcommand::
 
     punx <subcommand> -h
 
-Example::
+Example [#]_ ::
 
-   console> punx validate -h
-   punx validate -h
-   usage: punx validate [-h] [--report REPORT] [-l [LOGFILE]] [-i INTEREST]
-                        infile
+   console> punx val -h
+   usage: punx validate [-h] [--report REPORT] infile
    
    positional arguments:
-     infile                HDF5 or NXDL file name
+     infile           HDF5 or NXDL file name
    
    optional arguments:
-     -h, --help            show this help message and exit
-     --report REPORT       select which validation findings to report, choices:
-                           COMMENT,ERROR,NOTE,OK,TODO,UNUSED,WARN
-     -l [LOGFILE], --logfile [LOGFILE]
-                           log output to file (default: no log file)
-     -i INTEREST, --interest INTEREST
-                           logging interest level (1 - 50), default=20 (INFO)
+     -h, --help       show this help message and exit
+     --report REPORT  select which validation findings to report, choices:
+                      COMMENT,ERROR,NOTE,OK,OPTIONAL,TODO,UNUSED,WARN
 
 
-.. tip:: Subcommands may be abbreviated.
+.. [#] tip:: Subcommands may be abbreviated.
 
    It is only necessary to use the first two (or more) characters of any
    subcommand enough that the abbreviation is unique. 

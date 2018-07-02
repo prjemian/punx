@@ -49,6 +49,22 @@ Updating
 Required Packages
 *****************
 
+It may be necessary to install some prerequisite packages in your python installation.
+If you are using an Anaconda python distribution, it is advised to install these 
+pre-requisites using *conda* rather than *pip*.  The pre-requisites include:
+
+* h5py
+* lxml
+* numpy
+* Qt and PyQt (either v4 or v5)
+* requests
+* PyGithub
+
+See your distribution's documentation for how to install these.  With Anaconda, use::
+
+    conda install h5py lxml numpy Qt=5 PyQt=5 requests 
+    pip install PyGitHub pyRestTable
+
 ============  ===================================
 Package       URL
 ============  ===================================
@@ -69,6 +85,6 @@ Package       URL
 pyRestTable   http://pyresttable.readthedocs.io
 ============  ===================================
 
-The *pyRestTable* package is only used for various reports.
-   If using the package as a library and developing your own custom 
+The *pyRestTable* package is used for various reports in the punx application.
+   If using the punx package as a library and developing your own custom 
    reporting, this package is not required.

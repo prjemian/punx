@@ -2,7 +2,7 @@
 #-----------------------------------------------------------------------------
 # :author:    Pete R. Jemian
 # :email:     prjemian@gmail.com
-# :copyright: (c) 2017, Pete R. Jemian
+# :copyright: (c) 2017-2018, Pete R. Jemian
 #
 # Distributed under the terms of the Creative Commons Attribution 4.0 International Public License.
 #
@@ -88,7 +88,7 @@ def verify(validator, v_item, key=None):
 
     elif (utils.isHdf5Dataset(v_item.h5_object) or
           utils.isHdf5Group(v_item.h5_object) or
-          utils.isHdf5Link(v_item.parent, v_item.name) or
+          utils.isHdf5Link(v_item.h5_object) or
           utils.isHdf5ExternalLink(v_item.parent, v_item.name)):
         handle_groups_and_fields(validator, v_item)
 

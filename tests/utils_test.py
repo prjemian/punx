@@ -104,11 +104,33 @@ class Test_HDF5_Tests(unittest.TestCase):
  
         f2 = h5py.File(self.hfile)
         f2["/link"] = h5py.ExternalLink(f1_name, "/name")
-        link = f2["/link"]
-        self.assertTrue(punx.utils.isHdf5ExternalLink(f2, link))
+        f2.close()
+
+        f2 = h5py.File(self.hfile)
+        
+        # h5py.ExternalLink is transparent in standard API
+        self.assertFalse(punx.utils.isHdf5ExternalLink(f2, f2["/link"]))
+        
+        # use file.get(addr, getlink=True) to examine ExternalLink
+        _link_true = f2.get("/link", getlink=True)
+        self.assertTrue(punx.utils.isHdf5ExternalLink(f2, _link_true))
+        _link_false = f2.get("/link", getlink=False)
+        self.assertFalse(punx.utils.isHdf5ExternalLink(f2, _link_false))
+        # discard the references so h5py will release its hold
+        del _link_true, _link_false
+        f2.close()
 
         os.remove(f1_name)
-        self.assertTrue(punx.utils.isHdf5ExternalLink(f2, link))
+
+        f2 = h5py.File(self.hfile)
+        _link_true = f2.get("/link", getlink=True)
+        self.assertTrue(punx.utils.isHdf5ExternalLink(f2, _link_true))
+        _link_false = f2.get("/link", getlink=False)
+        self.assertFalse(punx.utils.isHdf5ExternalLink(f2, _link_false))
+        with self.assertRaises(KeyError):
+            # can't access the node because external link file is missing
+            punx.utils.isHdf5ExternalLink(f2, f2["/link"])
+        del _link_true, _link_false
         f2.close()
 
 

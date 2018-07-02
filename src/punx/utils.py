@@ -85,9 +85,9 @@ def isHdf5ExternalLink(parent, obj):
     Note: In the external link object, there are
     two attributes: ``@filename`` and ``@path``.
     """
-    if (isHdf5Group(parent) or isHdf5FileObject(parent)) and hasattr(obj, "file"):
-        return parent.file != obj.file
-    return False
+    # if (isHdf5Group(parent) or isHdf5FileObject(parent)) and hasattr(obj, "file"):
+    #     return parent.file != obj.file
+    return (isHdf5Group(parent) or isHdf5FileObject(parent)) and hasattr(obj, "filename") and hasattr(obj, "path")
 
 
 def __isHdf5ExternalLink(obj):

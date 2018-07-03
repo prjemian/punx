@@ -22,6 +22,7 @@ ISSUES
 import os
 import sys
 import h5py
+import numpy
 import tempfile
 import unittest
 
@@ -444,7 +445,7 @@ class Test_Validate(unittest.TestCase):
         ds = dg.create_dataset("y", data=vec)
         ds.attrs["units"] = "mm"
 
-        dg.attrs["axes"] = ["x", "y"]
+        dg.attrs["axes"] = [v.encode("utf8") for v in ["x", "y"]]
         dg.attrs["x_indices"] = [0]
         dg.attrs["y_indices"] = [1]
 
@@ -479,7 +480,7 @@ class Test_Validate(unittest.TestCase):
         ds = dg.create_dataset("y", data=vec)
         ds.attrs["units"] = "mm"
 
-        dg.attrs["axes"] = ["x,y"]
+        dg.attrs["axes"] = [v.encode("utf8") for v in ["x,y",]]
         dg.attrs["x_indices"] = [0]
         dg.attrs["y_indices"] = [1]
 
@@ -655,10 +656,9 @@ class Test_Default_Plot(unittest.TestCase):
 
     def test_default_plot_v2_fail_multi_signal(self):
         self.setup_simple_test_file()
-        f = h5py.File(self.hdffile)
-        f["/entry/data/x"].attrs["signal"] = 1
-        f["/entry/data/y"].attrs["signal"] = 1
-        f.close()
+        with h5py.File(self.hdffile) as f:
+            f["/entry/data/x"].attrs["signal"] = 1
+            f["/entry/data/y"].attrs["signal"] = 1
 
         self.validator = punx.validate.Data_File_Validator(ref=DEFAULT_NXDL_FILE_SET)
         self.validator.validate(self.hdffile)
@@ -702,10 +702,10 @@ class Test_Example_data(unittest.TestCase):
 def suite(*args, **kw):
     test_suite = unittest.TestSuite()
     test_list = [
-#         Test_Constructor,
-#         Test_Constructor_Exceptions,
-#         Test_Example_data,
-#         Test_Validate,
+        Test_Constructor,
+        Test_Constructor_Exceptions,
+        Test_Example_data,
+        Test_Validate,
 #         Test_Default_Plot,
         Test_Changing_NXDL_Rules,
         ]

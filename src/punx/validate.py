@@ -405,8 +405,8 @@ class ValidationItem(object):
                 self.h5_address = None
                 self.classpath = CLASSPATH_OF_NON_NEXUS_CONTENT
             else:
-                self.h5_address = parent.h5_address + "@" + self.name
-                self.classpath = str(parent.classpath) + "@" + self.name
+                self.h5_address = "%s@%s" % (parent.h5_address, self.name)
+                self.classpath = str(parent.classpath) + "@" + str(self.name)
         self.object_type = self.identify_object_type()
     
     def __str__(self, *args, **kwargs):

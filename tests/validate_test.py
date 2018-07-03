@@ -9,6 +9,7 @@ ISSUES
     Issues will only be marked "fixed" on GitHub once this branch is merged.
     Then, this table may be removed.
 
+* [ ] #110 all validation tests passing
 * [*] #95  validate item names in the classpath dict
 * [ ] #94  lazy load NXDL details only when needed
 * [*] #93  special classpath for non-NeXus groups
@@ -29,6 +30,7 @@ import unittest
 _path = os.path.join(os.path.dirname(__file__), '..', 'src')
 if _path not in sys.path:
     sys.path.insert(0, _path)
+import punx.utils
 import punx.validate
 
 DEFAULT_NXDL_FILE_SET = None
@@ -83,9 +85,8 @@ class Test_Constructor(unittest.TestCase):
         self.hdffile = None
 
     def test_valid_hdf5_file_constructed(self):
-        f = h5py.File(self.hdffile)
-        f['item'] = 5
-        f.close()
+        with h5py.File(self.hdffile) as f:
+            f['item'] = 5
 
         self.assertRaises(No_Exception, self.avert_exception, self.hdffile)
         self.validator = punx.validate.Data_File_Validator(ref=DEFAULT_NXDL_FILE_SET)
@@ -97,10 +98,9 @@ class Test_Constructor(unittest.TestCase):
         self.validator = None
 
     def test_valid_nexus_file_constructed(self):
-        f = h5py.File(self.hdffile)
-        g = f.create_group("entry")
-        g.attrs["NX_class"] = "NXentry"
-        f.close()
+        with h5py.File(self.hdffile) as f:
+            g = f.create_group("entry")
+            g.attrs["NX_class"] = "NXentry"
 
         self.assertRaises(No_Exception, self.avert_exception, self.hdffile)
         self.assertTrue(punx.utils.isNeXusFile(self.hdffile), "is valid NeXus file")
@@ -152,11 +152,10 @@ class Test_Changing_NXDL_Rules(unittest.TestCase):
         was required.  Not suitable for automated validation.
         """
         # minimal test file
-        f = h5py.File(self.hdffile)
-        eg = f.create_group(u"entry")
-        eg.attrs[u"NX_class"] = u"NXentry"
-        eg.create_dataset(u"title", data=u"NXdata group not provided")
-        f.close()
+        with h5py.File(self.hdffile) as f:
+            eg = f.create_group(u"entry")
+            eg.attrs[u"NX_class"] = u"NXentry"
+            eg.create_dataset(u"title", data=u"NXdata group not provided")
 
         refs = dict(nxdata_required=u"a4fd52d", nxdata_not_required=u"v3.3")
         self.validator = {}
@@ -205,18 +204,18 @@ class Test_Validate(unittest.TestCase):
         self.hdffile = None
 
     def setup_simple_test_file(self, create_validator=True):
-        f = h5py.File(self.hdffile)
-        f.attrs["default"] = "entry"
-        eg = f.create_group("entry")
-        eg.attrs["NX_class"] = "NXentry"
-        eg.attrs["default"] = "data"
-        dg = eg.create_group("data")
-        dg.attrs["NX_class"] = "NXdata"
-        dg.attrs["signal"] = "data"
-        ds = dg.create_dataset("data", data=[1, 2, 3.14])
-        ds.attrs["units"] = "arbitrary"
-        eg["link_to_data"] = ds
-        f.close()
+        with h5py.File(self.hdffile) as f:
+            f.attrs["default"] = "entry"
+            eg = f.create_group("entry")
+            eg.attrs["NX_class"] = "NXentry"
+            eg.attrs["default"] = "data"
+            dg = eg.create_group("data")
+            dg.attrs["NX_class"] = "NXdata"
+            dg.attrs["signal"] = "data"
+            ds = dg.create_dataset("data", data=[1, 2, 3.14])
+            ds.attrs["units"] = "arbitrary"
+            eg["link_to_data"] = ds
+
         self.expected_item_count = 12
         if create_validator:
             self.validator = punx.validate.Data_File_Validator(ref=DEFAULT_NXDL_FILE_SET)
@@ -234,12 +233,12 @@ class Test_Validate(unittest.TestCase):
 
     def test_non_nexus_group(self):
         self.setup_simple_test_file(create_validator=False)
-        f = h5py.File(self.hdffile)
-        other = f["/entry"].create_group("other")
-        other.attrs["intentions"] = "good"
-        ds = other.create_dataset("comment", data="this does not need validation")
-        ds.attrs["purpose"] = "testing, only"
-        f.close()
+        with h5py.File(self.hdffile) as f:
+            other = f["/entry"].create_group("other")
+            other.attrs["intentions"] = "good"
+            ds = other.create_dataset("comment", data="this does not need validation")
+            ds.attrs["purpose"] = "testing, only"
+    
         self.validator = punx.validate.Data_File_Validator(ref=DEFAULT_NXDL_FILE_SET)
         self.validator.validate(self.hdffile)
 
@@ -315,11 +314,11 @@ class Test_Validate(unittest.TestCase):
     def test_bad_link_target_value(self):
         # target attribute value points to non-existing item
         self.setup_simple_test_file(create_validator=False)
-        f = h5py.File(self.hdffile)
-        data = f["/entry/data/data"]
-        f["/entry/bad_target_in_link"] = data
-        data.attrs["target"] = data.name + "_make_it_incorrect"
-        f.close()
+        with h5py.File(self.hdffile) as f:
+            data = f["/entry/data/data"]
+            f["/entry/bad_target_in_link"] = data
+            data.attrs["target"] = data.name + "_make_it_incorrect"
+    
         self.validator = punx.validate.Data_File_Validator(ref=DEFAULT_NXDL_FILE_SET)
         self.validator.validate(self.hdffile)
         
@@ -337,11 +336,11 @@ class Test_Validate(unittest.TestCase):
     def test_wrong_link_target_value(self):
         # test target attribute value that points to wrong but existing item
         self.setup_simple_test_file(create_validator=False)
-        f = h5py.File(self.hdffile)
-        data = f["/entry/data/data"]
-        f["/entry/linked_item"] = data
-        data.attrs["target"] = f["/entry/data"].name    # points to wrong item
-        f.close()
+        with h5py.File(self.hdffile) as f:
+            data = f["/entry/data/data"]
+            f["/entry/linked_item"] = data
+            data.attrs["target"] = f["/entry/data"].name    # points to wrong item
+
         self.validator = punx.validate.Data_File_Validator(ref=DEFAULT_NXDL_FILE_SET)
         self.validator.validate(self.hdffile)
 
@@ -360,62 +359,60 @@ class Test_Validate(unittest.TestCase):
 
     def test_application_definition(self):
         self.setup_simple_test_file(create_validator=False)
-        f = h5py.File(self.hdffile)
-        other = f["/entry"].create_dataset(
-            "definition", 
-            data="NXcanSAS")
-        # TODO: add compliant contents
-        f.close()
+        with h5py.File(self.hdffile) as f:
+            other = f["/entry"].create_dataset(
+                "definition", 
+                data="NXcanSAS")
+            # TODO: add compliant contents
+
         self.validator = punx.validate.Data_File_Validator(ref=DEFAULT_NXDL_FILE_SET)
         self.validator.validate(self.hdffile)
         # TODO: assert what now?
 
     def test_contributed_base_class(self):
-        pass    # TODO: such as NXquadrupole_magnet
         self.setup_simple_test_file(create_validator=False)
-        f = h5py.File(self.hdffile)
-        # TODO: should be under an NXinstrument group
-        group = f["/entry"].create_group("quadrupole_magnet")
-        group.attrs["NX_class"] = "NXquadrupole_magnet"
-        f.close()
+        with h5py.File(self.hdffile) as f:
+            # TODO: should be under an NXinstrument group
+            group = f["/entry"].create_group("quadrupole_magnet")
+            group.attrs["NX_class"] = "NXquadrupole_magnet"
+
         self.validator = punx.validate.Data_File_Validator(ref=DEFAULT_NXDL_FILE_SET)
         self.validator.validate(self.hdffile)
+        # TODO: such as NXquadrupole_magnet
 
     def test_contributed_application_definition(self):
         self.setup_simple_test_file(create_validator=False)
-        f = h5py.File(self.hdffile)
-        other = f["/entry"].create_dataset(
-            "definition", 
-            data="NXspecdata")
-        # TODO: add compliant contents
-        f.close()
+        with h5py.File(self.hdffile) as f:
+            other = f["/entry"].create_dataset(
+                "definition", 
+                data="NXspecdata")
+            # TODO: add compliant contents
+
         self.validator = punx.validate.Data_File_Validator(ref=DEFAULT_NXDL_FILE_SET)
         self.validator.validate(self.hdffile)
         # TODO: assert what now?
 
     def test_axes_attribute_1D__pass(self):
-        f = h5py.File(self.hdffile)
-        f.attrs["default"] = "entry"
-
-        eg = f.create_group("entry")
-        eg.attrs["NX_class"] = "NXentry"
-        eg.attrs["default"] = "data"
-
-        dg = eg.create_group("data")
-        dg.attrs["NX_class"] = "NXdata"
-        dg.attrs["signal"] = "data"
-
-        vec = [1, 2, 3.14]
-        ds = dg.create_dataset("data", data=vec)
-        ds.attrs["units"] = "arbitrary"
-
-        ds = dg.create_dataset("x", data=vec)
-        ds.attrs["units"] = "m"
-
-        dg.attrs["axes"] = "x"
-        dg.attrs["x_indices"] = [0]
-
-        f.close()
+        with h5py.File(self.hdffile) as f:
+            f.attrs["default"] = "entry"
+    
+            eg = f.create_group("entry")
+            eg.attrs["NX_class"] = "NXentry"
+            eg.attrs["default"] = "data"
+    
+            dg = eg.create_group("data")
+            dg.attrs["NX_class"] = "NXdata"
+            dg.attrs["signal"] = "data"
+    
+            vec = [1, 2, 3.14]
+            ds = dg.create_dataset("data", data=vec)
+            ds.attrs["units"] = "arbitrary"
+    
+            ds = dg.create_dataset("x", data=vec)
+            ds.attrs["units"] = "m"
+    
+            dg.attrs["axes"] = "x"
+            dg.attrs["x_indices"] = [0]
 
         self.validator = punx.validate.Data_File_Validator(ref=DEFAULT_NXDL_FILE_SET)
         self.validator.validate(self.hdffile)
@@ -424,32 +421,30 @@ class Test_Validate(unittest.TestCase):
         # TODO: assert that @x_indices has been defined properly
     
     def test_axes_attribute_2D__pass(self):
-        f = h5py.File(self.hdffile)
-        f.attrs["default"] = "entry"
-
-        eg = f.create_group("entry")
-        eg.attrs["NX_class"] = "NXentry"
-        eg.attrs["default"] = "data"
-
-        dg = eg.create_group("data")
-        dg.attrs["NX_class"] = "NXdata"
-        dg.attrs["signal"] = "data"
-
-        vec = [1, 2, 3.14]
-        ds = dg.create_dataset("data", data=[vec, vec, vec])
-        ds.attrs["units"] = "arbitrary"
-
-        ds = dg.create_dataset("x", data=vec)
-        ds.attrs["units"] = "m"
-
-        ds = dg.create_dataset("y", data=vec)
-        ds.attrs["units"] = "mm"
-
-        dg.attrs["axes"] = [v.encode("utf8") for v in ["x", "y"]]
-        dg.attrs["x_indices"] = [0]
-        dg.attrs["y_indices"] = [1]
-
-        f.close()
+        with h5py.File(self.hdffile) as f:
+            f.attrs["default"] = "entry"
+    
+            eg = f.create_group("entry")
+            eg.attrs["NX_class"] = "NXentry"
+            eg.attrs["default"] = "data"
+    
+            dg = eg.create_group("data")
+            dg.attrs["NX_class"] = "NXdata"
+            dg.attrs["signal"] = "data"
+    
+            vec = [1, 2, 3.14]
+            ds = dg.create_dataset("data", data=[vec, vec, vec])
+            ds.attrs["units"] = "arbitrary"
+    
+            ds = dg.create_dataset("x", data=vec)
+            ds.attrs["units"] = "m"
+    
+            ds = dg.create_dataset("y", data=vec)
+            ds.attrs["units"] = "mm"
+    
+            dg.attrs["axes"] = punx.utils.string_list_to_hdf5(["x", "y"])
+            dg.attrs["x_indices"] = [0]
+            dg.attrs["y_indices"] = [1]
 
         self.validator = punx.validate.Data_File_Validator(ref=DEFAULT_NXDL_FILE_SET)
         self.validator.validate(self.hdffile)
@@ -459,32 +454,30 @@ class Test_Validate(unittest.TestCase):
         # TODO: assert that @y_indices has been defined properly
 
     def test_axes_attribute_2D__fail(self):
-        f = h5py.File(self.hdffile)
-        f.attrs["default"] = "entry"
-
-        eg = f.create_group("entry")
-        eg.attrs["NX_class"] = "NXentry"
-        eg.attrs["default"] = "data"
-
-        dg = eg.create_group("data")
-        dg.attrs["NX_class"] = "NXdata"
-        dg.attrs["signal"] = "data"
-
-        vec = [1, 2, 3.14]
-        ds = dg.create_dataset("data", data=[vec, vec, vec])
-        ds.attrs["units"] = "arbitrary"
-
-        ds = dg.create_dataset("x", data=vec)
-        ds.attrs["units"] = "m"
-
-        ds = dg.create_dataset("y", data=vec)
-        ds.attrs["units"] = "mm"
-
-        dg.attrs["axes"] = [v.encode("utf8") for v in ["x,y",]]
-        dg.attrs["x_indices"] = [0]
-        dg.attrs["y_indices"] = [1]
-
-        f.close()
+        with h5py.File(self.hdffile) as f:
+            f.attrs["default"] = "entry"
+    
+            eg = f.create_group("entry")
+            eg.attrs["NX_class"] = "NXentry"
+            eg.attrs["default"] = "data"
+    
+            dg = eg.create_group("data")
+            dg.attrs["NX_class"] = "NXdata"
+            dg.attrs["signal"] = "data"
+    
+            vec = [1, 2, 3.14]
+            ds = dg.create_dataset("data", data=[vec, vec, vec])
+            ds.attrs["units"] = "arbitrary"
+    
+            ds = dg.create_dataset("x", data=vec)
+            ds.attrs["units"] = "m"
+    
+            ds = dg.create_dataset("y", data=vec)
+            ds.attrs["units"] = "mm"
+    
+            dg.attrs["axes"] = punx.utils.string_list_to_hdf5(["x,y",])
+            dg.attrs["x_indices"] = [0]
+            dg.attrs["y_indices"] = [1]
 
         self.validator = punx.validate.Data_File_Validator(ref=DEFAULT_NXDL_FILE_SET)
         self.validator.validate(self.hdffile)

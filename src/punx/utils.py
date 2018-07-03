@@ -46,6 +46,11 @@ def decode_byte_string(text):
         text = text.decode(sys.stdout.encoding or "utf8")
     return text
 
+def string_list_to_hdf5(string_list):
+    """
+    converts string lists (incl unicode) to h5py-compatible
+    """
+    return [v.encode("utf8") for v in string_list]
 
 def isHdf5FileObject(obj):
     """is `obj` an HDF5 File?"""

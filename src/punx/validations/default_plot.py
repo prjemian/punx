@@ -20,6 +20,7 @@ from .. import utils
 
 def verify(validator):
     """entry function of this module"""
+    # TODO: isn't this validation needed for each NXentry and NXsubentry?
     c = "need to validate existence of default plot"
     obj = validator.addresses["/"]
     status = None
@@ -36,11 +37,17 @@ def verify(validator):
             break       # no need to look further
     if status is None:
         c = "no default plot described"
-        default_plot_optional_date = "2016-11-19 01:07:45"  # commit: a4fd52d
-        if validator.manager.nxdl_file_set.last_modified < default_plot_optional_date:
+        data_group = validator.manager.classes["NXentry"].groups["data"]
+        if hasattr(data_group, "minOccurs"):
+            minOccurs = data_group.minOccurs
+        else:
+            minOccurs = 1
+        if minOccurs > 0:
             status = finding.ERROR
         else:
-            status = finding.OK
+            # even though not "required" it is strongly recommended
+            # thus NOTE rather than OK
+            status = finding.NOTE
             
     validator.record_finding(obj, "NeXus default plot", status, c)
 

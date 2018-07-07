@@ -155,36 +155,45 @@ class Test_Changing_NXDL_Rules(unittest.TestCase):
         with h5py.File(self.hdffile) as f:
             eg = f.create_group(u"entry")
             eg.attrs[u"NX_class"] = u"NXentry"
-            eg.create_dataset(u"title", data=u"NXdata group not provided")
+            #eg.create_dataset(u"title", data=u"NXdata group not provided")
 
-        refs = dict(nxdata_required=u"a4fd52d", nxdata_not_required=u"v3.3")
+        refs = dict(
+            nxdata_required=u"a4fd52d", 
+            nxdata_not_required=u"v3.3")
         self.validator = {}
         
         ref = refs["nxdata_required"]
         try:
-            self.validator = punx.validate.Data_File_Validator(ref=ref)
+            self.validator = punx.validate.Data_File_Validator(ref=refs["nxdata_required"])
         except KeyError:
             msg = u"NXDL rule set %s not installed, cannot test" % ref
             self.assertTrue(False, msg)
         self.validator.validate(self.hdffile)
         self.assertTrue(u"NXentry/NXdata" not in self.validator.classpaths)
-        entry = self.validator.addresses[u"/entry"].validations
-        # TODO: look in "entry" for Finding with ERROR because NXdata is required
-        found = [v for v in entry if v == punx.finding.ERROR]
-        #self.assertEqual(len(found), 1, "ERROR located")  # FIXME: test is not robust
+        group = self.validator.addresses[u"/"].validations
+
+        # look in "/" for Finding with ERROR because NXdata is required
+        found = [v for v in group.values() if v.status == punx.finding.ERROR]
+        self.assertEqual(len(found), 1, "ERROR located")
         self.validator.close()
 
         ref = refs["nxdata_not_required"]
         try:
-            self.validator = punx.validate.Data_File_Validator(ref=ref)
+            self.validator = punx.validate.Data_File_Validator(ref=refs["nxdata_not_required"])
         except KeyError:
             msg = u"NXDL rule set %s not installed, cannot test" % ref
             self.assertTrue(False, msg)
         self.validator.validate(self.hdffile)
         self.assertTrue(u"NXentry/NXdata" not in self.validator.classpaths)
-        entry = self.validator.addresses[u"/entry"].validations
-        # TODO: look in "entry" for absence of Finding with ERROR because NXdata is not required
-        pass
+        group = self.validator.addresses[u"/"].validations
+
+        # look in "/" for absence of Finding with ERROR because NXdata is not required
+        found = [v for v in group.values() if v.status == punx.finding.ERROR]
+        self.assertEqual(len(found), 0, "ERROR located")
+
+        # look in "/" for presence of Finding with NOTE because NXdata is not required but recommended
+        found = [v for v in group.values() if v.status == punx.finding.NOTE]
+        self.assertEqual(len(found), 1, "NOTE located")
 
 
 class Test_Validate(unittest.TestCase):
@@ -606,7 +615,12 @@ class Test_Default_Plot(unittest.TestCase):
         test_name = "NeXus default plot"
         flist = self.locate_findings_by_test_name(test_name)
         self.assertEqual(len(flist), 0)
-        flist = self.locate_findings_by_test_name(test_name, punx.finding.ERROR)
+
+        if self.validator.manager.classes["NXentry"].groups["data"].minOccurs > 0:
+            expectation = punx.finding.ERROR
+        else:
+            expectation = punx.finding.NOTE
+        flist = self.locate_findings_by_test_name(test_name, expectation)
         self.assertEqual(len(flist), 1)
 
     def test_default_plot_v2_pass(self):
@@ -639,12 +653,18 @@ class Test_Default_Plot(unittest.TestCase):
         self.validator.validate(self.hdffile)
         sum, count, score = self.validator.finding_score()
         self.assertGreater(count, 0, "items counted for scoring")
-        self.assertLess(sum, 0, "scoring detects error(s)")
+        if self.validator.manager.classes["NXentry"].groups["data"].minOccurs > 0:
+            self.assertLess(sum, 0, "scoring detects error(s)")
 
         test_name = "NeXus default plot"
         flist = self.locate_findings_by_test_name(test_name)
         self.assertEqual(len(flist), 0)
-        flist = self.locate_findings_by_test_name(test_name, punx.finding.ERROR)
+
+        if self.validator.manager.classes["NXentry"].groups["data"].minOccurs > 0:
+            expectation = punx.finding.ERROR
+        else:
+            expectation = punx.finding.NOTE
+        flist = self.locate_findings_by_test_name(test_name, expectation)
         self.assertEqual(len(flist), 1)
 
     def test_default_plot_v2_fail_multi_signal(self):
@@ -662,11 +682,18 @@ class Test_Default_Plot(unittest.TestCase):
         test_name = "NeXus default plot"
         flist = self.locate_findings_by_test_name(test_name)
         self.assertEqual(len(flist), 0)
-        flist = self.locate_findings_by_test_name(test_name, punx.finding.ERROR)
+        
+        if self.validator.manager.classes["NXentry"].groups["data"].minOccurs > 0:
+            expectation = punx.finding.ERROR
+        else:
+            expectation = punx.finding.NOTE
+        flist = self.locate_findings_by_test_name(test_name, expectation)
         self.assertEqual(len(flist), 1)
+
         test_name = "NeXus default plot v2, @signal=1"
         flist = self.locate_findings_by_test_name(test_name)
         self.assertEqual(len(flist), 2)
+
         test_name = "NeXus default plot v2, multiple @signal=1"
         flist = self.locate_findings_by_test_name(test_name, punx.finding.ERROR)
         self.assertEqual(len(flist), 1)
@@ -699,7 +726,7 @@ def suite(*args, **kw):
         Test_Constructor_Exceptions,
         Test_Example_data,
         Test_Validate,
-#         Test_Default_Plot,
+        Test_Default_Plot,
         Test_Changing_NXDL_Rules,
         ]
     for test_case in test_list:

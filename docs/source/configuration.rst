@@ -49,9 +49,11 @@ release     v2018.5     name of a repository release [#]_
 
 .. [#] commit (hash): A commit is a snapshot of the GitHub repository.
    A SHA-1 hash code is the unique identifier of a commit.
-   It may be abbreviated to just the first characters which identify
-   it uniquely in the repository.  Three or four characters *may* be unique, 
-   seven characters are almost certain to be unique.
+   It is a 40-character sequence of hexadecimals.
+   It may be shortened to just the first characters which identify
+   it uniquely in the repository.  Three or four characters *may* be 
+   unique (1:16^3 or 1:16^4) while
+   seven characters are almost certain (1:16^7) to be a unique reference.
    
    For example. the commit `9eab` may also be identified
    as `9eab281`, or by its full SHA-1 has

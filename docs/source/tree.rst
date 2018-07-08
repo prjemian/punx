@@ -1,3 +1,4 @@
+.. _structure:
 .. _tree:
 .. index:: tree
 

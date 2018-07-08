@@ -11,9 +11,10 @@ command line help
 .. code-block:: console
 
    console> punx -h
-   usage: punx [-h] [-v] {demonstrate,tree,structure,update,validate} ...
+   usage: punx [-h] [-v]
+               {configuration,demonstrate,structure,tree,update,validate} ...
    
-   Python Utilities for NeXus HDF5 files version: 0.1.9+261.gfcaf00d.dirty URL:
+   Python Utilities for NeXus HDF5 files version: 0.2.0+9.g31fd4b4.dirty URL:
    http://punx.readthedocs.io
    
    optional arguments:
@@ -23,10 +24,11 @@ command line help
    subcommand:
      valid subcommands
    
-     {demonstrate,tree,structure,update,validate}
+     {configuration,demonstrate,structure,tree,update,validate}
+       configuration       show configuration details of punx
        demonstrate         demonstrate HDF5 file validation
+       structure           (deprecated) use ``tree``
        tree                show tree structure of HDF5 or NXDL file
-       structure           structure command deprecated. Use ``tree`` instead
        update              update the local cache of NeXus definitions
        validate            validate a NeXus file
    
@@ -40,9 +42,10 @@ Subcommands
 .. toctree::
    :hidden:
    
+   config
    demo
    hierarchy
-   structure
+   tree
    update
    validate
 
@@ -53,15 +56,17 @@ identifiable program.  These are invoked using commands of the form::
     
 where *<subcommand>* is chosen from this table:
 
-============================  ====================================================
-subcommand                    brief description
-============================  ====================================================
-:ref:`demonstrate <demo>`     demonstrate HDF5 file validation
-:ref:`hierarchy <hierarchy>`  show NeXus base class hierarch
-:ref:`tree <tree>`            show tree structure of HDF5 or NXDL file
-:ref:`update <update>`        update the local cache of NeXus definitions
-:ref:`validate <validate>`    validate a NeXus file
-============================  ====================================================
+=============================  ====================================================
+subcommand                     brief description
+=============================  ====================================================
+:ref:`configuration <config>`  show internal punx configuration
+:ref:`demonstrate <demo>`      demonstrate HDF5 file validation
+:ref:`hierarchy <hierarchy>`   show NeXus base class hierarchy (not implemented yet)
+:ref:`structure <tree>`        (deprecated) use :ref:`tree`
+:ref:`tree <tree>`             show tree structure of HDF5 or NXDL file
+:ref:`update <update>`         update the local cache of NeXus definitions
+:ref:`validate <validate>`     validate a NeXus file
+=============================  ====================================================
 
 and the *<other parameters>* are desribed by the help for each subcommand::
 
@@ -81,8 +86,11 @@ Example [#]_ ::
                       COMMENT,ERROR,NOTE,OK,OPTIONAL,TODO,UNUSED,WARN
 
 
-.. [#] tip:: Subcommands may be abbreviated.
+.. [#] tip: Subcommands may be shortened.
 
    It is only necessary to use the first two (or more) characters of any
-   subcommand enough that the abbreviation is unique. 
+   subcommand, enough that the short version remains unique and could not be
+   misinterpreted as another subcommand.  The program imposes a minimum limit
+   of at least 2-characters.
+    
    Such as: ``demonstrate`` can be abbreviated to ``demo`` or even ``de``.

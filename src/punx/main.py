@@ -20,23 +20,31 @@ main user interface file
 
 ::
 
-    usage: punx [-h] [-v] {demonstrate,tree,update,validate} ...
+    console> punx -h
+    usage: punx [-h] [-v]
+                {configuration,demonstrate,structure,tree,update,validate} ...
     
-    Python Utilities for NeXus HDF5 files URL: http://punx.readthedocs.io
-    v0.0.1+4.gff00892.dirty
+    Python Utilities for NeXus HDF5 files version: 0.2.0+9.g31fd4b4.dirty URL:
+    http://punx.readthedocs.io
     
     optional arguments:
       -h, --help            show this help message and exit
       -v, --version         show program's version number and exit
     
-    subcommands:
+    subcommand:
       valid subcommands
     
-      {demonstrate,tree,update,validate}
+      {configuration,demonstrate,structure,tree,update,validate}
+        configuration       show configuration details of punx
         demonstrate         demonstrate HDF5 file validation
+        structure           structure command deprecated. Use ``tree`` instead
         tree                show tree structure of HDF5 or NXDL file
         update              update the local cache of NeXus definitions
         validate            validate a NeXus file
+    
+    Note: It is only necessary to use the first two (or more) characters of any
+    subcommand, enough that the abbreviation is unique. Such as: ``demonstrate``
+    can be abbreviated to ``demo`` or even ``de``.
 
 .. autosummary::
    
@@ -44,11 +52,11 @@ main user interface file
    ~MyArgumentParser
    ~parse_command_line_arguments
    ~func_demo
+   ~func_validate
    ~func_hierarchy
-   ~func_show
+   ~func_configuration
    ~func_tree
    ~func_update
-   ~func_validate
 
 '''
 
@@ -88,6 +96,21 @@ def exit_message(msg, status=None, exit_code=1):
         status = ERROR
     logging.info("{} -- {}".format(msg, status))
     exit(exit_code)
+
+
+def func_configuration(args):
+    """show internal configuration of punx"""
+    from . import cache_manager
+    from . import github_handler
+
+    cm = cache_manager.CacheManager()
+    print("Locally-available versions of NeXus definitions (NXDL files)")
+    print(cm.table_of_caches())
+    print("default NXDL file set: ", cm.default_file_set.ref)
+
+    # nothing to show from here
+    # grr = github_handler.GitHub_Repository_Reference()
+    # perhaps does local creds file exist?  Show where it is?  or TMI?
 
 
 def func_demo(args):
@@ -143,12 +166,6 @@ def func_hierarchy(args):
     # TODO: issue #1 & #10 show NeXus base class hierarchy from a given base class
 
 
-def func_show(args):
-    "not implemented yet"
-    print('still in development -- not implemented yet')
-    print(args)
-
-
 def func_structure(args):
     "deprecated subcommand"
     msg = 'structure command deprecated.  Use ``tree`` instead'
@@ -157,7 +174,7 @@ def func_structure(args):
 
 
 def func_tree(args):
-    """print the tree structure"""
+    """print the tree structure of a NeXus HDF5 data file of NXDL XML file"""
     if args.infile.endswith('.nxdl.xml'):
         from . import nxdltree
 
@@ -185,46 +202,9 @@ def func_tree(args):
         print('\n'.join(report or ''))
 
 
-def _install(cm, grr, ref, use_user_cache = True, force = False):
-    """
-    Install or update the named NXDL file reference
-    """
-    force = force or ref == "master"    # always update from the master branch
-
-    msg = "install_NXDL_file_set(ref={}, force={}, user_cache={})".format(
-        ref, force, use_user_cache)
-    logger.info(msg)
-
-    m = cm.install_NXDL_file_set(
-        grr, 
-        user_cache=use_user_cache, 
-        ref=ref,
-        force = force)
-    if isinstance(m, list):
-        print(str(m[-1]))
-
-
-def func_update(args):
-    """update or install versions of the NeXus definitions"""
-    from . import cache_manager
-    from . import github_handler
-
-    cm = cache_manager.CacheManager()
-    print(cm.table_of_caches())
-
-    if args.try_to_install_or_update:
-        grr = github_handler.GitHub_Repository_Reference()
-        grr.connect_repo()
-        cm.find_all_file_sets()
-        
-        for ref in args.file_set_list:
-            _install(cm, grr, ref, force=args.force)
-        
-        print(cm.table_of_caches())
-
-
 def func_validate(args):
     """
+    validate the content of a NeXus HDF5 data file of NXDL XML file
     """
     from . import validate
 
@@ -263,6 +243,44 @@ def func_validate(args):
 
     # report the findings from the validation
     validator.print_report()
+
+
+def _install(cm, grr, ref, use_user_cache = True, force = False):
+    """
+    Install or update the named NXDL file reference
+    """
+    force = force or ref == "master"    # always update from the master branch
+
+    msg = "install_NXDL_file_set(ref={}, force={}, user_cache={})".format(
+        ref, force, use_user_cache)
+    logger.info(msg)
+
+    m = cm.install_NXDL_file_set(
+        grr, 
+        user_cache=use_user_cache, 
+        ref=ref,
+        force = force)
+    if isinstance(m, list):
+        print(str(m[-1]))
+
+
+def func_update(args):
+    """update or install versions of the NeXus definitions"""
+    from . import cache_manager
+    from . import github_handler
+
+    cm = cache_manager.CacheManager()
+    print(cm.table_of_caches())
+
+    if args.try_to_install_or_update:
+        grr = github_handler.GitHub_Repository_Reference()
+        grr.connect_repo()
+        cm.find_all_file_sets()
+        
+        for ref in args.file_set_list:
+            _install(cm, grr, ref, force=args.force)
+        
+        print(cm.table_of_caches())
 
 
 class MyArgumentParser(argparse.ArgumentParser):
@@ -336,6 +354,13 @@ def parse_command_line_arguments():
     #     help='graphical user interface (TBA)')
 
     subcommand = p.add_subparsers(title='subcommand', description='valid subcommands',)
+
+
+    ## subcommand: configuration
+    # TODO: issue #11
+    help_text = 'show configuration details of punx'
+    p_sub = subcommand.add_parser('configuration', help=help_text)
+    p_sub.set_defaults(func=func_configuration)
     
     
     ### subcommand: demo
@@ -352,11 +377,11 @@ def parse_command_line_arguments():
 #     #p_sub.add_argument('something', type=bool, help='something help_text')
 
 
-    ### subcommand: show
-#     # TODO: issue #11
-#     p_sub = subcommand.add_parser('show', help='show program information (about the cache)')
-#     p_sub.set_defaults(func=func_show)
-#     # p_sub.add_argument('details', type=bool, help='details help_text')
+    ### subcommand: structure
+    help_text = 'structure command deprecated.  Use ``tree`` instead'
+    p_sub = subcommand.add_parser('structure', help=help_text)
+    p_sub.set_defaults(func=func_structure)
+    p_sub.add_argument('infile', help="HDF5 or NXDL file name")
 
 
     ### subcommand: tree
@@ -378,13 +403,6 @@ def parse_command_line_arguments():
         #choices=range(1,51),
         help=help_text)
     # TODO: add_logging_argument(p_sub)
-
-
-    ### subcommand: structure
-    help_text = 'structure command deprecated.  Use ``tree`` instead'
-    p_sub = subcommand.add_parser('structure', help=help_text)
-    p_sub.set_defaults(func=func_structure)
-    p_sub.add_argument('infile', help="HDF5 or NXDL file name")
 
 
     ### subcommand: update

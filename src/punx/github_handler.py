@@ -71,6 +71,7 @@ def get_BasicAuth_credentials(creds_file_name = None):
     as shown below.  Be sure to make the file
     readable only by the user and not others.
     """
+    # TODO: also look in user's .config directory, use a for loop to pick first matching path
     if creds_file_name is None:
         path = os.path.dirname(__file__)
         creds_file_name = os.path.join(path, CREDS_FILE_NAME)

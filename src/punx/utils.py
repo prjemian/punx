@@ -40,8 +40,10 @@ def decode_byte_string(text):
     in python3, HDF5 attributes can be byte strings or numpy.ndarray strings
     """
     if isinstance(text, (numpy.ndarray)):
-        #text = [v for v in text]
-        text = text[0]
+        if len(text) > 0:
+            text = text[0]
+        else:
+            text = None
     if isinstance(text, (bytes, numpy.bytes_)):
         text = text.decode(sys.stdout.encoding or "utf8")
     return text

@@ -447,7 +447,7 @@ def parse_command_line_arguments():
 
 
 def main():
-    print("\n!!!\n!!!WARNING: this program is not ready for distribution.\n!!!\n")
+    print("\n!!! WARNING: this program is not ready for distribution.\n")
     args = parse_command_line_arguments()
     if not hasattr(args, "func"):
         print("ERROR: must specify a subcommand -- for help, type:")

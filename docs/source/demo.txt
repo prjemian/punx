@@ -1,8 +1,6 @@
 C:\Users\Pete\Documents\eclipse\punx\src\punx\main.py
 
-!!!
-!!!WARNING: this program is not ready for distribution.
-!!!
+!!! WARNING: this program is not ready for distribution.
 
 
 console> punx validate C:\Users\Pete\Documents\eclipse\punx\src\punx\data\writer_1_3.hdf5

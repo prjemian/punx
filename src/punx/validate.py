@@ -199,7 +199,7 @@ class Data_File_Validator(object):
             row.append(f.test_name)
             row.append(f.comment)
             t.addRow(row)
-        print(t)
+        print(str(t))
     
         summary = self.finding_summary()
         t = pyRestTable.Table()
@@ -211,9 +211,9 @@ class Data_File_Validator(object):
         t.addRow(["", "--", "", ""])
         t.addRow(["TOTAL", sum(summary.values()), "", ""])
         print("\nsummary statistics")
-        print(t)
+        print(str(t))
         total, count, average = self.finding_score()
-        print("<value>/finding=%f  count=%d  sum(finding values)=%f" % (average, count, total))
+        print("<finding>=%f of %d items reviewed" % (average, count))
 
     def validate(self, fname):
         """start the validation process from the file root"""

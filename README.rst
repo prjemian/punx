@@ -20,6 +20,11 @@ NOTE: project is under initial construction
 :PyPI:      https://pypi.python.org/pypi/punx/ 
 :TODO list: https://github.com/prjemian/punx/issues
 
+:citation:
+   .. image:: https://zenodo.org/badge/59300337.svg
+      :target: https://zenodo.org/badge/latestdoi/59300337
+      :alt: DOI: 10.5281/zenodo.1471687
+
 :build badges:
 
    ..  see http://shields.io/ for more badge ideas

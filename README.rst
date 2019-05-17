@@ -38,6 +38,13 @@ NOTE: project is under initial construction
    .. image:: https://landscape.io/github/prjemian/punx/master/landscape.svg?style=plastic
       :target: https://landscape.io/github/prjemian/punx/master
       :alt: Code Health
+   .. image:: https://img.shields.io/lgtm/grade/python/g/prjemian/punx.svg?logo=lgtm&logoWidth=18
+      :target: https://lgtm.com/projects/g/prjemian/punx/context:python
+      :alt: Language grade: Python
+   .. image:: https://img.shields.io/lgtm/alerts/g/prjemian/punx.svg?logo=lgtm&logoWidth=18
+      :target: https://lgtm.com/projects/g/prjemian/punx/alerts/
+      :alt: Total alerts
+
 
 :release badges:
       

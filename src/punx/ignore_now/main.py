@@ -203,7 +203,7 @@ def func_validate(args):
             exit_message(msg)
 
         # run the validation
-        validator.validate()
+        validator.validate()        # lgtm [py/call/wrong-arguments] 
 
         # report the findings from the validation
         from punx import cache_manager

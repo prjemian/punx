@@ -380,7 +380,7 @@ class NXDL_Element(Mixin):
                 type_obj.copy_to(self)
 
 
-class NXDL_Type(Mixin): 
+class NXDL_Type(Mixin):         # lgtm [py/missing-call-to-init] 
     '''
     a named NXDL structure type (such as groupGroup)
     

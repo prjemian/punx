@@ -158,7 +158,7 @@ class NxdlPattern(object):
         return self.re_obj.match(text)
 
 
-class CustomNxdlPattern(NxdlPattern):
+class CustomNxdlPattern(NxdlPattern):       # lgtm [py/missing-call-to-init] 
     '''
     custom regular expression pattern for validation
     

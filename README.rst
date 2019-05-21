@@ -35,9 +35,6 @@ NOTE: project is under initial construction
    .. image:: https://coveralls.io/repos/github/prjemian/punx/badge.svg?branch=master
       :target: https://coveralls.io/github/prjemian/punx?branch=master
       :alt: Code Coverage
-   .. image:: https://landscape.io/github/prjemian/punx/master/landscape.svg?style=plastic
-      :target: https://landscape.io/github/prjemian/punx/master
-      :alt: Code Health
    .. image:: https://img.shields.io/lgtm/grade/python/g/prjemian/punx.svg?logo=lgtm&logoWidth=18
       :target: https://lgtm.com/projects/g/prjemian/punx/context:python
       :alt: Language grade: Python

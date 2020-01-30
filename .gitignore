@@ -49,3 +49,7 @@ tests/__pycache__
 /.settings
 /.idea
 /src/punx/data/local
+
+# Microsoft VS Code editor
+launch.json
+settings.json

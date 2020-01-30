@@ -430,6 +430,13 @@ def parse_command_line_arguments():
         action='store_true', 
         default=False, 
         help='force update (if GitHub available)')
+
+    p_sub.add_argument(
+        '-t', '--token', 
+        action='store_true', 
+        default=None, 
+        help='GitHub personal access token')
+
     # TODO: add_logging_argument(p_sub)
 
 

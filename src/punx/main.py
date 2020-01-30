@@ -272,13 +272,13 @@ def func_update(args):
     cm = cache_manager.CacheManager()
     print(cm.table_of_caches())
 
-    if args.try_to_install_or_update:
+    if args.token is not None:
         grr = github_handler.GitHub_Repository_Reference()
-        grr.connect_repo()
+        grr.connect_repo(token=args.token)
         cm.find_all_file_sets()
         
         for ref in args.file_set_list:
-            _install(cm, grr, ref, force=args.force)
+            _install(cm, grr, ref, force=args.token is None)
         
         print(cm.table_of_caches())
 
@@ -419,12 +419,6 @@ def parse_command_line_arguments():
         nargs='*',
         help=help_text)
 
-    p_sub.add_argument("-i", "--install",
-        action='store_false', 
-        default=True,
-        dest='try_to_install_or_update',
-        help='Do not install (or update) -- default True')
-
     p_sub.add_argument(
         '-f', '--force', 
         action='store_true', 
@@ -433,9 +427,8 @@ def parse_command_line_arguments():
 
     p_sub.add_argument(
         '-t', '--token', 
-        action='store_true', 
         default=None, 
-        help='GitHub personal access token')
+        help='GitHub personal access token (to update the NXDL file sets)')
 
     # TODO: add_logging_argument(p_sub)
 

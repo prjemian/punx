@@ -144,15 +144,15 @@ class Hdf5TreeView(object):
         txShape = self._renderDsShape(dset)
         s = []
         if dset.dtype.kind == 'S':
-            if isinstance(dset.value, numpy.ndarray):
-                value = " = %s" % utils.decode_byte_string(dset.value[0])
+            if isinstance(dset[()], numpy.ndarray):
+                value = " = %s" % utils.decode_byte_string(dset[()][0])
             else:
-                value = " = %s" % utils.decode_byte_string(dset.value)
+                value = " = %s" % utils.decode_byte_string(dset[()])
             s += [ "%s%s:%s%s" % (indentation, name, txType, value) ]
             s += self._renderAttributes(dset, indentation)
             # dset.dtype.kind == 'S', nchar = dset.dtype.itemsize
         elif dset.dtype.kind == 'O':
-            value = " = %s" % str(dset.value)
+            value = " = %s" % str(dset[()])
             s += [ "%s%s:%s%s" % (indentation, name, txType, value) ]
             s += self._renderAttributes(dset, indentation)
         elif shape == (1,):

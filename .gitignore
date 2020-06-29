@@ -51,5 +51,4 @@ tests/__pycache__
 /src/punx/data/local
 
 # Microsoft VS Code editor
-launch.json
-settings.json
+.vscode/

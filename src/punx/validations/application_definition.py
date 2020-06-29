@@ -18,7 +18,7 @@ def verify(validator, v_item):
     """
     Verify items specified in application definition are present in HDF5 data file
     """
-    ad_name = utils.decode_byte_string(v_item.h5_object["definition"].value)
+    ad_name = utils.decode_byte_string(v_item.h5_object["definition"][()])
     key = "NeXus application definition"
 
     ad = validator.manager.classes.get(ad_name)
@@ -57,7 +57,7 @@ def verify(validator, v_item):
         if len(spec.enumerations) > 0:
             found = False
             for enum in spec.enumerations:
-                found = enum == utils.decode_byte_string(h5_obj.value)
+                found = enum == utils.decode_byte_string(h5_obj[()])
                 if found:
                     break
             msg = "%s:%s" % (ad_name, field)

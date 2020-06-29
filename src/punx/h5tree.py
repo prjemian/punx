@@ -19,8 +19,7 @@ Describe the tree structure of any HDF5 file
     ~Hdf5TreeView
 """
 
-import os       #@UnusedImport
-import sys      #@UnusedImport
+import os
 import h5py
 import numpy
 

@@ -171,7 +171,7 @@ class GitHub_Repository_Reference(object):
                                      )
             except requests.exceptions.ConnectionError as _exc:
                 raise IOError(
-                    f'ConnectionError from {self.zip_url}\n{_exc}'
+                    "ConnectionError from " + self.zip_url + "\n" + str(_exc)
                 )
             else:
                 break

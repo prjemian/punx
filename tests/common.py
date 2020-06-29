@@ -25,10 +25,9 @@ def create_test_file(content_function=None, suffix='.hdf5'):
     hfile = tempfile.NamedTemporaryFile(suffix=suffix, delete=False)
     hfile.close()
     if suffix == '.hdf5':
-        hdf5root = h5py.File(hfile.name, "w")
-        if content_function is not None:
-            content_function(hdf5root)
-        hdf5root.close()
+        with h5py.File(hfile.name, "w") as hdf5root:
+            if content_function is not None:
+                content_function(hdf5root)
     return str(hfile.name)
 
 

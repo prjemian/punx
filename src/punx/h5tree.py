@@ -145,7 +145,13 @@ class Hdf5TreeView(object):
         s = []
         if dset.dtype.kind == 'S':
             if isinstance(dset[()], numpy.ndarray):
-                value = " = %s" % utils.decode_byte_string(dset[()][0])
+                ss = [
+                    '"' + utils.decode_byte_string(ss) + '"' 
+                    for ss in dset[()]]
+                if len(ss) > 1:
+                    value = " = [%s]" % ", ".join(ss)
+                else:
+                    value = " = %s" % ", ".join(ss)
             else:
                 value = " = %s" % utils.decode_byte_string(dset[()])
             s += [ "%s%s:%s%s" % (indentation, name, txType, value) ]
@@ -186,7 +192,8 @@ class Hdf5TreeView(object):
         t = str(obj.dtype)
         # dset.dtype.kind == 'S', nchar = dset.dtype.itemsize
         if obj.dtype.kind == 'S':        # fixed-length string
-            t = 'char[%s]' % obj.dtype.itemsize
+            t = 'char[%s]' % ",".join(
+                [str(o.dtype.itemsize) for o in obj])
         elif obj.dtype.kind == 'O':      # variable-length string
             t = 'CHAR'
         if self.isNeXus:

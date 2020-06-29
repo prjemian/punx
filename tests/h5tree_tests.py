@@ -36,21 +36,25 @@ class Test_Battery(unittest.TestCase):
         self.assertTrue(os.path.exists(self.hfile))
         self.assertFalse(punx.utils.isHdf5FileObject(self.hfile))
         str_list = [
-            "Q=1",
-            "Q=0.1",
-            "Q=0.01",
-            "Q=0.001",
-            "Q=0.0001",
-            "Q=0.00001",
+            b"Q=1",
+            b"Q=0.1",
+            b"Q=0.01",
+            b"Q=0.001",
+            b"Q=0.0001",
+            b"Q=0.00001",
         ]
-        with h5py.File(self.hfile) as f:
+        with h5py.File(self.hfile, "w") as f:
             self.assertFalse(punx.utils.isHdf5FileObject(self.hfile))
             self.assertTrue(f)
-            f.create_dataset('str_list', data=[s.encode("utf8") for s in str_list])
+            f.create_dataset('str_list', data=str_list)
+            f.create_dataset('title', data=b"this is the title")
+            f.create_dataset('subtitle', data=[b"<a subtitle>",])
+            f.create_dataset('names', data=[b"one", b"two"])
 
         mc = punx.h5tree.Hdf5TreeView(self.hfile)
         txt = mc.report()
-        self.assertEqual(len(txt), len(str_list)+1)
+        print("\n".join(txt))
+        self.assertEqual(len(txt), 5)
 
 
 def suite(*args, **kw):

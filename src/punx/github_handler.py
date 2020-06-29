@@ -108,7 +108,7 @@ class GitHub_Repository_Reference(object):
         self.zip_url = None
         self.last_modified = None
     
-    def connect_repo(self, repo_name=None):
+    def connect_repo(self, repo_name=None, token=None):
         """
         connect with the GitHub repository
         
@@ -117,15 +117,13 @@ class GitHub_Repository_Reference(object):
         """
         repo_name = repo_name or self.appName
         
-        creds = get_BasicAuth_credentials()
-        if creds is None:
+        if token is None:
             gh = github.Github()
             self.repo = gh.get_repo(repo_name)
         else:
-            gh = github.Github(creds['user'], creds['password'])
+            gh = github.Github(token)
             user = gh.get_user(self.orgName)
             self.repo = user.get_repo(repo_name)
-        return creds is not None
     
     def request_info(self, ref=None):
         """

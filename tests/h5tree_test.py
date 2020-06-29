@@ -53,7 +53,6 @@ class Test_Battery(unittest.TestCase):
 
         mc = punx.h5tree.Hdf5TreeView(self.hfile)
         txt = mc.report()
-        print("\n".join(txt))
         self.assertEqual(len(txt), 5)
 
 

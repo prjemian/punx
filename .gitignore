@@ -49,3 +49,6 @@ tests/__pycache__
 /.settings
 /.idea
 /src/punx/data/local
+
+# MS VSCode editor
+.vscode/

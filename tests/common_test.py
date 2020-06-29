@@ -50,10 +50,9 @@ class TestCommon(unittest.TestCase):
         '''make an HDF5 file and test it by reading'''
         fname = common.create_test_file()
         self.file_list.append(fname)
-        fp = h5py.File(fname, 'r')
-        self.assertIsInstance(fp, h5py.File, 'is HDF5 file')
-        self.assertEqual(None, fp.get('entry', None))
-        fp.close()
+        with h5py.File(fname, 'r') as fp:
+            self.assertIsInstance(fp, h5py.File, 'is HDF5 file')
+            self.assertEqual(None, fp.get('entry', None))
 
     def test_hdf5_file_with_simple_content(self):
         '''make an HDF5 file, add more content, and test it by reading'''
@@ -65,13 +64,12 @@ class TestCommon(unittest.TestCase):
             ds.attrs["units"] = "counts"
         # - - - - - - - - - - - - - - -
         fname = common.getTestFileName(set_content)
-        fp = h5py.File(fname, 'r')
-        self.assertIsInstance(fp, h5py.File, 'is HDF5 file')
-        self.assertIsInstance(fp['entry'], h5py.Group)
-        self.assertEqual('counter', fp['entry'].attrs['signal'])
-        self.assertIsInstance(fp['entry/counter'], h5py.Dataset)
-        self.assertEqual('counts', fp['entry/counter'].attrs['units'])
-        fp.close()
+        with h5py.File(fname, 'r') as fp:
+            self.assertIsInstance(fp, h5py.File, 'is HDF5 file')
+            self.assertIsInstance(fp['entry'], h5py.Group)
+            self.assertEqual('counter', fp['entry'].attrs['signal'])
+            self.assertIsInstance(fp['entry/counter'], h5py.Dataset)
+            self.assertEqual('counts', fp['entry/counter'].attrs['units'])
 
     def test_is_not_hdf5_file(self):
         '''try to open this python code file as if it were HDF5'''
@@ -81,9 +79,8 @@ class TestCommon(unittest.TestCase):
         '''verify a punx data file exists and verify that it is HDF5'''
         fname = common.punx_data_file_name('writer_1_3.hdf5')
         self.assertTrue(os.path.exists(fname), 'test file exists')
-        fp = h5py.File(fname, 'r')
-        self.assertIsInstance(fp, h5py.File, 'is HDF5 file')
-        fp.close()
+        with h5py.File(fname, 'r') as fp:
+            self.assertIsInstance(fp, h5py.File, 'is HDF5 file')
 
     def test_read_filelines(self):
         path = os.path.abspath(os.path.dirname(__file__))

@@ -52,86 +52,77 @@ class Test_HDF5_Tests(unittest.TestCase):
         self.hfile = None
 
     def test_isHdf5FileObject(self):
-        f = h5py.File(self.hfile)
-        self.assertFalse(punx.utils.isHdf5FileObject(self.hfile))
-        self.assertTrue(punx.utils.isHdf5FileObject(f))
-        f.close()
+        with h5py.File(self.hfile, "w") as f:
+            self.assertFalse(punx.utils.isHdf5FileObject(self.hfile))
+            self.assertTrue(punx.utils.isHdf5FileObject(f))
 
     def test_isHdf5FileObject(self):
-        f = h5py.File(self.hfile)
-        self.assertFalse(punx.utils.isHdf5Group(self.hfile))
-        self.assertFalse(punx.utils.isHdf5Group(f))
-        g = f.create_group("name")
-        self.assertTrue(punx.utils.isHdf5Group(g))
-        self.assertTrue(punx.utils.isHdf5Group(f["name"]))
-        self.assertTrue(punx.utils.isHdf5Group(f["/name"]))
-        f.close()
+        with h5py.File(self.hfile, "w") as f:
+            self.assertFalse(punx.utils.isHdf5Group(self.hfile))
+            self.assertFalse(punx.utils.isHdf5Group(f))
+            g = f.create_group("name")
+            self.assertTrue(punx.utils.isHdf5Group(g))
+            self.assertTrue(punx.utils.isHdf5Group(f["name"]))
+            self.assertTrue(punx.utils.isHdf5Group(f["/name"]))
 
     def test_isHdf5Dataset(self):
-        f = h5py.File(self.hfile)
-        self.assertFalse(punx.utils.isHdf5Dataset(self.hfile))
-        self.assertFalse(punx.utils.isHdf5Dataset(f))  # file is a group, too
-        ds = f.create_dataset("name", data=1.0)
-        self.assertTrue(punx.utils.isHdf5Dataset(ds))
-        self.assertTrue(punx.utils.isHdf5Dataset(f["name"]))
-        self.assertTrue(punx.utils.isHdf5Dataset(f["/name"]))
-        f.close()
+        with h5py.File(self.hfile, "w") as f:
+            self.assertFalse(punx.utils.isHdf5Dataset(self.hfile))
+            self.assertFalse(punx.utils.isHdf5Dataset(f))  # file is a group, too
+            ds = f.create_dataset("name", data=1.0)
+            self.assertTrue(punx.utils.isHdf5Dataset(ds))
+            self.assertTrue(punx.utils.isHdf5Dataset(f["name"]))
+            self.assertTrue(punx.utils.isHdf5Dataset(f["/name"]))
 
     def test_isHdf5Group(self):
-        f = h5py.File(self.hfile)
-        self.assertFalse(punx.utils.isHdf5Group(self.hfile))
-        self.assertFalse(punx.utils.isHdf5Group(f))
-        g = f.create_group("group")
-        self.assertTrue(punx.utils.isHdf5Group(g))
-        self.assertEqual(g, f["/group"])
-        f.close()
+        with h5py.File(self.hfile, "w") as f:
+            self.assertFalse(punx.utils.isHdf5Group(self.hfile))
+            self.assertFalse(punx.utils.isHdf5Group(f))
+            g = f.create_group("group")
+            self.assertTrue(punx.utils.isHdf5Group(g))
+            self.assertEqual(g, f["/group"])
 
     def test_isHdf5Link(self):
-        f = h5py.File(self.hfile)
-        ds = f.create_dataset("name", data=1.0)
-        f["/link"] = f["/name"]
-        self.assertTrue(punx.utils.isHdf5Link(f["/link"]))
-        f.close()
+        with h5py.File(self.hfile, "w") as f:
+            ds = f.create_dataset("name", data=1.0)
+            f["/link"] = f["/name"]
+            self.assertTrue(punx.utils.isHdf5Link(f["/link"]))
  
     def test_isHdf5ExternalLink(self):
         tfile = tempfile.NamedTemporaryFile(suffix='.hdf5', delete=False)
         tfile.close()
         f1_name = tfile.name
  
-        f1 = h5py.File(f1_name)
-        ds = f1.create_dataset("name", data=1.0)
-        f1.close()
+        with h5py.File(f1_name, "w") as f1:
+            ds = f1.create_dataset("name", data=1.0)
  
-        f2 = h5py.File(self.hfile)
-        f2["/link"] = h5py.ExternalLink(f1_name, "/name")
-        f2.close()
+        with h5py.File(self.hfile, "w") as f2:
+            f2["/link"] = h5py.ExternalLink(f1_name, "/name")
 
-        f2 = h5py.File(self.hfile)
+        with h5py.File(self.hfile, "r") as f2:
         
-        # h5py.ExternalLink is transparent in standard API
-        self.assertFalse(punx.utils.isHdf5ExternalLink(f2, f2["/link"]))
-        
-        # use file.get(addr, getlink=True) to examine ExternalLink
-        _link_true = f2.get("/link", getlink=True)
-        self.assertTrue(punx.utils.isHdf5ExternalLink(f2, _link_true))
-        _link_false = f2.get("/link", getlink=False)
-        self.assertFalse(punx.utils.isHdf5ExternalLink(f2, _link_false))
-        # discard the references so h5py will release its hold
-        del _link_true, _link_false
-        f2.close()
+            # h5py.ExternalLink is transparent in standard API
+            self.assertFalse(punx.utils.isHdf5ExternalLink(f2, f2["/link"]))
+            
+            # use file.get(addr, getlink=True) to examine ExternalLink
+            _link_true = f2.get("/link", getlink=True)
+            self.assertTrue(punx.utils.isHdf5ExternalLink(f2, _link_true))
+            _link_false = f2.get("/link", getlink=False)
+            self.assertFalse(punx.utils.isHdf5ExternalLink(f2, _link_false))
+            # discard the references so h5py will release its hold
+            del _link_true, _link_false
 
         os.remove(f1_name)
 
-        f2 = h5py.File(self.hfile)
-        _link_true = f2.get("/link", getlink=True)
-        self.assertTrue(punx.utils.isHdf5ExternalLink(f2, _link_true))
-        _link_false = f2.get("/link", getlink=False)
-        self.assertFalse(punx.utils.isHdf5ExternalLink(f2, _link_false))
-        with self.assertRaises(KeyError):
-            # can't access the node because external link file is missing
-            punx.utils.isHdf5ExternalLink(f2, f2["/link"])
-        del _link_true, _link_false
-        f2.close()
+        with h5py.File(self.hfile, "r") as f2:
+            _link_true = f2.get("/link", getlink=True)
+            self.assertTrue(punx.utils.isHdf5ExternalLink(f2, _link_true))
+            _link_false = f2.get("/link", getlink=False)
+            self.assertFalse(punx.utils.isHdf5ExternalLink(f2, _link_false))
+            with self.assertRaises(KeyError):
+                # can't access the node because external link file is missing
+                punx.utils.isHdf5ExternalLink(f2, f2["/link"])
+            del _link_true, _link_false
 
 
 def suite(*args, **kw):

@@ -85,7 +85,7 @@ class Test_Constructor(unittest.TestCase):
         self.hdffile = None
 
     def test_valid_hdf5_file_constructed(self):
-        with h5py.File(self.hdffile) as f:
+        with h5py.File(self.hdffile, "w") as f:
             f['item'] = 5
 
         self.assertRaises(No_Exception, self.avert_exception, self.hdffile)
@@ -98,7 +98,7 @@ class Test_Constructor(unittest.TestCase):
         self.validator = None
 
     def test_valid_nexus_file_constructed(self):
-        with h5py.File(self.hdffile) as f:
+        with h5py.File(self.hdffile, "w") as f:
             g = f.create_group("entry")
             g.attrs["NX_class"] = "NXentry"
 
@@ -152,7 +152,7 @@ class Test_Changing_NXDL_Rules(unittest.TestCase):
         was required.  Not suitable for automated validation.
         """
         # minimal test file
-        with h5py.File(self.hdffile) as f:
+        with h5py.File(self.hdffile, "w") as f:
             eg = f.create_group(u"entry")
             eg.attrs[u"NX_class"] = u"NXentry"
             #eg.create_dataset(u"title", data=u"NXdata group not provided")
@@ -213,7 +213,7 @@ class Test_Validate(unittest.TestCase):
         self.hdffile = None
 
     def setup_simple_test_file(self, create_validator=True):
-        with h5py.File(self.hdffile) as f:
+        with h5py.File(self.hdffile, "w") as f:
             f.attrs["default"] = "entry"
             eg = f.create_group("entry")
             eg.attrs["NX_class"] = "NXentry"
@@ -242,7 +242,7 @@ class Test_Validate(unittest.TestCase):
 
     def test_non_nexus_group(self):
         self.setup_simple_test_file(create_validator=False)
-        with h5py.File(self.hdffile) as f:
+        with h5py.File(self.hdffile, "r+") as f:
             other = f["/entry"].create_group("other")
             other.attrs["intentions"] = "good"
             ds = other.create_dataset("comment", data="this does not need validation")
@@ -323,7 +323,7 @@ class Test_Validate(unittest.TestCase):
     def test_bad_link_target_value(self):
         # target attribute value points to non-existing item
         self.setup_simple_test_file(create_validator=False)
-        with h5py.File(self.hdffile) as f:
+        with h5py.File(self.hdffile, "r+") as f:
             data = f["/entry/data/data"]
             f["/entry/bad_target_in_link"] = data
             data.attrs["target"] = data.name + "_make_it_incorrect"
@@ -345,7 +345,7 @@ class Test_Validate(unittest.TestCase):
     def test_wrong_link_target_value(self):
         # test target attribute value that points to wrong but existing item
         self.setup_simple_test_file(create_validator=False)
-        with h5py.File(self.hdffile) as f:
+        with h5py.File(self.hdffile, "r+") as f:
             data = f["/entry/data/data"]
             f["/entry/linked_item"] = data
             data.attrs["target"] = f["/entry/data"].name    # points to wrong item
@@ -368,7 +368,7 @@ class Test_Validate(unittest.TestCase):
 
     def test_application_definition(self):
         self.setup_simple_test_file(create_validator=False)
-        with h5py.File(self.hdffile) as f:
+        with h5py.File(self.hdffile, "r+") as f:
             other = f["/entry"].create_dataset(
                 "definition", 
                 data="NXcanSAS")
@@ -380,7 +380,7 @@ class Test_Validate(unittest.TestCase):
 
     def test_contributed_base_class(self):
         self.setup_simple_test_file(create_validator=False)
-        with h5py.File(self.hdffile) as f:
+        with h5py.File(self.hdffile, "r+") as f:
             # TODO: should be under an NXinstrument group
             group = f["/entry"].create_group("quadrupole_magnet")
             group.attrs["NX_class"] = "NXquadrupole_magnet"
@@ -391,7 +391,7 @@ class Test_Validate(unittest.TestCase):
 
     def test_contributed_application_definition(self):
         self.setup_simple_test_file(create_validator=False)
-        with h5py.File(self.hdffile) as f:
+        with h5py.File(self.hdffile, "r+") as f:
             other = f["/entry"].create_dataset(
                 "definition", 
                 data="NXspecdata")
@@ -402,7 +402,7 @@ class Test_Validate(unittest.TestCase):
         # TODO: assert what now?
 
     def test_axes_attribute_1D__pass(self):
-        with h5py.File(self.hdffile) as f:
+        with h5py.File(self.hdffile, "w") as f:
             f.attrs["default"] = "entry"
     
             eg = f.create_group("entry")
@@ -430,7 +430,7 @@ class Test_Validate(unittest.TestCase):
         # TODO: assert that @x_indices has been defined properly
     
     def test_axes_attribute_2D__pass(self):
-        with h5py.File(self.hdffile) as f:
+        with h5py.File(self.hdffile, "w") as f:
             f.attrs["default"] = "entry"
     
             eg = f.create_group("entry")
@@ -463,7 +463,7 @@ class Test_Validate(unittest.TestCase):
         # TODO: assert that @y_indices has been defined properly
 
     def test_axes_attribute_2D__fail(self):
-        with h5py.File(self.hdffile) as f:
+        with h5py.File(self.hdffile, "w") as f:
             f.attrs["default"] = "entry"
     
             eg = f.create_group("entry")
@@ -495,7 +495,7 @@ class Test_Validate(unittest.TestCase):
 
     def test_item_names(self):
         """issue #104: test non-compliant item names"""
-        with h5py.File(self.hdffile) as f:
+        with h5py.File(self.hdffile, "w") as f:
             eg = f.create_group(u"entry")
             eg.attrs[u"NX_class"] = u"NXentry"
             eg.create_dataset(u"titl:e", data=u"item name is not compliant")
@@ -525,15 +525,14 @@ class Test_Default_Plot(unittest.TestCase):
         self.hdffile = None
 
     def setup_simple_test_file(self):
-        f = h5py.File(self.hdffile)
-        eg = f.create_group("entry")
-        eg.attrs["NX_class"] = "NXentry"
-        dg = eg.create_group("data")
-        dg.attrs["NX_class"] = "NXdata"
-        ds = dg.create_dataset("y", data=[1, 2, 3.14])
-        ds = dg.create_dataset("x", data=[1, 2, 3.14])
-        ds.attrs["units"] = "arbitrary"
-        f.close()
+        with h5py.File(self.hdffile, "w") as f:
+            eg = f.create_group("entry")
+            eg.attrs["NX_class"] = "NXentry"
+            dg = eg.create_group("data")
+            dg.attrs["NX_class"] = "NXdata"
+            ds = dg.create_dataset("y", data=[1, 2, 3.14])
+            ds = dg.create_dataset("x", data=[1, 2, 3.14])
+            ds.attrs["units"] = "arbitrary"
     
     def locate_findings_by_test_name(self, test_name, status = None):
         status = status or punx.finding.OK
@@ -547,11 +546,10 @@ class Test_Default_Plot(unittest.TestCase):
 
     def test_default_plot_v3_pass(self):
         self.setup_simple_test_file()
-        f = h5py.File(self.hdffile, "r+")
-        f.attrs["default"] = "entry"
-        f["/entry"].attrs["default"] = "data"
-        f["/entry/data"].attrs["signal"] = "y"
-        f.close()
+        with h5py.File(self.hdffile, "r+") as f:
+            f.attrs["default"] = "entry"
+            f["/entry"].attrs["default"] = "data"
+            f["/entry/data"].attrs["signal"] = "y"
 
         self.validator = punx.validate.Data_File_Validator(ref=DEFAULT_NXDL_FILE_SET)
         self.validator.validate(self.hdffile)
@@ -567,24 +565,23 @@ class Test_Default_Plot(unittest.TestCase):
 
     def test_default_plot_v3_pass_multi(self):
         self.setup_simple_test_file()
-        f = h5py.File(self.hdffile, "r+")
-        f.attrs["default"] = "entry"
-        f["/entry"].attrs["default"] = "data"
-        f["/entry/data"].attrs["signal"] = "y"
-        eg = f["/entry"]
-        dg = eg.create_group("data2")
-        dg.attrs["NX_class"] = "NXdata"
-        dg.attrs["signal"] = "moss"
-        ds = dg.create_dataset("turtle", data=[1, 2, 3.14])
-        ds = dg.create_dataset("moss", data=[1, 2, 3.14])
-        eg = f.create_group("entry2")
-        eg.attrs["NX_class"] = "NXentry"
-        eg.attrs["default"] = "data3"
-        dg = eg.create_group("data3")
-        dg.attrs["NX_class"] = "NXdata"
-        dg.attrs["signal"] = "u"
-        dg.create_dataset("u", data=[1, 2, 3.14])
-        f.close()
+        with h5py.File(self.hdffile, "r+") as f:
+            f.attrs["default"] = "entry"
+            f["/entry"].attrs["default"] = "data"
+            f["/entry/data"].attrs["signal"] = "y"
+            eg = f["/entry"]
+            dg = eg.create_group("data2")
+            dg.attrs["NX_class"] = "NXdata"
+            dg.attrs["signal"] = "moss"
+            ds = dg.create_dataset("turtle", data=[1, 2, 3.14])
+            ds = dg.create_dataset("moss", data=[1, 2, 3.14])
+            eg = f.create_group("entry2")
+            eg.attrs["NX_class"] = "NXentry"
+            eg.attrs["default"] = "data3"
+            dg = eg.create_group("data3")
+            dg.attrs["NX_class"] = "NXdata"
+            dg.attrs["signal"] = "u"
+            dg.create_dataset("u", data=[1, 2, 3.14])
 
         self.validator = punx.validate.Data_File_Validator(ref=DEFAULT_NXDL_FILE_SET)
         self.validator.validate(self.hdffile)
@@ -601,10 +598,9 @@ class Test_Default_Plot(unittest.TestCase):
 
     def test_default_plot_v3_fail(self):
         self.setup_simple_test_file()
-        f = h5py.File(self.hdffile)
-        f.attrs["default"] = "entry"
-        f["/entry"].attrs["default"] = "will not be found"
-        f.close()
+        with h5py.File(self.hdffile, "r+") as f:
+            f.attrs["default"] = "entry"
+            f["/entry"].attrs["default"] = "will not be found"
 
         self.validator = punx.validate.Data_File_Validator(ref=DEFAULT_NXDL_FILE_SET)
         self.validator.validate(self.hdffile)
@@ -625,10 +621,9 @@ class Test_Default_Plot(unittest.TestCase):
 
     def test_default_plot_v2_pass(self):
         self.setup_simple_test_file()
-        f = h5py.File(self.hdffile)
-        f["/entry/data/x"].attrs["signal"] = 1
-        f["/entry/data/y"].attrs["signal"] = 2
-        f.close()
+        with h5py.File(self.hdffile, "r+") as f:
+            f["/entry/data/x"].attrs["signal"] = 1
+            f["/entry/data/y"].attrs["signal"] = 2
 
         self.validator = punx.validate.Data_File_Validator(ref=DEFAULT_NXDL_FILE_SET)
         self.validator.validate(self.hdffile)
@@ -669,7 +664,7 @@ class Test_Default_Plot(unittest.TestCase):
 
     def test_default_plot_v2_fail_multi_signal(self):
         self.setup_simple_test_file()
-        with h5py.File(self.hdffile) as f:
+        with h5py.File(self.hdffile, "r+") as f:
             f["/entry/data/x"].attrs["signal"] = 1
             f["/entry/data/y"].attrs["signal"] = 1
 

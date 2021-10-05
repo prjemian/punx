@@ -3,7 +3,8 @@ dependencies:
   - h5py
   - lxml
   - numpy
-  - python=2.7.*
+  - python=3
+  - pip
   - pyqt
   - requests
   - sip

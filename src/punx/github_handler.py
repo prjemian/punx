@@ -42,8 +42,8 @@ from . import utils
 logger = utils.setup_logger(__name__)
 
 CREDS_FILE_NAME = u'__github_creds__.txt'
-DEFAULT_BRANCH_NAME = u'master'
-DEFAULT_RELEASE_NAME = u'v2018.5'
+DEFAULT_BRANCH_NAME = u'main'
+DEFAULT_RELEASE_NAME = u'v2020.10'
 #DEFAULT_TAG_NAME = u'NXroot-1.0'
 DEFAULT_TAG_NAME = u'Schema-3.3'
 DEFAULT_COMMIT_NAME = u'a4fd52d'

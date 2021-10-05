@@ -27,16 +27,15 @@ class Test_Github_Handler_Module(unittest.TestCase):
                          u'__github_creds__.txt', 
                          u'creds file: ' + punx.github_handler.CREDS_FILE_NAME)
         self.assertEqual(punx.github_handler.DEFAULT_BRANCH_NAME, 
-                         u'master', 
+                         u'main',
                          u'default branch: ' + punx.github_handler.DEFAULT_BRANCH_NAME)
         self.assertEqual(u'v3.3', 
                          u'v3.3', 
                          u'release: v3.3')
         self.assertEqual(punx.github_handler.DEFAULT_RELEASE_NAME, 
-                         u'v3.3', 
-                         u'default release: v3.3')
-        self.assertEqual(punx.github_handler.DEFAULT_TAG_NAME, 
-                         # u'NXroot-1.0', 
+                         u'v2020.10',
+                         u'default release: v2020.10')
+        self.assertEqual(punx.github_handler.DEFAULT_TAG_NAME,
                          u'Schema-3.3',
                          u'default tag: ' + punx.github_handler.DEFAULT_TAG_NAME)
         self.assertEqual(punx.github_handler.DEFAULT_COMMIT_NAME, 
@@ -83,11 +82,11 @@ class Test_Github_Handler_Module(unittest.TestCase):
         node = grr.get_branch()
         self.assertTrue(isinstance(node, (type(None), github.Branch.Branch)), 
                         u'grr.get_branch() returns ' + str(type(node)))
-        node = grr.request_info(u'master')
-        self.assertTrue(isinstance(node, (type(None), github.Branch.Branch)), 
-                        u'grr.request_info("master") returns ' + str(type(node)))
+        node = grr.request_info(u'main')
+        self.assertTrue(isinstance(node, (type(None), github.Branch.Branch)),
+                        u'grr.request_info("main") returns ' + str(type(node)))
         if node is not None:
-            self.assertEqual(grr.ref, u'master', u'ref: ' + grr.ref)
+            self.assertEqual(grr.ref, u'main', u'ref: ' + grr.ref)
             self.assertEqual(grr.ref_type, u'branch', u'ref_type: ' + grr.ref_type)
             self.assertNotEqual(grr.sha, None, u'sha: ' + grr.sha)
             self.assertNotEqual(grr.zip_url, None, u'zip_url: ' + grr.zip_url)

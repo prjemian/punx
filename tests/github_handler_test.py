@@ -133,17 +133,22 @@ class Test_Github_Handler_Module(unittest.TestCase):
             self.assertNotEqual(grr.zip_url, None, u'zip_url: ' + grr.zip_url)
             node = grr.get_commit(u'abcd123')
             self.assertEqual(node, None, u'search for hash that does not exist')
-    
-    def test_GitHub_BasicAuth_credentials(self):
-        creds = punx.github_handler.get_BasicAuth_credentials()
-        self.assertTrue(isinstance(creds, (type(None), dict)), 
-                        u'type of response: ' + str(type(creds)))
-        if isinstance(creds, dict):
-            self.assertEqual(len(creds), 2, u'credentials dict has two items')
-            self.assertEqual(' '.join(sorted(creds.keys())), 
-                             u'password user', 
-                             u'credentials dict has these keys: ')
-    
+
+    def test_GitHub_BasicAuth_credentials_file(self):
+        token = punx.github_handler.get_BasicAuth_credentials(
+            os.path.join(os.path.dirname(__file__), "data", "__github_creds__.txt"),
+        )
+        self.assertTrue(isinstance(token, str),
+                        u'type of response: ' + str(type(token)))
+        self.assertTrue(token == "ghp_ThisIsAFakeTokenFile")
+
+    def test_GitHub_BasicAuth_credentials_none(self):
+        token = punx.github_handler.get_BasicAuth_credentials(
+            "This file does not exist.",
+        )
+        self.assertTrue(token is None,
+                        u'type of response: ' + str(type(None)))
+
     def test_Github_download_default(self):
         import punx.cache_manager
         grr = punx.github_handler.GitHub_Repository_Reference()

@@ -33,8 +33,8 @@ class Test_Github_Handler_Module(unittest.TestCase):
                          u'v3.3',
                          u'release: v3.3')
         self.assertEqual(punx.github_handler.DEFAULT_RELEASE_NAME,
-                         u'v2020.10',
-                         u'default release: v2020.10')
+                         u'v2018.5',
+                         u'default release: v2018.5')
         self.assertEqual(punx.github_handler.DEFAULT_TAG_NAME,
                          # u'NXroot-1.0',
                          u'Schema-3.3',

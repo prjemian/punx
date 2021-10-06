@@ -57,7 +57,7 @@ GITHUB_RETRY_COUNT = 3
 #NXDL_CACHE_SUBDIR = GITHUB_NXDL_REPOSITORY + '-' + GITHUB_NXDL_BRANCH
 
 
-def get_BasicAuth_credentials(creds_file_name = None):
+def get_GitHub_credentials(creds_file_name = None):
     """
     get the Github Basic Authentication token from a local file
 
@@ -117,7 +117,7 @@ class GitHub_Repository_Reference(object):
         """
         repo_name = repo_name or self.appName
 
-        token = get_BasicAuth_credentials() if token is None else token
+        token = get_GitHub_credentials() if token is None else token
 
         if token is None:
             gh = github.Github()
@@ -162,7 +162,7 @@ class GitHub_Repository_Reference(object):
         #requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
         disable_warnings(InsecureRequestWarning)
 
-        token = get_BasicAuth_credentials()
+        token = get_GitHub_credentials()
         content = None
         for _retry in range(GITHUB_RETRY_COUNT):        # noqa
             try:

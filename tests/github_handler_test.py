@@ -134,16 +134,16 @@ class Test_Github_Handler_Module(unittest.TestCase):
             node = grr.get_commit(u'abcd123')
             self.assertEqual(node, None, u'search for hash that does not exist')
 
-    def test_GitHub_BasicAuth_credentials_file(self):
-        token = punx.github_handler.get_BasicAuth_credentials(
+    def test_GitHub_credentials_file(self):
+        token = punx.github_handler.get_GitHub_credentials(
             os.path.join(os.path.dirname(__file__), "data", "__github_creds__.txt"),
         )
         self.assertTrue(isinstance(token, str),
                         u'type of response: ' + str(type(token)))
         self.assertTrue(token == "ghp_ThisIsAFakeTokenFile")
 
-    def test_GitHub_BasicAuth_credentials_none(self):
-        token = punx.github_handler.get_BasicAuth_credentials(
+    def test_GitHub_credentials_none(self):
+        token = punx.github_handler.get_GitHub_credentials(
             "This file does not exist.",
         )
         self.assertTrue(token is None,

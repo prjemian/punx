@@ -1,0 +1,3 @@
+fake.user@email.org
+NotAPa$$w0rD
+ghp_ThisIsAFakeTokenFile

@@ -121,6 +121,7 @@ class GitHub_Repository_Reference(object):
 
         token = get_GitHub_credentials() if token is None else token
 
+        # also set the repo attribute
         if token is None:
             gh = github.Github()
             user = gh.get_user(self.orgName)

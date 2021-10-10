@@ -2,8 +2,7 @@
 unit tests of punx.github_handler
 """
 
-# from .. import github_handler
-from punx import github_handler  # FIXME: developer only
+from .. import github_handler
 
 
 def test_connect_repo():
@@ -14,6 +13,3 @@ def test_connect_repo():
 def test_get_GitHub_credentials():
     token = github_handler.get_GitHub_credentials()
     assert isinstance(token, (type(None), str))
-
-
-test_connect_repo()

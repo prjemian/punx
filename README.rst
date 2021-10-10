@@ -29,9 +29,7 @@ NOTE: project is under initial construction
 
    ..  see http://shields.io/ for more badge ideas
 
-   .. image:: https://travis-ci.org/prjemian/punx.svg?branch=master
-      :target: https://travis-ci.org/prjemian/punx
-      :alt: Unit Testing
+   .. badge here for Unit Testing
    .. image:: https://coveralls.io/repos/github/prjemian/punx/badge.svg?branch=master
       :target: https://coveralls.io/github/prjemian/punx?branch=master
       :alt: Code Coverage

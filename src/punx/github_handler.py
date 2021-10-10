@@ -123,7 +123,8 @@ class GitHub_Repository_Reference(object):
 
         if token is None:
             gh = github.Github()
-            self.repo = gh.get_repo(repo_name)
+            user = gh.get_user(self.orgName)
+            self.repo = user.get_repo(repo_name)
             return False
         else:
             gh = github.Github(token)

@@ -115,21 +115,19 @@ class GitHub_Repository_Reference(object):
         connect with the GitHub repository
 
         :param str repo_name: name of repository in https://github.com/nexusformat (default: *definitions*)
+        :param str or None token: GitHub access token or ``None``
         :returns bool: True if using GitHub credentials
         """
         repo_name = repo_name or self.appName
 
         token = get_GitHub_credentials() if token is None else token
 
-        if token is None:
-            gh = github.Github()
-            self.repo = gh.get_repo(repo_name)
-            return False
-        else:
-            gh = github.Github(token)
-            user = gh.get_user(self.orgName)
-            self.repo = user.get_repo(repo_name)
-            return True
+        # also set the repo attribute
+        gh = github.Github(token)  # token is either None or a str
+        user = gh.get_user(self.orgName)
+        self.repo = user.get_repo(repo_name)
+
+        return isinstance(token, str)
 
     def request_info(self, ref=None):
         """

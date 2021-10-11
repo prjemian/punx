@@ -1,16 +1,20 @@
 name: punx
+
+channels:
+  - defaults
+  - conda-forge
+
 dependencies:
   - h5py
   - lxml
   - numpy
   - python=3
   - pip
+  - PyGithub
   - pyqt
+  - pyRestTable
   - requests
   - sip
   - sphinx
-  - pip:
-    - versioneer
-    - pyRestTable
-    - PyGithub
-    - sphinx_rtd_theme
+  - versioneer
+  - sphinx_rtd_theme

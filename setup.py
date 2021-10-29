@@ -18,7 +18,6 @@ import sys
 import versioneer
 
 # pull in some definitions from the package's __init__.py file
-sys.path.insert(0, os.path.join('src', ))
 import punx
 
 

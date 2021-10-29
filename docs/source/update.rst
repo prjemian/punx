@@ -32,7 +32,7 @@ when the source cache needed to be updated:
    INFO: git iso8601: 2016-06-17T18:05:28Z
    INFO: updating NeXus definitions files
    INFO: download: https://github.com/nexusformat/definitions/archive/master.zip
-   INFO: extract ZIP to: C:/Users/Pete/Documents/eclipse/punx/src/punx/cache
+   INFO: extract ZIP to: C:/Users/Pete/Documents/eclipse/punx/punx/cache
 
 
 .. rubric:: command line help
@@ -65,33 +65,33 @@ GitHub API rate limit exceeded
 A common problem happens when updating the NXDL definitions from GitHub.
 Here's what it looks like::
 
-   $ python ./src/punx/main.py update --force
+   $ python ./punx/main.py update --force
    
    ('INFO:', 'get repo info: https://api.github.com/repos/nexusformat/definitions/commits')
    
    Traceback (most recent call last):
    
-     File "./src/punx/main.py", line 416, in <module>
+     File "./punx/main.py", line 416, in <module>
    
        main()
    
-     File "./src/punx/main.py", line 412, in main
+     File "./punx/main.py", line 412, in main
    
        args.func(args)
    
-     File "./src/punx/main.py", line 170, in func_update
+     File "./punx/main.py", line 170, in func_update
    
        cache.update_NXDL_Cache(force_update=args.force)
    
-     File "/home/travis/build/prjemian/punx/src/punx/cache.py", line 257, in update_NXDL_Cache
+     File "/home/travis/build/prjemian/punx/punx/cache.py", line 257, in update_NXDL_Cache
    
        info = __get_github_info__()    # check with GitHub first
    
-     File "/home/travis/build/prjemian/punx/src/punx/cache.py", line 246, in __get_github_info__
+     File "/home/travis/build/prjemian/punx/punx/cache.py", line 246, in __get_github_info__
    
        punx.GITHUB_NXDL_REPOSITORY)
    
-     File "/home/travis/build/prjemian/punx/src/punx/cache.py", line 228, in githubMasterInfo
+     File "/home/travis/build/prjemian/punx/punx/cache.py", line 228, in githubMasterInfo
    
        raise punx.CannotUpdateFromGithubNow(msg)
    

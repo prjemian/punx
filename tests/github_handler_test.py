@@ -13,7 +13,7 @@ import zipfile
 
 import github
 
-SRC_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src'))
+SRC_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '.'))
 sys.path.insert(0, SRC_PATH)
 import punx, punx.github_handler
 

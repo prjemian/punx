@@ -3,16 +3,19 @@ import pytest
 import shutil
 import tempfile
 
-CANONICAL_RELEASE = u'v3.3'
+CANONICAL_RELEASE = u"v3.3"  # TODO: pick a newer?
 
 TEST_DATA_DIR = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "..", "tests", "data")
 )
 
 
+class No_Exception(Exception): ...
+
+
 @pytest.fixture(scope="function")
 def hfile():
-    tfile = tempfile.NamedTemporaryFile(suffix='.hdf5', delete=False)
+    tfile = tempfile.NamedTemporaryFile(suffix=".hdf5", delete=False)
     tfile.close()
     hfile = tfile.name
     yield hfile

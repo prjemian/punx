@@ -17,4 +17,4 @@ exclude =
 # some in test cases
 max-line-length = 115
 # TODO: re-enable E501 error
-ignore: E226,E402,E501,E741,F401,F403,W503,W504
+ignore: E226,E402,E501,E741,F401,F403,F811,W503,W504

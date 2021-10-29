@@ -24,7 +24,7 @@ def test_h5tree(hfile):
         assert utils.isHdf5FileObject(f)
         f.create_dataset("str_list", data=str_list)
         f.create_dataset("title", data=b"this is the title")
-        f.create_dataset("subtitle", data=[b"<a subtitle>",])
+        f.create_dataset("subtitle", data=[b"<a subtitle>"])
         f.create_dataset("names", data=[b"one", b"two"])
     assert os.path.exists(hfile)
 

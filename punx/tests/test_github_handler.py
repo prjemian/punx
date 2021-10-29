@@ -156,7 +156,7 @@ def test_Github_download_default():
     if node is not None:
         path = tempfile.mkdtemp()
         assert os.path.exists(path)
-        _msgs = cache_manager.extract_from_download(grr, path)
+        cache_manager.extract_from_download(grr, path)
         assert os.path.exists(
             os.path.join(path, grr.ref)
         ), "installed in: " + os.path.join(path, grr.ref)

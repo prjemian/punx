@@ -1,6 +1,6 @@
+.. index:: tree
 .. _structure:
 .. _tree:
-.. index:: tree
 
 User interface: subcommand: **tree**
 ####################################

@@ -1,5 +1,5 @@
 License
 =======
 
-.. literalinclude:: ../../src/punx/LICENSE.txt
+.. literalinclude:: ../../punx/LICENSE.txt
    :language: text

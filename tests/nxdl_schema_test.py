@@ -9,7 +9,7 @@ import sys
 import tempfile
 import unittest
 
-SRCPATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src'))
+SRCPATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '.'))
 sys.path.insert(0, SRCPATH)
 from punx import cache_manager, nxdl_schema
 

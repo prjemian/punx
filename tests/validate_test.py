@@ -27,7 +27,7 @@ import numpy
 import tempfile
 import unittest
 
-_path = os.path.join(os.path.dirname(__file__), '..', 'src')
+_path = os.path.join(os.path.dirname(__file__), '..', '.')
 if _path not in sys.path:
     sys.path.insert(0, _path)
 import punx.utils

@@ -10,7 +10,7 @@ import tempfile
 import unittest
 from six import StringIO
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '.'))
 
 
 __test_file_name__ = None   # singleton
@@ -54,9 +54,9 @@ def cleanup():
 
 def punx_data_file_name(fname):
     '''
-    return the absolute path to the file in src/punx/data/fname
+    return the absolute path to the file in punx/data/fname
     '''
-    path = os.path.join(os.path.dirname(__file__), '..', 'src', 'punx', 'data')
+    path = os.path.join(os.path.dirname(__file__), '..', 'punx', 'data')
     return os.path.abspath(os.path.join(path, fname))
 
 

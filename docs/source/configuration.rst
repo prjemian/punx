@@ -1,4 +1,5 @@
 .. _config:
+
 .. index:: configuration
 
 User interface: subcommand: **configuration**
@@ -38,14 +39,14 @@ revisions by the developers on that date).
 
 An NXDL file set is *referenced* by one of the GitHub identifiers:
 
-=========   ==========  ==========================================
+==========  ==========  ==========================================
 identifier  example     description
-=========   ==========  ==========================================
+==========  ==========  ==========================================
 commit      9eab        SHA-1 hash tag [#]_ that identifies a specific commit to the repository
 branch      master      name of a branch [#]_ in the repository
 tag         Schema-3.4  name of a tag [#]_ in the repository
 release     v2018.5     name of a repository release [#]_
-=========   ==========  ==========================================
+==========  ==========  ==========================================
 
 .. [#] commit (hash): A commit is a snapshot of the GitHub repository.
    A SHA-1 hash code is the unique identifier of a commit.

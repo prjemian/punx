@@ -42,7 +42,7 @@ Subcommands
 .. toctree::
    :hidden:
    
-   config
+   configuration
    demo
    hierarchy
    tree

@@ -11,7 +11,8 @@ EXAMPLE_DATA_DIR = os.path.abspath(os.path.join(_ppath, "data"))
 TEST_DATA_DIR = os.path.abspath(os.path.join(_ppath, "tests", "data"))
 
 
-class No_Exception(Exception): ...
+class No_Exception(Exception):
+    ...
 
 
 @pytest.fixture(scope="function")

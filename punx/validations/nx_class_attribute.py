@@ -1,5 +1,4 @@
-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # :author:    Pete R. Jemian
 # :email:     prjemian@gmail.com
 # :copyright: (c) 2017, Pete R. Jemian
@@ -7,7 +6,7 @@
 # Distributed under the terms of the Creative Commons Attribution 4.0 International Public License.
 #
 # The full license is in the file LICENSE.txt, distributed with this software.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 from .. import finding
@@ -16,11 +15,11 @@ from .. import finding
 def validate_NX_class_attribute(validator, v_item, nx_class):
     """
     validate proper use of NeXus groups
-    
-    Only known base classes (and contributed definitions intended 
+
+    Only known base classes (and contributed definitions intended
     for use as base classes) can be used as groups in a NeXus data file.
-    Application definitions are used in a different way, as an overlay 
-    on a parent NXentry or NXsubentry group, and declared in the 
+    Application definitions are used in a different way, as an overlay
+    on a parent NXentry or NXsubentry group, and declared in the
     `definition` field of that parent group.
     """
     known = nx_class in validator.manager.classes

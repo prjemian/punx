@@ -37,7 +37,7 @@ def avert_exception(fname):
     try:
         validator = validate.Data_File_Validator(ref=DEFAULT_NXDL_FILE_SET)
         validator.validate(fname)
-    except Exception as _exc:
+    except Exception:
         pass
     else:
         raise No_Exception
@@ -90,29 +90,29 @@ def test_NXdata_requirement_or_optional(hfile):
     """
     check for changes in NXDL rules
 
-    (#91) test something that is defined in 
+    (#91) test something that is defined in
     one NXDL file set but not another,
     such as: NXdata group not required after NIAC2016
-    
+
     Before v3.2, part of the NXentry definition read::
-    
+
         <group type="NXdata" minOccurs="1">
             <doc>The required data group</doc>
         </group>
-    
+
     With v3.2 and after, the same part was changed to::
-    
+
         <group type="NXdata">
             <doc>
                 The data group
             </doc>
         </group>
-    
+
     note:  v3.1.0 had a much simpler version::
-    
+
         <group type="NXdata" />
-    
-    It was stated only in the manual that NXdata 
+
+    It was stated only in the manual that NXdata
     was required.  Not suitable for automated validation.
     """
     # create a minimal test file
@@ -347,7 +347,7 @@ def TODO_test_contributed_base_class(hfile):
 def TODO_test_contributed_application_definition(hfile):
     setup_simple_test_file_validate(hfile)
     with h5py.File(hfile, "r+") as f:
-        other = f["/entry"].create_dataset("definition", data="NXspecdata")
+        f["/entry"].create_dataset("definition", data="NXspecdata")
         # TODO: add compliant contents
 
     validator = validate.Data_File_Validator(ref=DEFAULT_NXDL_FILE_SET)
@@ -440,7 +440,7 @@ def TODO_test_axes_attribute_2D__fail(hfile):
         ds = dg.create_dataset("y", data=vec)
         ds.attrs["units"] = "mm"
 
-        dg.attrs["axes"] = utils.string_list_to_hdf5(["x,y",])
+        dg.attrs["axes"] = utils.string_list_to_hdf5(["x,y", ])
         dg.attrs["x_indices"] = [0]
         dg.attrs["y_indices"] = [1]
 

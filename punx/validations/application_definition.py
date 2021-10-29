@@ -1,5 +1,4 @@
-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # :author:    Pete R. Jemian
 # :email:     prjemian@gmail.com
 # :copyright: (c) 2017-2018, Pete R. Jemian
@@ -7,7 +6,7 @@
 # Distributed under the terms of the Creative Commons Attribution 4.0 International Public License.
 #
 # The full license is in the file LICENSE.txt, distributed with this software.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 from .. import finding
 from .. import utils
@@ -42,9 +41,11 @@ def verify(validator, v_item):
     validator.record_finding(v_item, key, finding.TODO, c)
 
     # TODO: groups, attributes, links, type, ... in separate functions
-    ad_entry = list(ad.groups.values())[0]   # only 1 at this level of the application definition (ad)
+    ad_entry = list(ad.groups.values())[
+        0
+    ]  # only 1 at this level of the application definition (ad)
     for field, spec in ad_entry.fields.items():
-        
+
         msg = "%s:%s" % (ad_name, field)
         h5_obj = v_item.h5_object.get(field)
         status = finding.TF_RESULT[h5_obj is not None]
@@ -53,7 +54,7 @@ def verify(validator, v_item):
         msg += " found"
         v_obj = ValidationItem(v_item, h5_obj)
         validator.record_finding(v_obj, "NXDL field", status, msg)
-        
+
         if len(spec.enumerations) > 0:
             found = False
             for enum in spec.enumerations:
@@ -61,7 +62,9 @@ def verify(validator, v_item):
                 if found:
                     break
             msg = "%s:%s" % (ad_name, field)
-            required = spec.xml_attributes["minOccurs"].default_value == 1  # TODO: is this right?
+            required = (
+                spec.xml_attributes["minOccurs"].default_value == 1
+            )  # TODO: is this right?
             if required:
                 msg += " (required)"
             else:
@@ -72,5 +75,5 @@ def verify(validator, v_item):
             else:
                 msg += " does not have value: " + " | ".join(spec.enumerations)
             validator.record_finding(v_obj, "NXDL field enumerations", status, msg)
-        
+
         # TODO: attributes, xml_attributes, dimensions, ...

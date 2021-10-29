@@ -1,5 +1,4 @@
-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # :author:    Pete R. Jemian
 # :email:     prjemian@gmail.com
 # :copyright: (c) 2017, Pete R. Jemian
@@ -7,7 +6,7 @@
 # Distributed under the terms of the Creative Commons Attribution 4.0 International Public License.
 #
 # The full license is in the file LICENSE.txt, distributed with this software.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 """validate the setup identifying the default plot"""
@@ -24,7 +23,7 @@ def verify(validator):
     c = "need to validate existence of default plot"
     obj = validator.addresses["/"]
     status = None
-    
+
     methods = collections.OrderedDict()
     methods["v3"] = default_plot_v3
     methods["v2"] = default_plot_v2
@@ -34,7 +33,7 @@ def verify(validator):
         if addr is not None:
             c = "found by %s: %s" % (k, addr)
             status = finding.OK
-            break       # no need to look further
+            break  # no need to look further
     if status is None:
         c = "no default plot described"
         data_group = validator.manager.classes["NXentry"].groups["data"]
@@ -48,14 +47,14 @@ def verify(validator):
             # even though not "required" it is strongly recommended
             # thus NOTE rather than OK
             status = finding.NOTE
-            
+
     validator.record_finding(obj, "NeXus default plot", status, c)
 
 
 def default_plot_v3(validator):
     """
     return the HDF5 address of the v3 default plottable data or None
-    
+
     :see: http://download.nexusformat.org/doc/html/datarules.html#version-3
     """
     # The default plot is described only at classpath: /NXentry/NXdata@signal
@@ -72,6 +71,7 @@ def default_plot_v3(validator):
             addr += "/"
         addr += utils.decode_byte_string(pointer)
         return addr
+
     def attribute_points_at_target(v_item, attribute_name, v_target):
         "test if attribute value actually points at target"
         pointer = v_item.h5_object.attrs.get(attribute_name)
@@ -90,7 +90,7 @@ def default_plot_v3(validator):
     niac2014_path = []
     for v_item in short_list:
         # check existence of @default attributes, as well
-        _root, entry, data = v_item.h5_address.split("@")[0].split("/") # noqa
+        _root, entry, data = v_item.h5_address.split("@")[0].split("/")  # noqa
         nxdata = validator.addresses["/" + entry + "/" + data]
         nxentry = validator.addresses["/" + entry]
         nxroot = validator.addresses["/"]
@@ -107,7 +107,7 @@ def default_plot_v3(validator):
         if t1 and t2 and t3 and t4:
             # this is the NIAC2014 test
             niac2014_path.append(v_item)
-    
+
     # TODO: could also test /NXentry/NXdata@axes
     if len(niac2014_path) == 1:
         v_item = niac2014_path[0]
@@ -115,14 +115,14 @@ def default_plot_v3(validator):
         c = "default plot setup in /NXentry/NXdata"
         validator.record_finding(v_item, test_name + " NIAC2014", status, c)
         return v_item.h5_address
-    
+
     return h5_address
 
 
 def default_plot_v2(validator):
     """
     return the HDF5 address of the v2 default plottable data or None
-    
+
     :see: http://download.nexusformat.org/doc/html/datarules.html#version-2
     """
     test_name = "NeXus default plot v2"
@@ -136,10 +136,8 @@ def default_plot_v2(validator):
                         status = finding.OK
                         c = "found field with @signal=1: " + v_item.h5_address
                         validator.record_finding(
-                            v_item, 
-                            test_name + ", @signal=1", 
-                            status, 
-                            c)
+                            v_item, test_name + ", @signal=1", status, c
+                        )
 
                         gparent = v_item.parent.parent
                         group_name = gparent.h5_address
@@ -151,10 +149,8 @@ def default_plot_v2(validator):
                         c = "found field with @signal!=1: " + v_item.h5_address
                         c += "=" + signal
                         validator.record_finding(
-                            v_item, 
-                            test_name + ", @signal!=1", 
-                            status, 
-                            c)
+                            v_item, test_name + ", @signal!=1", status, c
+                        )
 
     addr = None
     for group_name, v_item_list in review_dict.items():
@@ -167,17 +163,18 @@ def default_plot_v2(validator):
             status = finding.ERROR
             c = "multiple fields found with @signal=1 in: " + group_name
             validator.record_finding(
-                v_item_list[0].parent.parent, 
-                test_name + ", multiple @signal=1", 
-                status, 
-                c)
+                v_item_list[0].parent.parent,
+                test_name + ", multiple @signal=1",
+                status,
+                c,
+            )
     return addr
 
 
-def default_plot_v1(validator):     # noqa
+def default_plot_v1(validator):  # noqa
     """
     return the HDF5 address of the v1 default plottable data or None
-    
+
     :see: http://download.nexusformat.org/doc/html/datarules.html#version-1
     """
     test_name = "NeXus default plot v1"  # noqa

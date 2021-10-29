@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # :author:    Pete R. Jemian
 # :email:     prjemian@gmail.com
 # :copyright: (c) 2017-2018, Pete R. Jemian
@@ -9,7 +9,7 @@
 # Distributed under the terms of the Creative Commons Attribution 4.0 International Public License.
 #
 # The full license is in the file LICENSE.txt, distributed with this software.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 """
@@ -18,13 +18,13 @@ validate files against the NeXus/HDF5 standard
 PUBLIC
 
 .. autosummary::
-   
+
    ~Data_File_Validator
 
 INTERNAL
 
 .. autosummary::
-   
+
    ~ValidationItem
 
 """
@@ -42,43 +42,43 @@ from . import nxdl_manager
 
 
 SLASH = "/"
-INFORMATIVE = int((logging.INFO + logging.DEBUG)/2)
+INFORMATIVE = int((logging.INFO + logging.DEBUG) / 2)
 CLASSPATH_OF_NON_NEXUS_CONTENT = "non-NeXus content"
-VALIDITEMNAME_STRICT_PATTERN = r'[a-z_][a-z0-9_]*'
+VALIDITEMNAME_STRICT_PATTERN = r"[a-z_][a-z0-9_]*"
 logger = utils.setup_logger(__name__)
 
 
 class Data_File_Validator(object):
-    
+
     """
     manage the validation of a NeXus HDF5 data file
-    
+
     USAGE
 
 
     1. make a validator with a certain schema::
-        
+
         validator = punx.validate.Data_File_Validator()    # default
-    
+
        You may have downloaded additional NeXus Schema (NXDL file sets).
        If so, pick any of these by name as follows::
 
         validator = punx.validate.Data_File_Validator("v3.2")
         validator = punx.validate.Data_File_Validator("master")
-        
+
     2. use to validate a file or files::
-        
+
         result = validator.validate(hdf5_file_name)
         result = validator.validate(another_file)
-        
+
     3. close the HDF5 file when done with validation::
-        
+
         validator.close()
 
     PUBLIC METHODS
-    
+
     .. autosummary::
-       
+
        ~close
        ~validate
        ~print_report
@@ -86,7 +86,7 @@ class Data_File_Validator(object):
     INTERNAL METHODS
 
     .. autosummary::
-       
+
        ~build_address_catalog
        ~_group_address_catalog_
        ~validate_item_name
@@ -99,11 +99,13 @@ class Data_File_Validator(object):
         self.manager = nxdl_manager.NXDL_Manager(ref)
 
     def __init_local__(self):
-        self.validations = []      # list of Finding() instances
-        self.addresses = collections.OrderedDict()     # dictionary of all HDF5 address nodes in the data file
+        self.validations = []  # list of Finding() instances
+        self.addresses = (
+            collections.OrderedDict()
+        )  # dictionary of all HDF5 address nodes in the data file
         self.classpaths = {}
         self.regexp_cache = {}
-    
+
     def close(self):
         """
         close the HDF5 file (if it is open)
@@ -111,7 +113,7 @@ class Data_File_Validator(object):
         if utils.isHdf5FileObject(self.h5):
             self.h5.close()
             self.h5 = None
-    
+
     def record_finding(self, v_item, key, status, comment):
         """
         prepare the finding object and record it
@@ -120,16 +122,16 @@ class Data_File_Validator(object):
         self.validations.append(f)
         v_item.validations[key] = f
         return f
-    
+
     def finding_score(self):
         """
         return a numerical score for the set of findings
-        
+
         count: number of findings
         total: sum of status values for all findings
         score: total / count -- average status / finding
         """
-        total= 0
+        total = 0
         count = 0
         for f in self.validations:
             if f.status.value != 0:
@@ -138,25 +140,25 @@ class Data_File_Validator(object):
         if count == 0:
             return total, count, 0
         else:
-            return total, count, float(total)/count
-    
+            return total, count, float(total) / count
+
     def finding_summary(self, report_statuses=None):
         """
         return a summary dictionary of the count of findings by status
 
         summary statistics
         ======= ===== ===========================================================
-        status  count description                                                
+        status  count description
         ======= ===== ===========================================================
-        OK      10    meets NeXus specification                                  
-        NOTE    1     does not meet NeXus specification, but acceptable          
+        OK      10    meets NeXus specification
+        NOTE    1     does not meet NeXus specification, but acceptable
         WARN    0     does not meet NeXus specification, not generally acceptable
-        ERROR   0     violates NeXus specification                               
-        TODO    3     validation not implemented yet                             
-        UNUSED  2     optional NeXus item not used in data file                  
-        COMMENT 0     comment from the punx source code                          
-        --      --    --                                                         
-        TOTAL   16    --                                                         
+        ERROR   0     violates NeXus specification
+        TODO    3     validation not implemented yet
+        UNUSED  2     optional NeXus item not used in data file
+        COMMENT 0     comment from the punx source code
+        --      --    --
+        TOTAL   16    --
         ======= ===== ===========================================================
         """
         report_statuses = report_statuses or finding.VALID_STATUS_LIST
@@ -172,18 +174,20 @@ class Data_File_Validator(object):
         print a validation report
         """
         print("data file: " + self.fname)
-        print("NeXus definitions ({}): {}, dated {}, sha={}\n".format(
-            self.manager.nxdl_file_set.ref_type,
-            self.manager.nxdl_file_set.ref,
-            self.manager.nxdl_file_set.last_modified,
-            self.manager.nxdl_file_set.sha,
-            ))
-    
+        print(
+            "NeXus definitions ({}): {}, dated {}, sha={}\n".format(
+                self.manager.nxdl_file_set.ref_type,
+                self.manager.nxdl_file_set.ref,
+                self.manager.nxdl_file_set.last_modified,
+                self.manager.nxdl_file_set.sha,
+            )
+        )
+
         def sort_validations(f):
             value = f.h5_address
-            value += " %3d" % -f.status.value       # sort from best to worst
+            value += " %3d" % -f.status.value  # sort from best to worst
             value += " " + f.status.description
-            value = value.replace("@", " @")        # keep attributes with group or dataset
+            value = value.replace("@", " @")  # keep attributes with group or dataset
             return value
 
         print("findings")
@@ -192,7 +196,7 @@ class Data_File_Validator(object):
             t.addLabel(label)
         for f in sorted(self.validations, key=sort_validations):
             if f.status == finding.OPTIONAL:
-                continue    # enable if you like verbose reports
+                continue  # enable if you like verbose reports
             row = []
             row.append(f.h5_address)
             row.append(f.status)
@@ -200,7 +204,7 @@ class Data_File_Validator(object):
             row.append(f.comment)
             t.addRow(row)
         print(str(t))
-    
+
         summary = self.finding_summary()
         t = pyRestTable.Table()
         for label in "status count description (value)".split():
@@ -224,9 +228,9 @@ class Data_File_Validator(object):
         self.fname = fname
 
         if self.h5 is not None:
-            self.close()            # left open from previous call to validate()
+            self.close()  # left open from previous call to validate()
         try:
-            self.h5 = h5py.File(fname, 'r')
+            self.h5 = h5py.File(fname, "r")
         except IOError:
             logger.error("Could not open as HDF5: " + fname)
             raise HDF5_Open_Error(fname)
@@ -242,8 +246,9 @@ class Data_File_Validator(object):
 
         # 2. check all base classes against defaults
         for k, v_item in self.addresses.items():
-            if utils.isHdf5Group(v_item.h5_object) \
-            or utils.isHdf5FileObject(v_item.h5_object):
+            if utils.isHdf5Group(v_item.h5_object) or utils.isHdf5FileObject(
+                v_item.h5_object
+            ):
                 self.validate_group(v_item)
 
         # 3. check application definitions
@@ -254,9 +259,9 @@ class Data_File_Validator(object):
 
         # 4. check for default plot
         default_plot.verify(self)
-    
+
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    
+
     def build_address_catalog(self):
         """
         find all HDF5 addresses and NeXus class paths in the data file
@@ -267,11 +272,13 @@ class Data_File_Validator(object):
         """
         catalog this group's address and all its contents
         """
+
         def addClasspath(v):
             if v.classpath not in self.classpaths:
                 self.classpaths[v.classpath] = []
             self.classpaths[v.classpath].append(v)
             logger.log(INFORMATIVE, "NeXus classpath: " + v.classpath)
+
         def get_subject(parent, o):
             v = ValidationItem(parent, o)
             self.addresses[v.h5_address] = v
@@ -293,10 +300,12 @@ class Data_File_Validator(object):
 
     def validate_item_name(self, v_item, key=None):
         from .validations import item_name
+
         item_name.verify(self, v_item, key)
 
     def validate_attribute(self, v_item):
         from .validations import attribute
+
         attribute.verify(self, v_item)
 
     def validate_group(self, v_item):
@@ -308,23 +317,19 @@ class Data_File_Validator(object):
 
         key = "NeXus_group"
         if v_item.classpath == CLASSPATH_OF_NON_NEXUS_CONTENT:
-            self.record_finding(
-                v_item, 
-                key,
-                finding.OK, 
-                "not a NeXus group")
+            self.record_finding(v_item, key, finding.OK, "not a NeXus group")
             return
 
         if v_item.classpath.startswith("/NX"):
             nx_class = v_item.nx_class
         elif v_item.classpath == "":
-            nx_class = "NXroot"    # handle as NXroot
+            nx_class = "NXroot"  # handle as NXroot
         else:
             raise ValueError("unexpected: " + str(v_item))
 
         # print(str(v_item), v_item.name, v_item.classpath)
         self.validate_NX_class_attribute(v_item, nx_class)
-        
+
         base_class = self.manager.classes.get(nx_class)
         if base_class is None:
             c = "unknown NeXus base class: " + nx_class
@@ -332,7 +337,7 @@ class Data_File_Validator(object):
         else:
             hdf5_group_items_in_base_class.verify(self, v_item, base_class)
             base_class_items_in_hdf5_group.verify(self, v_item, base_class)
-    
+
             # TODO: validate attributes - both HDF5-supplied & NXDL-specified
             # TODO: validate symbols - both HDF5-supplied & NXDL-specified
             # TODO: validate fields - both HDF5-supplied & NXDL-specified
@@ -345,22 +350,23 @@ class Data_File_Validator(object):
         validate group as a NeXus application definition
         """
         from .validations import application_definition
+
         application_definition.verify(self, v_item)
-    
+
     def validate_NX_class_attribute(self, v_item, nx_class):
         from .validations import nx_class_attribute
-        nx_class_attribute.validate_NX_class_attribute(
-            self, v_item, nx_class)
+
+        nx_class_attribute.validate_NX_class_attribute(self, v_item, nx_class)
 
     def usedAsBaseClass(self, nx_class):
         """
         returns bool: is the nx_class a base class?
-        
-        NXDL specifications in the contributed definitions directory 
-        could be intended as either a base class or an 
-        application definition.  NeXus provides no easy identifier 
+
+        NXDL specifications in the contributed definitions directory
+        could be intended as either a base class or an
+        application definition.  NeXus provides no easy identifier
         for this difference.  The most obvious distinction between
-        them is the presence of the `definition` field 
+        them is the presence of the `definition` field
         in the `NXentry` group of an application definition.
         This field is not present in base classes.
         """
@@ -373,9 +379,11 @@ class Data_File_Validator(object):
             return True
         # now, need to work at it a bit
         # *Should* only be one NXentry group but that is not a rule.
-        if len(nxdl_def.fields) == 0 and \
-           len(nxdl_def.links) == 0 and \
-           len(nxdl_def.groups) == 1: # maybe ...
+        if (
+            len(nxdl_def.fields) == 0
+            and len(nxdl_def.links) == 0
+            and len(nxdl_def.groups) == 1
+        ):  # maybe ...
             entry_group = nxdl_def.groups.values()[0]
             # TODO: test entry_group.NX_class == "NXentry" but that attribute is not ready yet!
             # assume OK
@@ -384,15 +392,15 @@ class Data_File_Validator(object):
 
 
 class ValidationItem(object):
-    
+
     """HDF5 data file object for validation"""
-    
+
     def __init__(self, parent, obj, attribute_name=None):
-        assert(isinstance(parent, (ValidationItem, type(None))))
+        assert isinstance(parent, (ValidationItem, type(None)))
         self.parent = parent
-        self.validations = {}    # validation findings go here
+        self.validations = {}  # validation findings go here
         self.h5_object = obj
-        if hasattr(obj, 'name'):
+        if hasattr(obj, "name"):
             self.h5_address = obj.name
             if obj.name == SLASH:
                 self.name = SLASH
@@ -408,7 +416,7 @@ class ValidationItem(object):
                 self.h5_address = "%s@%s" % (parent.h5_address, self.name)
                 self.classpath = str(parent.classpath) + "@" + str(self.name)
         self.object_type = self.identify_object_type()
-    
+
     def __str__(self, *args, **kwargs):
         try:
             terms = collections.OrderedDict()
@@ -419,9 +427,10 @@ class ValidationItem(object):
             return "ValidationItem(" + s + ")"
         except Exception:
             return object.__str__(self, *args, **kwargs)
-    
+
     def identify_object_type(self, *args, **kwargs):
         import h5py._hl
+
         if isinstance(self.h5_object, h5py._hl.files.File):
             object_type = "HDF5 file root"
         elif isinstance(self.h5_object, h5py._hl.group.Group):
@@ -438,25 +447,25 @@ class ValidationItem(object):
     def determine_NeXus_classpath(self):
         """
         determine the NeXus class path
-        
+
         :see: http://download.nexusformat.org/sphinx/preface.html#class-path-specification
-        
+
         EXAMPLE
-        
+
         Given this NeXus data file structure::
-            
+
             /
                 entry: NXentry
                     data: NXdata
                         @signal = data
                         data: NX_NUMBER
-        
+
         For the "signal" attribute of this HDF5 address: ``/entry/data``,
         its NeXus class path is: ``/NXentry/NXdata@signal``
-        
+
         The ``@signal`` attribute has the value of ``data`` which means
         that the local field named ``data`` is the plottable data.
-        
+
         The HDF5 address of the plottable data is: ``/entry/data/data``,
         its NeXus class path is: ``/NXentry/NXdata/data``
         """
@@ -475,13 +484,18 @@ class ValidationItem(object):
                     if "NX_class" in h5_obj.attrs:
                         nx_class = utils.decode_byte_string(h5_obj.attrs["NX_class"])
                         if nx_class.startswith("NX"):
-                            self.nx_class = nx_class    # only for groups
+                            self.nx_class = nx_class  # only for groups
                             logger.log(INFORMATIVE, "NeXus base class: " + nx_class)
                         else:
-                            logger.log(INFORMATIVE, "HDF5 group is not NeXus: " + self.h5_address)
+                            logger.log(
+                                INFORMATIVE,
+                                "HDF5 group is not NeXus: " + self.h5_address,
+                            )
                             return CLASSPATH_OF_NON_NEXUS_CONTENT
                     else:
-                        logger.log(INFORMATIVE, "HDF5 group is not NeXus: " + self.h5_address)
+                        logger.log(
+                            INFORMATIVE, "HDF5 group is not NeXus: " + self.h5_address
+                        )
                         return CLASSPATH_OF_NON_NEXUS_CONTENT
                 else:
                     nx_class = self.name

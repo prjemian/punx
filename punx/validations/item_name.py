@@ -1,5 +1,4 @@
-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # :author:    Pete R. Jemian
 # :email:     prjemian@gmail.com
 # :copyright: (c) 2017-2018, Pete R. Jemian
@@ -7,7 +6,7 @@
 # Distributed under the terms of the Creative Commons Attribution 4.0 International Public License.
 #
 # The full license is in the file LICENSE.txt, distributed with this software.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 import re
@@ -30,7 +29,7 @@ NOT_LINKED = "not linked"
 def isNeXusLinkTarget(v_item):
     """
     Is v_item a NeXus link target?
-    
+
     It is a "target" if its HDF5 address does not match the target value.
     It is a "source" if its HDF5 address matches the target attribute value.
     """
@@ -38,23 +37,23 @@ def isNeXusLinkTarget(v_item):
         source_name = utils.decode_byte_string(v_item.h5_address)
         target_name = utils.decode_byte_string(v_item.h5_object.attrs["target"])
         return target_name != source_name
-    return False    # no @target attribute at all
+    return False  # no @target attribute at all
 
 
 def verify(validator, v_item, key=None):
     """
     check :class:`ValidationItem` *v_item* using *validItemName* regular expression
-    
+
     This is used for the names of groups, fields, links, and attributes.
-    
+
     :param obj v_item: instance of :class:`ValidationItem`
     :param str key: named key to search, default: None (``validItemName``)
 
-    This method will test the object's name for validation,  
-    comparing with the strict or relaxed regular expressions for 
-    a valid item name.  
+    This method will test the object's name for validation,
+    comparing with the strict or relaxed regular expressions for
+    a valid item name.
     The finding for each name is classified by the next table:
-    
+
     =====  =======  =======  ================================================================
     order  finding  match    description
     =====  =======  =======  ================================================================
@@ -63,7 +62,7 @@ def verify(validator, v_item, key=None):
     3      ERROR    UTF8     specific to strings with UnicodeDecodeError (see issue #37)
     4      WARN     HDF5     acceptable to HDF5 but not NeXus
     =====  =======  =======  ================================================================
-    
+
     :see: http://download.nexusformat.org/doc/html/datarules.html?highlight=regular%20expression
     """
     if v_item.parent is None:
@@ -71,7 +70,7 @@ def verify(validator, v_item, key=None):
         logger.log(INFORMATIVE, msg)
         return
     if "name" in v_item.validations:
-        return      # do not repeat this
+        return  # do not repeat this
 
     key = key or "validItemName"
 
@@ -86,17 +85,19 @@ def verify(validator, v_item, key=None):
     elif v_item.classpath.find("@") > -1:
         handle_any_attribute(validator, v_item)
 
-    elif (utils.isHdf5Dataset(v_item.h5_object) or
-          utils.isHdf5Group(v_item.h5_object) or
-          utils.isHdf5Link(v_item.h5_object) or
-          utils.isHdf5ExternalLink(v_item.parent, v_item.name)):
+    elif (
+        utils.isHdf5Dataset(v_item.h5_object)
+        or utils.isHdf5Group(v_item.h5_object)
+        or utils.isHdf5Link(v_item.h5_object)
+        or utils.isHdf5ExternalLink(v_item.parent, v_item.name)
+    ):
         handle_groups_and_fields(validator, v_item)
 
     elif v_item.classpath == CLASSPATH_OF_NON_NEXUS_CONTENT:
-        pass    # nothing else to do here
+        pass  # nothing else to do here
 
     else:
-        status = finding.TODO        # TODO:
+        status = finding.TODO  # TODO:
         c = "not handled yet"
         validator.record_finding(v_item, TEST_NAME, status, c)
 
@@ -112,7 +113,7 @@ def handle_NX_class(validator, v_item):
     status = finding.ERROR
     for k, p in patterns.items():
         if k not in validator.regexp_cache:
-            validator.regexp_cache[k] = re.compile('^' + p + '$')
+            validator.regexp_cache[k] = re.compile("^" + p + "$")
         s = utils.decode_byte_string(v_item.h5_object)
         m = validator.regexp_cache[k].match(s)
         matches = m is not None and m.string == s
@@ -130,7 +131,7 @@ def handle_any_attribute(validator, v_item, key=None):
     status = finding.TF_RESULT[k is not None]
     k = k or "no matching pattern found"
     key = key or "validItemName"
-    f = finding.Finding(v_item.h5_address, TEST_NAME, status, k)    # noqa
+    f = finding.Finding(v_item.h5_address, TEST_NAME, status, k)  # noqa
     validator.validations.append(f)
     v_item.validations[key] = f
 
@@ -156,8 +157,8 @@ def validItemName_match_key(validator, text):
     patterns = getValidItemNamePatterns(validator)
     for k, p in patterns.items():
         if k not in validator.regexp_cache:
-            validator.regexp_cache[k] = re.compile('^' + p + '$')
-        
+            validator.regexp_cache[k] = re.compile("^" + p + "$")
+
         s = utils.decode_byte_string(text)
         m = validator.regexp_cache[k].match(s)
         matches = m is not None and m.string == s
@@ -178,6 +179,6 @@ def handle_groups_and_fields(validator, v_item):
             status = finding.OK
         else:
             status = finding.NOTE
-    except UnicodeDecodeError:      # TODO: see issue #37
+    except UnicodeDecodeError:  # TODO: see issue #37
         status = finding.ERROR
     validator.record_finding(v_item, TEST_NAME, status, k)

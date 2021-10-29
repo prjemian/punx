@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # :author:    Pete R. Jemian
 # :email:     prjemian@gmail.com
 # :copyright: (c) 2016, Pete R. Jemian
@@ -9,7 +9,7 @@
 # Distributed under the terms of the Creative Commons Attribution 4.0 International Public License.
 #
 # The full license is in the file LICENSE.txt, distributed with this software.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 """
 manages the communications with GitHub
@@ -41,23 +41,23 @@ from . import utils
 
 logger = utils.setup_logger(__name__)
 
-CREDS_FILE_NAME = u'__github_creds__.txt'
-DEFAULT_BRANCH_NAME = u'main'
-DEFAULT_RELEASE_NAME = u'v2018.5'
-#DEFAULT_TAG_NAME = u'NXroot-1.0'
-DEFAULT_TAG_NAME = u'Schema-3.3'
-DEFAULT_COMMIT_NAME = u'a4fd52d'
+CREDS_FILE_NAME = "__github_creds__.txt"
+DEFAULT_BRANCH_NAME = "main"
+DEFAULT_RELEASE_NAME = "v2018.5"
+# DEFAULT_TAG_NAME = u'NXroot-1.0'
+DEFAULT_TAG_NAME = "Schema-3.3"
+DEFAULT_COMMIT_NAME = "a4fd52d"
 DEFAULT_NXDL_SET = DEFAULT_RELEASE_NAME
 GITHUB_RETRY_COUNT = 3
 
-GITHUB_NXDL_ORGANIZATION = 'nexusformat'
-GITHUB_NXDL_REPOSITORY = 'definitions'
-GITHUB_NXDL_BRANCH = 'master'
+GITHUB_NXDL_ORGANIZATION = "nexusformat"
+GITHUB_NXDL_REPOSITORY = "definitions"
+GITHUB_NXDL_BRANCH = "master"
 GITHUB_RETRY_COUNT = 3
-#NXDL_CACHE_SUBDIR = GITHUB_NXDL_REPOSITORY + '-' + GITHUB_NXDL_BRANCH
+# NXDL_CACHE_SUBDIR = GITHUB_NXDL_REPOSITORY + '-' + GITHUB_NXDL_BRANCH
 
 
-def get_GitHub_credentials(creds_file_name = None):
+def get_GitHub_credentials(creds_file_name=None):
     """
     get the Github Basic Authentication token from a local file
 
@@ -81,7 +81,7 @@ def get_GitHub_credentials(creds_file_name = None):
     if not os.path.exists(creds_file_name):
         return None
 
-    return open(creds_file_name, 'r').read().strip().split()[-1]
+    return open(creds_file_name, "r").read().strip().split()[-1]
 
 
 class GitHub_Repository_Reference(object):
@@ -146,37 +146,37 @@ class GitHub_Repository_Reference(object):
         """
         ref = ref or DEFAULT_NXDL_SET
         if self.repo is None:
-            raise ValueError('call connect_repo() first')
+            raise ValueError("call connect_repo() first")
 
-        node = self.get_branch(ref) \
-            or self.get_release(ref) \
-            or self.get_tag(ref) \
+        node = (
+            self.get_branch(ref)
+            or self.get_release(ref)
+            or self.get_tag(ref)
             or self.get_commit(ref)
+        )
         return node
 
     def download(self):
         """
         download the NXDL definitions described by ``ref``
         """
-        _msg = u'disabling warnings about GitHub self-signed https certificates'
-        #requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+        # "disabling warnings about GitHub self-signed https certificates"
         disable_warnings(InsecureRequestWarning)
 
         token = get_GitHub_credentials()
         content = None
-        for _retry in range(GITHUB_RETRY_COUNT):        # noqa
+        for _retry in range(GITHUB_RETRY_COUNT):  # noqa
             try:
                 if token is None:
                     content = requests.get(self.zip_url, verify=False)
                 else:
-                    content = requests.get(self.zip_url,
-                                     headers={f'Authorization': 'TOK:{token}}'},
-                                     verify=False,
-                                     )
+                    content = requests.get(
+                        self.zip_url,
+                        headers={"Authorization": f"TOK:{token}"},
+                        verify=False,
+                    )
             except requests.exceptions.ConnectionError as _exc:
-                raise IOError(
-                    "ConnectionError from " + self.zip_url + "\n" + str(_exc)
-                )
+                raise IOError("ConnectionError from " + self.zip_url + "\n" + str(_exc))
             else:
                 break
 
@@ -184,17 +184,17 @@ class GitHub_Repository_Reference(object):
 
     def _make_zip_url(self, ref=DEFAULT_BRANCH_NAME):
         """create the download URL for the ``ref``"""
-        url = u'https://github.com/'
-        url += u'/'.join([self.orgName, self.appName, u'archive', ref])
-        url += u'.zip'
+        url = "https://github.com/"
+        url += "/".join([self.orgName, self.appName, "archive", ref])
+        url += ".zip"
         return url
 
     def _get_last_modified(self):
         """get the ``last_modified`` date from the SHA's commit"""
         if self.sha is not None:
             commit = self.repo.get_commit(self.sha)
-            mod_date_time = commit.last_modified    # Tue, 20 Dec 2016 18:30:29 GMT
-            fmt = '%a, %d %b %Y %H:%M:%S %Z'        # --> 2016-11-19 01:04:28
+            mod_date_time = commit.last_modified  # Tue, 20 Dec 2016 18:30:29 GMT
+            fmt = "%a, %d %b %Y %H:%M:%S %Z"  # --> 2016-11-19 01:04:28
             mod_date_time = datetime.datetime.strptime(commit.last_modified, fmt)
             self.last_modified = str(mod_date_time)
 
@@ -207,7 +207,7 @@ class GitHub_Repository_Reference(object):
         try:
             node = self.repo.get_branch(ref)
             self.ref = ref
-            self.ref_type = u'branch'
+            self.ref_type = "branch"
             self.sha = node.commit.sha
             self.zip_url = self._make_zip_url(self.sha[:7])
             self._get_last_modified()
@@ -225,7 +225,7 @@ class GitHub_Repository_Reference(object):
             node = self.repo.get_release(ref)
             self.get_tag(node.tag_name)
             self.ref = ref
-            self.ref_type = u'release'
+            self.ref_type = "release"
             return node
         except github.GithubException:
             return None
@@ -240,7 +240,7 @@ class GitHub_Repository_Reference(object):
             for tag in self.repo.get_tags():
                 if tag.name == ref:
                     self.ref = ref
-                    self.ref_type = u'tag'
+                    self.ref_type = "tag"
                     self.sha = tag.commit.sha
                     # self.zip_url = self._make_zip_url(self.sha[:7])
                     self.zip_url = tag.zipball_url
@@ -258,7 +258,7 @@ class GitHub_Repository_Reference(object):
         try:
             node = self.repo.get_commit(ref)
             self.ref = ref
-            self.ref_type = u'commit'
+            self.ref_type = "commit"
             self.sha = node.commit.sha
             self.zip_url = self._make_zip_url(self.sha[:7])
             self._get_last_modified()

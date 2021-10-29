@@ -56,7 +56,7 @@ def punx_data_file_name(fname):
     '''
     return the absolute path to the file in src/punx/data/fname
     '''
-    path = os.path.join(os.path.dirname(__file__), '..', 'src', 'punx', 'data')
+    path = os.path.join(os.path.dirname(__file__), '..', 'punx', 'data')
     return os.path.abspath(os.path.join(path, fname))
 
 

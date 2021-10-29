@@ -1,5 +1,5 @@
-.. _update:
 .. index:: update
+.. _update:
 
 User interface: subcommand: **update**
 ######################################

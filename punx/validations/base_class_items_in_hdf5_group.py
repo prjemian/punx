@@ -1,5 +1,4 @@
-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # :author:    Pete R. Jemian
 # :email:     prjemian@gmail.com
 # :copyright: (c) 2017, Pete R. Jemian
@@ -7,9 +6,10 @@
 # Distributed under the terms of the Creative Commons Attribution 4.0 International Public License.
 #
 # The full license is in the file LICENSE.txt, distributed with this software.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 from .. import finding
+
 # from .. import utils
 
 
@@ -46,15 +46,15 @@ def verify(validator, v_item, base_class):
             f = finding.OPTIONAL
         t += " in " + v_item.h5_address + "/" + group_name
         validator.record_finding(v_item, test, f, t)
-        
-        #---------- this code is in the wrong place: to nxdl_manager -----
+
+        # ---------- this code is in the wrong place: to nxdl_manager -----
         minOccurs = 0
-        if hasattr(base_class, "definition"):   # application definition
+        if hasattr(base_class, "definition"):  # application definition
             minOccurs = 1
         minOccurs = int(group_object.attributes.get("minOccurs", minOccurs))
         group_object.minOccurs = minOccurs
-        #---------------------------------------------------------
-        pass        # FIXME: report if required item is present, name could be flexible
+        # ---------------------------------------------------------
+        pass  # FIXME: report if required item is present, name could be flexible
 
-    for link_name, link_obj in base_class.links.items():        # noqa
-        pass    # TODO: complete
+    for link_name, link_obj in base_class.links.items():  # noqa
+        pass  # TODO: complete

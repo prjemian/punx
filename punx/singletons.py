@@ -1,4 +1,3 @@
-
 """
 singletons: Python 2 and 3 Compatible Version
 
@@ -11,18 +10,21 @@ USAGE::
 
 """
 
+
 class _Singleton(type):
 
     """A metaclass that creates a Singleton base class when called."""
 
     _instances = {}
+
     def __call__(self, *args, **kwargs):
         if self not in self._instances:
             self._instances[self] = super(_Singleton, self).__call__(*args, **kwargs)
         return self._instances[self]
 
-class Singleton(_Singleton('SingletonMeta', (object,), {})): 
-    
+
+class Singleton(_Singleton("SingletonMeta", (object,), {})):
+
     """public interface to Singleton class"""
-    
+
     pass

@@ -10,7 +10,7 @@ from .. import utils
 
 def test_numpy_ndarray_string():
     s = "this is a test"
-    arr = numpy.array([s,])
+    arr = numpy.array([s])
     assert s == utils.decode_byte_string(arr)
 
 

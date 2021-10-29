@@ -22,7 +22,10 @@ def raises_exception(text):
 
 @pytest.mark.parametrize(
     "xcptn, text",
-    [[No_Exception, "<good_root />"], [lxml.etree.XMLSyntaxError, "<#bad_root />"],],
+    [
+        [No_Exception, "<good_root />"],
+        [lxml.etree.XMLSyntaxError, "<#bad_root />"],
+    ],
 )
 def test_xml_validation__valid(xcptn, text):
     with pytest.raises(xcptn):

@@ -1,5 +1,4 @@
-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # :author:    Pete R. Jemian
 # :email:     prjemian@gmail.com
 # :copyright: (c) 2017, Pete R. Jemian
@@ -7,7 +6,7 @@
 # Distributed under the terms of the Creative Commons Attribution 4.0 International Public License.
 #
 # The full license is in the file LICENSE.txt, distributed with this software.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 from .. import finding
 from .. import utils
@@ -51,8 +50,8 @@ def verify_group_attributes(validator, v_item, base_class):
         c += ": " + base_class.title + "@" + k
         a_item = validator.addresses[v_item.h5_address + "@" + k]
         validator.record_finding(a_item, "known attribute", status, c)
-        
-        if not known:   # ignore details of the unknown
+
+        if not known:  # ignore details of the unknown
             continue
 
         spec = base_class.attributes[k]
@@ -70,11 +69,13 @@ def verify_group_attributes(validator, v_item, base_class):
             # TODO: ...
 
         # TODO: if spec.xml_attributes["deprecated"]
-        
+
         # @default attribute points to child group in these classpaths
-        if k == "default" and v_item.classpath in ("", 
-                                                   "/NXentry", 
-                                                   "/NXentry/NXsubentry"):
+        if k == "default" and v_item.classpath in (
+            "",
+            "/NXentry",
+            "/NXentry/NXsubentry",
+        ):
             test_name = "value of @default"
             child_exists(validator, test_name, v, v_item, a_item)
 
@@ -105,7 +106,6 @@ def verify_group_attributes(validator, v_item, base_class):
             validator.record_finding(a_item, test_name, status, c)
 
 
-
 def verify_group_children(validator, v_item, base_class):
     """verify the group's children (groups, fields)"""
     for child_name in v_item.h5_object:
@@ -119,11 +119,7 @@ def verify_group_children(validator, v_item, base_class):
             else:
                 t = "not defined: "
             t += base_class.title + "/" + child_name
-            validator.record_finding(
-                v_sub_item,
-                "field in base class",
-                finding.OK, 
-                t)
+            validator.record_finding(v_sub_item, "field in base class", finding.OK, t)
 
         elif utils.isHdf5Group(obj):
             if child_name in base_class.groups:
@@ -131,15 +127,12 @@ def verify_group_children(validator, v_item, base_class):
             else:
                 t = "not defined: "
             t += base_class.title + "/" + child_name
-            validator.record_finding(
-                v_sub_item,
-                "group in base class",
-                finding.OK, 
-                t)
+            validator.record_finding(v_sub_item, "group in base class", finding.OK, t)
 
         else:
             validator.record_finding(
                 v_sub_item,
                 "unhandled: group_items_in_base_class",
-                finding.TODO, 
-                "TODO: ")
+                finding.TODO,
+                "TODO: ",
+            )

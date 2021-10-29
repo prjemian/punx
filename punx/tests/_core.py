@@ -4,10 +4,11 @@ import shutil
 import tempfile
 
 CANONICAL_RELEASE = u"v3.3"  # TODO: pick a newer?
+DEFAULT_NXDL_FILE_SET = None
 
-TEST_DATA_DIR = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), "..", "..", "tests", "data")
-)
+_ppath = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+EXAMPLE_DATA_DIR = os.path.abspath(os.path.join(_ppath, "data"))
+TEST_DATA_DIR = os.path.abspath(os.path.join(_ppath, "..", "tests", "data"))
 
 
 class No_Exception(Exception): ...

@@ -23,13 +23,13 @@ def suite(*args, **kw):
     # from tests import github_handler_test
     # from tests import h5tree_test
     # from tests import logs_test
-    from tests import nxdl_manager_test
-    from tests import nxdl_schema_test
-    #from tests import nxdlstructure_test
+    # from tests import nxdl_manager_test
+    # from tests import nxdl_schema_test
+    # from tests import nxdlstructure_test
     # from tests import schema_manager_test
     # from tests import utils_test
-    from tests import validate_test
-    #from tests import warnings_test
+    # from tests import validate_test
+    # from tests import warnings_test
     
     test_suite = unittest.TestSuite()
     test_list = [
@@ -42,12 +42,12 @@ def suite(*args, **kw):
         # github_handler_test,
         # h5tree_test,
         # logs_test,
-        nxdl_manager_test,
-        nxdl_schema_test,
+        # nxdl_manager_test,
+        # nxdl_schema_test,
         # nxdlstructure_test,
         # schema_manager_test,
         # utils_test,
-        validate_test,
+        # validate_test,
         # warnings_test,
         ]
 

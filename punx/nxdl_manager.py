@@ -131,13 +131,13 @@ def validate_xml_tree(xml_tree):
 
     :param str xml_file_name: name of XML file
     """
-    from punx import schema_manager
+    from . import schema_manager
     schema = schema_manager.get_default_schema_manager().lxml_schema
     try:
         result = schema.assertValid(xml_tree)
     except lxml.etree.DocumentInvalid as exc:
         logger.error(str(exc))
-        raise InvalidNxdlFile(str(exc))
+        raise InvalidNxdlFile(exc)
     return result
 
 

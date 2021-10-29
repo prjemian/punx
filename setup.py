@@ -13,8 +13,6 @@
 
 from setuptools import setup, find_packages
 import os
-import re
-import sys
 import versioneer
 
 # pull in some definitions from the package's __init__.py file

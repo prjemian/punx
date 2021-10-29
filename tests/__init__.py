@@ -21,7 +21,7 @@ def suite(*args, **kw):
     #from tests import external_links
     from tests import finding_test
     # from tests import github_handler_test
-    from tests import h5tree_test
+    # from tests import h5tree_test
     # from tests import logs_test
     from tests import nxdl_manager_test
     from tests import nxdl_schema_test
@@ -40,7 +40,7 @@ def suite(*args, **kw):
         # external_links,
         finding_test,
         # github_handler_test,
-        h5tree_test,
+        # h5tree_test,
         # logs_test,
         nxdl_manager_test,
         nxdl_schema_test,

@@ -1,5 +1,5 @@
 """
-test punx tests/validate module
+test punx validate module
 
 ISSUES
 
@@ -24,12 +24,12 @@ import pytest
 
 from ._core import DEFAULT_NXDL_FILE_SET
 from ._core import EXAMPLE_DATA_DIR
-from ._core import No_Exception
 from ._core import hfile
-from .. import utils
+from ._core import No_Exception
 from .. import FileNotFound
 from .. import finding
 from .. import HDF5_Open_Error
+from .. import utils
 from .. import validate
 
 

@@ -62,5 +62,5 @@ setup (
         ],
         #'gui_scripts': [],
     },
-    test_suite       = "tests",
+    test_suite       = "punx/tests",
 )

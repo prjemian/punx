@@ -8,7 +8,7 @@ DEFAULT_NXDL_FILE_SET = None
 
 _ppath = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 EXAMPLE_DATA_DIR = os.path.abspath(os.path.join(_ppath, "data"))
-TEST_DATA_DIR = os.path.abspath(os.path.join(_ppath, "..", "tests", "data"))
+TEST_DATA_DIR = os.path.abspath(os.path.join(_ppath, "tests", "data"))
 
 
 class No_Exception(Exception): ...

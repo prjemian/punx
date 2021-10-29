@@ -26,7 +26,7 @@ def suite(*args, **kw):
     from tests import nxdl_manager_test
     from tests import nxdl_schema_test
     #from tests import nxdlstructure_test
-    from tests import schema_manager_test
+    # from tests import schema_manager_test
     from tests import utils_test
     from tests import validate_test
     #from tests import warnings_test
@@ -45,7 +45,7 @@ def suite(*args, **kw):
         nxdl_manager_test,
         nxdl_schema_test,
         # nxdlstructure_test,
-        schema_manager_test,
+        # schema_manager_test,
         utils_test,
         validate_test,
         # warnings_test,

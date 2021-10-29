@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.6', '3.7', '3.8', '3.9', '3.10']
+        python-version: ['3.7', '3.8', '3.9', '3.10']
       max-parallel: 5
 
     steps:
@@ -50,7 +50,7 @@ jobs:
     - name: Run tests with pytest
       run: |
         source $CONDA/bin/activate $ENV_NAME
-        pytest -vvv --ignore=./tests/ignore_now .
+        pytest -vvv .
       env:
         PY_VER: ${{ matrix.python-version }}
         ENV_NAME: anaconda-test-env-py-${{ matrix.python-version }}

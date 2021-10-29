@@ -37,6 +37,7 @@ log.txt
 nosetests.xml
 htmlcov
 tests/__pycache__
+punx/tests/__pycache__
 
 # Translations
 *.mo

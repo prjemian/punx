@@ -27,7 +27,6 @@ ignore-patterns:
   - ^example/doc_.*\.py$
   - (^|/)docs(/|$)
 python-targets:
-  - 2
   - 3
 pylint:
   disable:

@@ -15,7 +15,7 @@ Python Utilities for NeXus HDF5 files
 #-----------------------------------------------------------------------------
 # :author:    Pete R. Jemian
 # :email:     prjemian@gmail.com
-# :copyright: (c) 2014-2017, Pete R. Jemian
+# :copyright: (c) 2014-2021, Pete R. Jemian
 #
 # Distributed under the terms of the Creative Commons Attribution 4.0 International Public License.
 #
@@ -30,7 +30,7 @@ if _path not in sys.path:
 
 __author__    = 'Pete R. Jemian'
 __email__     = 'prjemian@gmail.com'
-__copyright__ = '2017-2018, Pete R. Jemian'
+__copyright__ = '2014-2021, Pete R. Jemian'
 
 __package_name__ = 'punx'
 
@@ -68,11 +68,11 @@ __classifiers__ = [
      'License :: Freely Distributable',
      'License :: Public Domain',
      'Programming Language :: Python',
-     'Programming Language :: Python :: 2',
-     'Programming Language :: Python :: 2.7',
      'Programming Language :: Python :: 3',
-     'Programming Language :: Python :: 3.5',
-     'Programming Language :: Python :: 3.6',
+     'Programming Language :: Python :: 3.7',
+     'Programming Language :: Python :: 3.8',
+     'Programming Language :: Python :: 3.9',
+     'Programming Language :: Python :: 3.10',
      'Topic :: Scientific/Engineering',
      'Topic :: Scientific/Engineering :: Astronomy',
      'Topic :: Scientific/Engineering :: Bio-Informatics',

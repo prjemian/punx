@@ -1,1 +1,1 @@
-src/punx/_version.py export-subst
+punx/_version.py export-subst

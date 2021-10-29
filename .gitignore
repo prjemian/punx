@@ -1,13 +1,10 @@
 *.py[cod]
 
 # local creds for authenticated access
-src/punx/__github_creds__.txt
+punx/__github_creds__.txt
 
 # local NXDL source cache (to be packaged with sdist)
-#src/punx/cache/*
-
-# eclipse/PyDev
-.pydevproject
+#punx/cache/*
 
 # C extensions
 *.so
@@ -48,7 +45,7 @@ tests/__pycache__
 .mr.developer.cfg
 /.settings
 /.idea
-/src/punx/data/local
+/punx/data/local
 
 # Microsoft VS Code editor
 .vscode/

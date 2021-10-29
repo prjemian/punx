@@ -6,8 +6,8 @@ exclude =
     dist,
     versioneer.py,
     docs/source,
-    src/punx/_version.py,
-    src/punx/ignore_now,
+    punx/_version.py,
+    punx/ignore_now,
     tests/ignore_now,
     ideas
 

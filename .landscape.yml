@@ -16,11 +16,11 @@ requirements:
   - coveralls
 ignore-paths:
   - docs
-  - src/punx/cache
-  - src/punx/data
-  - src/punx/ignore_now
+  - punx/cache
+  - punx/data
+  - punx/ignore_now
   - versioneer.py
-  - src/punx/_version.py
+  - punx/_version.py
   - install_NXDL_file_sets.py
   - _installer.py
 ignore-patterns:

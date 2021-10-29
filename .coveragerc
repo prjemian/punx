@@ -12,6 +12,6 @@ exclude_lines =
 [run]
 omit =
 	versioneer.py
-	src/punx/_version.py
-	src/punx/github_handler.py
+	punx/_version.py
+	punx/github_handler.py
 	tests/github_handler_test.py

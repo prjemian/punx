@@ -20,7 +20,7 @@ def suite(*args, **kw):
     #from tests import default_plot_test
     #from tests import external_links
     from tests import finding_test
-    from tests import github_handler_test
+    # from tests import github_handler_test
     from tests import h5tree_test
     # from tests import logs_test
     from tests import nxdl_manager_test

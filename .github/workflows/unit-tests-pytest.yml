@@ -50,7 +50,7 @@ jobs:
     - name: Run tests with pytest
       run: |
         source $CONDA/bin/activate $ENV_NAME
-        pytest -vvv --ignore=./tests/ignore_now .
+        pytest -vvv .
       env:
         PY_VER: ${{ matrix.python-version }}
         ENV_NAME: anaconda-test-env-py-${{ matrix.python-version }}

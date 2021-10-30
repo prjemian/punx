@@ -151,10 +151,7 @@ class Hdf5TreeView(object):
         """return a [formatted_string] with any attributes"""
         s = []
         if self.show_attributes:
-            for (
-                name,
-                value,
-            ) in obj.attrs.items():  # FIXME: for name, value in obj.attrs.iteritems():
+            for name, value in obj.attrs.items():
                 s.append(
                     "%s  @%s = %s"
                     % (indentation, name, utils.decode_byte_string(value))

@@ -1,3 +1,7 @@
+"""
+Issue 131: fails to parse attribute with dictionary content
+"""
+
 import h5py
 import numpy as np
 import os

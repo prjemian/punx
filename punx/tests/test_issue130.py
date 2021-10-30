@@ -55,4 +55,4 @@ def test_SwissFEL_file_replica(hfile):
         (12, "data: --> /entry/data/data"),
     ]
     for line, expect in samples:
-        assert report[line].strip() == expect, f"{line = }  {expect = }"
+        assert report[line].strip() == expect, f"line={line}  expect={expect}"

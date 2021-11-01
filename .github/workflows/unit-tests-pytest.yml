@@ -38,10 +38,10 @@ jobs:
     # $CONDA is an environment variable pointing to the
     # root of the miniconda directory
 
-    - name: Install Python package requirements
+    - name: Install Python package & test requirements
       run: |
         $CONDA/bin/conda env update --file environment.yml --name $ENV_NAME
-        $CONDA/bin/conda install pytest --name $ENV_NAME
+        $CONDA/bin/conda install pytest yaml pyyaml ruamel_yaml --name $ENV_NAME
         $CONDA/bin/conda list -r --name $ENV_NAME
       env:
         PY_VER: ${{ matrix.python-version }}

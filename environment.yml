@@ -5,7 +5,7 @@ channels:
   - conda-forge
 
 dependencies:
-  - h5py
+  - h5py>=3
   - lxml
   - numpy
   - python=3

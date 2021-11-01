@@ -17,7 +17,7 @@ TESTFILE = os.path.join(EXAMPLE_DATA_DIR, DLS_EXAMPLE_FILE)
 
 def test_DLS_master_file():
     """
-    Test that the tree report of the DLS example has length 183.
+    Test that the tree renders a 183-item report of the DLS example.  With no errors.
     """
     os.path.exists(TESTFILE)
 

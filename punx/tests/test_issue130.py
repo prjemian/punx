@@ -27,6 +27,11 @@ def test_DLS_master_file():
 
 
 def test_SwissFEL_file_replica(hfile):
+"""Test that missing external links are handled gracefully.
+
+Create a NeXus file with a broken external link and an internal link to that broken link. Check
+that the missing file is correctly reported but does not raise an exception.
+"""
     # create a replica of the problem parts in the Swiss FEL file
     with h5py.File(hfile, "w") as root:
         g_entry = root.create_group("entry")

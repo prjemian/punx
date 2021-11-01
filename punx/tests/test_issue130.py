@@ -16,6 +16,8 @@ TESTFILE = os.path.join(EXAMPLE_DATA_DIR, DLS_EXAMPLE_FILE)
 
 
 def test_DLS_master_file():
+"""Test that the tree report of the DLS example has length 183.
+"""
     os.path.exists(TESTFILE)
 
     tree = h5tree.Hdf5TreeView(TESTFILE)

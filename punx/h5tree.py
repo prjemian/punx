@@ -105,10 +105,7 @@ class Hdf5TreeView(object):
                 if utils.isNeXusLink(value):
                     s += self._renderLinkedObject(value, itemname, indentation + "  ")
                 elif utils.isHdf5Group(value) or utils.isHdf5FileObject(value):
-                    groups.append(value)
-                    # TODO: report external group links in the right place
-                    # The problem is the link file and path need to be fed into the
-                    # next call to _renderGroup().  No such design exists now for that.
+                    groups.append((value, itemname))
                 elif utils.isHdf5Dataset(value):
                     s += self._renderDataset(value, itemname, indentation + "  ")
                     if utils.isHdf5ExternalLink(
@@ -141,9 +138,14 @@ class Hdf5TreeView(object):
                     )
                     raise Exception(msg)
 
-        for value in groups:  # show things that look like groups
-            itemname = value.name.split("/")[-1]
-            s += self._renderGroup(value, itemname, indentation + "  ")
+        for value, itemname in groups:  # show things that look like groups
+            # if isinstance(md, h5py.ExternalLink):
+            #     pass
+            #     # TODO: report external group links in the right place
+            #     # The problem is the link file and path need to be fed into the
+            #     # next call to _renderGroup().  No such design exists now for that.
+            g = self._renderGroup(value, itemname, indentation + "  ")
+            s += g
 
         return s
 

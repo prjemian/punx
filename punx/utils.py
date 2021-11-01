@@ -78,7 +78,7 @@ def isHdf5Link(obj):
     if not hasattr(obj, "parent"):
         return False
     details = obj.parent.get(obj.name, getlink=True)
-    return isinstance(details, h5py.HardLink)
+    return isinstance(details, h5py.HardLink)  # TODO: h5py.SoftLink, too?
 
 
 def isHdf5ExternalLink(parent, obj):

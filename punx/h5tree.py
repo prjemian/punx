@@ -68,7 +68,7 @@ class Hdf5TreeView(object):
         f.close()
         return tree_string_list
 
-    def _renderGroup(self, obj, name, indentation="  "):
+    def _renderGroup(self, obj, name, indentation="  ", md=None):
         """return a [formatted_string] with the contents of the group"""
         s = []
         nxclass = obj.attrs.get("NX_class", "")
@@ -79,37 +79,45 @@ class Hdf5TreeView(object):
                 nxclass = nxclass[0]  # convert as if DATATYPE SCALAR
             nxclass = ":" + utils.decode_byte_string(nxclass)
         s += [indentation + name + nxclass]
-        s += self._renderAttributes(obj, indentation)
+        extra_attrs = {}
+        if isinstance(md, h5py.ExternalLink):
+            # also report external group links (file & path)
+            extra_attrs = dict(file=md.filename, path=md.path)
+        s += self._renderAttributes(obj, indentation, extra_attrs)
+
         # show datasets and links next
         groups = []
         for itemname in sorted(obj):
-            linkref = obj.get(itemname, getlink=True)
-            try:
-                # this will fail for external links if file is not available
-                classref = obj.get(itemname, getclass=True)
-            except KeyError:
+            link_info = obj.get(itemname, getlink=True)
+            if (
+                isinstance(link_info, h5py.ExternalLink)
+                and not os.path.exists(link_info.filename)
+            ):
                 classref = None
+                # otherwise, this fails for external links if file is not available
+            else:
+                classref = obj.get(itemname, getclass=True)
 
             if classref is None:
                 s += ["%s  %s: external file missing" % (indentation, itemname)]
                 fmt = "%s    %s = %s"
                 s += [
                     fmt
-                    % (indentation, "@file", utils.decode_byte_string(linkref.filename))
+                    % (indentation, "@file", utils.decode_byte_string(link_info.filename))
                 ]
                 s += [
-                    fmt % (indentation, "@path", utils.decode_byte_string(linkref.path))
+                    fmt % (indentation, "@path", utils.decode_byte_string(link_info.path))
                 ]
             else:
                 value = obj.get(itemname)
                 if utils.isNeXusLink(value):
                     s += self._renderLinkedObject(value, itemname, indentation + "  ")
                 elif utils.isHdf5Group(value) or utils.isHdf5FileObject(value):
-                    groups.append((value, itemname))
+                    groups.append((value, itemname, link_info))
                 elif utils.isHdf5Dataset(value):
                     s += self._renderDataset(value, itemname, indentation + "  ")
                     if utils.isHdf5ExternalLink(
-                        obj, linkref
+                        obj, link_info
                     ):  # TODO: is obj the "parent"
                         # When "classref" is defined, then external data is available
                         fmt = "%s    %s = %s"
@@ -118,7 +126,7 @@ class Hdf5TreeView(object):
                             % (
                                 indentation,
                                 "@file",
-                                utils.decode_byte_string(linkref.filename),
+                                utils.decode_byte_string(link_info.filename),
                             )
                         ]
                         s += [
@@ -126,7 +134,7 @@ class Hdf5TreeView(object):
                             % (
                                 indentation,
                                 "@path",
-                                utils.decode_byte_string(linkref.path),
+                                utils.decode_byte_string(link_info.path),
                             )
                         ]
                 else:
@@ -134,30 +142,26 @@ class Hdf5TreeView(object):
                         "unidentified %s: %s, %s",
                         itemname,
                         repr(classref),
-                        repr(linkref),
+                        repr(link_info),
                     )
                     raise Exception(msg)
 
-        for value, itemname in groups:  # show things that look like groups
-            # if isinstance(md, h5py.ExternalLink):
-            #     pass
-            #     # TODO: report external group links in the right place
-            #     # The problem is the link file and path need to be fed into the
-            #     # next call to _renderGroup().  No such design exists now for that.
-            g = self._renderGroup(value, itemname, indentation + "  ")
+        for value, itemname, md in groups:  # show things that look like groups
+            g = self._renderGroup(value, itemname, indentation + "  ", md)
             s += g
 
         return s
 
-    def _renderAttributes(self, obj, indentation="  "):
+    def _renderAttributes(self, obj, indentation="  ", extra={}):
         """return a [formatted_string] with any attributes"""
         s = []
         if self.show_attributes:
-            for name, value in obj.attrs.items():
-                s.append(
-                    "%s  @%s = %s"
-                    % (indentation, name, utils.decode_byte_string(value))
-                )
+            for d in (obj.attrs, extra):
+                for name, value in d.items():
+                    s.append(
+                        "%s  @%s = %s"
+                        % (indentation, name, utils.decode_byte_string(value))
+                    )
         return s
 
     def _renderLinkedObject(self, obj, name, indentation="  "):

@@ -2,8 +2,9 @@
 Issue 130: BUG: tree cannot parse some NeXus examples
 """
 
-import h5py
 import os
+
+import h5py
 
 from ._core import EXAMPLE_DATA_DIR
 from ._core import hfile

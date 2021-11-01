@@ -16,8 +16,9 @@ TESTFILE = os.path.join(EXAMPLE_DATA_DIR, DLS_EXAMPLE_FILE)
 
 
 def test_DLS_master_file():
-"""Test that the tree report of the DLS example has length 183.
-"""
+    """
+    Test that the tree report of the DLS example has length 183.
+    """
     os.path.exists(TESTFILE)
 
     tree = h5tree.Hdf5TreeView(TESTFILE)
@@ -29,11 +30,12 @@ def test_DLS_master_file():
 
 
 def test_SwissFEL_file_replica(hfile):
-"""Test that missing external links are handled gracefully.
+    """
+    Test that missing external links are handled gracefully.
 
-Create a NeXus file with a broken external link and an internal link to that broken link. Check
-that the missing file is correctly reported but does not raise an exception.
-"""
+    Create a NeXus file with a broken external link and an internal link to that broken link. Check
+    that the missing file is correctly reported but does not raise an exception.
+    """
     # create a replica of the problem parts in the Swiss FEL file
     with h5py.File(hfile, "w") as root:
         g_entry = root.create_group("entry")

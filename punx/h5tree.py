@@ -171,7 +171,7 @@ class Hdf5TreeView(object):
         if self.show_attributes:
             for name, value in obj.attrs.items():
                 if name == "axes":
-                    if isinstance(value, numpy.ndarray):
+                    if isinstance(value, (numpy.ndarray, numpy.bytes_)):
                         value = value.astype('U')
                     s.append(
                         '%s  @%s = ["%s"]'

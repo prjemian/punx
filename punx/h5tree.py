@@ -170,10 +170,18 @@ class Hdf5TreeView(object):
         s = []
         if self.show_attributes:
             for name, value in obj.attrs.items():
-                s.append(
-                    "%s  @%s = %s"
-                    % (indentation, name, utils.decode_byte_string(value))
-                )
+                if name == "axes":
+                    if isinstance(value, numpy.ndarray):
+                        value = value.astype('U')
+                    s.append(
+                        '%s  @%s = ["%s"]'
+                        % (indentation, name, '", "'.join(value))
+                    )
+                else:
+                    s.append(
+                        "%s  @%s = %s"
+                        % (indentation, name, utils.decode_byte_string(value))
+                    )
         return s
 
     def _renderLinkedObject(self, obj, name, indentation="  "):

@@ -27,7 +27,8 @@ def test_render_muliple_axes_attribute():
         '      @axes = ["Words", "are", "these", "things"]',
         '  string',
         '    data:float64[0] = []',
-        '      @axes = ["W", "o", "r", "d", "s", " ", "a", "r", "e", " ", "t", "h", "e", "s", "e", " ", "t", "h", "i", "n", "g", "s"]',
+        '      @axes = ["W", "o", "r", "d", "s", " ", "a", "r", "e", " ", "t",'
+        ' "h", "e", "s", "e", " ", "t", "h", "i", "n", "g", "s"]',
         '  stringarray',
         '    data:float64[0] = []',
         '      @axes = ["Words", "are", "these", "things"]',

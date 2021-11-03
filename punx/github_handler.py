@@ -81,7 +81,7 @@ def get_GitHub_credentials(creds_file_name=""):
     GitHub credentials. Be sure to make the file readable only by the user and
     not others.
 
-    Returns None if there is no credentials file.
+    Returns None if credentials are not found per above search.
     """
     for variable in ["GH_TOKEN", "GITHUB_TOKEN"]:
         if variable in os.environ:

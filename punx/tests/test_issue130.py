@@ -17,7 +17,10 @@ TESTFILE = os.path.join(EXAMPLE_DATA_DIR, DLS_EXAMPLE_FILE)
 
 def test_DLS_master_file():
     """
-    Test that the tree renders a 183-item report of the DLS example.  With no errors.
+    Test that missing external links are handled gracefully.
+
+    Using the data from DLS (a master file with missing external files),
+    test that the tree renders a 183-item report, with no errors.
     """
     os.path.exists(TESTFILE)
 

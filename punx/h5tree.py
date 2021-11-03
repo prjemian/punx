@@ -19,11 +19,15 @@ Describe the tree structure of any HDF5 file
     ~Hdf5TreeView
 """
 
+import logging
 import os
 import h5py
 import numpy
 
 from . import utils
+
+
+logger = logging.getLogger(__name__)
 
 
 class Hdf5TreeView(object):
@@ -60,12 +64,11 @@ class Hdf5TreeView(object):
         if self.filename is None:
             return None
         self.show_attributes = show_attributes
-        f = h5py.File(self.filename, "r")
-        txt = self.filename
-        if self.isNeXus:
-            txt += " : NeXus data file"
-        tree_string_list = self._renderGroup(f, txt, indentation="")
-        f.close()
+        with h5py.File(self.filename, "r") as f:
+            txt = self.filename
+            if self.isNeXus:
+                txt += " : NeXus data file"
+            tree_string_list = self._renderGroup(f, txt, indentation="")
         return tree_string_list
 
     def _renderGroup(self, obj, name, indentation="  ", md=None):
@@ -89,25 +92,33 @@ class Hdf5TreeView(object):
         groups = []
         for itemname in sorted(obj):
             link_info = obj.get(itemname, getlink=True)
+            # prevent fails of obj.get(itemname, getclass=True)
+            # for external links if file is not available
             if (
                 isinstance(link_info, h5py.ExternalLink)
                 and not os.path.exists(link_info.filename)
             ):
                 classref = None
-                # otherwise, this fails for external links if file is not available
+                logger.debug(
+                    "FileNotFound: external file=%s  external HDF5 addr=%s",
+                    link_info.filename, link_info.path
+                )
+            elif isinstance(link_info, h5py.SoftLink):
+                classref = None
+                logger.debug("SoftLink: HDF5 addr=%s", link_info.path)
             else:
                 classref = obj.get(itemname, getclass=True)
 
             if classref is None:
-                s += ["%s  %s: external file missing" % (indentation, itemname)]
-                fmt = "%s    %s = %s"
-                s += [
-                    fmt
-                    % (indentation, "@file", utils.decode_byte_string(link_info.filename))
-                ]
-                s += [
-                    fmt % (indentation, "@path", utils.decode_byte_string(link_info.path))
-                ]
+                if isinstance(link_info, h5py.SoftLink):
+                    s += ["%s  %s: --> %s" % (indentation, itemname, link_info.path)]
+                else:
+                    s += ["%s  %s: external file missing" % (indentation, itemname)]
+                    fmt = "%s    @%s = %s"
+                    for nm, attr in ("file", "filename"), ("path", "path"):
+                        v = getattr(link_info, attr, None)
+                        if v is not None:
+                            s += [fmt % (indentation, nm, utils.decode_byte_string(v))]
             else:
                 value = obj.get(itemname)
                 if utils.isNeXusLink(value):
@@ -243,7 +254,10 @@ class Hdf5TreeView(object):
         t = str(obj.dtype)
         # dset.dtype.kind == 'S', nchar = dset.dtype.itemsize
         if obj.dtype.kind == "S":  # fixed-length string
-            t = "char[%s]" % ",".join([str(o.dtype.itemsize) for o in obj])
+            if len(obj.shape):
+                t = "char[%s]" % ",".join([str(o.dtype.itemsize) for o in obj])
+            else:
+                t = "CHAR"
         elif obj.dtype.kind == "O":  # variable-length string
             t = "CHAR"
         if self.isNeXus:

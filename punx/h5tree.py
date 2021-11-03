@@ -59,6 +59,21 @@ class Hdf5TreeView(object):
         """
         return the structure of the HDF5 file in a list of strings
 
+        The hierarchy of the file is represented by indentation using spaces.
+        Attributes are signified using `@`. Group/dataset names are separated
+        from their datatypes using `:`. A preview of the value of an item
+        follows the `=`. For example:
+
+        ```python
+        [
+            '/tmp/tmpb7iqqapu.hdf5',
+            '  external_data:NXdata',
+            '    @NX_class = NXdata',
+            '    @signal = x',
+            '    x:int64 = 0',
+        ]
+        ```
+
         The work of parsing the datafile is done in this method.
         """
         if self.filename is None:

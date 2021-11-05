@@ -137,7 +137,7 @@ class Hdf5TreeView(object):
                 if isinstance(link_info, h5py.SoftLink):
                     s += ["%s  %s: --> %s" % (indentation, itemname, link_info.path)]
                 else:
-                    s += ["%s  %s: external file missing" % (indentation, itemname)]
+                    s += ["%s  %s: missing external file" % (indentation, itemname)]
                     fmt = "%s    @%s = %s"
                     for nm, attr in ("file", "filename"), ("path", "path"):
                         v = getattr(link_info, attr, None)

@@ -21,9 +21,9 @@ NOTE: project is under initial construction
 :TODO list: https://github.com/prjemian/punx/issues
 
 :citation:
-   .. image:: https://zenodo.org/badge/59300337.svg
-      :target: https://zenodo.org/badge/latestdoi/59300337
-      :alt: DOI: 10.5281/zenodo.1471687
+   .. image:: https://zenodo.org/badge/DOI/10.5281/zenodo.1471686.svg
+      :target: https://doi.org/10.5281/zenodo.1471686
+      :alt: DOI: 10.5281/zenodo.1471686
 
 :build badges:
 

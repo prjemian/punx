@@ -22,7 +22,7 @@ def ext_file():
 def test_basic_premise(ext_file, hfile):
     """
     Assert that a master/external file pair can be rendered by h5tree.
-    
+
     Tests both complete pairs and a pair where one file is missing.
     """
     assert os.path.exists(ext_file)

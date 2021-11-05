@@ -88,7 +88,7 @@ class Hdf5TreeView(object):
 
     def _renderGroup(self, obj, name, indentation="  ", md=None):
         """return a [formatted_string] with the contents of the group
-        
+
         Parameters
         ----------
         obj : h5py.Group

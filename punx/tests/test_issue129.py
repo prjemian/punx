@@ -11,28 +11,39 @@ def test_render_muliple_axes_attribute():
     whitespace or other charachters will not be rendered correctly.
     """
     with h5py.File('test.h5', 'w') as f:
-        d = f.create_dataset("bytearray/data", data=[])
-        d.attrs['axes'] = np.array("Words are these things".split(), dtype='S')
-        d = f.create_dataset("stringarray/data", data=[])
-        d.attrs['axes'] = "Words are these things".split()
-        d = f.create_dataset("string/data", data=[])
-        d.attrs['axes'] = "Words are these things"
+
+        print()
+
+        d = f.create_dataset("zero-term-byte-array/data", data=[])
+        d.attrs['axes'] = np.array("zero terminated byte array".split(), dtype='S')
+        print(f"{d.name} is converted to {type(d.attrs['axes'])} of {type(d.attrs['axes'][0])}")
+
+        # HDF5 does not support unicode strings
+        # d = f.create_dataset("unicode-array/data", data=[])
+        # d.attrs['axes'] = np.array("unicode numpy array".split(), dtype='U')
+
+        d = f.create_dataset("pystring-list/data", data=[])
+        d.attrs['axes'] = "python native string list".split()
+        print(f"{d.name} is converted to {type(d.attrs['axes'])} of {type(d.attrs['axes'][0])}")
+
+        d = f.create_dataset("pystring/data", data=[])
+        d.attrs['axes'] = "python native string"
+        print(f"{d.name} is converted to {type(d.attrs['axes'])} of {type(d.attrs['axes'][0])}")
 
     report = h5tree.Hdf5TreeView('test.h5').report()
     print("\n".join(report))
 
     reference = [
         'test.h5',
-        '  bytearray',
+        '  pystring',
         '    data:float64[0] = []',
-        '      @axes = ["Words", "are", "these", "things"]',
-        '  string',
+        '      @axes = ["p", "y", "t", "h", "o", "n", " ", "n", "a", "t", "i", "v", "e", " ", "s", "t", "r", "i", "n", "g"]',
+        '  pystring-list',
         '    data:float64[0] = []',
-        '      @axes = ["W", "o", "r", "d", "s", " ", "a", "r", "e", " ", "t",'
-        ' "h", "e", "s", "e", " ", "t", "h", "i", "n", "g", "s"]',
-        '  stringarray',
+        '      @axes = ["python", "native", "string", "list"]',
+        '  zero-term-byte-array',
         '    data:float64[0] = []',
-        '      @axes = ["Words", "are", "these", "things"]',
+        '      @axes = ["zero", "terminated", "byte", "array"]',
     ]
 
     assert "\n".join(report) == "\n".join(reference)

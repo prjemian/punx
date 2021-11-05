@@ -65,7 +65,7 @@ def test_SwissFEL_file_replica(hfile):
     assert isinstance(report, list)
     assert len(report) == 13
     samples = [
-        (5, "data: external file missing"),
+        (5, "data: missing external file"),
         (6, "@file = lyso009a_0087.JF07T32V01.h5"),
         (7, "@path = data/data"),
         (12, "data: --> /entry/data/data"),

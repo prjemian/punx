@@ -63,9 +63,9 @@ def test_basic_premise(ext_file, hfile):
     report = tree.report()
     assert len(report) == 16
     samples = [
-        (5, "problem: external file missing"),
-        (6, "@file = no such file"),
-        (7, "@path = /nope"),
+        (5, "other_data: missing external file"),
+        (6, "@file = no-such-file.h5"),
+        (7, "@path = /other/external/data"),
         (8, "master_data:NXdata"),
         (9, "@NX_class = NXdata"),
         (11, f"@file = {ext_file}"),
@@ -80,7 +80,7 @@ def test_basic_premise(ext_file, hfile):
     assert tree.isNeXus
     report = tree.report()
     samples = [
-        (5, "master_data: external file missing"),
+        (5, "master_data: missing external file"),
         (6, f"@file = {ext_file}"),
         (7, "@path = /external_data"),
     ]

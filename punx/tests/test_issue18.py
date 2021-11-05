@@ -46,7 +46,7 @@ def test_basic_premise(ext_file, hfile):
         group.attrs["NX_class"] = "NXnote"
         group = root.create_group("a_note")
         group.attrs["NX_class"] = "NXnote"
-        g_entry["problem"] = h5py.ExternalLink("no such file", "/nope")
+        g_entry["other_data"] = h5py.ExternalLink("no-such-file.h5", "/other/external/data")
 
     assert os.path.exists(hfile)
 

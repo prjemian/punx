@@ -91,11 +91,13 @@ class Hdf5TreeView(object):
 
         Parameters
         ----------
-        obj : h5py.Group
+        obj : instance of ``h5py.Group``
         name : str
             the name of the group
-        md : ?
-           ?
+        md : dict
+            If group was an ExternalLink, then keys ``filename`` and ``path``
+            describe the external link point.  If not ExternalLink, the dictionary
+            contents will not be used.
         """
         s = []
         nxclass = obj.attrs.get("NX_class", "")

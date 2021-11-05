@@ -29,6 +29,7 @@ USAGE::
 """
 
 import os
+import pathlib
 
 import datetime
 import requests
@@ -94,14 +95,16 @@ def get_GitHub_credentials(creds_file_name=""):
     GitHub credentials. Be sure to make the file readable only by the user and
     not others.
 
-    Returns None if credentials are not found per above search.
+    Returns ``None`` if credentials are not found per above search.
     """
+    home = pathlib.Path.home()
     search_paths = (
         ".",
         os.path.join(os.path.dirname(__file__)),
-        os.path.join(os.path.expanduser("~"), ".config"),
-        os.path.join(os.path.expanduser("~"), ".config", "punx"),
+        os.path.join(home, ".config"),
+        os.path.join(home, ".config", "punx"),
     )
+
     if len(creds_file_name) == 0:
         # first check for environment variables
         for variable in ["GH_TOKEN", "GITHUB_TOKEN"]:

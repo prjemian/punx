@@ -78,9 +78,8 @@ def get_GitHub_credentials():
             return token
 
     warnings.warn(
-        UserWarning(
-            "Did not find environment variables GH_TOKEN or GITHUB_TOKEN"
-        )
+        "Did not find environment variables GH_TOKEN or GITHUB_TOKEN",
+        UserWarning,
     )
     # TODO: move next conent to documentation.
     # warnings.warn(

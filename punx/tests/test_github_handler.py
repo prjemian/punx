@@ -14,9 +14,6 @@ from .. import github_handler
 
 
 def test_basic_setup():
-    assert github_handler.CREDS_FILE_NAME == u"__github_creds__.txt", (
-        u"creds file: " + github_handler.CREDS_FILE_NAME
-    )
     assert github_handler.DEFAULT_BRANCH_NAME == u"main", (
         u"default branch: " + github_handler.DEFAULT_BRANCH_NAME
     )
@@ -39,11 +36,6 @@ def test_basic_setup():
 def test_connect_repo():
     grr = github_handler.GitHub_Repository_Reference()
     assert isinstance(grr.connect_repo(), bool)
-
-
-def test_get_GitHub_credentials():
-    token = github_handler.get_GitHub_credentials()
-    assert isinstance(token, (type(None), str))
 
 
 def test_class_GitHub_Repository_Reference():
@@ -130,18 +122,40 @@ def test_connected_GitHub_Repository_Reference():
         assert node is None, u"search for hash that does not exist"
 
 
-def test_GitHub_credentials_file():
-    assert os.path.exists(TEST_DATA_DIR)
-    creds_file = os.path.join(TEST_DATA_DIR, "__github_creds__.txt")
-    assert os.path.exists(creds_file)
-    token = github_handler.get_GitHub_credentials(creds_file)
-    assert isinstance(token, str), u"type of response: " + str(type(token))
-    assert token == "ghp_ThisIsAFakeTokenFile"
+@pytest.mark.parametrize(
+    "env_var, token",
+    [
+        ["GH_TOKEN", "fake_github_token1"],
+        ["GITHUB_TOKEN", "fake_github_token2"],
+    ]
+)
+def test_get_GitHub_credentials_defined(env_var, token):
+    # first, clear out any potential matches
+    for k in ("GH_TOKEN", "GITHUB_TOKEN"):
+        if k in os.environ:
+            os.environ.pop(k)
+    # set the environment variable (if not None)
+    if env_var is not None:
+        os.environ[env_var] = token
+
+    # call the code and check
+    response = github_handler.get_GitHub_credentials()
+    if env_var is not None:
+        assert isinstance(response, str)
+    assert response == token
 
 
-def test_GitHub_credentials_none():
-    token = github_handler.get_GitHub_credentials("This file does not exist.",)
-    assert token is None
+def test_get_GitHub_credentials_None_warning():
+    # first, clear out any potential matches
+    for k in ("GH_TOKEN", "GITHUB_TOKEN"):
+        if k in os.environ:
+            os.environ.pop(k)
+
+    with pytest.warns(UserWarning):
+        response = github_handler.get_GitHub_credentials()
+
+    assert isinstance(response, type(None))
+    assert response is None
 
 
 def test_Github_download_default():

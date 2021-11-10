@@ -78,17 +78,13 @@ def get_GitHub_credentials():
             return token
 
     warnings.warn(
-        "Did not find environment variables GH_TOKEN or GITHUB_TOKEN",
-        UserWarning,
+        "Did not find environment variables GH_TOKEN or GITHUB_TOKEN"
+        " which provide the GitHub API token necessary to download"
+        " resources from GitHub through its API.  You may experience"
+        " restrictions on the amount of content that can be downloaded"
+        " over a short interval (such as an hour or so).",
+        UserWarning
     )
-    # TODO: move next conent to documentation.
-    # warnings.warn(
-    #     "Did not find environment variables GH_TOKEN or GITHUB_TOKEN"
-    #     " which provide the GitHub API token necessary to download"
-    #     " resources from GitHub through its API.  You may experience"
-    #     " restrictions on the amount of content that can be downloaded"
-    #     " over a chort intervale (such as an hour or so)."
-    # )
     return None
 
 

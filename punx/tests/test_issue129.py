@@ -3,7 +3,7 @@ import numpy as np
 from punx import h5tree
 
 
-def test_render_muliple_axes_attribute():
+def test_render_multiple_axes_attribute():
     """Ensure axes attributes are rendered as list of double quoted strings.
 
     @axes should be saved as an array of byte strings or an array of object
@@ -14,21 +14,27 @@ def test_render_muliple_axes_attribute():
 
         print()
 
-        d = f.create_dataset("zero-term-byte-array/data", data=[])
-        d.attrs['axes'] = np.array("zero terminated byte array".split(), dtype='S')
-        print(f"{d.name} is converted to {type(d.attrs['axes'])} of {type(d.attrs['axes'][0])}")
-
         # HDF5 does not support unicode strings
         # d = f.create_dataset("unicode-array/data", data=[])
         # d.attrs['axes'] = np.array("unicode numpy array".split(), dtype='U')
 
-        d = f.create_dataset("pystring-list/data", data=[])
-        d.attrs['axes'] = "python native string list".split()
-        print(f"{d.name} is converted to {type(d.attrs['axes'])} of {type(d.attrs['axes'][0])}")
-
         d = f.create_dataset("pystring/data", data=[])
         d.attrs['axes'] = "python native string"
-        print(f"{d.name} is converted to {type(d.attrs['axes'])} of {type(d.attrs['axes'][0])}")
+        print(f"{d.name} is converted to {type(d.attrs['axes'])} "
+              f"of {type(d.attrs['axes'][0])}")
+
+        d = f.create_dataset("pystring-list/data", data=[])
+        d.attrs['axes'] = "python native string list".split()
+        print(f"{d.name} is converted to {type(d.attrs['axes'])} "
+              f"of {type(d.attrs['axes'][0])}")
+        assert d.attrs['axes'].dtype.kind == 'O'
+
+        d = f.create_dataset("zero-term-byte-array/data", data=[])
+        d.attrs['axes'] = np.array("zero terminated byte array".split(),
+                                   dtype='S')
+        print(f"{d.name} is converted to {type(d.attrs['axes'])} "
+              f"of {type(d.attrs['axes'][0])}")
+        assert d.attrs['axes'].dtype.kind == 'S'
 
     report = h5tree.Hdf5TreeView('test.h5').report()
     print("\n".join(report))

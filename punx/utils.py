@@ -7,7 +7,6 @@
 #
 # The full license is in the file LICENSE.txt, distributed with this software.
 # -----------------------------------------------------------------------------
-
 """
 utility routines
 
@@ -34,19 +33,24 @@ import numpy
 import sys
 
 
-def decode_byte_string(text):
+def decode_byte_string(value):
+    """Convert (arrays of) byte-strings to (list of) unicode strings.
+
+    Due to limitations of HDF5, all strings are saved as byte-strings or arrays
+    of byte-stings, so they must be converted back to unicode. All other typed
+    objects pass unchanged.
+
+    Zero-dimenstional arrays are replaced with None.
     """
-    in python3, HDF5 attributes can be byte strings or numpy.ndarray strings
-    """
-    if isinstance(text, (numpy.ndarray)):
-        if len(text) > 0:
-            text = text.astype('U').tolist()
+    if (isinstance(value, numpy.ndarray) and value.dtype.kind in ['O', 'S']):
+        if value.size > 0:
+            return value.astype('U').tolist()
         else:
-            text = None
-    if isinstance(text, (bytes, numpy.bytes_)):
-        # TODO: This case is unused?
-        text = text.decode(sys.stdout.encoding or "utf8")
-    return text
+            return None
+    elif isinstance(value, (bytes, numpy.bytes_)):
+        return value.decode(sys.stdout.encoding or "utf8")
+    else:
+        return value
 
 
 def string_list_to_hdf5(string_list):

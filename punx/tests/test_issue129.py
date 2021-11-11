@@ -37,7 +37,7 @@ def test_render_muliple_axes_attribute():
         'test.h5',
         '  pystring',
         '    data:float64[0] = []',
-        '      @axes = ["p", "y", "t", "h", "o", "n", " ", "n", "a", "t", "i", "v", "e", " ", "s", "t", "r", "i", "n", "g"]',
+        '      @axes = "python native string"',
         '  pystring-list',
         '    data:float64[0] = []',
         '      @axes = ["python", "native", "string", "list"]',

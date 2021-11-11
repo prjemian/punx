@@ -40,10 +40,11 @@ def decode_byte_string(text):
     """
     if isinstance(text, (numpy.ndarray)):
         if len(text) > 0:
-            text = text[0]
+            text = text.astype('U').tolist()
         else:
             text = None
     if isinstance(text, (bytes, numpy.bytes_)):
+        # TODO: This case is unused?
         text = text.decode(sys.stdout.encoding or "utf8")
     return text
 

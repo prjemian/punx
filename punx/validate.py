@@ -488,8 +488,8 @@ class ValidationItem(object):
                     if isinstance(nx_class, str) and nx_class.startswith("NX"):
                         self.nx_class = nx_class  # only for groups
                         logger.log(
-                        INFORMATIVE,
-                        "NeXus base class: " + nx_class,
+                            INFORMATIVE,
+                            "NeXus base class: " + nx_class,
                         )
                     else:
                         logger.log(

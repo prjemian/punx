@@ -12,7 +12,6 @@
 # -----------------------------------------------------------------------------
 
 from setuptools import setup, find_packages
-import os
 import versioneer
 
 # pull in some definitions from the package's __init__.py file
@@ -20,8 +19,6 @@ import punx
 
 
 verbose = 1
-README = os.path.join(os.path.dirname(__file__), "README.rst")
-long_description = open(README, "r").read()
 
 
 setup(
@@ -30,7 +27,7 @@ setup(
     version=versioneer.get_version(),
     cmdclass=versioneer.get_cmdclass(),
     description=punx.__description__,
-    long_description=long_description,
+    long_description=punx.__long_description__,
     author=punx.__author_name__,
     author_email=punx.__author_email__,
     url=punx.__url__,

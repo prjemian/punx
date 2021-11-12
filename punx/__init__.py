@@ -48,6 +48,17 @@ __url__ = u"http://punx.readthedocs.io"
 __download_url__ = u"https://github.com/prjemian/punx/archive/master.zip"
 __keywords__ = ["NeXus", "HDF5"]
 
+__long_description__ = f"""
+{__package_name__}: {__description__}
+
+* home: {__url__}
+* GitHub: {__download_url__}
+* PyPI: https://pypi.python.org/pypi/punx/
+* Conda: https://anaconda.org/conda-forge/punx
+* Copyright: {__copyright__}
+* email: {__email__}
+""".strip()
+
 # used by QSettings to store configuration and user cache
 __settings_organization__ = __package_name__
 __settings_package__ = __package_name__

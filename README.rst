@@ -21,9 +21,9 @@ NOTE: project is under initial construction
 :TODO list: https://github.com/prjemian/punx/issues
 
 :citation:
-   .. image:: https://zenodo.org/badge/59300337.svg
-      :target: https://zenodo.org/badge/latestdoi/59300337
-      :alt: DOI: 10.5281/zenodo.1471687
+   .. image:: https://zenodo.org/badge/DOI/10.5281/zenodo.1471686.svg
+      :target: https://doi.org/10.5281/zenodo.1471686
+      :alt: DOI: 10.5281/zenodo.1471686
 
 :build badges:
 
@@ -51,10 +51,7 @@ NOTE: project is under initial construction
       :target: https://pypi.python.org/pypi/punx/
 
 :social badges:
-      
-   .. image:: http://depsy.org/api/package/pypi/punx/badge.svg
-      :target: http://depsy.org/package/python/punx
-      :alt: Depsy (impact)
+
    .. image:: https://badges.gitter.im/punx-nexus/Lobby.svg
       :target: https://gitter.im/punx-nexus/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
       :alt: gitter (chat)

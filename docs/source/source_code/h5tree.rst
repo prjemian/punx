@@ -5,10 +5,10 @@ HDF5 Data File Tree Structure : :mod:`h5tree`
 
 Print the tree structure of any HDF5 file.
 
-Note:  The *tree* subcommand replaces the now-legacy *structure* subcommand and
-       also [replaces](https://github.com/prjemian/spec2nexus/issues/70) 
+:Note: The *tree* subcommand replaces the now-legacy *structure* subcommand and
+       also `replaces <https://github.com/prjemian/spec2nexus/issues/70>`_
        the `h5toText` program from the 
-       [`spec2nexus`](https://github.com/prjemian/spec2nexus) project.
+       `spec2nexus <https://github.com/prjemian/spec2nexus>`_ project.
 
 .. index:: examples; h5tree
 
@@ -41,7 +41,7 @@ the help message:
 Example
 *******
 
-Here's an example from a test data file 
+Here's an example tree view of a NeXus HDF5 data file 
 (**writer_1_3.h5** from the NeXus documentation [#]_):
 
 .. code-block:: text

@@ -17,12 +17,12 @@ def verify(validator, v_item):
     """
     Verify items specified in application definition are present in HDF5 data file
     """
-    ad_name = utils.decode_byte_string(v_item.h5_object["definition"][()])
+    ad_name = str(utils.decode_byte_string(v_item.h5_object["definition"][()]))
     key = "NeXus application definition"
 
     ad = validator.manager.classes.get(ad_name)
     status = finding.TF_RESULT[ad is not None]
-    msg = ad_name + ": recognized NXDL specification"
+    msg = ad_name + f": {'un' if ad is None else ''}recognized NXDL specification"
     validator.record_finding(v_item, "known NXDL", status, msg)
     if ad is None:
         return

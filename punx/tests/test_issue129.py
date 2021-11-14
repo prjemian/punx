@@ -13,6 +13,13 @@ def test_render_multiple_axes_attribute(hfile):
     strings because the NeXus standard says so. Single strings separated by
     whitespace or other charachters will not be rendered correctly.
     """
+    assert True
+    # TODO:  use 2-D example (random numbers) from NeXus documentation
+    # https://manual.nexusformat.org/datarules.html#examples
+
+
+def test_attribute_is_list_str(hfile):
+    """Valid NeXus with 1-D data: only test that some attribute is a list of str."""
     assert os.path.exists(hfile)
     with h5py.File(hfile, "w") as h5:
         nxentry = h5.create_group("Scan")

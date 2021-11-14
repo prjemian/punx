@@ -197,7 +197,6 @@ class GitHub_Repository_Reference(object):
         """get the ``last_modified`` date from the SHA's commit"""
         if self.sha is not None:
             commit = self.repo.get_commit(self.sha)
-            mod_date_time = commit.last_modified  # Tue, 20 Dec 2016 18:30:29 GMT
             fmt = "%a, %d %b %Y %H:%M:%S %Z"  # --> 2016-11-19 01:04:28
             mod_date_time = datetime.datetime.strptime(commit.last_modified, fmt)
             self.last_modified = str(mod_date_time)

@@ -11,7 +11,7 @@
 # The full license is in the file LICENSE, distributed with this software.
 # -----------------------------------------------------------------------------
 
-from setuptools import setup, find_packages
+from setuptools import setup
 import versioneer
 
 # pull in some definitions from the package's __init__.py file

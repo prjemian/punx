@@ -40,14 +40,13 @@ def isNeXusLinkTarget(v_item):
     return False  # no @target attribute at all
 
 
-def verify(validator, v_item, key=None):
+def verify(validator, v_item):
     """
     check :class:`ValidationItem` *v_item* using *validItemName* regular expression
 
     This is used for the names of groups, fields, links, and attributes.
 
     :param obj v_item: instance of :class:`ValidationItem`
-    :param str key: named key to search, default: None (``validItemName``)
 
     This method will test the object's name for validation,
     comparing with the strict or relaxed regular expressions for
@@ -71,8 +70,6 @@ def verify(validator, v_item, key=None):
         return
     if "name" in v_item.validations:
         return  # do not repeat this
-
-    key = key or "validItemName"
 
     if v_item.h5_address is not None and v_item.h5_address.endswith("@NX_class"):
         handle_NX_class(validator, v_item)

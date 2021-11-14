@@ -298,10 +298,10 @@ class Data_File_Validator(object):
             else:
                 get_subject(parent, group[item])
 
-    def validate_item_name(self, v_item, key=None):
+    def validate_item_name(self, v_item):
         from .validations import item_name
 
-        item_name.verify(self, v_item, key)
+        item_name.verify(self, v_item)
 
     def validate_attribute(self, v_item):
         from .validations import attribute

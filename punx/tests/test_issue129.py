@@ -12,10 +12,68 @@ def test_render_multiple_axes_attribute(hfile):
     @axes should be saved as an array of byte strings or an array of object
     strings because the NeXus standard says so. Single strings separated by
     whitespace or other charachters will not be rendered correctly.
+
+    Use 2-D example (random numbers) from NeXus documentation:
+    https://manual.nexusformat.org/datarules.html#examples
     """
-    assert True
-    # TODO:  use 2-D example (random numbers) from NeXus documentation
-    # https://manual.nexusformat.org/datarules.html#examples
+    structure = """
+    datafile.hdf5:NeXus data file
+    @default = "entry"
+    entry:NXentry
+        @NX_class = "NXentry"
+        @default = "data_2d"
+        data_2d:NXdata
+            @NX_class = "NXdata"
+            @axes = ["time", "pressure"]
+            @pressure_indices = 1
+            @signal = "data"
+            @temperature_indices = 1
+            @time_indices = 0
+            data:NX_INT64[4,3] = [ ... ]
+            pressure:NX_INT64[3] = [ ... ]
+            temperature:NX_FLOAT64[3] = [ ... ]
+            time:NX_FLOAT64[4] = [ ... ]
+    """.strip().splitlines()
+
+    assert os.path.exists(hfile)
+    with h5py.File(hfile, "w") as h5:
+        h5.attrs["default"] = "entry"
+
+        nxentry = h5.create_group("entry")
+        nxentry.attrs["NX_class"] = "NXentry"
+        nxentry.attrs["default"] = "data_2d"
+
+        nxdata = nxentry.create_group("data_2d")
+        nxdata.attrs["NX_class"] = "NXdata"
+        nxdata.attrs["axes"] = ["time", "pressure"]
+        nxdata.attrs["pressure_indices"] = 1
+        nxdata.attrs["signal"] = "data"
+        nxdata.attrs["temperature_indices"] = 1
+        nxdata.attrs["time_indices"] = 0
+
+        nxdata.create_dataset("pressure", data=[1, 2, 3])
+        nxdata.create_dataset(
+            "data",
+            data=[
+                [11, 12, 13],
+                [21, 22, 23],
+                [31, 32, 33],
+                [41, 42, 43],
+            ]
+        )
+        nxdata.create_dataset("temperature", data=[1e-4, 1e-5, 1e-6])
+        nxdata.create_dataset("time", data=[7, 8, 9, 10.1])
+
+    tree = h5tree.Hdf5TreeView(hfile)
+    assert tree.isNeXus
+    tree.array_items_shown = 0
+    report = tree.report()
+    assert len(report) == len(structure)
+
+    # compare line-by-line, except for file name
+    # TODO: data size is OS-dependent?
+    for ref, xture in zip(report[1:], structure[1:]):
+        assert ref.strip() == xture.strip()
 
 
 def test_attribute_is_list_str(hfile):

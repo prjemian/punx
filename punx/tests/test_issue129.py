@@ -1,9 +1,10 @@
 import h5py
 import numpy as np
 import os
+import pytest
 
-from punx.tests._core import hfile
-from punx import h5tree
+from ._core import hfile
+from .. import h5tree
 
 
 def test_render_multiple_axes_attribute(hfile):
@@ -75,53 +76,26 @@ def test_render_multiple_axes_attribute(hfile):
     for ref, xture in zip(report[1:], structure[1:]):
         assert ref.strip() == xture.strip()
 
-
-def test_attribute_is_list_str(hfile):
-    """Valid NeXus with 1-D data: only test that some attribute is a list of str."""
+@pytest.mark.parametrize(
+    "defined, xture",
+    [
+        # show that different definitions share same result
+        ["one two three".split(), '@multi_str = ["one", "two", "three"]'],
+        [["one", "two", "three"], '@multi_str = ["one", "two", "three"]'],
+        [b"one two three".split(), '@multi_str = ["one", "two", "three"]'],
+    ]
+)
+def test_attribute_is_list_str(defined, xture, hfile):
+    """Only test that some attribute is a list of str."""
     assert os.path.exists(hfile)
     with h5py.File(hfile, "w") as h5:
-        nxentry = h5.create_group("Scan")
-        nxentry.attrs["NX_class"] = "NXentry"
-
-        nxdata = nxentry.create_group("data")
-        nxdata.attrs["NX_class"] = "NXdata"
-        nxdata.attrs["axes"] = "two_theta"
-        nxdata.attrs["signal"] = "counts"
-        nxdata.attrs["two_theta_indices"] = 0
-        nxdata.attrs["multi_str"] = "one two three".split()
-
-        ds = nxentry.create_dataset(
-            "counts",
-            data=[1037, 1318, 1704, 2857, 4516],
-        )
-        ds.attrs["units"] = "counts"
-
-        ds = nxentry.create_dataset(
-            "two_theta",
-            data=[17.92608, 17.92591, 17.92575, 17.92558, 17.92541],
-        )
-        ds.attrs["units"] = "degrees"
+        h5.attrs["multi_str"] = defined
 
     tree = h5tree.Hdf5TreeView(hfile)
-    assert tree.isNeXus
+    assert not tree.isNeXus
     report = tree.report()
-    assert len(report) == 13
-    reference = [
-        '  Scan:NXentry',
-        '    @NX_class = "NXentry"',
-        '    counts:NX_INT64[5] = [1037, 1318, 1704, 2857, 4516]',
-        '      @units = "counts"',
-        '    two_theta:NX_FLOAT64[5] = [17.92608, 17.92591, 17.92575, 17.92558, 17.92541]',
-        '      @units = "degrees"',
-        '    data:NXdata',
-        '      @NX_class = "NXdata"',
-        '      @axes = "two_theta"',
-        '      @multi_str = ["one", "two", "three"]',
-        '      @signal = "counts"',
-        '      @two_theta_indices = 0',
-    ]
-
-    assert "\n".join(report[1:]) == "\n".join(reference)
+    assert len(report) == 2
+    assert report[1].strip() == xture
 
 
 def test_byte_string_conversion(hfile):

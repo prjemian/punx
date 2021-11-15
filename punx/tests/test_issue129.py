@@ -100,46 +100,42 @@ def test_attribute_is_list_str(defined, xture, hfile):
 
 def test_byte_string_conversion(hfile):
     """Demonstrates how various string types are converted and rendered."""
+    structure = """
+    hfile.hdf5
+    pystring
+        data:float64[0] = [ ... ]
+        @axes = "python native string"
+    pystring-list
+        data:float64[0] = [ ... ]
+        @axes = ["python", "native", "string", "list"]
+    zero-term-byte-array
+        data:float64[0] = [ ... ]
+        @axes = ["zero", "terminated", "byte", "array"]
+    """.strip().splitlines()
+
     assert os.path.exists(hfile)
     with h5py.File(hfile, "w") as f:
-
-        print()
-
         # HDF5 does not support unicode strings
         # d = f.create_dataset("unicode-array/data", data=[])
         # d.attrs['axes'] = np.array("unicode numpy array".split(), dtype='U')
 
         d = f.create_dataset("pystring/data", data=[])
         d.attrs['axes'] = "python native string"
-        print(f"{d.name} is converted to {type(d.attrs['axes'])} "
-              f"of {type(d.attrs['axes'][0])}")
 
         d = f.create_dataset("pystring-list/data", data=[])
         d.attrs['axes'] = "python native string list".split()
-        print(f"{d.name} is converted to {type(d.attrs['axes'])} "
-              f"of {type(d.attrs['axes'][0])}")
         assert d.attrs['axes'].dtype.kind == 'O'
 
         d = f.create_dataset("zero-term-byte-array/data", data=[])
         d.attrs['axes'] = np.array("zero terminated byte array".split(),
                                    dtype='S')
-        print(f"{d.name} is converted to {type(d.attrs['axes'])} "
-              f"of {type(d.attrs['axes'][0])}")
         assert d.attrs['axes'].dtype.kind == 'S'
 
-    report = h5tree.Hdf5TreeView(hfile).report()
-    print("\n".join(report))
+    tree = h5tree.Hdf5TreeView(hfile)
+    tree.array_items_shown = 0
+    report = tree.report()
 
-    reference = [
-        '  pystring',
-        '    data:float64[0] = []',
-        '      @axes = "python native string"',
-        '  pystring-list',
-        '    data:float64[0] = []',
-        '      @axes = ["python", "native", "string", "list"]',
-        '  zero-term-byte-array',
-        '    data:float64[0] = []',
-        '      @axes = ["zero", "terminated", "byte", "array"]',
-    ]
-
-    assert "\n".join(report[1:]) == "\n".join(reference)
+    # compare line-by-line, except for file name
+    # TODO: data size is OS-dependent?
+    for ref, xture in zip(report[1:], structure[1:]):
+        assert ref.strip() == xture.strip()

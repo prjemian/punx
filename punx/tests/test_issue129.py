@@ -104,6 +104,9 @@ def test_byte_string_conversion(hfile):
     """Demonstrates how various string types are converted and rendered."""
     structure = """
     hfile.hdf5
+    bytestring-list
+        data:IGNORE_THE_DATA
+        @axes = ["python", "byte", "string", "list"]
     pystring
         data:IGNORE_THE_DATA
         @axes = "python native string"
@@ -126,6 +129,10 @@ def test_byte_string_conversion(hfile):
 
         d = f.create_dataset("pystring-list/data", data=[])
         d.attrs['axes'] = "python native string list".split()
+        assert d.attrs['axes'].dtype.kind == 'O'
+
+        d = f.create_dataset("bytestring-list/data", data=[])
+        d.attrs['axes'] = b"python byte string list".split()
         assert d.attrs['axes'].dtype.kind == 'O'
 
         d = f.create_dataset("zero-term-byte-array/data", data=[])

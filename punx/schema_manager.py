@@ -109,6 +109,7 @@ class SchemaManager(object):
             raise FileNotFound(schema_file)
 
         self.schema_file = schema_file
+        self.name = os.path.basename(path)  # name of this cache
         if not os.path.exists(self.schema_file):
             raise FileNotFound("XML Schema file: " + self.schema_file)
 

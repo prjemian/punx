@@ -76,6 +76,7 @@ def test_render_multiple_axes_attribute(hfile):
     for ref, xture in zip(report[1:], structure[1:]):
         assert ref.strip() == xture.strip()
 
+
 @pytest.mark.parametrize(
     "defined, xture",
     [

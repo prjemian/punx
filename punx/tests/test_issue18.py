@@ -61,15 +61,16 @@ def test_basic_premise(ext_file, hfile):
     tree = h5tree.Hdf5TreeView(hfile)
     assert tree.isNeXus
     report = tree.report()
+    print("\n".join(report))
     assert len(report) == 16
     samples = [
         (5, "other_data: missing external file"),
-        (6, "@file = no-such-file.h5"),
-        (7, "@path = /other/external/data"),
+        (6, '@file = "no-such-file.h5"'),
+        (7, '@path = "/other/external/data"'),
         (8, "master_data:NXdata"),
-        (9, "@NX_class = NXdata"),
-        (11, f"@file = {ext_file}"),
-        (12, "@path = /external_data"),
+        (9, '@NX_class = "NXdata"'),
+        (11, f'@file = "{ext_file}"'),
+        (12, '@path = "/external_data"'),
     ]
     for line, item in samples:
         assert report[line].strip() == item
@@ -79,10 +80,11 @@ def test_basic_premise(ext_file, hfile):
     tree = h5tree.Hdf5TreeView(hfile)
     assert tree.isNeXus
     report = tree.report()
+    print("\n".join(report))
     samples = [
         (5, "master_data: missing external file"),
-        (6, f"@file = {ext_file}"),
-        (7, "@path = /external_data"),
+        (6, f'@file = "{ext_file}"'),
+        (7, '@path = "/external_data"'),
     ]
     for line, item in samples:
         assert report[line].strip() == item

@@ -141,11 +141,11 @@ class Hdf5TreeView(object):
                     s += ["%s  %s: --> %s" % (indentation, itemname, link_info.path)]
                 else:
                     s += ["%s  %s: missing external file" % (indentation, itemname)]
-                    fmt = "%s    @%s = %s"
-                    for nm, attr in ("file", "filename"), ("path", "path"):
-                        v = getattr(link_info, attr, None)
-                        if v is not None:
-                            s += [fmt % (indentation, nm, utils.decode_byte_string(v))]
+                    if self.show_attributes:
+                        for nm, attr in ("file", "filename"), ("path", "path"):
+                            v = getattr(link_info, attr, None)
+                            if v is not None:
+                                s += [self._renderSingleAttribute(indentation + "  ", nm, v)]
             else:
                 value = obj.get(itemname)
                 if utils.isNeXusLink(value):
@@ -154,27 +154,12 @@ class Hdf5TreeView(object):
                     groups.append((value, itemname, link_info))
                 elif utils.isHdf5Dataset(value):
                     s += self._renderDataset(value, itemname, indentation + "  ")
-                    if utils.isHdf5ExternalLink(
+                    if self.show_attributes and utils.isHdf5ExternalLink(
                         obj, link_info
                     ):  # TODO: is obj the "parent"
                         # When "classref" is defined, then external data is available
-                        fmt = "%s    %s = %s"
-                        s += [
-                            fmt
-                            % (
-                                indentation,
-                                "@file",
-                                utils.decode_byte_string(link_info.filename),
-                            )
-                        ]
-                        s += [
-                            fmt
-                            % (
-                                indentation,
-                                "@path",
-                                utils.decode_byte_string(link_info.path),
-                            )
-                        ]
+                        s += self._renderSingleAttribute(indentation + "  ", "file", link_info.filename)
+                        s += self._renderSingleAttribute(indentation + "  ", "path", link_info.path)
                 else:
                     msg = (
                         "unidentified %s: %s, %s",
@@ -190,6 +175,15 @@ class Hdf5TreeView(object):
 
         return s
 
+    def _renderSingleAttribute(self, indentation, name, value):
+        value = utils.decode_byte_string(value)
+        # Wrap str and list of str in double quotes.
+        if isinstance(value, list) and isinstance(value[0], str):
+            value = '["' + '", "'.join(value) + '"]'
+        elif isinstance(value, str):
+            value = f'"{value}"'
+        return f'{indentation}  @{name} = {value}'
+
     def _renderAttributes(self, obj, indentation="  ", extra={}):
         """return a [formatted_string] with any attributes"""
         s = []
@@ -197,8 +191,7 @@ class Hdf5TreeView(object):
             for d in (obj.attrs, extra):
                 for name, value in d.items():
                     s.append(
-                        "%s  @%s = %s"
-                        % (indentation, name, utils.decode_byte_string(value))
+                        self._renderSingleAttribute(indentation, name, value)
                     )
         return s
 

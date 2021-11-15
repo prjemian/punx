@@ -480,24 +480,26 @@ class ValidationItem(object):
                 return CLASSPATH_OF_NON_NEXUS_CONTENT
 
             if not classpath.endswith(SLASH):
+
                 if utils.isHdf5Group(h5_obj):
-                    if "NX_class" in h5_obj.attrs:
-                        nx_class = utils.decode_byte_string(h5_obj.attrs["NX_class"])
-                        if nx_class.startswith("NX"):
-                            self.nx_class = nx_class  # only for groups
-                            logger.log(INFORMATIVE, "NeXus base class: " + nx_class)
-                        else:
-                            logger.log(
-                                INFORMATIVE,
-                                "HDF5 group is not NeXus: " + self.h5_address,
-                            )
-                            return CLASSPATH_OF_NON_NEXUS_CONTENT
+                    nx_class = utils.decode_byte_string(
+                        h5_obj.attrs.get("NX_class"))
+
+                    if isinstance(nx_class, str) and nx_class.startswith("NX"):
+                        self.nx_class = nx_class  # only for groups
+                        logger.log(
+                            INFORMATIVE,
+                            "NeXus base class: " + nx_class,
+                        )
                     else:
                         logger.log(
-                            INFORMATIVE, "HDF5 group is not NeXus: " + self.h5_address
+                            INFORMATIVE,
+                            "HDF5 group is not NeXus: " + self.h5_address,
                         )
                         return CLASSPATH_OF_NON_NEXUS_CONTENT
                 else:
                     nx_class = self.name
+
                 classpath += SLASH + nx_class
+
             return classpath

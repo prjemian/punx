@@ -39,7 +39,7 @@ def test_issue131_array_attributes(hfile):
     assert not tree.isNeXus
     report = tree.report()
     assert len(report) == 4
-    assert report[-1].strip() == "@1 = [0.1 0.1 0.3]"
+    assert report[-1].strip() == "@1 = [[0.1 0.1 0.3]]"
 
 
 def test_issue131_array_attributes_issue(hfile):

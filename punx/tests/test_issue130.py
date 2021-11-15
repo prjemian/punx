@@ -66,8 +66,8 @@ def test_SwissFEL_file_replica(hfile):
     assert len(report) == 13
     samples = [
         (5, "data: missing external file"),
-        (6, "@file = lyso009a_0087.JF07T32V01.h5"),
-        (7, "@path = data/data"),
+        (6, '@file = "lyso009a_0087.JF07T32V01.h5"'),
+        (7, '@path = "data/data"'),
         (12, "data: --> /entry/data/data"),
     ]
     for line, expect in samples:

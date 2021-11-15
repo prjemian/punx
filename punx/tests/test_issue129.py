@@ -30,10 +30,10 @@ def test_render_multiple_axes_attribute(hfile):
             @signal = "data"
             @temperature_indices = 1
             @time_indices = 0
-            data:NX_INT64[4,3] = [ ... ]
-            pressure:NX_INT64[3] = [ ... ]
-            temperature:NX_FLOAT64[3] = [ ... ]
-            time:NX_FLOAT64[4] = [ ... ]
+            data:IGNORE_THE_DATA
+            pressure:IGNORE_THE_DATA
+            temperature:IGNORE_THE_DATA
+            time:IGNORE_THE_DATA
     """.strip().splitlines()
 
     assert os.path.exists(hfile)
@@ -72,8 +72,9 @@ def test_render_multiple_axes_attribute(hfile):
     assert len(report) == len(structure)
 
     # compare line-by-line, except for file name
-    # TODO: data size is OS-dependent?
     for ref, xture in zip(report[1:], structure[1:]):
+        if xture.strip().endswith("IGNORE_THE_DATA"):
+            continue  # data size is OS-dependent
         assert ref.strip() == xture.strip()
 
 
@@ -104,13 +105,13 @@ def test_byte_string_conversion(hfile):
     structure = """
     hfile.hdf5
     pystring
-        data:float64[0] = [ ... ]
+        data:IGNORE_THE_DATA
         @axes = "python native string"
     pystring-list
-        data:float64[0] = [ ... ]
+        data:IGNORE_THE_DATA
         @axes = ["python", "native", "string", "list"]
     zero-term-byte-array
-        data:float64[0] = [ ... ]
+        data:IGNORE_THE_DATA
         @axes = ["zero", "terminated", "byte", "array"]
     """.strip().splitlines()
 
@@ -134,9 +135,11 @@ def test_byte_string_conversion(hfile):
 
     tree = h5tree.Hdf5TreeView(hfile)
     tree.array_items_shown = 0
+    assert not tree.isNeXus
     report = tree.report()
 
     # compare line-by-line, except for file name
-    # TODO: data size is OS-dependent?
     for ref, xture in zip(report[1:], structure[1:]):
+        if xture.strip().endswith("IGNORE_THE_DATA"):
+            continue  # data size is OS-dependent
         assert ref.strip() == xture.strip()

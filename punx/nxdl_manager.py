@@ -449,9 +449,13 @@ class NXDL__dimensions(NXDL__Mixin):
         ns = nxdl_schema.get_xml_namespace_dictionary()
         nxdl_defaults = self.nxdl_definition.nxdl_manager.nxdl_defaults
 
+          # nxdl.xsd says NX_CHAR but should be NX_UINT? issue #571
+        # Per NeXusformat/definitions#571,
+        # Value [of "rank"] could be either an unsigned integer or
+        # a symbol as defined in the *symbol* table of the NXDL file.
         self.rank = xml_node.attrib.get(
             "rank"
-        )  # nxdl.xsd says NX_CHAR but should be NX_UINT? issue #571
+        )
         for node in xml_node.xpath("nx:dim", namespaces=ns):
             obj = NXDL__dim(self.nxdl_definition, nxdl_defaults=nxdl_defaults)
             obj.parse_nxdl_xml(node)

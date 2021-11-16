@@ -134,24 +134,44 @@ def test_count_NXDL_files(file_set, num_nxdl_files):
 
 
 @pytest.mark.parametrize(
-    "nxclass, category, nattrs, nfields, ngroups, nlinks, nsyms, minOccurs, maxOccurs",
+    (
+        # fmt: off
+        "nxclass, file_set, category, nattrs, nfields, ngroups, "
+        "nlinks, nsyms, minOccurs, maxOccurs"
+        # fmt: on
+    ),
     [
-        ["NXbeam", "base_classes", 0, 13, 1, 0, 0, 0, 1],
-        ["NXcrystal", "base_classes", 0, 38, 5, 0, 2, 0, 1],
-        ["NXdata", "base_classes", 3, 9, 0, 0, 5, 0, 1],
-        ["NXentry", "base_classes", 2, 17, 13, 0, 0, 0, 1],
-        ["NXfluo", "applications", 0, 0, 1, 0, 0, 0, 1],
-        ["NXgeometry", "base_classes", 0, 2, 3, 0, 0, 0, 1],
-        ["NXnote", "base_classes", 0, 7, 0, 0, 0, 0, 1],
-        ["NXobject", "base_classes", 0, 0, 0, 0, 0, 0, 1],
-        ["NXsas", "applications", 0, 0, 1, 0, 0, 0, 1],
-        ["NXscan", "applications", 0, 0, 1, 0, 0, 0, 1],
-        ["NXsubentry", "base_classes", 2, 16, 12, 0, 0, 0, 1],
+        # spot checks of a few NXDL files
+        ["NXbeam", "a4fd52d", "base_classes", 0, 13, 1, 0, 0, 0, 1],
+        ["NXcontainer", "a4fd52d", "contributed_definitions", 0, 6, 3, 1, 0, 0, 1],
+        ["NXcanSAS", "a4fd52d", "contributed_definitions", 0, 0, 1, 0, 0, 0, 1],
+        ["NXcanSAS", "v2018.5", "applications", 0, 0, 1, 0, 0, 0, 1],
+        ["NXcanSAS", "v3.3", "applications", 0, 0, 1, 0, 0, 0, 1],
+        ["NXcrystal", "a4fd52d", "base_classes", 0, 38, 5, 0, 2, 0, 1],
+        ["NXdata", "a4fd52d", "base_classes", 3, 9, 0, 0, 5, 0, 1],
+        ["NXdata", "v3.3", "base_classes", 3, 9, 0, 0, 5, 0, 1],
+        ["NXentry", "a4fd52d", "base_classes", 2, 17, 13, 0, 0, 0, 1],
+        ["NXentry", "v3.3", "base_classes", 2, 17, 12, 0, 0, 0, 1],
+        ["NXfluo", "a4fd52d", "applications", 0, 0, 1, 0, 0, 0, 1],
+        ["NXgeometry", "a4fd52d", "base_classes", 0, 2, 3, 0, 0, 0, 1],
+        ["NXmx", "a4fd52d", "applications", 0, 0, 1, 0, 3, 0, 1],
+        ["NXmx", "v2018.5", "applications", 0, 0, 1, 0, 5, 0, 1],
+        ["NXmx", "v3.3", "applications", 0, 0, 1, 0, 5, 0, 1],
+        ["NXnote", "a4fd52d", "base_classes", 0, 7, 0, 0, 0, 0, 1],
+        ["NXobject", "a4fd52d", "base_classes", 0, 0, 0, 0, 0, 0, 1],
+        ["NXsas", "a4fd52d", "applications", 0, 0, 1, 0, 0, 0, 1],
+        ["NXscan", "a4fd52d", "applications", 0, 0, 1, 0, 0, 0, 1],
+        ["NXsubentry", "a4fd52d", "base_classes", 2, 16, 12, 0, 0, 0, 1],
     ]
 )
-def test_NXDL__definition_structure(nxclass, category, nattrs, nfields, ngroups, nlinks, nsyms, minOccurs, maxOccurs):
+def test_NXDL__definition_structure(
+    # fmt: off
+    nxclass, file_set, category, nattrs, nfields, ngroups,
+    nlinks, nsyms, minOccurs, maxOccurs
+    # fmt: on
+):
     cache_manager.CacheManager()  # must initialize
-    manager = nxdl_manager.NXDL_Manager("a4fd52d")
+    manager = nxdl_manager.NXDL_Manager(file_set)
 
     nxdl = manager.classes.get(nxclass)
     assert isinstance(nxdl, nxdl_manager.NXDL__definition)
@@ -174,8 +194,7 @@ def test_NXDL__definition_structure(nxclass, category, nattrs, nfields, ngroups,
     assert len(nxdl.symbols) == nsyms
 
     assert isinstance(nxdl.xml_attributes, dict)
-    # TODO: what tests for any of these?
-    # attributes of xml_attributes
+    # These are the attributes of xml_attributes, no tests here.
     #     'category',
     #     'deprecated',
     #     'extends',

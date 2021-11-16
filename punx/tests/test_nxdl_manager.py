@@ -245,14 +245,36 @@ def test_NXDL__definition_structure(
 
 
 @pytest.mark.parametrize(
-    "",  # TODO:
+    "nxclass, file_set, attr_names",  # TODO:
     [
         # spot checks of a few NXDL files
-        [],
+        ["NXdata", "a4fd52d", "signal axes AXISNAME_indices".split()],
+        ["NXentry", "a4fd52d", "IDF_Version default".split()],
+        ["NXobject", "a4fd52d", []],
+        ["NXsubentry", "a4fd52d", "IDF_Version default".split()],
     ]
 )
-def test_NXDL__attribute_structure():
-    assert True
+def test_NXDL__attribute_structure(nxclass, file_set, attr_names):
+    """Spot-check one"""
+    cache_manager.CacheManager()
+    manager = nxdl_manager.NXDL_Manager(file_set)
+    nxdl_def = manager.classes.get(nxclass)
+    assert isinstance(nxdl_def, nxdl_manager.NXDL__definition)
+
+    attrs = nxdl_def.attributes
+    assert isinstance(attrs, dict)
+    assert len(attrs) == len(attr_names), f"{nxclass}: {attr_names}"
+    for k in attr_names:
+        assert k in attrs
+
+        # THIS is the item to be tested here
+        attr_obj = attrs[k]
+        assert isinstance(attr_obj, nxdl_manager.NXDL__attribute)
+        assert attr_obj.name == k
+        assert hasattr(attr_obj, "enumerations")
+        assert isinstance(attr_obj.enumerations, list)
+        for a in "groups minOccurs maxOccurs".split():
+            assert not hasattr(attr_obj, a)
 
 
 @pytest.mark.parametrize(

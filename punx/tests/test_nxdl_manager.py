@@ -136,7 +136,6 @@ def test_count_NXDL_files(file_set, num_nxdl_files):
 @pytest.mark.parametrize(
     "nxclass, category, nattrs, nfields, ngroups, nlinks, nsyms, minOccurs, maxOccurs",
     [
-        # TODO: why all len(links) == 0?
         # TODO: why all maxOccurs == 1?
         ["NXbeam", "base_classes", 0, 13, 1, 0, 0, 0, 1],
         ["NXcrystal", "base_classes", 0, 38, 5, 0, 2, 0, 1],

@@ -449,7 +449,7 @@ class NXDL__dimensions(NXDL__Mixin):
         ns = nxdl_schema.get_xml_namespace_dictionary()
         nxdl_defaults = self.nxdl_definition.nxdl_manager.nxdl_defaults
 
-          # nxdl.xsd says NX_CHAR but should be NX_UINT? issue #571
+        # nxdl.xsd says NX_CHAR but should be NX_UINT? issue #571
         # Per NeXusformat/definitions#571,
         # Value [of "rank"] could be either an unsigned integer or
         # a symbol as defined in the *symbol* table of the NXDL file.

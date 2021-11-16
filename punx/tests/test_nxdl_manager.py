@@ -190,6 +190,5 @@ def test_NXDL__definition_structure(nxclass, category, nattrs, nfields, ngroups,
     #     'type',
     #     'version',
 
-
     assert nxdl.minOccurs == minOccurs
     assert nxdl.maxOccurs == maxOccurs  # FIXME: why 1?  why not "unbounded"?

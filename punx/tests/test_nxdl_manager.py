@@ -136,7 +136,6 @@ def test_count_NXDL_files(file_set, num_nxdl_files):
 @pytest.mark.parametrize(
     "nxclass, category, nattrs, nfields, ngroups, nlinks, nsyms, minOccurs, maxOccurs",
     [
-        # TODO: why all maxOccurs == 1?
         ["NXbeam", "base_classes", 0, 13, 1, 0, 0, 0, 1],
         ["NXcrystal", "base_classes", 0, 38, 5, 0, 2, 0, 1],
         ["NXdata", "base_classes", 3, 9, 0, 0, 5, 0, 1],
@@ -190,4 +189,4 @@ def test_NXDL__definition_structure(nxclass, category, nattrs, nfields, ngroups,
     #     'version',
 
     assert nxdl.minOccurs == minOccurs
-    assert nxdl.maxOccurs == maxOccurs  # FIXME: why 1?  why not "unbounded"?
+    assert nxdl.maxOccurs == maxOccurs

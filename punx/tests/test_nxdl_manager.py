@@ -133,6 +133,39 @@ def test_count_NXDL_files(file_set, num_nxdl_files):
     assert len(manager.classes) == num_nxdl_files
 
 
+def test_NXDL__Mixin_structure():
+    """Spot-check one"""
+    file_set = "a4fd52d"
+    cache_manager.CacheManager()
+    manager = nxdl_manager.NXDL_Manager(file_set)
+    nxmx = manager.classes.get("NXmx")
+    nxentry = nxmx.groups["entry"]
+    assert nxentry is not None
+    for k in "name nxdl_definition xml_attributes".split():
+        assert hasattr(nxentry, k), k
+    assert nxentry.name == "entry"
+    assert nxentry.nxdl_definition is not None
+    assert isinstance(nxentry.xml_attributes, dict)
+    assert len(nxentry.xml_attributes) == 5
+
+
+@pytest.mark.parametrize(
+    "item",
+    [
+        nxdl_manager.NXDL__attribute,
+        nxdl_manager.NXDL__definition,
+        nxdl_manager.NXDL__dim,
+        nxdl_manager.NXDL__dimensions,
+        nxdl_manager.NXDL__field,
+        nxdl_manager.NXDL__group,
+        nxdl_manager.NXDL__link,
+        nxdl_manager.NXDL__symbols,
+    ]
+)
+def test_NXDL__Mixin_subclasses(item):
+    assert issubclass(item, nxdl_manager.NXDL__Mixin)
+
+
 @pytest.mark.parametrize(
     (
         # fmt: off
@@ -209,3 +242,80 @@ def test_NXDL__definition_structure(
 
     assert nxdl.minOccurs == minOccurs
     assert nxdl.maxOccurs == maxOccurs
+
+
+@pytest.mark.parametrize(
+    "",  # TODO:
+    [
+        # spot checks of a few NXDL files
+        [],
+    ]
+)
+def test_NXDL__attribute_structure():
+    assert True
+
+
+@pytest.mark.parametrize(
+    "",  # TODO:
+    [
+        # spot checks of a few NXDL files
+        [],
+    ]
+)
+def test_NXDL__dim_structure():
+    assert True
+
+
+@pytest.mark.parametrize(
+    "",  # TODO:
+    [
+        # spot checks of a few NXDL files
+        [],
+    ]
+)
+def test_NXDL__dimensions_structure():
+    assert True
+
+
+@pytest.mark.parametrize(
+    "",  # TODO:
+    [
+        # spot checks of a few NXDL files
+        [],
+    ]
+)
+def test_NXDL__field_structure():
+    assert True
+
+
+@pytest.mark.parametrize(
+    "",  # TODO:
+    [
+        # spot checks of a few NXDL files
+        [],
+    ]
+)
+def test_NXDL__group_structure():
+    assert True
+
+
+@pytest.mark.parametrize(
+    "",  # TODO:
+    [
+        # spot checks of a few NXDL files
+        [],
+    ]
+)
+def test_NXDL__link_structure():
+    assert True
+
+
+@pytest.mark.parametrize(
+    "",  # TODO:
+    [
+        # spot checks of a few NXDL files
+        [],
+    ]
+)
+def test_NXDL__symbols_structure():
+    assert True

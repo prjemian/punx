@@ -9,6 +9,21 @@ from .. import InvalidNxdlFile
 from .. import nxdl_manager
 
 
+def navigate_path(path_start, nxpath):
+    """Drill down the nxpath to the group containing the last item."""
+    group = path_start  # starting point
+
+    parts = nxpath.lstrip("/").split("/")
+    target = parts[-1]
+    for nm in parts[:-1]:
+        obj = group.groups.get(nm)
+        assert obj is not None
+        assert isinstance(obj, nxdl_manager.NXDL__group)
+        group = obj
+
+    return group, target
+
+
 @pytest.mark.parametrize(
     "xcptn, text",
     [
@@ -167,6 +182,39 @@ def test_NXDL__Mixin_subclasses(item):
 
 
 @pytest.mark.parametrize(
+    "nxclass, file_set, attr_names",
+    [
+        # spot checks of a few NXDL files
+        ["NXdata", "a4fd52d", "signal axes AXISNAME_indices".split()],
+        ["NXentry", "a4fd52d", "IDF_Version default".split()],
+        ["NXobject", "a4fd52d", []],
+        ["NXsubentry", "a4fd52d", "IDF_Version default".split()],
+    ]
+)
+def test_NXDL__attribute_structure(nxclass, file_set, attr_names):
+    """Spot-check one"""
+    cache_manager.CacheManager()
+    manager = nxdl_manager.NXDL_Manager(file_set)
+    nxdl_def = manager.classes.get(nxclass)
+    assert isinstance(nxdl_def, nxdl_manager.NXDL__definition)
+
+    attrs = nxdl_def.attributes
+    assert isinstance(attrs, dict)
+    assert len(attrs) == len(attr_names), f"{nxclass}: {attr_names}"
+    for k in attr_names:
+        assert k in attrs
+
+        # THIS is the item to be tested here
+        attr_obj = attrs[k]
+        assert isinstance(attr_obj, nxdl_manager.NXDL__attribute)
+        assert attr_obj.name == k
+        assert hasattr(attr_obj, "enumerations")
+        assert isinstance(attr_obj.enumerations, list)
+        for a in "groups minOccurs maxOccurs".split():
+            assert not hasattr(attr_obj, a)
+
+
+@pytest.mark.parametrize(
     (
         # fmt: off
         "nxclass, file_set, category, nattrs, nfields, ngroups, "
@@ -245,58 +293,58 @@ def test_NXDL__definition_structure(
 
 
 @pytest.mark.parametrize(
-    "nxclass, file_set, attr_names",  # TODO:
+    "nxclass, file_set, nxpath, rank, dimensions",  # TODO:
     [
         # spot checks of a few NXDL files
-        ["NXdata", "a4fd52d", "signal axes AXISNAME_indices".split()],
-        ["NXentry", "a4fd52d", "IDF_Version default".split()],
-        ["NXobject", "a4fd52d", []],
-        ["NXsubentry", "a4fd52d", "IDF_Version default".split()],
+        # note: nxpath (here) is the NeXus class path within the NXDL definition
+        # note: rank is a str (could be int or symbol in NXDL file)
+        ["NXarpes", "a4fd52d", "/entry/instrument/analyser/sensor_size", "2", []],
+        ["NXfluo", "a4fd52d", "/entry/instrument/fluorescence/data", "1", ["nenergy", ]],
+        ["NXiqproc", "a4fd52d", "/entry/data/data", "3", "NE NQX NQY".split()],
+        ["NXindirecttof", "a4fd52d", "/entry/instrument/analyser/polar_angle", "1", ["ndet", ]],
+        ["NXmx", "a4fd52d", "/entry/instrument/detector/data", "3", "np i j".split()],
+        ["NXmx", "v2018.5", "/entry/instrument/detector/data", "dataRank", "np i j k".split()],
+        ["NXdata", "v2018.5", "VARIABLE", "1", ["n", ]],
+        ["NXdata", "v2018.5", "DATA", "dataRank", ["n", ]],
+        ["NXdetector", "v2018.5", "time_of_flight", "1", ["tof+1", ]],
     ]
 )
-def test_NXDL__attribute_structure(nxclass, file_set, attr_names):
-    """Spot-check one"""
+def test_NXDL__dimensions_structure(
+    nxclass, file_set, nxpath, rank, dimensions
+):
+    """Tests both NXDL__dimensions & NXDL__dim structures."""
     cache_manager.CacheManager()
     manager = nxdl_manager.NXDL_Manager(file_set)
     nxdl_def = manager.classes.get(nxclass)
-    assert isinstance(nxdl_def, nxdl_manager.NXDL__definition)
 
-    attrs = nxdl_def.attributes
-    assert isinstance(attrs, dict)
-    assert len(attrs) == len(attr_names), f"{nxclass}: {attr_names}"
-    for k in attr_names:
-        assert k in attrs
+    # drill down the nxpath to the group containing the field
+    group, field = navigate_path(nxdl_def, nxpath)
 
-        # THIS is the item to be tested here
-        attr_obj = attrs[k]
-        assert isinstance(attr_obj, nxdl_manager.NXDL__attribute)
-        assert attr_obj.name == k
-        assert hasattr(attr_obj, "enumerations")
-        assert isinstance(attr_obj.enumerations, list)
-        for a in "groups minOccurs maxOccurs".split():
-            assert not hasattr(attr_obj, a)
+    field_def = group.fields.get(field)
+    assert isinstance(field_def, nxdl_manager.NXDL__field), f"{group}  {field}"
+    assert field_def.name == field
+    assert hasattr(field_def, "dimensions")
+    assert field_def.dimensions.rank == rank
 
+    dims = field_def.dimensions.dims  # dict: int: NXDL__dim
+    assert isinstance(dims, dict)
 
-@pytest.mark.parametrize(
-    "",  # TODO:
-    [
-        # spot checks of a few NXDL files
-        [],
-    ]
-)
-def test_NXDL__dim_structure():
-    assert True
+    # cross-check the NXDL__dim structure here
+    dims_keys = list(dims.keys())
+    for i, k in enumerate(dims):
+        dim_def = dims[k]
+        assert isinstance(dim_def, nxdl_manager.NXDL__dim)
+        for a in "index value ref refindex incr".split():
+            assert hasattr(dim_def, a)
+        assert dim_def.index == dims_keys[i]
 
-
-@pytest.mark.parametrize(
-    "",  # TODO:
-    [
-        # spot checks of a few NXDL files
-        [],
-    ]
-)
-def test_NXDL__dimensions_structure():
-    assert True
+    for i, value in enumerate(dimensions):
+        k = dims_keys[i]
+        assert k in dims
+        assert dims[k].value == value
+        assert dim_def.ref is None  # TODO:
+        assert dim_def.refindex is None  # TODO:
+        assert dim_def.incr is None  # TODO:
 
 
 @pytest.mark.parametrize(
@@ -322,22 +370,46 @@ def test_NXDL__group_structure():
 
 
 @pytest.mark.parametrize(
-    "",  # TODO:
+    "nxclass, file_set, source, target",
     [
         # spot checks of a few NXDL files
-        [],
+        ["NXrefscan", "a4fd52d", "/entry/data/data", "/NXentry/NXinstrument/NXdetector/data"],
+        ["NXtas", "a4fd52d", "/entry/data/data", "/NXentry/NXinstrument/NXdetector/data"],
+        ["NXtas", "v2018.5", "/entry/data/qk", "/NXentry/NXsample/qk"],
     ]
 )
-def test_NXDL__link_structure():
-    assert True
+def test_NXDL__link_structure(nxclass, file_set, source, target):
+    cache_manager.CacheManager()
+    manager = nxdl_manager.NXDL_Manager(file_set)
+    nxdl_def = manager.classes.get(nxclass)
+
+    # get link for testing
+    group, link = navigate_path(nxdl_def, source)
+    link_def = group.links.get(link)
+    assert link_def is not None
+    assert isinstance(link_def, nxdl_manager.NXDL__link)
+    assert link_def.name == link
+    assert link_def.target == target
 
 
 @pytest.mark.parametrize(
-    "",  # TODO:
+    "nxclass, file_set, symbols",
     [
         # spot checks of a few NXDL files
-        [],
+        ["NXarpes", "a4fd52d", ""],
+        ["NXmx", "a4fd52d", "np i j"],
+        ["NXmx", "v3.3", "dataRank np i j k"],
+        ["NXmx", "v2018.5", "dataRank np i j k"],
+        ["NXdata", "a4fd52d", "dataRank n nx ny nz"],
+        ["NXdata", "v2018.5", "dataRank n nx ny nz"],
+        ["NXdetector", "v2018.5", "np i j k tof"],
     ]
 )
-def test_NXDL__symbols_structure():
-    assert True
+def test_NXDL__symbols_structure(nxclass, file_set, symbols):
+    cache_manager.CacheManager()
+    manager = nxdl_manager.NXDL_Manager(file_set)
+    nxdl_def = manager.classes.get(nxclass)
+
+    # nxdl_def.symbols is a list
+    symbols_defined = " ".join(nxdl_def.symbols)
+    assert symbols_defined == symbols, f"{nxclass} {file_set}"

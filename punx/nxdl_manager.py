@@ -528,6 +528,7 @@ class NXDL__group(NXDL__Mixin):
         self.parse_attributes(xml_node)
         for k, v in xml_node.attrib.items():
             if k not in ("name", "type"):
+                # https://github.com/prjemian/punx/issues/165
                 self.attributes[k] = v  # FIXME: should be NXDL__attribute instance
         self.parse_groups(xml_node)
         self.parse_fields(xml_node)

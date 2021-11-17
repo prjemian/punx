@@ -328,7 +328,7 @@ def test_NXDL__definition_structure(
 
 
 @pytest.mark.parametrize(
-    "nxclass, file_set, nxpath, rank, dimensions",  # TODO:
+    "nxclass, file_set, nxpath, rank, dimensions",
     [
         # spot checks of a few NXDL files
         # note: nxpath (here) is the NeXus class path within the NXDL definition

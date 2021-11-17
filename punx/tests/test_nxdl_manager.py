@@ -381,14 +381,26 @@ def test_NXDL__dimensions_structure(
 
 
 @pytest.mark.parametrize(
-    "",  # TODO:
+    "nxclass, file_set, nxpath, minOccurs",
     [
         # spot checks of a few NXDL files
-        [],
+        ["NXentry", "a4fd52d", "title", 0],
+        ["NXarchive", "a4fd52d", "/entry/release_date", 1],
+        ["NXtomo", "a4fd52d", "/entry/definition", 1],
     ]
 )
-def test_NXDL__field_structure():
-    assert True
+def test_NXDL__field_structure(nxclass, file_set, nxpath, minOccurs):
+    nxdl_def = get_NXDL_definition(nxclass, file_set)
+    parent, field_name = navigate_path(nxdl_def, nxpath)
+    assert parent is not None
+
+    obj = parent.fields.get(field_name)
+    assert isinstance(obj, nxdl_manager.NXDL__field)
+    assert obj.name == field_name
+    # FIXME: minOccurs & maxOccurs are not correct
+    # assert obj.xml_attributes["minOccurs"].default_value == minOccurs  # FIXME: base class
+    # assert str(obj.xml_attributes["minOccurs"]) == ""
+    # TODO: what else to test?
 
 
 @pytest.mark.parametrize(

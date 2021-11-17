@@ -7,10 +7,47 @@ from .. import cache_manager
 from .. import FileNotFound
 from .. import InvalidNxdlFile
 from .. import nxdl_manager
+from .. import nxdl_schema
+
+
+def get_NXDL_definition(nxclass, file_set):
+    """
+    Return instance of nxdl_manager.NXDL__definition from file_set.
+
+    PARAMETERS
+
+    nxclass str:
+        Name of NeXus class (such as NXdata, NXentry, NXsas, ...)
+    file_set str:
+        Name of NeXus definitions *file set* to be found in
+        one of the local caches.  A file set is a directory
+        containing all the NXDL files and XML Schema files
+        that define a specific version of the NeXus definitions.
+    """
+    cache_manager.CacheManager()
+    manager = nxdl_manager.NXDL_Manager(file_set)
+    return manager.classes.get(nxclass)
 
 
 def navigate_path(path_start, nxpath):
-    """Drill down the nxpath to the group containing the last item."""
+    """
+    Drill down the nxpath to the group containing the last item.
+
+    PARAMETERS
+
+    path_start obj:
+        Instance of either ``nxdl_manager.NXDL__definition``
+        or ``nxdl_manager.NXDL__group`` that serves as the starting
+        point for ``nxpath``.
+    nxpath str:
+        NeXus path specification to an entity defined in a NXDL file.
+        This is not necessarily an HDF5 address in an HDF5 data file
+        but it sure looks like one.  Pay particular attention to the
+        use of default names for unnamed groups.  Unnamed groups are
+        common in NXDL files.
+
+        Example: ``/entry/data/data``
+    """
     group = path_start  # starting point
 
     parts = nxpath.lstrip("/").split("/")
@@ -193,9 +230,7 @@ def test_NXDL__Mixin_subclasses(item):
 )
 def test_NXDL__attribute_structure(nxclass, file_set, attr_names):
     """Spot-check one"""
-    cache_manager.CacheManager()
-    manager = nxdl_manager.NXDL_Manager(file_set)
-    nxdl_def = manager.classes.get(nxclass)
+    nxdl_def = get_NXDL_definition(nxclass, file_set)
     assert isinstance(nxdl_def, nxdl_manager.NXDL__definition)
 
     attrs = nxdl_def.attributes
@@ -313,9 +348,7 @@ def test_NXDL__dimensions_structure(
     nxclass, file_set, nxpath, rank, dimensions
 ):
     """Tests both NXDL__dimensions & NXDL__dim structures."""
-    cache_manager.CacheManager()
-    manager = nxdl_manager.NXDL_Manager(file_set)
-    nxdl_def = manager.classes.get(nxclass)
+    nxdl_def = get_NXDL_definition(nxclass, file_set)
 
     # drill down the nxpath to the group containing the field
     group, field = navigate_path(nxdl_def, nxpath)
@@ -359,14 +392,39 @@ def test_NXDL__field_structure():
 
 
 @pytest.mark.parametrize(
-    "",  # TODO:
+    "nxclass, file_set, nxpath",
     [
         # spot checks of a few NXDL files
-        [],
+        ["NXentry", "a4fd52d", "data"],
+        ["NXentry", "a4fd52d", "notes"],
+        ["NXrefscan", "a4fd52d", "/entry/data"],
+        ["NXtas", "a4fd52d", "/entry/data"],
+        ["NXtofraw", "v3.3", "/entry/instrument/detector"],
+        ["NXstxm", "v2018.5", "/entry/data"],
     ]
 )
-def test_NXDL__group_structure():
-    assert True
+def test_NXDL__group_structure(nxclass, file_set, nxpath):
+    nxdl_def = get_NXDL_definition(nxclass, file_set)
+    parent, group_name = navigate_path(nxdl_def, nxpath)
+    assert parent is not None
+    assert hasattr(parent, "groups")
+    group = parent.groups.get(group_name)
+    assert isinstance(group, nxdl_manager.NXDL__group), f"{nxclass} {nxpath}"
+
+    xtures = dict(
+        # TODO: see nxdl_manager.py, line 531
+        # https://github.com/prjemian/punx/issues/165
+        attributes=str,  # TODO: Why not nxdl_manager.NXDL__attribute?
+        fields=nxdl_manager.NXDL__field,
+        groups=nxdl_manager.NXDL__group,
+        links=nxdl_manager.NXDL__link,
+        xml_attributes=nxdl_schema.NXDL_schema__attribute,
+    )
+    # check that all these are of the correct type
+    for item, xture in xtures.items():
+        assert hasattr(group, item)
+        for obj in getattr(group, item).values():
+            assert isinstance(obj, xture), f"{nxclass} {obj}  {item}"
 
 
 @pytest.mark.parametrize(
@@ -379,9 +437,7 @@ def test_NXDL__group_structure():
     ]
 )
 def test_NXDL__link_structure(nxclass, file_set, source, target):
-    cache_manager.CacheManager()
-    manager = nxdl_manager.NXDL_Manager(file_set)
-    nxdl_def = manager.classes.get(nxclass)
+    nxdl_def = get_NXDL_definition(nxclass, file_set)
 
     # get link for testing
     group, link = navigate_path(nxdl_def, source)
@@ -406,9 +462,7 @@ def test_NXDL__link_structure(nxclass, file_set, source, target):
     ]
 )
 def test_NXDL__symbols_structure(nxclass, file_set, symbols):
-    cache_manager.CacheManager()
-    manager = nxdl_manager.NXDL_Manager(file_set)
-    nxdl_def = manager.classes.get(nxclass)
+    nxdl_def = get_NXDL_definition(nxclass, file_set)
 
     # nxdl_def.symbols is a list
     symbols_defined = " ".join(nxdl_def.symbols)

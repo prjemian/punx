@@ -1,5 +1,8 @@
 *.py[cod]
 
+# developer local test modules
+dev_*.py
+
 # local creds for authenticated access
 punx/__github_creds__.txt
 

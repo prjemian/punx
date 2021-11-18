@@ -185,7 +185,7 @@ def test_count_NXDL_files(file_set, num_nxdl_files):
     assert len(manager.classes) == num_nxdl_files
 
 
-def test_NXDL__Mixin_structure():
+def test_NXDL__base_structure():
     """Spot-check one"""
     file_set = "a4fd52d"
     cache_manager.CacheManager()
@@ -214,8 +214,8 @@ def test_NXDL__Mixin_structure():
         nxdl_manager.NXDL__symbols,
     ]
 )
-def test_NXDL__Mixin_subclasses(item):
-    assert issubclass(item, nxdl_manager.NXDL__Mixin)
+def test_NXDL__base_subclasses(item):
+    assert issubclass(item, nxdl_manager.NXDL__base)
 
 
 @pytest.mark.parametrize(

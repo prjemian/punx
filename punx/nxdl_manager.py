@@ -152,7 +152,7 @@ def validate_xml_tree(xml_tree):
     return result
 
 
-class NXDL__Mixin(object):
+class NXDL__base(object):
 
     """
     Base class for each NXDL structure.
@@ -319,7 +319,7 @@ class NXDL__Mixin(object):
         PARAMETERS
 
         obj obj:
-            Instance of nxdl_manager.NXDL__Mixin subclass.
+            Instance of nxdl_manager.NXDL__base subclass.
         """
         name_list = []
         for k in "groups fields links".split():
@@ -338,7 +338,7 @@ class NXDL__Mixin(object):
                 self.__setattr__(k, v.default_value)
 
 
-class NXDL__definition(NXDL__Mixin):
+class NXDL__definition(NXDL__base):
 
     """
     Contents of a *definition* element in a NXDL XML file.
@@ -429,7 +429,7 @@ class NXDL__definition(NXDL__Mixin):
         self.parse_links(root_node)
 
 
-class NXDL__attribute(NXDL__Mixin):
+class NXDL__attribute(NXDL__base):
 
     """
     Contents of a *attribute* structure (XML element) in a NXDL XML file.
@@ -438,7 +438,7 @@ class NXDL__attribute(NXDL__Mixin):
     """
 
     def __init__(self, nxdl_definition, nxdl_defaults=None, *args, **kwargs):
-        NXDL__Mixin.__init__(self, nxdl_definition)
+        NXDL__base.__init__(self, nxdl_definition)
 
         self.enumerations = []
 
@@ -470,14 +470,14 @@ class NXDL__attribute(NXDL__Mixin):
                     self.enumerations.append(v)
 
 
-class NXDL__dim(NXDL__Mixin):
+class NXDL__dim(NXDL__base):
 
     """
     Contents of a *dim* structure (XML element) in a NXDL XML file.
     """
 
     def __init__(self, nxdl_definition, nxdl_defaults=None, *args, **kwargs):
-        NXDL__Mixin.__init__(self, nxdl_definition)
+        NXDL__base.__init__(self, nxdl_definition)
         self._init_defaults_from_schema(nxdl_defaults)
 
     def _init_defaults_from_schema(self, nxdl_defaults):
@@ -495,14 +495,14 @@ class NXDL__dim(NXDL__Mixin):
         self.name = self.index
 
 
-class NXDL__dimensions(NXDL__Mixin):
+class NXDL__dimensions(NXDL__base):
 
     """
     Contents of a *dimensions* structure (XML element) in a NXDL XML file.
     """
 
     def __init__(self, nxdl_definition, nxdl_defaults=None, *args, **kwargs):
-        NXDL__Mixin.__init__(self, nxdl_definition)
+        NXDL__base.__init__(self, nxdl_definition)
 
         self.rank = None
         self.dims = collections.OrderedDict()
@@ -531,14 +531,14 @@ class NXDL__dimensions(NXDL__Mixin):
             self.dims[obj.name] = obj
 
 
-class NXDL__field(NXDL__Mixin):
+class NXDL__field(NXDL__base):
 
     """
     Contents of a *field* structure (XML element) in a NXDL XML file.
     """
 
     def __init__(self, nxdl_definition, nxdl_defaults=None, *args, **kwargs):
-        NXDL__Mixin.__init__(self, nxdl_definition)
+        NXDL__base.__init__(self, nxdl_definition)
 
         self.attributes = {}
         self.dimensions = None
@@ -570,14 +570,14 @@ class NXDL__field(NXDL__Mixin):
             self.enumerations.append(node.attrib.get("value"))
 
 
-class NXDL__group(NXDL__Mixin):
+class NXDL__group(NXDL__base):
 
     """
     Contents of a *group* structure (XML element) in a NXDL XML file.
     """
 
     def __init__(self, nxdl_definition, nxdl_defaults=None, *args, **kwargs):
-        NXDL__Mixin.__init__(self, nxdl_definition)
+        NXDL__base.__init__(self, nxdl_definition)
 
         self.attributes = {}
         self.fields = {}
@@ -604,7 +604,7 @@ class NXDL__group(NXDL__Mixin):
         self.parse_links(xml_node)
 
 
-class NXDL__link(NXDL__Mixin):
+class NXDL__link(NXDL__base):
 
     """
     Contents of a *link* structure (XML element) in a NXDL XML file.
@@ -621,7 +621,7 @@ class NXDL__link(NXDL__Mixin):
     """
 
     def __init__(self, nxdl_definition, nxdl_defaults=None, *args, **kwargs):
-        NXDL__Mixin.__init__(self, nxdl_definition)
+        NXDL__base.__init__(self, nxdl_definition)
 
         self.name = None
         self.target = None
@@ -632,7 +632,7 @@ class NXDL__link(NXDL__Mixin):
         self.target = xml_node.attrib.get("target")
 
 
-class NXDL__symbols(NXDL__Mixin):
+class NXDL__symbols(NXDL__base):
 
     """
     Contents of a *symbols* structure (XML element) in a NXDL XML file.
@@ -648,7 +648,7 @@ class NXDL__symbols(NXDL__Mixin):
     """
 
     def __init__(self, nxdl_definition, nxdl_defaults=None, *args, **kwargs):
-        NXDL__Mixin.__init__(self, nxdl_definition)
+        NXDL__base.__init__(self, nxdl_definition)
 
         self.symbols = []
 

@@ -380,9 +380,9 @@ class NXDL__definition(NXDL__base):
         return s
 
     def _init_defaults_from_schema(self, nxdl_defaults):
-        """ """
-        # definition is special: it has structure of a group AND a symbols table
-
+        """
+        NXDL ``definition`` has structure of a group AND a symbols table.
+        """
         self.minOccurs = 0
         self.maxOccurs = 1
 

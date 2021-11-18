@@ -13,10 +13,16 @@
 
 
 """
-Load and/or document the structure of a NeXus NXDL class specification
+Python representation of an NeXus NXDL class specification.
 
-The *nxdl_manager* calls the *schema_manager* and
-is called by *____tba_____*.
+* The *nxdl_manager* calls *schema_manager*
+* It gets a specific file_set from *cache_manager*
+* It is called from *validate*
+
+A *file_set* refers to a directory containing a complete set of the NXDL files
+and XML Schema files that comprise a version of the NeXus definitions standard.
+It is identified by a name (release name, tag name, short commit hash, or branch
+name).
 
 """
 
@@ -38,7 +44,7 @@ logger = utils.setup_logger(__name__)
 
 class NXDL_Manager(object):
 
-    """the NXDL classes found in ``nxdl_dir``"""
+    """Python access to the NXDL classes found in ``nxdl_dir``."""
 
     nxdl_file_set = None
     nxdl_defaults = None
@@ -91,7 +97,9 @@ class NXDL_Manager(object):
         return s
 
     def get_nxdl_defaults(self):
-        """ """
+        """
+        Get default values for this NXDL type from the NXDL Schema.
+        """
         schema_file = os.path.join(self.nxdl_file_set.path, nxdl_schema.NXDL_XSD_NAME)
         if os.path.exists(schema_file):
             return nxdl_schema.NXDL_Summary(schema_file)
@@ -99,11 +107,15 @@ class NXDL_Manager(object):
 
 def get_NXDL_file_list(nxdl_dir):
     """
-    return a list of all NXDL files in the ``nxdl_dir``
+    Return a list of all NXDL files in the ``nxdl_dir``.
 
-    The list is sorted by NXDL category
-    (base_classes, applications, contributed_definitions)
-    and then alphabetically within each category.
+    The list is sorted by NXDL category (base_classes, applications,
+    contributed_definitions) and then alphabetically within each category.
+
+    PARAMETERS
+
+    nxdl_dir str:
+        Absolute path to the directory of a ``file_set`` (defined above).
     """
     if not os.path.exists(nxdl_dir):
         msg = "NXDL directory: " + nxdl_dir
@@ -125,7 +137,7 @@ def get_NXDL_file_list(nxdl_dir):
 
 def validate_xml_tree(xml_tree):
     """
-    validate an NXDL XML file against the NeXus NXDL XML Schema file
+    Validate an NXDL XML file against its NeXus NXDL XML Schema file.
 
     :param str xml_file_name: name of XML file
     """
@@ -143,7 +155,7 @@ def validate_xml_tree(xml_tree):
 class NXDL__Mixin(object):
 
     """
-    base class for each NXDL structure
+    Base class for each NXDL structure.
     """
 
     def __init__(self, nxdl_definition, *args, **kwargs):
@@ -155,16 +167,32 @@ class NXDL__Mixin(object):
         return nxdl_schema.render_class_str(self)
 
     def parse_nxdl_xml(self, *args, **kwargs):
-        """parse the XML node and assemble NXDL structure"""
+        """Parse the XML node and assemble NXDL structure."""
         raise NotImplementedError("must override parse_nxdl_xml() in subclass")
 
     def parse_xml_attributes(self, defaults):
-        """ """
+        """
+        Parse the XML attributes of an NXDL element tag.
+
+        PARAMETERS
+
+        defaults obj:
+            Instance of nxdl_schema.NXDL_schema__element.
+        """
         for k, v in sorted(defaults.attributes.items()):
             self.xml_attributes[k] = v
 
     def parse_attributes(self, xml_node):
-        """ """
+        """
+        Parse NXDL ``<attribute>`` elements in ``xml_node``.
+
+        PARAMETERS
+
+        xml_node obj:
+            Instance of XML element in NXDL file with ``<attribute>`` nodes.
+
+            Element is one of the NXDL elements: field, group, attribute, link, ...
+        """
         ns = nxdl_schema.get_xml_namespace_dictionary()
         manager = self.nxdl_definition.nxdl_manager
         nxdl_defaults = manager.nxdl_defaults
@@ -187,7 +215,14 @@ class NXDL__Mixin(object):
             self.attributes[obj.name] = obj
 
     def parse_fields(self, xml_node):
-        """ """
+        """
+        Parse NXDL ``<field>`` elements in ``xml_node``.
+
+        PARAMETERS
+
+        xml_node obj:
+            Instance of XML element in NXDL file with ``<field>`` nodes.
+        """
         ns = nxdl_schema.get_xml_namespace_dictionary()
         manager = self.nxdl_definition.nxdl_manager
         nxdl_defaults = manager.nxdl_defaults
@@ -204,7 +239,14 @@ class NXDL__Mixin(object):
             self.fields[obj.name] = obj
 
     def parse_groups(self, xml_node):
-        """ """
+        """
+        Parse NXDL ``<group>`` elements in ``xml_node``.
+
+        PARAMETERS
+
+        xml_node obj:
+            Instance of XML element in NXDL file with ``<group>`` nodes.
+        """
         ns = nxdl_schema.get_xml_namespace_dictionary()
         manager = self.nxdl_definition.nxdl_manager
         nxdl_defaults = manager.nxdl_defaults
@@ -221,7 +263,14 @@ class NXDL__Mixin(object):
             self.groups[obj.name] = obj
 
     def parse_links(self, xml_node):
-        """ """
+        """
+        Parse NXDL ``<link>`` elements in ``xml_node``.
+
+        PARAMETERS
+
+        xml_node obj:
+            Instance of XML element in NXDL file with ``<link>`` nodes.
+        """
         ns = nxdl_schema.get_xml_namespace_dictionary()
         manager = self.nxdl_definition.nxdl_manager
         nxdl_defaults = manager.nxdl_defaults
@@ -239,7 +288,14 @@ class NXDL__Mixin(object):
             self.links[obj.name] = obj
 
     def parse_symbols(self, xml_node):
-        """ """
+        """
+        Parse NXDL ``<symbols>`` elements in ``xml_node``.
+
+        PARAMETERS
+
+        xml_node obj:
+            Instance of XML element in NXDL file with ``<symbols>`` nodes.
+        """
         ns = nxdl_schema.get_xml_namespace_dictionary()
         manager = self.nxdl_definition.nxdl_manager
         nxdl_defaults = manager.nxdl_defaults
@@ -251,7 +307,20 @@ class NXDL__Mixin(object):
                 self.symbols += obj.symbols
 
     def ensure_unique_name(self, obj):
-        """ """
+        """
+        Check ``obj.name``, replace to make unique if needed.
+
+        EXAMPLE:
+
+        * First name of ``item`` will stay ``item``.
+        * Second name of ``item`` will become ``item1``.
+        * Third name of ``item`` will become ``item2``.
+
+        PARAMETERS
+
+        obj obj:
+            Instance of nxdl_manager.NXDL__Mixin subclass.
+        """
         name_list = []
         for k in "groups fields links".split():
             name_list += list(self.__getattribute__(k).keys())
@@ -263,7 +332,7 @@ class NXDL__Mixin(object):
             obj.name = base_name + str(index)
 
     def assign_defaults(self):
-        """set default values for required components now"""
+        """Set default values for required components now."""
         for k, v in sorted(self.xml_attributes.items()):
             if v.required and not hasattr(self, k):
                 self.__setattr__(k, v.default_value)
@@ -272,7 +341,7 @@ class NXDL__Mixin(object):
 class NXDL__definition(NXDL__Mixin):
 
     """
-    contents of a *definition* element in a NXDL XML file
+    Contents of a *definition* element in a NXDL XML file.
 
     :param str path: absolute path to NXDL definitions directory (has nxdl.xsd)
     """
@@ -363,7 +432,7 @@ class NXDL__definition(NXDL__Mixin):
 class NXDL__attribute(NXDL__Mixin):
 
     """
-    contents of a *attribute* structure (XML element) in a NXDL XML file
+    Contents of a *attribute* structure (XML element) in a NXDL XML file.
 
     ~parse_nxdl_xml
     """
@@ -404,7 +473,7 @@ class NXDL__attribute(NXDL__Mixin):
 class NXDL__dim(NXDL__Mixin):
 
     """
-    contents of a *dim* structure (XML element) in a NXDL XML file
+    Contents of a *dim* structure (XML element) in a NXDL XML file.
     """
 
     def __init__(self, nxdl_definition, nxdl_defaults=None, *args, **kwargs):
@@ -429,7 +498,7 @@ class NXDL__dim(NXDL__Mixin):
 class NXDL__dimensions(NXDL__Mixin):
 
     """
-    contents of a *dimensions* structure (XML element) in a NXDL XML file
+    Contents of a *dimensions* structure (XML element) in a NXDL XML file.
     """
 
     def __init__(self, nxdl_definition, nxdl_defaults=None, *args, **kwargs):
@@ -465,7 +534,7 @@ class NXDL__dimensions(NXDL__Mixin):
 class NXDL__field(NXDL__Mixin):
 
     """
-    contents of a *field* structure (XML element) in a NXDL XML file
+    Contents of a *field* structure (XML element) in a NXDL XML file.
     """
 
     def __init__(self, nxdl_definition, nxdl_defaults=None, *args, **kwargs):
@@ -504,7 +573,7 @@ class NXDL__field(NXDL__Mixin):
 class NXDL__group(NXDL__Mixin):
 
     """
-    contents of a *group* structure (XML element) in a NXDL XML file
+    Contents of a *group* structure (XML element) in a NXDL XML file.
     """
 
     def __init__(self, nxdl_definition, nxdl_defaults=None, *args, **kwargs):
@@ -538,7 +607,7 @@ class NXDL__group(NXDL__Mixin):
 class NXDL__link(NXDL__Mixin):
 
     """
-    contents of a *link* structure (XML element) in a NXDL XML file
+    Contents of a *link* structure (XML element) in a NXDL XML file.
 
     example from NXmonopd::
 
@@ -566,7 +635,7 @@ class NXDL__link(NXDL__Mixin):
 class NXDL__symbols(NXDL__Mixin):
 
     """
-    contents of a *symbols* structure (XML element) in a NXDL XML file
+    Contents of a *symbols* structure (XML element) in a NXDL XML file.
 
     example from NXcrystal::
 

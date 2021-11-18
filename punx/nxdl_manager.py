@@ -333,6 +333,7 @@ class NXDL__base(object):
 
     def assign_defaults(self):
         """Set default values for required components now."""
+        # FIXME: Clarify. The specific intent of this method is ambiguous.
         for k, v in sorted(self.xml_attributes.items()):
             if v.required and not hasattr(self, k):
                 self.__setattr__(k, v.default_value)

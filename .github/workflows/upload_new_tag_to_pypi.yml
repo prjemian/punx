@@ -19,7 +19,9 @@ jobs:
         python -m
         pip install
         build
+        twine
         --user
+
     - name: Build a binary wheel and a source tarball
       run: >-
         python -m

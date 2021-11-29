@@ -570,7 +570,10 @@ class NXDL_item_catalog(object):
 class NXDL_Summary(object):
 
     """
-    provide an easy interface for the nxdl_manager
+    Default values for all NXDL as defined by the ``nxdl.xsd``.
+
+    Provide an easy interface to the default values defined in
+    the XML Schema for the NXDL language.
 
     USAGE::
 

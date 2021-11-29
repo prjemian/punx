@@ -47,10 +47,27 @@ class NXDL_Manager(object):
     """
     Python access to the NXDL classes found in ``nxdl_dir``.
 
-    The ``classes`` attribute here is a dictionary of the NXDL classes found
-    in ``nxdl_dir`` where the key is the NeXus class name and the value is
-    an instance of the ``NXDL__definition`` class (defined below) which describes
-    the NXDL structure.
+    Attributes
+
+    classes dict :
+        Dictionary of the NXDL classes found
+        in ``nxdl_dir`` where the key is the NeXus class name and the value is
+        an instance of the ``NXDL__definition`` class (defined below) which describes
+        the NXDL structure.
+
+    nxdl_file_set str :
+        Absolute path to a directory which contains a complete set of the
+        NeXus definitions.  This directory will have this content:
+        * file ``nxdl.xsd`` : The XML Schema defining the NeXus NXDL language
+        * file ``nxdlTypes.xsd`` : data and engineering units types used by ``nxdl.xsd``
+        * file ``__github_info__.json`` : description of the git repository for this file set
+        * directory ``applications`` : contains NeXus application definitions NXDL files
+        * directory ``base_classes`` : contains NeXus base class NXDL files
+        * directory ``contributed_definitions`` : contains NeXus contributed definitions NXDL files
+
+    nxdl_defaults obj :
+        Instance of :class:`punx.nxdl_schema.NXDL_Summary()` or ``None``.
+        If not ``None``, default values for all NXDL as defined by the ``nxdl.xsd``.
     """
 
     nxdl_file_set = None

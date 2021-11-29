@@ -31,7 +31,7 @@ def get_NXDL_definition(nxclass, file_set):
 
 def navigate_path(path_start, nxpath):
     """
-    Drill down the nxpath to the group containing the last item.
+    Use the nxpath to the group containing the last item.
 
     PARAMETERS
 
@@ -50,6 +50,8 @@ def navigate_path(path_start, nxpath):
     """
     group = path_start  # starting point
 
+    # Since this is an HDF5 address, it is correct to use "/" as the
+    # separator, regardless of operating system.
     parts = nxpath.lstrip("/").split("/")
     target = parts[-1]
     for nm in parts[:-1]:

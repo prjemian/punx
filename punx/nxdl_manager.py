@@ -44,7 +44,14 @@ logger = utils.setup_logger(__name__)
 
 class NXDL_Manager(object):
 
-    """Python access to the NXDL classes found in ``nxdl_dir``."""
+    """
+    Python access to the NXDL classes found in ``nxdl_dir``.
+
+    The ``classes`` attribute here is a dictionary of the NXDL classes found
+    in ``nxdl_dir`` where the key is the NeXus class name and the value is
+    an instance of the ``NXDL__definition`` class (defined below) which describes
+    the NXDL structure.
+    """
 
     nxdl_file_set = None
     nxdl_defaults = None

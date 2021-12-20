@@ -13,10 +13,16 @@
 
 
 """
-Load and/or document the structure of a NeXus NXDL class specification
+Python representation of an NeXus NXDL class specification.
 
-The *nxdl_manager* calls the *schema_manager* and
-is called by *____tba_____*.
+* The *nxdl_manager* calls *schema_manager*
+* It gets a specific file_set from *cache_manager*
+* It is called from *validate*
+
+A *file_set* refers to a directory containing a complete set of the NXDL files
+and XML Schema files that comprise a version of the NeXus definitions standard.
+It is identified by a name (release name, tag name, short commit hash, or branch
+name).
 
 """
 
@@ -38,7 +44,31 @@ logger = utils.setup_logger(__name__)
 
 class NXDL_Manager(object):
 
-    """the NXDL classes found in ``nxdl_dir``"""
+    """
+    Python access to the NXDL classes found in ``nxdl_dir``.
+
+    Attributes
+
+    classes dict :
+        Dictionary of the NXDL classes found in ``nxdl_dir`` where the key
+        is the NeXus class name and the value is an instance of the
+        :class:`~punx.nxdl_manager.NXDL__definition()` class (defined below)
+        which describes the NXDL structure.
+
+    nxdl_file_set str :
+        Absolute path to a directory which contains a complete set of the
+        NeXus definitions.  This directory will have this content:
+        * file ``nxdl.xsd`` : The XML Schema defining the NeXus NXDL language
+        * file ``nxdlTypes.xsd`` : data and engineering units types used by ``nxdl.xsd``
+        * file ``__github_info__.json`` : description of the git repository for this file set
+        * directory ``applications`` : contains NXDL files of NeXus application definitions
+        * directory ``base_classes`` : contains NXDL files of NeXus base classes
+        * directory ``contributed_definitions`` : contains NXDL files of NeXus contributed definitions
+
+    nxdl_defaults obj :
+        Instance of :class:`punx.nxdl_schema.NXDL_Summary()` or ``None``.
+        If not ``None``, default values for all NXDL as defined by the ``nxdl.xsd``.
+    """
 
     nxdl_file_set = None
     nxdl_defaults = None
@@ -91,7 +121,9 @@ class NXDL_Manager(object):
         return s
 
     def get_nxdl_defaults(self):
-        """ """
+        """
+        Get default values for this NXDL type from the NXDL Schema.
+        """
         schema_file = os.path.join(self.nxdl_file_set.path, nxdl_schema.NXDL_XSD_NAME)
         if os.path.exists(schema_file):
             return nxdl_schema.NXDL_Summary(schema_file)
@@ -99,11 +131,15 @@ class NXDL_Manager(object):
 
 def get_NXDL_file_list(nxdl_dir):
     """
-    return a list of all NXDL files in the ``nxdl_dir``
+    Return a list of all NXDL files in the ``nxdl_dir``.
 
-    The list is sorted by NXDL category
-    (base_classes, applications, contributed_definitions)
-    and then alphabetically within each category.
+    The list is sorted by NXDL category (base_classes, applications,
+    contributed_definitions) and then alphabetically within each category.
+
+    PARAMETERS
+
+    nxdl_dir str:
+        Absolute path to the directory of a ``file_set`` (defined above).
     """
     if not os.path.exists(nxdl_dir):
         msg = "NXDL directory: " + nxdl_dir
@@ -125,7 +161,7 @@ def get_NXDL_file_list(nxdl_dir):
 
 def validate_xml_tree(xml_tree):
     """
-    validate an NXDL XML file against the NeXus NXDL XML Schema file
+    Validate an NXDL XML file against its NeXus NXDL XML Schema file.
 
     :param str xml_file_name: name of XML file
     """
@@ -140,10 +176,10 @@ def validate_xml_tree(xml_tree):
     return result
 
 
-class NXDL__Mixin(object):
+class NXDL__base(object):
 
     """
-    base class for each NXDL structure
+    Base class for each NXDL structure.
     """
 
     def __init__(self, nxdl_definition, *args, **kwargs):
@@ -155,16 +191,32 @@ class NXDL__Mixin(object):
         return nxdl_schema.render_class_str(self)
 
     def parse_nxdl_xml(self, *args, **kwargs):
-        """parse the XML node and assemble NXDL structure"""
+        """Parse the XML node and assemble NXDL structure."""
         raise NotImplementedError("must override parse_nxdl_xml() in subclass")
 
     def parse_xml_attributes(self, defaults):
-        """ """
+        """
+        Parse the XML attributes of an NXDL element tag.
+
+        PARAMETERS
+
+        defaults obj:
+            Instance of nxdl_schema.NXDL_schema__element.
+        """
         for k, v in sorted(defaults.attributes.items()):
             self.xml_attributes[k] = v
 
     def parse_attributes(self, xml_node):
-        """ """
+        """
+        Parse NXDL ``<attribute>`` elements in ``xml_node``.
+
+        PARAMETERS
+
+        xml_node obj:
+            Instance of XML element in NXDL file with ``<attribute>`` nodes.
+
+            Element is one of the NXDL elements: field, group, attribute, link, ...
+        """
         ns = nxdl_schema.get_xml_namespace_dictionary()
         manager = self.nxdl_definition.nxdl_manager
         nxdl_defaults = manager.nxdl_defaults
@@ -187,7 +239,14 @@ class NXDL__Mixin(object):
             self.attributes[obj.name] = obj
 
     def parse_fields(self, xml_node):
-        """ """
+        """
+        Parse NXDL ``<field>`` elements in ``xml_node``.
+
+        PARAMETERS
+
+        xml_node obj:
+            Instance of XML element in NXDL file with ``<field>`` nodes.
+        """
         ns = nxdl_schema.get_xml_namespace_dictionary()
         manager = self.nxdl_definition.nxdl_manager
         nxdl_defaults = manager.nxdl_defaults
@@ -204,7 +263,14 @@ class NXDL__Mixin(object):
             self.fields[obj.name] = obj
 
     def parse_groups(self, xml_node):
-        """ """
+        """
+        Parse NXDL ``<group>`` elements in ``xml_node``.
+
+        PARAMETERS
+
+        xml_node obj:
+            Instance of XML element in NXDL file with ``<group>`` nodes.
+        """
         ns = nxdl_schema.get_xml_namespace_dictionary()
         manager = self.nxdl_definition.nxdl_manager
         nxdl_defaults = manager.nxdl_defaults
@@ -221,7 +287,14 @@ class NXDL__Mixin(object):
             self.groups[obj.name] = obj
 
     def parse_links(self, xml_node):
-        """ """
+        """
+        Parse NXDL ``<link>`` elements in ``xml_node``.
+
+        PARAMETERS
+
+        xml_node obj:
+            Instance of XML element in NXDL file with ``<link>`` nodes.
+        """
         ns = nxdl_schema.get_xml_namespace_dictionary()
         manager = self.nxdl_definition.nxdl_manager
         nxdl_defaults = manager.nxdl_defaults
@@ -239,7 +312,14 @@ class NXDL__Mixin(object):
             self.links[obj.name] = obj
 
     def parse_symbols(self, xml_node):
-        """ """
+        """
+        Parse NXDL ``<symbols>`` elements in ``xml_node``.
+
+        PARAMETERS
+
+        xml_node obj:
+            Instance of XML element in NXDL file with ``<symbols>`` nodes.
+        """
         ns = nxdl_schema.get_xml_namespace_dictionary()
         manager = self.nxdl_definition.nxdl_manager
         nxdl_defaults = manager.nxdl_defaults
@@ -251,7 +331,20 @@ class NXDL__Mixin(object):
                 self.symbols += obj.symbols
 
     def ensure_unique_name(self, obj):
-        """ """
+        """
+        Check ``obj.name``, replace to make unique if needed.
+
+        EXAMPLE:
+
+        * First name of ``item`` will stay ``item``.
+        * Second name of ``item`` will become ``item1``.
+        * Third name of ``item`` will become ``item2``.
+
+        PARAMETERS
+
+        obj obj:
+            Instance of nxdl_manager.NXDL__base subclass.
+        """
         name_list = []
         for k in "groups fields links".split():
             name_list += list(self.__getattribute__(k).keys())
@@ -263,24 +356,29 @@ class NXDL__Mixin(object):
             obj.name = base_name + str(index)
 
     def assign_defaults(self):
-        """set default values for required components now"""
+        """Set default values for required components now."""
+        # FIXME: Clarify. The specific intent of this method is ambiguous.
         for k, v in sorted(self.xml_attributes.items()):
             if v.required and not hasattr(self, k):
                 self.__setattr__(k, v.default_value)
 
 
-class NXDL__definition(NXDL__Mixin):
+class NXDL__definition(NXDL__base):
 
     """
-    contents of a *definition* element in a NXDL XML file
+    Contents of a *definition* element in a NXDL XML file.
 
-    :param str path: absolute path to NXDL definitions directory (has nxdl.xsd)
+    nxdl_manager obj :
+        Instance of :class:`~punx.nxdl_manager.NXDL_Manager()`.
     """
 
     def __init__(self, nxdl_manager=None, *args, **kwargs):
         self.nxdl_definition = self
         self.nxdl_manager = nxdl_manager
         self.nxdl_path = self.nxdl_manager.nxdl_file_set.path
+
+        # shortcut: absolute path to NXDL definitions directory
+        # (the directory which has file ``nxdl.xsd``)
         self.schema_file = os.path.join(self.nxdl_path, nxdl_schema.NXDL_XSD_NAME)
         assert os.path.exists(self.schema_file)
 
@@ -310,9 +408,9 @@ class NXDL__definition(NXDL__Mixin):
         return s
 
     def _init_defaults_from_schema(self, nxdl_defaults):
-        """ """
-        # definition is special: it has structure of a group AND a symbols table
-
+        """
+        NXDL ``definition`` has structure of a group AND a symbols table.
+        """
         self.minOccurs = 0
         self.maxOccurs = 1
 
@@ -360,16 +458,16 @@ class NXDL__definition(NXDL__Mixin):
         self.parse_links(root_node)
 
 
-class NXDL__attribute(NXDL__Mixin):
+class NXDL__attribute(NXDL__base):
 
     """
-    contents of a *attribute* structure (XML element) in a NXDL XML file
+    Contents of a *attribute* structure (XML element) in a NXDL XML file.
 
     ~parse_nxdl_xml
     """
 
     def __init__(self, nxdl_definition, nxdl_defaults=None, *args, **kwargs):
-        NXDL__Mixin.__init__(self, nxdl_definition)
+        NXDL__base.__init__(self, nxdl_definition)
 
         self.enumerations = []
 
@@ -401,14 +499,14 @@ class NXDL__attribute(NXDL__Mixin):
                     self.enumerations.append(v)
 
 
-class NXDL__dim(NXDL__Mixin):
+class NXDL__dim(NXDL__base):
 
     """
-    contents of a *dim* structure (XML element) in a NXDL XML file
+    Contents of a *dim* structure (XML element) in a NXDL XML file.
     """
 
     def __init__(self, nxdl_definition, nxdl_defaults=None, *args, **kwargs):
-        NXDL__Mixin.__init__(self, nxdl_definition)
+        NXDL__base.__init__(self, nxdl_definition)
         self._init_defaults_from_schema(nxdl_defaults)
 
     def _init_defaults_from_schema(self, nxdl_defaults):
@@ -426,14 +524,14 @@ class NXDL__dim(NXDL__Mixin):
         self.name = self.index
 
 
-class NXDL__dimensions(NXDL__Mixin):
+class NXDL__dimensions(NXDL__base):
 
     """
-    contents of a *dimensions* structure (XML element) in a NXDL XML file
+    Contents of a *dimensions* structure (XML element) in a NXDL XML file.
     """
 
     def __init__(self, nxdl_definition, nxdl_defaults=None, *args, **kwargs):
-        NXDL__Mixin.__init__(self, nxdl_definition)
+        NXDL__base.__init__(self, nxdl_definition)
 
         self.rank = None
         self.dims = collections.OrderedDict()
@@ -449,23 +547,27 @@ class NXDL__dimensions(NXDL__Mixin):
         ns = nxdl_schema.get_xml_namespace_dictionary()
         nxdl_defaults = self.nxdl_definition.nxdl_manager.nxdl_defaults
 
+        # nxdl.xsd says NX_CHAR but should be NX_UINT? issue #571
+        # Per NeXusformat/definitions#571,
+        # Value [of "rank"] could be either an unsigned integer or
+        # a symbol as defined in the *symbol* table of the NXDL file.
         self.rank = xml_node.attrib.get(
             "rank"
-        )  # nxdl.xsd says NX_CHAR but should be NX_UINT? issue #571
+        )
         for node in xml_node.xpath("nx:dim", namespaces=ns):
             obj = NXDL__dim(self.nxdl_definition, nxdl_defaults=nxdl_defaults)
             obj.parse_nxdl_xml(node)
             self.dims[obj.name] = obj
 
 
-class NXDL__field(NXDL__Mixin):
+class NXDL__field(NXDL__base):
 
     """
-    contents of a *field* structure (XML element) in a NXDL XML file
+    Contents of a *field* structure (XML element) in a NXDL XML file.
     """
 
     def __init__(self, nxdl_definition, nxdl_defaults=None, *args, **kwargs):
-        NXDL__Mixin.__init__(self, nxdl_definition)
+        NXDL__base.__init__(self, nxdl_definition)
 
         self.attributes = {}
         self.dimensions = None
@@ -497,14 +599,14 @@ class NXDL__field(NXDL__Mixin):
             self.enumerations.append(node.attrib.get("value"))
 
 
-class NXDL__group(NXDL__Mixin):
+class NXDL__group(NXDL__base):
 
     """
-    contents of a *group* structure (XML element) in a NXDL XML file
+    Contents of a *group* structure (XML element) in a NXDL XML file.
     """
 
     def __init__(self, nxdl_definition, nxdl_defaults=None, *args, **kwargs):
-        NXDL__Mixin.__init__(self, nxdl_definition)
+        NXDL__base.__init__(self, nxdl_definition)
 
         self.attributes = {}
         self.fields = {}
@@ -524,16 +626,17 @@ class NXDL__group(NXDL__Mixin):
         self.parse_attributes(xml_node)
         for k, v in xml_node.attrib.items():
             if k not in ("name", "type"):
+                # https://github.com/prjemian/punx/issues/165
                 self.attributes[k] = v  # FIXME: should be NXDL__attribute instance
         self.parse_groups(xml_node)
         self.parse_fields(xml_node)
         self.parse_links(xml_node)
 
 
-class NXDL__link(NXDL__Mixin):
+class NXDL__link(NXDL__base):
 
     """
-    contents of a *link* structure (XML element) in a NXDL XML file
+    Contents of a *link* structure (XML element) in a NXDL XML file.
 
     example from NXmonopd::
 
@@ -547,7 +650,7 @@ class NXDL__link(NXDL__Mixin):
     """
 
     def __init__(self, nxdl_definition, nxdl_defaults=None, *args, **kwargs):
-        NXDL__Mixin.__init__(self, nxdl_definition)
+        NXDL__base.__init__(self, nxdl_definition)
 
         self.name = None
         self.target = None
@@ -558,10 +661,10 @@ class NXDL__link(NXDL__Mixin):
         self.target = xml_node.attrib.get("target")
 
 
-class NXDL__symbols(NXDL__Mixin):
+class NXDL__symbols(NXDL__base):
 
     """
-    contents of a *symbols* structure (XML element) in a NXDL XML file
+    Contents of a *symbols* structure (XML element) in a NXDL XML file.
 
     example from NXcrystal::
 
@@ -574,7 +677,7 @@ class NXDL__symbols(NXDL__Mixin):
     """
 
     def __init__(self, nxdl_definition, nxdl_defaults=None, *args, **kwargs):
-        NXDL__Mixin.__init__(self, nxdl_definition)
+        NXDL__base.__init__(self, nxdl_definition)
 
         self.symbols = []
 
@@ -589,59 +692,3 @@ class NXDL__symbols(NXDL__Mixin):
                 nm = node.attrib.get("name")
                 if nm is not None:
                     self.symbols.append(nm)
-
-
-#
-#
-# def main():
-#     from punx import cache_manager
-#     cm = cache_manager.CacheManager()
-#     cm.select_NXDL_file_set("master")
-#     if cm is not None and cm.default_file_set is not None:
-#         manager = NXDL_Manager(cm.default_file_set)
-#         counts_keys = 'attributes fields groups links symbols'.split()
-#         total_counts = {k: 0 for k in counts_keys}
-#
-#         try:
-#             def count_group(g, counts):
-#                 for k in counts_keys:
-#                     if hasattr(g, k):
-#                         n = len(g.__getattribute__(k))
-#                         if n > 0:
-#                             counts[k] += n
-#                 for group in g.groups.values():
-#                     counts = count_group(group, counts)
-#                 return counts
-#
-#             import pyRestTable
-#             t = pyRestTable.Table()
-#             t.labels = 'class category'.split() + counts_keys
-#             for v in manager.classes.values():
-#                 row = [v.title, v.category]
-#                 counts = {k: 0 for k in counts_keys}
-#                 counts = count_group(v, counts)
-#                 for k in counts_keys:
-#                     n = counts[k]
-#                     total_counts[k] += n
-#                     if n == 0:
-#                         n = ""
-#                     row.append(n)
-#                 t.addRow(row)
-#
-#             t.addRow(["TOTAL", "-"*4] + ["-"*4 for k in counts_keys])
-#             row = [len(manager.classes), 3]
-#             for k in counts_keys:
-#                 n = total_counts[k]
-#                 if n == 0:
-#                     n = ""
-#                 row.append(n)
-#             t.addRow(row)
-#             print(t)
-#         except Exception:
-#             pass
-#
-#         print(manager)
-#
-#
-# if __name__ == '__main__':
-#     main()

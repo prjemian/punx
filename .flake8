@@ -10,6 +10,7 @@ exclude =
     punx/ignore_now,
     tests/ignore_now,
     ideas
+    dev_*.py
 
 # E501 line too long
 # many long lines in python code

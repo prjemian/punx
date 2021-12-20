@@ -653,5 +653,48 @@ def TODO_test_default_plot_v1_fail(hfile):
     setup_simple_test_file_default_plot(hfile)
     # TODO:
 
+@pytest.mark.parametrize(
+    "infile, report, num",
+    [
+        ["writer_1_3.hdf5", "TODO", 7],
+        ["writer_1_3.hdf5", "NOTE", 1],
+        ["writer_1_3.hdf5", "NOTE,TODO", 7+1],
+        ["writer_2_1.hdf5", "note", 0],
+        ["writer_2_1.hdf5", "TODO", 11],
+        ["1998spheres.h5", "ERROR", 2],
+        ["02_03_setup.h5", "NOTE,OPTIONAL,ERROR", 98+70+0],
+    ]
+)
+def test_report_option(infile, report, num, capsys):
+    full_file_name = os.path.join(EXAMPLE_DATA_DIR, infile)
+    assert os.path.exists(full_file_name)
+
+    validator = validate.Data_File_Validator()
+    validator.validate(full_file_name)
+    validator.print_report()
+    out, err = capsys.readouterr()
+    lines = out.splitlines()
+    assert len(lines) > 0
+    # assert lines == []
+
+    count = 0
+    statuses = report.upper().split(",")
+    for line in out.splitlines()[6:]:
+        if (
+            len(line.strip()) == 0
+            or line.startswith("==")
+            or line.startswith("data file")
+            or line.startswith("NeXus definitions")
+            or line.startswith("findings")
+            or line.startswith("address")
+        ):
+            continue
+        if line.startswith("summary statistics"):
+            break
+        assert line.split()[1] in statuses
+        count += 1
+    assert count == num
+
+
 
 # Note: class Test_Example_data is already handled by test_data_files.py

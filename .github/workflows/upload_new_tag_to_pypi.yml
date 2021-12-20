@@ -31,12 +31,6 @@ jobs:
         --outdir dist/
         .
 
-    - name: Install twine
-      run: >-
-        python -m
-        pip install
-        twine
-
     - name: Check package metadata
       run: >-
         twine check dist/*

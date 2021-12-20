@@ -430,8 +430,10 @@ def parse_command_line_arguments():
     p_sub.add_argument("infile", help="HDF5 or NXDL file name")
     p_sub.set_defaults(func=func_validate)
     reporting_choices = ",".join(sorted(finding.VALID_STATUS_DICT.keys()))
-    help_text = "select which validation findings to report, choices: "
-    help_text += reporting_choices
+    help_text = (
+        "select which validation findings to report, "
+        f"choices: {reporting_choices}"
+    )
     p_sub.add_argument("--report", default=reporting_choices, help=help_text)
     # TODO: add_logging_argument(p_sub)
 

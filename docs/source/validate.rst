@@ -42,7 +42,8 @@ validate a NeXus file
 
    optional arguments:
      -h, --help       show this help message and exit
-     --report REPORT  select which validation findings to report, choices: COMMENT,ERROR,NOTE,OK,OPTIONAL,TODO,UNUSED,WARN
+    --report REPORT  select which validation findings to report, choices: COMMENT,ERROR,NOTE,OK,OPTIONAL,TODO,UNUSED,WARN (separate with comma if more
+                     than one, do not use white space)
 
 The **REPORT** findings are as presented in the table above for each validation step.
 

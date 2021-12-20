@@ -368,13 +368,17 @@ class NXDL__definition(NXDL__base):
     """
     Contents of a *definition* element in a NXDL XML file.
 
-    :param str path: absolute path to NXDL definitions directory (has nxdl.xsd)
+    nxdl_manager obj :
+        Instance of :class:`~punx.nxdl_manager.NXDL_Manager()`.
     """
 
     def __init__(self, nxdl_manager=None, *args, **kwargs):
         self.nxdl_definition = self
         self.nxdl_manager = nxdl_manager
         self.nxdl_path = self.nxdl_manager.nxdl_file_set.path
+
+        # shortcut: absolute path to NXDL definitions directory
+        # (the directory which has file ``nxdl.xsd``)
         self.schema_file = os.path.join(self.nxdl_path, nxdl_schema.NXDL_XSD_NAME)
         assert os.path.exists(self.schema_file)
 

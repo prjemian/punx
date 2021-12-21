@@ -169,10 +169,12 @@ class Data_File_Validator(object):
             summary[f.status] += 1
         return summary
 
-    def print_report(self):
+    def print_report(self, statuses=None):
         """
-        print a validation report
+        Print a validation report.
         """
+        reported_statuses = statuses or list(finding.VALID_STATUS_DICT.keys())
+
         print("data file: " + self.fname)
         print(
             "NeXus definitions ({}): {}, dated {}, sha={}\n".format(
@@ -195,14 +197,13 @@ class Data_File_Validator(object):
         for label in "address status test comments".split():
             t.addLabel(label)
         for f in sorted(self.validations, key=sort_validations):
-            if f.status == finding.OPTIONAL:
-                continue  # enable if you like verbose reports
-            row = []
-            row.append(f.h5_address)
-            row.append(f.status)
-            row.append(f.test_name)
-            row.append(f.comment)
-            t.addRow(row)
+            if str(f.status) in reported_statuses:
+                row = []
+                row.append(f.h5_address)
+                row.append(f.status)
+                row.append(f.test_name)
+                row.append(f.comment)
+                t.addRow(row)
         print(str(t))
 
         summary = self.finding_summary()

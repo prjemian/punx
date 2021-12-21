@@ -6,14 +6,14 @@ Validation
 
 .. toctree::
    :hidden:
-   
+
    data_file_validation
    nxdl_file_validation
 
 *Validation* is the process of comparing an object with a standard.
 An important aspect of validation is the report of each aspect tested and whether
 or not it complies with the standard.  This is a useful and necessary step when
-composing NeXus HDF5 data files or software that will read NeXus data files and when 
+composing NeXus HDF5 data files or software that will read NeXus data files and when
 building NeXus Definition Language (NXDL) files.
 
 In NeXus, three basic types of object can be validated:
@@ -34,25 +34,18 @@ validate a NeXus file
 
 .. code-block:: console
    :linenos:
-   
-   usage: punx validate [-h] [--report REPORT] [-l [LOGFILE]] [-i INTEREST]
-                        infile
-   
+
+   usage: punx validate [-h] [--report REPORT] infile
+
    positional arguments:
-     infile                HDF5 or NXDL file name
-   
+     infile           HDF5 or NXDL file name
+
    optional arguments:
-     -h, --help            show this help message and exit
-     --report REPORT       select which validation findings to report, choices:
-                           COMMENT,ERROR,NOTE,OK,TODO,UNUSED,WARN
-     -l [LOGFILE], --logfile [LOGFILE]
-                           log output to file (default: no log file)
-     -i INTEREST, --interest INTEREST
-                           logging interest level (1 - 50), default=1 (Level 1)
+     -h, --help       show this help message and exit
+    --report REPORT  select which validation findings to report, choices: COMMENT,ERROR,NOTE,OK,OPTIONAL,TODO,UNUSED,WARN (separate with comma if more
+                     than one, do not use white space)
 
 The **REPORT** findings are as presented in the table above for each validation step.
-
-The logging **INTEREST** levels are for output from the program, 
 
 ..
 	For now, refer to the source code documentation: :ref:`source.validate`.

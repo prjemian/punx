@@ -222,7 +222,7 @@ def func_validate(args):
     report_choices, trouble = [], []
     for c in args.report.upper().split(","):
         if c in finding.VALID_STATUS_DICT:
-            report_choices.append(finding.VALID_STATUS_DICT[c])
+            report_choices.append(c)
         else:
             trouble.append(c)
     if len(trouble) > 0:
@@ -244,7 +244,7 @@ def func_validate(args):
         exit_message(str(_exc))
 
     # report the findings from the validation
-    validator.print_report()
+    validator.print_report(statuses=report_choices)
 
 
 def _install(cm, grr, ref, use_user_cache=True, force=False):
@@ -430,8 +430,11 @@ def parse_command_line_arguments():
     p_sub.add_argument("infile", help="HDF5 or NXDL file name")
     p_sub.set_defaults(func=func_validate)
     reporting_choices = ",".join(sorted(finding.VALID_STATUS_DICT.keys()))
-    help_text = "select which validation findings to report, choices: "
-    help_text += reporting_choices
+    help_text = (
+        "select which validation findings to report, "
+        f"choices: {reporting_choices}"
+        " (separate with comma if more than one, do not use white space)"
+    )
     p_sub.add_argument("--report", default=reporting_choices, help=help_text)
     # TODO: add_logging_argument(p_sub)
 

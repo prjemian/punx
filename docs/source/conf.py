@@ -214,10 +214,10 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-  ('index', 
-   punx.__package_name__+'.tex', 
+  ('index',
+   punx.__package_name__+'.tex',
    punx.__package_name__+u' Documentation',
-   punx.__author__, 
+   punx.__author__,
    'manual'),
 ]
 
@@ -240,3 +240,13 @@ latex_documents = [
 
 # If false, no module index is generated.
 #latex_domain_indices = True
+
+# http://www.sphinx-doc.org/en/master/usage/extensions/autodoc.html#confval-autodoc_mock_imports
+autodoc_mock_imports = """
+    github
+    h5py
+    lxml
+    PyGithub
+    pyqt
+    pyRestTable
+""".split()

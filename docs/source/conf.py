@@ -249,5 +249,7 @@ autodoc_mock_imports = """
     lxml
     PyGithub
     pyqt
+    PyQt4
+    PyQt5
     pyRestTable
 """.split()

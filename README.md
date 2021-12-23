@@ -21,7 +21,7 @@ The *punx* package provides these features:
 
 - author:   Pete R. Jemian
 - email:   <prjemian@gmail.com>
-- copyright:   2014-2021, Pete R. Jemian
+- copyright:   2014-2022, Pete R. Jemian
 - license:   Creative Commons Attribution 4.0 International Public License (see [LICENSE.txt](punx/LICENSE.txt))
 - URL:   <https://prjemian.github.io/punx>
 - git:   <https://github.com/prjemian/punx>

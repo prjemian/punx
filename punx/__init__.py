@@ -15,7 +15,7 @@ Python Utilities for NeXus HDF5 files
 # -----------------------------------------------------------------------------
 # :author:    Pete R. Jemian
 # :email:     prjemian@gmail.com
-# :copyright: (c) 2014-2021, Pete R. Jemian
+# :copyright: (c) 2014-2022, Pete R. Jemian
 #
 # Distributed under the terms of the Creative Commons Attribution 4.0 International Public License.
 #
@@ -31,7 +31,7 @@ if _path not in sys.path:
 
 __author__ = "Pete R. Jemian"
 __email__ = "prjemian@gmail.com"
-__copyright__ = "2014-2021, Pete R. Jemian"
+__copyright__ = "2014-2022, Pete R. Jemian"
 
 __package_name__ = "punx"
 

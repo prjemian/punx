@@ -24,8 +24,8 @@ main user interface file
     usage: punx [-h] [-v]
                 {configuration,demonstrate,structure,tree,update,validate} ...
 
-    Python Utilities for NeXus HDF5 files version: 0.2.0+9.g31fd4b4.dirty URL:
-    http://punx.readthedocs.io
+    Python Utilities for NeXus HDF5 files version: 0.2.6 URL:
+    https://prjemian.github.io/punx
 
     optional arguments:
       -h, --help            show this help message and exit
@@ -162,9 +162,9 @@ def func_demo(args):
 
 def func_hierarchy(args):
     "not implemented yet"
-    url = "http://punx.readthedocs.io/en/latest/analyze.html"
     print("A chart of the NeXus hierarchy is in the **punx** documentation.")
-    print("see: " + url)
+    # TODO: url = ???
+    # print("see: " + url)
     # TODO: issue #1 & #10 show NeXus base class hierarchy from a given base class
 
 

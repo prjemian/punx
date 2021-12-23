@@ -6,7 +6,7 @@
 [![PyPI](https://img.shields.io/pypi/v/punx.svg)](https://pypi.python.org/pypi/punx)
 [![conda-forge](https://img.shields.io/conda/vn/conda-forge/punx)](https://anaconda.org/conda-forge/punx)
 
-## [Documentation](http://punx.readthedocs.io)
+## [Documentation](https://prjemian.github.io/punx)
 
 The *punx* package provides these features:
 
@@ -23,7 +23,7 @@ The *punx* package provides these features:
 - email:   <prjemian@gmail.com>
 - copyright:   2014-2021, Pete R. Jemian
 - license:   Creative Commons Attribution 4.0 International Public License (see [LICENSE.txt](punx/LICENSE.txt))
-- URL:   <https://punx.readthedocs.io>
+- URL:   <https://prjemian.github.io/punx>
 - git:   <https://github.com/prjemian/punx>
 - issues:   <https://github.com/prjemian/punx/issues>
 - citation:   [![DOI: 10.5281/zenodo.1471686](https://zenodo.org/badge/DOI/10.5281/zenodo.1471686.svg)](https://doi.org/10.5281/zenodo.1471686)

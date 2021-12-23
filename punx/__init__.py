@@ -44,7 +44,7 @@ __license__ = (
 __description__ = "Python Utilities for NeXus"
 __author_name__ = __author__
 __author_email__ = __email__
-__url__ = u"http://punx.readthedocs.io"
+__url__ = u"https://prjemian.github.io/punx"
 __download_url__ = u"https://github.com/prjemian/punx/archive/master.zip"
 __keywords__ = ["NeXus", "HDF5"]
 

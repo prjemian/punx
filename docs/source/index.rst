@@ -13,10 +13,11 @@ NOTE: project is under initial construction
 
 :author:    Pete R. Jemian
 :email:     prjemian@gmail.com
-:copyright: 2017-2018, Pete R. Jemian
+:copyright: 2017-2021, Pete R. Jemian
 :license:   Creative Commons Attribution 4.0 International Public License (see *LICENSE.txt*)
-:URL:       http://punx.readthedocs.io
+:URL:       https://prjemian.github.io/punx
 :git:       https://github.com/prjemian/punx
+:conda:     https://anaconda.org/conda-forge
 :PyPI:      https://pypi.python.org/pypi/punx
 :TODO list: https://github.com/prjemian/punx/issues
 

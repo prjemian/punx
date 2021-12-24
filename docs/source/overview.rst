@@ -14,8 +14,8 @@ command line help
    usage: punx [-h] [-v]
                {configuration,demonstrate,structure,tree,update,validate} ...
    
-   Python Utilities for NeXus HDF5 files version: 0.2.0+9.g31fd4b4.dirty URL:
-   http://punx.readthedocs.io
+   Python Utilities for NeXus HDF5 files version: 0.2.6 URL:
+   https://prjemian.github.io/punx
    
    optional arguments:
      -h, --help            show this help message and exit

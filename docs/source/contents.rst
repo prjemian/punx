@@ -9,7 +9,7 @@ Contents
    install
    changes
    license
-   source_code/*
+   api/*
 
 ..
    .. toctree::

@@ -17,7 +17,7 @@ NOTE: project is under initial construction
 :license:   Creative Commons Attribution 4.0 International Public License (see *LICENSE.txt*)
 :URL:       https://prjemian.github.io/punx
 :git:       https://github.com/prjemian/punx
-:conda:     https://anaconda.org/conda-forge
+:conda:     https://anaconda.org/conda-forge/punx
 :PyPI:      https://pypi.python.org/pypi/punx
 :TODO list: https://github.com/prjemian/punx/issues
 

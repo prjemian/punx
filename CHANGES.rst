@@ -12,6 +12,7 @@ Production
 Development
 ***********
 
+:0.2.7: -tba- -- publish documentation on GitHub Pages
 :0.2.6: 2021-12-22 -- drop support for python<3.6
 :0.2.5: 2020-06-29 -- bug fix and up to date
 :0.2.0: 2018-07-02 -- first tag after major refactor (#72, #105)

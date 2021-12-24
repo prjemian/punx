@@ -21,8 +21,8 @@ NOTE: project is under initial construction
 :PyPI:      https://pypi.python.org/pypi/punx
 :TODO list: https://github.com/prjemian/punx/issues
 
-:version:   |version|
 :release:   |release|
+:version:   |version|
 :published: |today|
 
 Use these steps to :ref:`install <install>` and try the :ref:`demo <demo>`:

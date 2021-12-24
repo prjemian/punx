@@ -26,14 +26,12 @@ copyright = punx.__copyright__
 author = punx.__author__
 
 versioneer_version = punx.__version__.split("+")
-version = versioneer_version[0]
-# The full version, including alpha/beta/rc tags.
-# release = punx.__release__
-# release = version
+release = versioneer_version[0]
 if len(versioneer_version) == 2:
-    release = versioneer_version[1]
+    # additional details (if available)
+    version = versioneer_version[1]
 else:
-    release = ""
+    version = ""
 
 # -- General configuration ---------------------------------------------------
 

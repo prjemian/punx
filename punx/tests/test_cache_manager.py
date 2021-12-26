@@ -78,7 +78,7 @@ def test_write_json_file(tempdir):
     buf = cache_manager.read_json_file(tfile_name)
     assert len(buf) == 4
     assert buf.get("label") == "description"
-    assert buf.get("boolean") == True
+    assert buf.get("boolean") is True
     assert buf.get("did not write this one") is None
     assert buf == xture
 
@@ -185,7 +185,7 @@ def test_table_of_caches():
     assert isinstance(table, pyRestTable.Table)
     assert len(table.labels) == 6
     assert len(table.rows) >= 3
-    
+
     count = 0
     for row in table.rows:
         if row[2] == "source":

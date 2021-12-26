@@ -43,8 +43,7 @@ def test_class_raw():
     with pytest.raises(ValueError):
         fs.read_info_file()
     assert str(fs).startswith("<punx.cache_manager.NXDL_File_Set")
-    with pytest.raises(IOError):
-        # TODO: should be: punx.FileNotFound,
+    with pytest.raises(FileNotFoundError):
         fs.read_info_file("this file does not exist")
 
 

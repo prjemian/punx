@@ -271,9 +271,19 @@ def func_update(args):
     cm = cache_manager.CacheManager()
     print(cm.table_of_caches())
 
-    if args.token is not None:
+    if args.token is None:
+        token = github_handler.get_GitHub_credentials()
+    else:
+        token = args.token
+
+    if token is None:
+        # TODO: Is it possible to update the cache without a GitHub API token?
+        # Might be possible by downloading a ZIP of the file_set and removing
+        # the unnecessary content.
+        print("GitHub API token is not available.  Will not update cache.")
+    else:
         grr = github_handler.GitHub_Repository_Reference()
-        grr.connect_repo(token=args.token)
+        grr.connect_repo(token=token)
         cm.find_all_file_sets()
 
         for ref in args.file_set_list:

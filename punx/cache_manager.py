@@ -267,13 +267,13 @@ class CacheManager(singletons.Singleton):
 
     def install_NXDL_file_set(self, grr, user_cache=True, ref=None, force=False):
         """
-        using `ref` as a name, get the se of NXDL files from the NeXus GitHub
+        Using `ref`, get the set of NXDL files from the NeXus GitHub repo.
 
         :param obj grr: instance of :class:`GitHub_Repository_Reference`
         :param bool user_cache: ``True``: use user cache,
                                 `` False``: use source cache (default)
         :param str ref: name to use when requesting from GitHub,
-                        (`master`, commit hash such as `abc1234`,
+                        (`main`, commit hash such as `abc1234`,
                         branch name, release name such as `v3.2`,
                         or tag name)
         :param bool force: update if installed is not the same SHA

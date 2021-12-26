@@ -12,7 +12,7 @@
 # -----------------------------------------------------------------------------
 
 """
-manages the NXDL cache directories of this project
+Manage the NXDL cache directories of this project.
 
 A key component necessary to validate both NeXus data files and
 NXDL class files is a current set of the NXDL definitions.
@@ -123,11 +123,14 @@ def should_extract_this(item, NXDL_file_endings_list, allowed_parent_directories
     return False
 
 
-def should_avoid_download(grr, path):
+def should_avoid_download(grr, cache_dir):
     """
     decide if the download should be avoided (True: avoid, False: download)
 
-    :return bool:
+    :param str cache_dir: directory with NXDL file_sets (A file_set is a
+                          directory with a version of the NeXus definitions
+                          repository.)
+    :return bool: True: avoid, False: download
     """
     names = []
     names.append(grr.appName + "-" + grr.sha)
@@ -137,8 +140,8 @@ def should_avoid_download(grr, path):
     names.append(grr.orgName + "-" + short_sha + "-" + grr.sha)
     names.append(grr.ref)
     for subdir in names:
-        if subdir in os.listdir(path):
-            info_file_name = os.path.join(path, subdir, INFO_FILE_NAME)
+        if subdir in os.listdir(cache_dir):
+            info_file_name = os.path.join(cache_dir, subdir, INFO_FILE_NAME)
             if os.path.exists(info_file_name):
                 info = read_json_file(info_file_name)
                 if info["sha"] == grr.sha:
@@ -146,13 +149,17 @@ def should_avoid_download(grr, path):
     return False
 
 
-def extract_from_download(grr, path):  # TODO refactor into NXDL_File_Set
+def extract_from_download(grr, cache_dir):  # TODO refactor into NXDL_File_Set
     """
     download & extract NXDL files from ``grr`` into a subdirectory of ``path``
 
+    :param str cache_dir: directory with NXDL file_sets (A file_set is a
+                          directory with a version of the NeXus definitions
+                          repository.)
+
     USAGE::
 
-        grr = github_handler.GitHub_Repository_Reference()
+        grr = punx.github_handler.GitHub_Repository_Reference()
         grr.connect_repo()
         if grr.request_info() is not None:
             extract_from_download(grr, cache_directory)
@@ -167,9 +174,9 @@ def extract_from_download(grr, path):  # TODO refactor into NXDL_File_Set
     msg_list = []
 
     download_dir_name = None  # to be learned en route
-    NXDL_refs_dir_name = os.path.join(path, grr.ref)
+    NXDL_refs_dir_name = os.path.join(cache_dir, grr.ref)
 
-    if should_avoid_download(grr, path):
+    if should_avoid_download(grr, cache_dir):
         return
     msg_list.append("downloading: " + grr.zip_url)
     zip_content = zipfile.ZipFile(io.BytesIO(grr.download().content))
@@ -178,12 +185,12 @@ def extract_from_download(grr, path):  # TODO refactor into NXDL_File_Set
     for item in zip_content.namelist():
         if download_dir_name is None:
             root_name = item.split("/")[0]
-            download_dir_name = os.path.join(path, root_name)
+            download_dir_name = os.path.join(cache_dir, root_name)
             allowed_parent_directories.append(root_name)
         if should_extract_this(
             item, NXDL_file_endings_list, allowed_parent_directories
         ):
-            zip_content.extract(item, path)
+            zip_content.extract(item, cache_dir)
             msg_list.append("extracted: " + item)
 
     if len(msg_list) < 2:
@@ -249,16 +256,16 @@ class CacheManager(singletons.Singleton):
         self.user = UserCache()
 
         self.NXDL_file_sets = self.find_all_file_sets()
-        msg = " NXDL_file_sets names = "
-        msg += str(sorted(list(self.NXDL_file_sets.keys())))
-        logger.debug(msg)
+        logger.debug(
+            " NXDL_file_sets names = %s",
+            sorted(list(self.NXDL_file_sets.keys()))
+        )
         try:
             self.select_NXDL_file_set()
         except KeyError:
             pass
         if self.default_file_set is None:
-            msg = " CacheManager: no default_file_set selected yet"
-            logger.debug(msg)
+            logger.debug(" CacheManager: no default_file_set selected yet")
 
         # TODO: update the .ini file as needed (remember the default_file_set value
 
@@ -298,7 +305,7 @@ class CacheManager(singletons.Singleton):
                         logger.info(" NXDL file set: %s unchanged, not updating", ref)
                 if force:
                     logger.info(" %s NXDL file set: %s", verb, ref)
-                    m = extract_from_download(grr, cache_obj.path())
+                    m = extract_from_download(grr, cache_obj.path)
                     return m
 
     def select_NXDL_file_set(self, ref=None):
@@ -404,6 +411,7 @@ class Base_Cache(object):
     qsettings = None
     is_temporary_directory = False
 
+    @property
     def path(self):
         """directory containing the QSettings file"""
         if self.qsettings is None:
@@ -422,7 +430,7 @@ class Base_Cache(object):
         fs = {}
         if self.qsettings is None:
             raise RuntimeError("cache qsettings not defined!")
-        cache_path = self.path()
+        cache_path = self.path
         logger.debug(" cache path: " + str(cache_path))
 
         for item in os.listdir(cache_path):
@@ -436,7 +444,7 @@ class Base_Cache(object):
     def cleanup(self):
         """removes any temporary directories"""
         if self.is_temporary_directory:
-            os.removedirs(self.path())
+            os.removedirs(self.path)
             self.is_temporary_directory = False
 
 
@@ -472,7 +480,7 @@ class UserCache(Base_Cache):
             __settings_package__,
         )
 
-        path = self.path()
+        path = self.path
         if not os.path.exists(path):
             try:
                 os.mkdir(path)
@@ -530,16 +538,16 @@ class NXDL_File_Set(object):
         if self.ref is None:
             return object.__str__(self)
 
-        s = "NXDL_File_Set("
-        s += "ref_type=" + str(self.ref_type)
-        s += ", ref=" + str(self.ref)
-        s += ", last_modified=" + str(self.last_modified)
-        s += ", cache=" + str(self.cache)
-        # s += ', sha=' + str(self.sha,)
-        s += ", short_sha=" + get_short_sha(self.sha)
-        s += ", path=" + str(self.path)
-        s += ")"
-        return s
+        return(
+            "NXDL_File_Set("
+            f"ref_type={self.ref_type}"
+            f", last_modified={self.last_modified}"
+            f", cache={self.cache}"
+            # f", sha={self.sha}"
+            f", short_sha={get_short_sha(self.sha)}"
+            f", path= {self.path}"
+            ")"
+        )
 
     def read_info_file(self, file_name=None):
         if file_name is None and self.ref is None:

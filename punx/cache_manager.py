@@ -70,7 +70,7 @@ try:
 except ImportError:
     from PyQt4 import QtCore
 
-from .__init__ import __settings_organization__, __settings_package__, FileNotFound
+from .__init__ import __settings_organization__, __settings_package__
 from . import singletons
 from . import github_handler
 from . import utils

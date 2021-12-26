@@ -10,6 +10,7 @@ Python Utilities for NeXus HDF5 files: validation, structure, hierarchy
 * Choose the NeXus definitions
   `release <https://github.com/nexusformat/definitions/releases>`_
   to use for validation
+
 .. * Display NeXus class hierarchy (stretch goal, graphical output)
 
 NOTE: project is under initial construction

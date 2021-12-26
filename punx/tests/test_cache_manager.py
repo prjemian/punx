@@ -54,7 +54,7 @@ def test_class_raw():
 def test_class():
     cm = cache_manager.CacheManager()
     assert cm is not None and cm.default_file_set is not None
-    assert len(cm.NXDL_file_sets) > 3
+    assert len(cm.NXDL_file_sets) >= 3
 
     fs = cm.default_file_set
     assert isinstance(fs, cache_manager.NXDL_File_Set)

@@ -65,10 +65,7 @@ import os
 import pyRestTable
 import shutil
 
-try:
-    from PyQt5 import QtCore
-except ImportError:
-    from PyQt4 import QtCore
+from PyQt5 import QtCore
 
 from .__init__ import __settings_organization__, __settings_package__
 from . import singletons

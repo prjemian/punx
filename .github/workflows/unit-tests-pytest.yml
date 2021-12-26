@@ -50,7 +50,7 @@ jobs:
     - name: Run tests with pytest & coverage
       run: |
         source $CONDA/bin/activate $ENV_NAME
-        env GH_TOKEN=${{ secrets.GITHUB_TOKEN }} bash -c 'coverage run --concurrency=thread --parallel-mode -m pytest -vvv .''
+        env GH_TOKEN=${{ secrets.GITHUB_TOKEN }} bash -c 'coverage run --concurrency=thread --parallel-mode -m pytest -vvv .'
         coverage combine
       env:
         PY_VER: ${{ matrix.python-version }}

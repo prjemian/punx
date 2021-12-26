@@ -126,7 +126,7 @@ def test_summary_table():
     """
     cm = cache_manager.CacheManager()
     with pytest.raises(KeyError):
-        cm.select_NXDL_file_set("main")
+        cm.select_NXDL_file_set("no such file_set exists so raises KeyError")
 
     cm.select_NXDL_file_set(FILE_SET)
     assert cm is not None

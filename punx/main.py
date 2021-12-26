@@ -277,7 +277,7 @@ def func_update(args):
         cm.find_all_file_sets()
 
         for ref in args.file_set_list:
-            _install(cm, grr, ref, force=args.token is None)
+            _install(cm, grr, ref, force=True)
 
         print(cm.table_of_caches())
 

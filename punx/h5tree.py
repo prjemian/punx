@@ -57,7 +57,7 @@ class Hdf5TreeView(object):
 
     def report(self, show_attributes=True):
         """
-        Return the structure of the HDF5 file in a list of strings.
+        Return the tree structure of the HDF5 file in a list of strings.
 
         The work of parsing the datafile is done in this method.
 
@@ -202,7 +202,9 @@ class Hdf5TreeView(object):
         return s
 
     def _renderDataset(self, dset, name, indentation="  "):
-        """return a [formatted_string] with the contents and structure of a dataset"""
+        """
+        Return a [formatted_string] with the contents and tree structure of a dataset.
+        """
         shape = dset.shape
         # dset.dtype.kind == 'S', nchar = dset.dtype.itemsize
         if self.isNeXus:

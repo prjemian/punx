@@ -43,9 +43,10 @@ NeXus HDF5 Data Files
 ---------------------
 
 NeXus data files are HDF5 [#]_ and are validated against the suite of NXDL files
-using tools provided by this package.  The strategy is to compare the structure
-of the HDF file with the structure of the NXDL file(s) as specified by the
-``NX_class`` attributes of the various HDF groups in the data file.
+using tools provided by this package.  The strategy is to compare the tree
+structure of the HDF file with the tree structure of the NXDL file(s) as
+specified by the ``NX_class`` attributes of the various HDF groups in the data
+file.
 
 NeXus NXDL Definition Language Files
 ------------------------------------

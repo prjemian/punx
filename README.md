@@ -10,11 +10,13 @@
 
 The *punx* package provides these features:
 
-- Validate NeXus HDF5 data files
-- Choose the NeXus [release](https://github.com/nexusformat/definitions/releases) to use for validation
+- Display tree structure of _any_ HDF5 data file
+- Validate any HDF5 data file using NeXus definitions
 - Validate NeXus NXDL files
-- Display NeXus HDF5 data file structure
-- Display NeXus class hierarchy (stretch goal, graphical output)
+- Choose the NeXus definitions
+  [release](https://github.com/nexusformat/definitions/releases)
+  to use for validation
+<!-- - Display NeXus class hierarchy (stretch goal, graphical output) -->
 
 
 ## Package Details

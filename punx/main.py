@@ -22,7 +22,7 @@ main user interface file
 
     console> punx -h
     usage: punx [-h] [-v]
-                {configuration,demonstrate,structure,tree,update,validate} ...
+                {configuration,demonstrate,tree,update,validate} ...
 
     Python Utilities for NeXus HDF5 files version: 0.2.6 URL:
     https://prjemian.github.io/punx
@@ -34,10 +34,9 @@ main user interface file
     subcommand:
       valid subcommands
 
-      {configuration,demonstrate,structure,tree,update,validate}
+      {configuration,demonstrate,tree,update,validate}
         configuration       show configuration details of punx
         demonstrate         demonstrate HDF5 file validation
-        structure           structure command deprecated. Use ``tree`` instead
         tree                show tree structure of HDF5 or NXDL file
         update              update the local cache of NeXus definitions
         validate            validate a NeXus file
@@ -80,9 +79,6 @@ from . import utils
 
 ERROR = 40
 logger = utils.setup_logger(__name__, logging.INFO)
-
-# :see: https://docs.python.org/2/library/argparse.html#sub-commands
-# obvious 1st implementations are h5structure and update
 
 
 def exit_message(msg, status=None, exit_code=1):
@@ -166,13 +162,6 @@ def func_hierarchy(args):
     # TODO: url = ???
     # print("see: " + url)
     # TODO: issue #1 & #10 show NeXus base class hierarchy from a given base class
-
-
-def func_structure(args):
-    "deprecated subcommand"
-    msg = "structure command deprecated.  Use ``tree`` instead"
-    print(ValueError(msg))
-    sys.exit(1)
 
 
 def func_tree(args):
@@ -367,15 +356,10 @@ def parse_command_line_arguments():
     #     p_sub.set_defaults(func=func_hierarchy)
     #     #p_sub.add_argument('something', type=bool, help='something help_text')
 
-    # --- subcommand: structure
-    help_text = "structure command deprecated.  Use ``tree`` instead"
-    p_sub = subcommand.add_parser("structure", help=help_text)
-    p_sub.set_defaults(func=func_structure)
-    p_sub.add_argument("infile", help="HDF5 or NXDL file name")
-
     # --- subcommand: tree
     help_text = "show tree structure of HDF5 or NXDL file"
     p_sub = subcommand.add_parser("tree", help=help_text)
+
     p_sub.set_defaults(func=func_tree)
     p_sub.add_argument("infile", help="HDF5 or NXDL file name")
     p_sub.add_argument(
@@ -383,7 +367,7 @@ def parse_command_line_arguments():
         action="store_false",
         default=True,
         dest="show_attributes",
-        help="Do not print attributes of HDF5 file structure",
+        help="Do not print attributes of HDF5 file tree structure",
     )
     help_text = "maximum number of array items to be shown"
     p_sub.add_argument(

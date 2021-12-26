@@ -5,11 +5,6 @@ HDF5 Data File Tree Structure : :mod:`h5tree`
 
 Print the tree structure of any HDF5 file.
 
-:Note: The *tree* subcommand replaces the now-legacy *structure* subcommand and
-       also `replaces <https://github.com/prjemian/spec2nexus/issues/70>`_
-       the `h5toText` program from the 
-       `spec2nexus <https://github.com/prjemian/spec2nexus>`_ project.
-
 .. index:: examples; h5tree
 
 How to use **h5tree**
@@ -33,7 +28,7 @@ the help message:
       
       optional arguments:
         -h, --help            show this help message and exit
-        -a                    Do not print attributes of HDF5 file structure
+        -a                    Do not print attributes of HDF5 file tree structure
         -m MAX_ARRAY_ITEMS, --max_array_items MAX_ARRAY_ITEMS
                               maximum number of array items to be shown
 
@@ -71,5 +66,5 @@ source code documentation
 
 .. automodule:: punx.h5tree
     :members: 
-    :synopsis: Command line tool to print the structure of any HDF5 file
+    :synopsis: Command line tool to print the tree structure of any HDF5 file
     

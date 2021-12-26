@@ -19,7 +19,7 @@ show tree structure of HDF5 or NXDL file
    
    optional arguments:
      -h, --help            show this help message and exit
-     -a                    Do not print attributes of HDF5 file structure
+     -a                    Do not print attributes of HDF5 file tree structure
      -m MAX_ARRAY_ITEMS, --max_array_items MAX_ARRAY_ITEMS
                            maximum number of array items to be shown
 

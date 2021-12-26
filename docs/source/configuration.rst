@@ -26,14 +26,12 @@ of the ``punx`` program.  It shows a table with the available
    default NXDL file set:  master
 
 
-An NXDL file set is the complete set of NXDL (XML) files that 
-provide a version of the NeXus standard, including the XML Schema
-files that provide all the default and basic structures of the NXDL
-files.
+An NXDL file set is the complete set of NXDL (XML) files that provide a version
+of the NeXus standard, including the XML Schema files that provide all the
+default and basic structures of the NXDL files.
 
-Above, the user cache has a version of the GitHub *master* branch (
-the master branch contains the latest
-revisions by the developers on that date).
+Above, the user cache has a version of the GitHub *master* branch ( the master
+branch contains the latest revisions by the developers on that date).
 
 .. index:: NXDL file set
 

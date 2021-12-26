@@ -113,6 +113,7 @@ class GitHub_Repository_Reference(object):
         self.sha = None
         self.zip_url = None
         self.last_modified = None
+        self.token = None
 
     def connect_repo(self, repo_name=None, token=None):
         """
@@ -124,14 +125,14 @@ class GitHub_Repository_Reference(object):
         """
         repo_name = repo_name or self.appName
 
-        token = get_GitHub_credentials() if token is None else token
+        self.token = get_GitHub_credentials() if token is None else token
 
         # also set the repo attribute
-        gh = github.Github(token)  # token is either None or a str
+        gh = github.Github(self.token)  # token is either None or a str
         user = gh.get_user(self.orgName)
         self.repo = user.get_repo(repo_name)
 
-        return isinstance(token, str)
+        return isinstance(self.token, str)
 
     def request_info(self, ref=None):
         """
@@ -167,20 +168,20 @@ class GitHub_Repository_Reference(object):
         # "disabling warnings about GitHub self-signed https certificates"
         disable_warnings(InsecureRequestWarning)
 
-        token = get_GitHub_credentials()
+        # token = get_GitHub_credentials()
         content = None
         for _retry in range(GITHUB_RETRY_COUNT):  # noqa
             try:
-                if token is None:
+                if self.token is None:
                     content = requests.get(self.zip_url, verify=False)
                 else:
                     content = requests.get(
                         self.zip_url,
-                        headers={"Authorization": f"TOK:{token}"},
+                        headers={"Authorization": f"TOK:{self.token}"},
                         verify=False,
                     )
             except requests.exceptions.ConnectionError as _exc:
-                raise IOError("ConnectionError from " + self.zip_url + "\n" + str(_exc))
+                raise IOError(f"ConnectionError from {self.zip_url}\n{_exc}")
             else:
                 break
 

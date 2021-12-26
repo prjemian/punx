@@ -117,7 +117,7 @@ def test_should_extract_this(item, should, tempdir):
         [None, True],
         ["v3.3", True],
         ["ddd9514", False],
-        ["Schema-3.4", False],
+        # ["Schema-3.4", False],
     ]
 )
 def test_should_avoid_download(ref, avoid):
@@ -144,8 +144,8 @@ def test_should_avoid_download(ref, avoid):
 @pytest.mark.parametrize(
     "ref, ref_type",
     [
-        ["ddd9514", "commit"],
-        ["Schema-3.4", "release"],
+        # ["ddd9514", "commit"],
+        # ["Schema-3.4", "release"],
         ["main", "branch"],
     ]
 )
@@ -191,3 +191,23 @@ def test_table_of_caches():
         if row[2] == "source":
             count += 1
     assert count == 3
+
+    table2 = cache_manager.table_of_caches()
+    assert isinstance(table2, pyRestTable.Table)
+    assert len(table2.labels) == len(table.labels)
+    assert len(table2.rows) == len(table.rows)
+
+    for row, row2 in zip(table.rows, table2.rows):
+        assert row == row2
+
+
+def test_install_NXDL_file_set():
+    pass  # TODO:
+
+
+def test_SourceCache():
+    pass  # TODO:
+
+
+def test_UserCache():
+    pass  # TODO:

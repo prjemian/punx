@@ -126,7 +126,9 @@ def test_summary_table():
     """
     cm = cache_manager.CacheManager()
     with pytest.raises(KeyError):
-        cm.select_NXDL_file_set("main")
+        # Search for a file set (branch, release, commit, tag)
+        # using a name that will not be found.
+        cm.select_NXDL_file_set("no-such-fileset-reference")
 
     cm.select_NXDL_file_set(FILE_SET)
     assert cm is not None

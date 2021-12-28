@@ -126,6 +126,7 @@ class GitHub_Repository_Reference(object):
 
         if token is None:
             token = get_GitHub_credentials()
+        assert isinstance(token, str) and len(token) > 0
 
         # also set the repo attribute
         gh = github.Github(token)  # token is either None or a str

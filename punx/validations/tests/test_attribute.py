@@ -9,28 +9,28 @@ from ...tests._core import hfile
 from punx.validations import attribute
 
 
-# @pytest.mark.parametrize(
-#     "file_set, nx_class, subdir, category",
-#     [
-#         [None, "NXentry", "base_classes", True],
-#         ["v3.3", "NXentry", "base_classes", True],
-#         ["v3.3", "NXcontainer", "contributed_definitions", True],
-#         ["a4fd52d", "NXcanSAS", "contributed_definitions", False],
-#         ["v2018.5", "NXcanSAS", "applications", False],
+@pytest.mark.parametrize(
+    "file_set, nx_class, subdir, category",
+    [
+        [None, "NXentry", "base_classes", True],
+        ["v3.3", "NXentry", "base_classes", True],
+        ["v3.3", "NXcontainer", "contributed_definitions", True],
+        ["a4fd52d", "NXcanSAS", "contributed_definitions", False],
+        ["v2018.5", "NXcanSAS", "applications", False],
 
-#         # category is wrong in NeXus NXDL!
-#         ["a4fd52d", "NXreflections", "contributed_definitions", False],  
-#         ["v2018.5", "NXreflections", "base_classes", True],
-#     ]
-# )
-# def test_isBaseClassNXDL(file_set, nx_class, subdir, category):
-#     validator = validate.Data_File_Validator(ref=file_set)
-#     assert validator is not None
+        # category is wrong in NeXus NXDL!
+        ["a4fd52d", "NXreflections", "contributed_definitions", False],
+        ["v2018.5", "NXreflections", "base_classes", True],
+    ]
+)
+def test_isBaseClassNXDL(file_set, nx_class, subdir, category):
+    validator = validate.Data_File_Validator(ref=file_set)
+    assert validator is not None
 
-#     nxdl = validator.manager.classes.get(nx_class)
-#     assert validator is not None
+    nxdl = validator.manager.classes.get(nx_class)
+    assert validator is not None
 
-#     assert isBaseClassNXDL(nxdl) is category, f"{file_set}/{subdir}/{nx_class}"
+    assert isBaseClassNXDL(nxdl) is category, f"{file_set}/{subdir}/{nx_class}"
 
 
 @pytest.mark.parametrize(

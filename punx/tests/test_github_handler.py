@@ -59,10 +59,8 @@ def test_class_GitHub_Repository_Reference():
 
 def test_connected_GitHub_Repository_Reference(gh_token):
     grr = github_handler.GitHub_Repository_Reference()
-    using_creds = grr.connect_repo(token=gh_token)
+    grr.connect_repo(token=gh_token)
     assert grr.repo is not None
-    if not using_creds:
-        return  # skip if on CI unit test workflow
 
     assert isinstance(
         grr.repo, github.Repository.Repository
@@ -168,9 +166,7 @@ def test_Github_download_default(gh_token):
     from .. import cache_manager
 
     grr = github_handler.GitHub_Repository_Reference()
-    using_creds = grr.connect_repo(token=gh_token)
-    if not using_creds:
-        return  # skip on CI unit test workflows
+    grr.connect_repo(token=gh_token)
 
     node = grr.request_info()
     if node is not None:

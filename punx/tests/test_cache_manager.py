@@ -201,13 +201,33 @@ def test_table_of_caches():
         assert row == row2
 
 
-def test_install_NXDL_file_set():
-    pass  # TODO:
+@pytest.mark.parametrize(
+    "cache_name, ref, force",
+    [
+        ["source", "a4fd52d", False],
+        ["source", "v3.3", True],
+        ["user", "main", True],
+        ["user", "Schema-3.4", False],
+    ]
+)
+def test_install_NXDL_file_set(cache_name, ref, force):
+    cm = cache_manager.CacheManager()
+    assert cm.default_file_set is not None, ref
+    assert os.path.exists(cm.source.path), ref
 
+    token = github_handler.get_GitHub_credentials()
+    assert token is not None, ref
+    assert isinstance(token, str), ref
 
-def test_SourceCache():
-    pass  # TODO:
+    grr = github_handler.GitHub_Repository_Reference()
+    grr.connect_repo(token=token)
 
+    node = grr.request_info(ref=ref)
+    assert node is not None, ref
 
-def test_UserCache():
-    pass  # TODO:
+    cm.install_NXDL_file_set(
+        grr, user_cache=(cache_name == "user"), ref=ref, force=force
+    )
+    cache = dict(user=cm.user).get(cache_name, cm.source)
+    fs = cache.find_all_file_sets()
+    assert ref in fs

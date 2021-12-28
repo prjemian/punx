@@ -3,6 +3,8 @@ import pytest
 import shutil
 import tempfile
 
+from .. import github_handler
+
 CANONICAL_RELEASE = u"v3.3"  # TODO: pick a newer?
 DEFAULT_NXDL_FILE_SET = None
 
@@ -33,3 +35,26 @@ def tempdir():
 
     if os.path.exists(path):
         shutil.rmtree(path, ignore_errors=True)
+
+
+@pytest.fixture(scope="function")
+def gh_token():
+    tokens = {}
+    for k in "GH_TOKEN GITHUB_TOKEN".split():
+        if k in os.environ:
+            tokens[k] = os.environ[k]  # remember for later
+
+    assert len(
+        os.environ.get("GH_TOKEN") or os.environ.get("GITHUB_TOKEN")
+    ) is not None
+
+    token = github_handler.get_GitHub_credentials()
+    assert token is not None
+    assert isinstance(token, str)
+    assert len(token.strip()) > 0
+
+    yield token
+
+    for k, v in tokens.items():
+        # restore token(s) so other workflows do not fail
+        os.environ[k] = v

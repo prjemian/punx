@@ -9,7 +9,7 @@ import shutil
 import tempfile
 
 from ._core import CANONICAL_RELEASE
-from ._core import TEST_DATA_DIR
+from ._core import gh_token
 from .. import github_handler
 
 
@@ -33,9 +33,9 @@ def test_basic_setup():
     assert github_handler.GITHUB_RETRY_COUNT == 3, u"GitHub retry count: 3"
 
 
-def test_connect_repo():
+def test_connect_repo(gh_token):
     grr = github_handler.GitHub_Repository_Reference()
-    assert isinstance(grr.connect_repo(), bool)
+    assert isinstance(grr.connect_repo(token=gh_token), bool)
 
 
 def test_class_GitHub_Repository_Reference():
@@ -57,14 +57,9 @@ def test_class_GitHub_Repository_Reference():
         grr.request_info()
 
 
-def test_connected_GitHub_Repository_Reference():
-    token = github_handler.get_GitHub_credentials()
-    assert token is not None
-    assert isinstance(token, str)
-    assert len(token.strip()) > 0
-
+def test_connected_GitHub_Repository_Reference(gh_token):
     grr = github_handler.GitHub_Repository_Reference()
-    using_creds = grr.connect_repo(token=token)
+    using_creds = grr.connect_repo(token=gh_token)
     assert grr.repo is not None
     if not using_creds:
         return  # skip if on CI unit test workflow
@@ -128,31 +123,37 @@ def test_connected_GitHub_Repository_Reference():
 
 
 @pytest.mark.parametrize(
-    "env_var, token",
+    "env_var, fake_token",
     [
         ["GH_TOKEN", "fake_github_token1"],
         ["GITHUB_TOKEN", "fake_github_token2"],
     ]
 )
-def test_get_GitHub_credentials_defined(env_var, token):
-    # first, clear out any potential matches
-    for k in ("GH_TOKEN", "GITHUB_TOKEN"):
+def test_get_GitHub_credentials_defined(env_var, fake_token, gh_token):
+    # ensure an invalid token is used
+    assert fake_token != gh_token
+
+    # clear out any potential matches
+    for k in "GH_TOKEN GITHUB_TOKEN".split():
         if k in os.environ:
             os.environ.pop(k)
+
     # set the environment variable (if not None)
     if env_var is not None:
-        os.environ[env_var] = token
+        os.environ[env_var] = fake_token
 
     # call the code and check
     response = github_handler.get_GitHub_credentials()
     if env_var is not None:
         assert isinstance(response, str)
-    assert response == token
+    assert response == fake_token
 
 
-def test_get_GitHub_credentials_None_warning():
+def test_get_GitHub_credentials_None_warning(gh_token):
+    assert isinstance(gh_token, str)
+
     # first, clear out any potential matches
-    for k in ("GH_TOKEN", "GITHUB_TOKEN"):
+    for k in "GH_TOKEN GITHUB_TOKEN".split():
         if k in os.environ:
             os.environ.pop(k)
 
@@ -163,11 +164,11 @@ def test_get_GitHub_credentials_None_warning():
     assert response is None
 
 
-def test_Github_download_default():
+def test_Github_download_default(gh_token):
     from .. import cache_manager
 
     grr = github_handler.GitHub_Repository_Reference()
-    using_creds = grr.connect_repo()
+    using_creds = grr.connect_repo(token=gh_token)
     if not using_creds:
         return  # skip on CI unit test workflows
 

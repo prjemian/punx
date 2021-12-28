@@ -3,6 +3,7 @@ import pyRestTable
 import pytest
 
 from ._core import tempdir
+from ._core import gh_token
 from .. import cache_manager
 from .. import github_handler
 
@@ -120,17 +121,13 @@ def test_should_extract_this(item, should, tempdir):
         # ["Schema-3.4", False],
     ]
 )
-def test_should_avoid_download(ref, avoid):
+def test_should_avoid_download(ref, avoid, gh_token):
     cm = cache_manager.CacheManager()
     assert cm.default_file_set is not None
     assert os.path.exists(cm.source.path)
 
-    token = github_handler.get_GitHub_credentials()
-    assert token is not None
-    assert isinstance(token, str)
-
     grr = github_handler.GitHub_Repository_Reference()
-    grr.connect_repo(token=token)
+    grr.connect_repo(token=gh_token)
     assert grr.appName == "definitions"
 
     node = grr.request_info(ref=ref)
@@ -149,7 +146,7 @@ def test_should_avoid_download(ref, avoid):
         ["main", "branch"],
     ]
 )
-def test_extract_from_download(ref, ref_type, tempdir):
+def test_extract_from_download(ref, ref_type, tempdir, gh_token):
     assert os.path.exists(tempdir)
     os.chdir(tempdir)
 
@@ -159,12 +156,8 @@ def test_extract_from_download(ref, ref_type, tempdir):
     assert cm.default_file_set is not None, ref
     assert os.path.exists(cm.source.path), ref
 
-    token = github_handler.get_GitHub_credentials()
-    assert token is not None, ref
-    assert isinstance(token, str), ref
-
     grr = github_handler.GitHub_Repository_Reference()
-    grr.connect_repo(token=token)
+    grr.connect_repo(token=gh_token)
 
     node = grr.request_info(ref=ref)
     assert node is not None, ref
@@ -210,17 +203,13 @@ def test_table_of_caches():
         ["user", "Schema-3.4", False],
     ]
 )
-def test_install_NXDL_file_set(cache_name, ref, force):
+def test_install_NXDL_file_set(cache_name, ref, force, gh_token):
     cm = cache_manager.CacheManager()
     assert cm.default_file_set is not None, ref
     assert os.path.exists(cm.source.path), ref
 
-    token = github_handler.get_GitHub_credentials()
-    assert token is not None, ref
-    assert isinstance(token, str), ref
-
     grr = github_handler.GitHub_Repository_Reference()
-    grr.connect_repo(token=token)
+    grr.connect_repo(token=gh_token)
 
     node = grr.request_info(ref=ref)
     assert node is not None, ref

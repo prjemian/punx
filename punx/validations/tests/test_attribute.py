@@ -3,10 +3,8 @@ import pytest
 
 from ..attribute import isBaseClassNXDL, nxclass_handler
 from ... import finding
-from ... import utils
 from ... import validate
 from ...tests._core import hfile
-from punx.validations import attribute
 
 
 @pytest.mark.parametrize(
@@ -69,7 +67,7 @@ def test_nxclass_handler(nx_class, known, status, text_start, hfile):
         v_item = validate.ValidationItem(v_parent, attr)
 
         l0 = len(validator.validations)
-        attribute.nxclass_handler(validator, v_item)
+        nxclass_handler(validator, v_item)
         assert len(validator.validations) == l0 + 1
 
         f = validator.validations[-1]

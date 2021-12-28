@@ -58,8 +58,13 @@ def test_class_GitHub_Repository_Reference():
 
 
 def test_connected_GitHub_Repository_Reference():
+    token = github_handler.get_GitHub_credentials()
+    assert token is not None
+    assert isinstance(token, str)
+    assert len(token.strip()) > 0
+
     grr = github_handler.GitHub_Repository_Reference()
-    using_creds = grr.connect_repo()
+    using_creds = grr.connect_repo(token=token)
     assert grr.repo is not None
     if not using_creds:
         return  # skip if on CI unit test workflow

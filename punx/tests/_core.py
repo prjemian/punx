@@ -44,9 +44,7 @@ def gh_token():
         if k in os.environ:
             tokens[k] = os.environ[k]  # remember for later
 
-    assert len(
-        os.environ.get("GH_TOKEN") or os.environ.get("GITHUB_TOKEN")
-    ) is not None
+    assert len(tokens) in (1, 2)
 
     token = github_handler.get_GitHub_credentials()
     assert token is not None
@@ -56,5 +54,5 @@ def gh_token():
     yield token
 
     for k, v in tokens.items():
-        # restore token(s) so other workflows do not fail
+        # restore token(s) so later tests in this workflow do not fail
         os.environ[k] = v

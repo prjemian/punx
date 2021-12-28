@@ -44,7 +44,7 @@ def isBaseClassNXDL(nxdl):
     """
     Is the given NXDL intended for use as a base class?
 
-    The situation os obvious for base classes and application definitions.
+    The situation is obvious for base classes and application definitions.
     For contributed definitions, deeper analysis is necessary.
     Application definitions define this additional substructure::
 

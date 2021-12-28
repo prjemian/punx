@@ -271,7 +271,7 @@ class CacheManager(singletons.Singleton):
 
     def install_NXDL_file_set(self, grr, user_cache=True, ref=None, force=False):
         """
-        using `ref` as a name, get the se of NXDL files from the NeXus GitHub
+        Using `ref` as a name, get the set of NXDL files from the NeXus GitHub repo.
 
         :param obj grr: instance of :class:`GitHub_Repository_Reference`
         :param bool user_cache: ``True``: use user cache,
@@ -294,20 +294,24 @@ class CacheManager(singletons.Singleton):
                 else:
                     force = ref in fs and grr.sha != fs[ref].sha
                     if force:
-                        msg = " different SHAs - existing=" + fs[ref].sha
-                        msg += " GitHub=" + grr.sha
-                        logger.info(msg)
+                        logger.info(
+                            " different SHAs - existing=%s GitHub=%s",
+                            fs[ref].sha, grr.sha
+                        )
                         verb = "Updating"
                     else:
-                        logger.info(" NXDL file set: %s unchanged, not updating", ref)
+                        logger.info(
+                            " NXDL file set: %s unchanged, not updating", ref
+                        )
                 if force:
                     logger.info(" %s NXDL file set: %s", verb, ref)
-                    m = extract_from_download(grr, cache_obj.path)
-                    return m
+                    return extract_from_download(grr, cache_obj.path)
 
     def select_NXDL_file_set(self, ref=None):
         """
-        return the named self.default_file_set instance or raise KeyError exception if unknown
+        Return the named self.default_file_set instance.
+
+        Raise KeyError exception if unknown.
 
         :return obj:
         """
@@ -453,13 +457,13 @@ class SourceCache(Base_Cache):
         path = os.path.abspath(
             os.path.join(os.path.dirname(__file__), SOURCE_CACHE_SUBDIR)
         )
-        if not os.path.exists(path):
-            # make the directory and load the default set of NXDL files
-            os.mkdir(path)
-            grr = github_handler.GitHub_Repository_Reference()
-            grr.connect_repo()
-            if grr.request_info() is not None:
-                extract_from_download(grr, path)
+        # if not os.path.exists(path):
+        #     # make the directory and load the default set of NXDL files
+        #     os.mkdir(path)
+        #     grr = github_handler.GitHub_Repository_Reference()
+        #     grr.connect_repo()
+        #     if grr.request_info() is not None:
+        #         extract_from_download(grr, path)
 
         ini_file = os.path.abspath(os.path.join(path, SOURCE_CACHE_SETTINGS_FILENAME))
         self.qsettings = QtCore.QSettings(ini_file, QtCore.QSettings.IniFormat)
@@ -479,19 +483,20 @@ class UserCache(Base_Cache):
 
         path = self.path
         if not os.path.exists(path):
-            try:
-                os.mkdir(path)
-            except OSError:
-                import tempfile
+            os.mkdir(path)
+            # try:
+            #     os.mkdir(path)
+            # except OSError:
+            #     import tempfile
 
-                # legacy CI (travis) raised this exception, could not create dir
-                # last ditch effort here, make a temp dir for 1-time use
-                path = tempfile.mkdtemp()
-                ini_file = os.path.abspath(
-                    os.path.join(path, SOURCE_CACHE_SETTINGS_FILENAME)
-                )
-                self.qsettings = QtCore.QSettings(ini_file, QtCore.QSettings.IniFormat)
-                self.is_temporary_directory = True
+            #     # legacy CI (travis) raised this exception, could not create dir
+            #     # last ditch effort here, make a temp dir for 1-time use
+            #     path = tempfile.mkdtemp()
+            #     ini_file = os.path.abspath(
+            #         os.path.join(path, SOURCE_CACHE_SETTINGS_FILENAME)
+            #     )
+            #     self.qsettings = QtCore.QSettings(ini_file, QtCore.QSettings.IniFormat)
+            #     self.is_temporary_directory = True
 
 
 class NXDL_File_Set(object):

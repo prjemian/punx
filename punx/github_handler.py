@@ -124,7 +124,8 @@ class GitHub_Repository_Reference(object):
         """
         repo_name = repo_name or self.appName
 
-        token = get_GitHub_credentials() if token is None else token
+        if token is None:
+            token = get_GitHub_credentials()
 
         # also set the repo attribute
         gh = github.Github(token)  # token is either None or a str

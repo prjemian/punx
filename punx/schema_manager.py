@@ -522,7 +522,7 @@ class Schema_Element(_Mixin):
                 type_obj.copy_to(self)
 
 
-class Schema_Type(_Mixin):
+class Schema_Type(_Mixin):  # lgtm [py/missing-call-to-init]
 
     """
     a named NXDL structure type (such as groupGroup)

@@ -64,7 +64,7 @@ class Data_File_Validator(object):
        If so, pick any of these by name as follows::
 
         validator = punx.validate.Data_File_Validator("v3.2")
-        validator = punx.validate.Data_File_Validator("master")
+        validator = punx.validate.Data_File_Validator("main")
 
     2. use to validate a file or files::
 

@@ -131,7 +131,7 @@ def func_demo(args):
     (line breaks added here for clarity)::
 
         punx.cache.FileNotFound: file does not exist:
-        /Users/<username>/.config/punx/definitions-master/nxdl.xsd
+        /Users/<username>/.config/punx/definitions-main/nxdl.xsd
         AND not found in source cache either!  Report this problem to the developer.
 
     then you will need to update your local cache of the NeXus definitions.
@@ -251,7 +251,7 @@ def _install(cm, grr, ref, use_user_cache=True, force=False):
     """
     Install or update the named NXDL file reference
     """
-    force = force or ref == "master"  # always update from the master branch
+    force = force or ref == "main"  # always update from the main branch
 
     msg = "install_NXDL_file_set(ref={}, force={}, user_cache={})".format(
         ref, force, use_user_cache
@@ -402,10 +402,10 @@ def parse_command_line_arguments():
     p_sub.set_defaults(func=func_update)
 
     help_text = "name(s) of reference NeXus NXDL file set"
-    help_text += " (GitHub tag, hash, version, or 'master')"
-    help_text += " -- default master"
+    help_text += " (GitHub tag, hash, version, or 'main')"
+    help_text += " -- default main"
     p_sub.add_argument(
-        "-r", "--file_set_list", default=["master", ], nargs="*", help=help_text
+        "-r", "--file_set_list", default=["main", ], nargs="*", help=help_text
     )
 
     p_sub.add_argument(

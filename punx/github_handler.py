@@ -53,7 +53,7 @@ GITHUB_RETRY_COUNT = 3
 
 GITHUB_NXDL_ORGANIZATION = "nexusformat"
 GITHUB_NXDL_REPOSITORY = "definitions"
-GITHUB_NXDL_BRANCH = "master"
+GITHUB_NXDL_BRANCH = "main"
 GITHUB_RETRY_COUNT = 3
 # NXDL_CACHE_SUBDIR = GITHUB_NXDL_REPOSITORY + '-' + GITHUB_NXDL_BRANCH
 
@@ -144,7 +144,7 @@ class GitHub_Repository_Reference(object):
         download URLs
 
         * base:  https://github.com
-        * master: https://github.com/nexusformat/definitions/archive/master.zip
+        * main: https://github.com/nexusformat/definitions/archive/main.zip
         * branch (www_page_486): https://github.com/nexusformat/definitions/archive/www_page_486.zip
         * hash (83ce630): https://github.com/nexusformat/definitions/archive/83ce630.zip
         * release (v3.2): see hash c0b9500

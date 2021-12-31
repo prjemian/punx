@@ -484,19 +484,6 @@ class UserCache(Base_Cache):
         path = self.path
         if not os.path.exists(path):
             os.mkdir(path)
-            # try:
-            #     os.mkdir(path)
-            # except OSError:
-            #     import tempfile
-
-            #     # legacy CI (travis) raised this exception, could not create dir
-            #     # last ditch effort here, make a temp dir for 1-time use
-            #     path = tempfile.mkdtemp()
-            #     ini_file = os.path.abspath(
-            #         os.path.join(path, SOURCE_CACHE_SETTINGS_FILENAME)
-            #     )
-            #     self.qsettings = QtCore.QSettings(ini_file, QtCore.QSettings.IniFormat)
-            #     self.is_temporary_directory = True
 
 
 class NXDL_File_Set(object):

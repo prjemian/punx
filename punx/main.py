@@ -109,10 +109,6 @@ def func_configuration(args):
     print(cm.table_of_caches())
     print("default NXDL file set: ", cm.default_file_set.ref)
 
-    # nothing to show from here
-    # grr = github_handler.GitHub_Repository_Reference()
-    # perhaps does local creds file exist?  Show where it is?  or TMI?
-
 
 def func_demo(args):
     """
@@ -253,10 +249,10 @@ def _install(cm, grr, ref, use_user_cache=True, force=False):
     """
     force = force or ref == "main"  # always update from the main branch
 
-    msg = "install_NXDL_file_set(ref={}, force={}, user_cache={})".format(
+    logger.info(
+        "install_NXDL_file_set(ref=%s, force=%s, user_cache=%s)",
         ref, force, use_user_cache
     )
-    logger.info(msg)
 
     m = cm.install_NXDL_file_set(grr, user_cache=use_user_cache, ref=ref, force=force)
     if isinstance(m, list):
@@ -271,13 +267,15 @@ def func_update(args):
     cm = cache_manager.CacheManager()
     print(cm.table_of_caches())
 
-    if args.token is not None:
+    token = args.token or github_handler.get_GitHub_credentials()
+
+    if token is not None:
         grr = github_handler.GitHub_Repository_Reference()
-        grr.connect_repo(token=args.token)
+        grr.connect_repo(token=token)
         cm.find_all_file_sets()
 
         for ref in args.file_set_list:
-            _install(cm, grr, ref, force=args.token is None)
+            _install(cm, grr, ref, force=token is None)
 
         print(cm.table_of_caches())
 

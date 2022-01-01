@@ -41,8 +41,16 @@ jobs:
     - name: Install Python package & test requirements
       run: |
         $CONDA/bin/conda env update --file environment.yml --name $ENV_NAME
-        $CONDA/bin/conda install coverage coveralls pytest pyyaml ruamel_yaml yaml --name $ENV_NAME
+        $CONDA/bin/conda install coverage coveralls pytest pyyaml ruamel_yaml yaml -c conda-forge --name $ENV_NAME
         $CONDA/bin/conda list -r --name $ENV_NAME
+      env:
+        PY_VER: ${{ matrix.python-version }}
+        ENV_NAME: anaconda-test-env-py-${{ matrix.python-version }}
+
+    - name: Diagnostic
+      run: |
+        $CONDA/bin/conda env update --file environment.yml --name $ENV_NAME
+        $CONDA/bin/conda list --name $ENV_NAME
       env:
         PY_VER: ${{ matrix.python-version }}
         ENV_NAME: anaconda-test-env-py-${{ matrix.python-version }}

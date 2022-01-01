@@ -158,8 +158,6 @@ def download_NeXus_zip_archive(url):
         except requests.exceptions.ConnectionError as _exc:
             raise IOError(f"ConnectionError from {url}\n{_exc}")
 
-    return None
-
 
 def download_file_set(file_set_name, cache_path, replace=False):
     """

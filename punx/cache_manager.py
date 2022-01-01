@@ -74,7 +74,6 @@ from requests.packages.urllib3 import disable_warnings
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
 from .__init__ import __settings_organization__, __settings_package__
-from . import cache_manager
 from . import singletons
 from . import utils
 

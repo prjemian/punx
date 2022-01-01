@@ -43,6 +43,16 @@ def avert_exception(fname):
         raise No_Exception
 
 
+def test_avert_exception(hfile):
+    avert_exception(None)
+
+    with h5py.File(hfile, "w") as f:
+        f["item"] = 5
+
+    with pytest.raises(No_Exception):
+        avert_exception(hfile)
+
+
 def test_no_such_file_set_reference():
     with pytest.raises(KeyError):
         validate.Data_File_Validator("no such file set")

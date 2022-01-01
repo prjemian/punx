@@ -65,6 +65,8 @@ def test_nxclass_handler(nx_class, known, status, text_start, hfile):
     with h5py.File(hfile, "r") as root:
         attr = root["/group"].attrs["NX_class"]
         v_item = validate.ValidationItem(v_parent, attr)
+        assert isinstance(v_item, validate.ValidationItem)
+        assert str(v_item).startswith("ValidationItem(")
 
         l0 = len(validator.validations)
         nxclass_handler(validator, v_item)

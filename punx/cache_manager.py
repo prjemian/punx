@@ -509,7 +509,7 @@ class NXDL_File_Set(object):
 
         return(
             "NXDL_File_Set("
-            f", last_modified={self.last_modified}"
+            f"last_modified={self.last_modified}"
             f", cache={self.cache}"
             f", short_sha={get_short_sha(self.sha)}"
             f", path= {self.path}"

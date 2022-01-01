@@ -49,7 +49,6 @@ jobs:
 
     - name: Diagnostic
       run: |
-        $CONDA/bin/conda env update --file environment.yml --name $ENV_NAME
         $CONDA/bin/conda list --name $ENV_NAME
       env:
         PY_VER: ${{ matrix.python-version }}

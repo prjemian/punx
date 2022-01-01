@@ -624,13 +624,22 @@ def test_default_plot_v2_fail_no_signal(file_set_name, status, occurs, hfile):
     assert len(flist) == occurs
 
 
-def test_default_plot_v2_fail_multi_signal(hfile):
+@pytest.mark.parametrize(
+    "file_set_name, status, occurs",
+    # occurs: # findings with status
+    [
+        [DEFAULT_NXDL_FILE_SET, finding.NOTE, 1],
+        ["a4fd52d", finding.NOTE, 0],
+        ["v3.3", finding.ERROR, 0],
+    ]
+)
+def test_default_plot_v2_fail_multi_signal(file_set_name, status, occurs, hfile):
     setup_simple_test_file_default_plot(hfile)
     with h5py.File(hfile, "r+") as f:
         f["/entry/data/x"].attrs["signal"] = 1
         f["/entry/data/y"].attrs["signal"] = 1
 
-    validator = validate.Data_File_Validator(ref=DEFAULT_NXDL_FILE_SET)
+    validator = validate.Data_File_Validator(ref=file_set_name)
     validator.validate(hfile)
     sum, count, _ = validator.finding_score()
     assert count > 0, "items counted for scoring"
@@ -640,12 +649,8 @@ def test_default_plot_v2_fail_multi_signal(hfile):
     flist = locate_findings_by_test(validator, test_name)
     assert len(flist) == 0
 
-    if validator.manager.classes["NXentry"].groups["data"].minOccurs > 0:
-        expectation = finding.ERROR
-    else:
-        expectation = finding.NOTE
-    flist = locate_findings_by_test(validator, test_name, expectation)
-    assert len(flist) == 1
+    flist = locate_findings_by_test(validator, test_name, status)
+    assert len(flist) == occurs
 
     test_name = "NeXus default plot v2, @signal=1"
     flist = locate_findings_by_test(validator, test_name)
@@ -656,14 +661,14 @@ def test_default_plot_v2_fail_multi_signal(hfile):
     assert len(flist) == 1
 
 
-def TODO_test_default_plot_v1_pass(hfile):
-    setup_simple_test_file_default_plot(hfile)
-    # TODO:
+# def TODO_test_default_plot_v1_pass(hfile):
+#     setup_simple_test_file_default_plot(hfile)
+#     # TODO:
 
 
-def TODO_test_default_plot_v1_fail(hfile):
-    setup_simple_test_file_default_plot(hfile)
-    # TODO:
+# def TODO_test_default_plot_v1_fail(hfile):
+#     setup_simple_test_file_default_plot(hfile)
+#     # TODO:
 
 
 @pytest.mark.parametrize(

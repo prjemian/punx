@@ -26,6 +26,9 @@ Use these steps to :ref:`install <install>` and try the :ref:`demo <demo>`:
    
    contents
 
+See the :ref:`overview` for how to use this application or the :ref:`contents`
+for more details.
+
 :author:    Pete R. Jemian
 :email:     prjemian@gmail.com
 :copyright: 2014-2022, Pete R. Jemian

@@ -177,12 +177,9 @@ class Data_File_Validator(object):
 
         print("data file: " + self.fname)
         print(
-            "NeXus definitions ({}): {}, dated {}, sha={}\n".format(
-                self.manager.nxdl_file_set.ref_type,
-                self.manager.nxdl_file_set.ref,
-                self.manager.nxdl_file_set.last_modified,
-                self.manager.nxdl_file_set.sha,
-            )
+            f"NeXus definitions: {self.manager.nxdl_file_set.ref}"
+            f", dated {self.manager.nxdl_file_set.last_modified}"
+            f", sha={self.manager.nxdl_file_set.sha}\n"
         )
 
         def sort_validations(f):

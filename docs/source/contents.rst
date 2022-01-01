@@ -31,7 +31,6 @@ Source Code
    ~punx.nxdl_schema
    ~punx.schema_manager
    ~punx.cache_manager
-   ~punx.github_handler
 
 
 Indices and tables

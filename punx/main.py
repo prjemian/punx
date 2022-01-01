@@ -21,48 +21,45 @@ main user interface file
 ::
 
     console> punx -h
-    usage: punx [-h] [-v]
-                {configuration,demonstrate,structure,tree,update,validate} ...
+    usage: punx [-h] [-v] {configuration,demonstrate,install,tree,validate} ...
 
-    Python Utilities for NeXus HDF5 files version: 0.2.6 URL:
-    https://prjemian.github.io/punx
+    Python Utilities for NeXus HDF5 files version: 0.2.7+30.gf373b62.dirty URL: https://prjemian.github.io/punx
 
     optional arguments:
-      -h, --help            show this help message and exit
-      -v, --version         show program's version number and exit
+    -h, --help            show this help message and exit
+    -v, --version         show program's version number and exit
 
     subcommand:
-      valid subcommands
+    valid subcommands
 
-      {configuration,demonstrate,structure,tree,update,validate}
+    {configuration,demonstrate,install,tree,validate}
         configuration       show configuration details of punx
         demonstrate         demonstrate HDF5 file validation
-        structure           structure command deprecated. Use ``tree`` instead
+        install             install NeXus definitions into the local cache
         tree                show tree structure of HDF5 or NXDL file
-        update              update the local cache of NeXus definitions
         validate            validate a NeXus file
 
-    Note: It is only necessary to use the first two (or more) characters of any
-    subcommand, enough that the abbreviation is unique. Such as: ``demonstrate``
-    can be abbreviated to ``demo`` or even ``de``.
+    Note: It is only necessary to use the first two (or more) characters
+    of any subcommand, enough that the abbreviation is unique. Such as:
+    ``demonstrate`` can be abbreviated to ``demo`` or even ``de``.
 
 .. autosummary::
 
    ~main
    ~MyArgumentParser
    ~parse_command_line_arguments
-   ~func_demo
-   ~func_validate
-   ~func_hierarchy
    ~func_configuration
+   ~func_demo
+   ~func_install
    ~func_tree
-   ~func_update
+   ~func_validate
 
 """
 
 import argparse
 import logging
 import os
+import pathlib
 import sys
 
 logging.basicConfig(
@@ -80,9 +77,6 @@ from . import utils
 
 ERROR = 40
 logger = utils.setup_logger(__name__, logging.INFO)
-
-# :see: https://docs.python.org/2/library/argparse.html#sub-commands
-# obvious 1st implementations are h5structure and update
 
 
 def exit_message(msg, status=None, exit_code=1):
@@ -102,7 +96,6 @@ def exit_message(msg, status=None, exit_code=1):
 def func_configuration(args):
     """show internal configuration of punx"""
     from . import cache_manager
-    from . import github_handler
 
     cm = cache_manager.CacheManager()
     print("Locally-available versions of NeXus definitions (NXDL files)")
@@ -156,19 +149,12 @@ def func_demo(args):
     print("\n".join(mc.report(show_attributes)))
 
 
-def func_hierarchy(args):
-    "not implemented yet"
-    print("A chart of the NeXus hierarchy is in the **punx** documentation.")
-    # TODO: url = ???
-    # print("see: " + url)
-    # TODO: issue #1 & #10 show NeXus base class hierarchy from a given base class
-
-
-def func_structure(args):
-    "deprecated subcommand"
-    msg = "structure command deprecated.  Use ``tree`` instead"
-    print(ValueError(msg))
-    sys.exit(1)
+# def func_hierarchy(args):
+#     "not implemented yet"
+#     print("A chart of the NeXus hierarchy is in the **punx** documentation.")
+#     # TODO: url = ???
+#     # print("see: " + url)
+#     # TODO: issue #1 & #10 show NeXus base class hierarchy from a given base class
 
 
 def func_tree(args):
@@ -243,41 +229,29 @@ def func_validate(args):
     validator.print_report(statuses=report_choices)
 
 
-def _install(cm, grr, ref, use_user_cache=True, force=False):
+def func_install(args):
     """
-    Install or update the named NXDL file reference
+    Install or update the named versions of the NeXus definitions.
+
+    Install into the user cache.  (Developer manages the source cache.)
     """
-    force = force or ref == "main"  # always update from the main branch
-
-    logger.info(
-        "install_NXDL_file_set(ref=%s, force=%s, user_cache=%s)",
-        ref, force, use_user_cache
-    )
-
-    m = cm.install_NXDL_file_set(grr, user_cache=use_user_cache, ref=ref, force=force)
-    if isinstance(m, list):
-        print(str(m[-1]))
-
-
-def func_update(args):
-    """update or install versions of the NeXus definitions"""
     from . import cache_manager
-    from . import github_handler
 
     cm = cache_manager.CacheManager()
+    cache_dir = pathlib.Path(cm.user.path)
+
+    cm.find_all_file_sets()
+
+    for file_set_name in args.file_set_list:
+        logger.info(
+            "cache_manager.download_file_set('%s', '%s', force=%s)",
+            file_set_name, cache_dir, args.update
+        )
+        cache_manager.download_file_set(
+            file_set_name, cache_dir, replace=args.update
+        )
+
     print(cm.table_of_caches())
-
-    token = args.token or github_handler.get_GitHub_credentials()
-
-    if token is not None:
-        grr = github_handler.GitHub_Repository_Reference()
-        grr.connect_repo(token=token)
-        cm.find_all_file_sets()
-
-        for ref in args.file_set_list:
-            _install(cm, grr, ref, force=token is None)
-
-        print(cm.table_of_caches())
 
 
 class MyArgumentParser(argparse.ArgumentParser):
@@ -325,6 +299,8 @@ class MyArgumentParser(argparse.ArgumentParser):
 
 def parse_command_line_arguments():
     """process command line"""
+    from . import cache_manager
+
     doc = __doc__.strip().splitlines()[0]
     doc += "\n  version: " + __version__
     doc += "\n  URL: " + __url__
@@ -365,11 +341,28 @@ def parse_command_line_arguments():
     #     p_sub.set_defaults(func=func_hierarchy)
     #     #p_sub.add_argument('something', type=bool, help='something help_text')
 
-    # --- subcommand: structure
-    help_text = "structure command deprecated.  Use ``tree`` instead"
-    p_sub = subcommand.add_parser("structure", help=help_text)
-    p_sub.set_defaults(func=func_structure)
-    p_sub.add_argument("infile", help="HDF5 or NXDL file name")
+    # --- subcommand: install
+    help_text = "install NeXus definitions into the local cache"
+    p_sub = subcommand.add_parser("install", help=help_text)
+    p_sub.set_defaults(func=func_install)
+
+    help_text = "name(s) of reference NeXus NXDL file set"
+    help_text += f" -- default {cache_manager.GITHUB_NXDL_BRANCH}"
+    # TODO: don't need the -r switch
+    p_sub.add_argument(
+        # "-r", "--file_set_list", default=[cache_manager.GITHUB_NXDL_BRANCH], nargs="*", help=help_text
+        "file_set_list", default=[cache_manager.GITHUB_NXDL_BRANCH], nargs="*", help=help_text
+    )
+
+    p_sub.add_argument(
+        "-u",
+        "--update",
+        action="store_true",
+        default=False,
+        help="force existing file set to update from NeXus repository on GitHub",
+    )
+
+    # TODO: add_logging_argument(p_sub)
 
     # --- subcommand: tree
     help_text = "show tree structure of HDF5 or NXDL file"
@@ -392,35 +385,6 @@ def parse_command_line_arguments():
         # choices=range(1,51),
         help=help_text,
     )
-    # TODO: add_logging_argument(p_sub)
-
-    # --- subcommand: update
-    help_text = "update the local cache of NeXus definitions"
-    p_sub = subcommand.add_parser("update", help=help_text)
-    p_sub.set_defaults(func=func_update)
-
-    help_text = "name(s) of reference NeXus NXDL file set"
-    help_text += " (GitHub tag, hash, version, or 'main')"
-    help_text += " -- default main"
-    p_sub.add_argument(
-        "-r", "--file_set_list", default=["main", ], nargs="*", help=help_text
-    )
-
-    p_sub.add_argument(
-        "-f",
-        "--force",
-        action="store_true",
-        default=False,
-        help="force update (if GitHub available)",
-    )
-
-    p_sub.add_argument(
-        "-t",
-        "--token",
-        default=None,
-        help="GitHub personal access token (to update the NXDL file sets)",
-    )
-
     # TODO: add_logging_argument(p_sub)
 
     # --- subcommand: validate

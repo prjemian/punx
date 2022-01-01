@@ -48,9 +48,3 @@ Problems when running the demo
 Sometimes, problems happen when running the demo.
 In this section are some common problems encountered and
 what was done to resolve them.
-
-
-Cannot reach GitHub
-~~~~~~~~~~~~~~~~~~~
-
-See :ref:`github_api_rate_limit_exceeded`

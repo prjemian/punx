@@ -70,7 +70,8 @@ def test_Finding_make_md5(addr, test_name, status, comment):
             f.make_md5()
     else:
         md5 = f.make_md5()
-        assert isinstance(md5, str)
+        assert isinstance(md5, str)  # is str?
+        assert isinstance(int(md5, 16), int)  # is hexadecimal?
 
-        # can be duplicated from same inputs (is NOT random)
+        # can be duplicated from same inputs (is NOT random)?
         assert md5 == f.make_md5()

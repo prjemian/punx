@@ -84,7 +84,6 @@ autodoc_mock_imports = """
     h5py
     lxml
     pyqt
-    PyQt4
     PyQt5
     pyRestTable
 """.split()

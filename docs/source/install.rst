@@ -66,11 +66,11 @@ See your distribution's documentation for how to install these.  With Anaconda, 
 ============  ===================================
 Package       URL
 ============  ===================================
-h5py          http://www.h5py.org
-lxml          http://lxml.de
-numpy         http://numpy.scipy.org
-PyQt4         https://riverbankcomputing.com/software/pyqt/intro
-requests      http://docs.python-requests.org 
+h5py          https://www.h5py.org
+lxml          https://lxml.de
+numpy         https://numpy.scipy.org
+PyQt5         https://www.riverbankcomputing.com/software/pyqt/
+requests      https://docs.python-requests.org 
 ============  ===================================
 
 Optional Packages
@@ -79,7 +79,7 @@ Optional Packages
 ============  ===================================
 Package       URL
 ============  ===================================
-pyRestTable   http://pyresttable.readthedocs.io
+pyRestTable   https://pyresttable.readthedocs.io
 ============  ===================================
 
 The *pyRestTable* package is used for various reports in the punx application.

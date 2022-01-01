@@ -313,7 +313,7 @@ class CacheManager(singletons.Singleton):
 
         if ref is None and len(self.NXDL_file_sets) > 0:
             ref = ref or sorted(self.NXDL_file_sets, key=sorter, reverse=True)[0]
-        ref = ref or cache_manager.GITHUB_NXDL_BRANCH
+        ref = ref or GITHUB_NXDL_BRANCH
         logger.debug(" final ref: " + str(ref))
 
         if ref not in self.NXDL_file_sets:

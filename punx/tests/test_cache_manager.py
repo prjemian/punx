@@ -110,7 +110,7 @@ def test_should_extract_this(item, should, tempdir):
         item,
         NXDL_file_endings_list, allowed_parent_directories
     )
-    assert decision == should, f"{item = }  {allowed_parent_directories = }"
+    assert decision == should, item
 
 
 @pytest.mark.parametrize(

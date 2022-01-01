@@ -10,7 +10,6 @@ dependencies:
   - numpy
   - python=3
   - pip
-  - PyGithub
   - pyqt
   - pyRestTable
   - requests

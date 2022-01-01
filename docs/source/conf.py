@@ -83,7 +83,6 @@ autodoc_mock_imports = """
     github
     h5py
     lxml
-    PyGithub
     pyqt
     PyQt4
     PyQt5

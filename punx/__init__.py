@@ -69,9 +69,8 @@ __install_requires__ = [
     "numpy",
     "pyRestTable",
     "requests",
-    # 'PyQt4',
+    # 'PyQt5',
     # see: http://stackoverflow.com/questions/4628519/is-it-possible-to-require-pyqt-from-setuptools-setup-py
-    "PyGithub >= 1.32",
 ]
 __classifiers__ = [
     # 'Development Status :: 5 - Production/Stable',

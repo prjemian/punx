@@ -56,14 +56,12 @@ pre-requisites using *conda* rather than *pip*.  The pre-requisites include:
 * h5py
 * lxml
 * numpy
-* Qt and PyQt (either v4 or v5)
+* Qt and PyQt (v5)
 * requests
-* PyGithub
 
 See your distribution's documentation for how to install these.  With Anaconda, use::
 
-    conda install h5py lxml numpy Qt=5 PyQt=5 requests 
-    pip install PyGitHub pyRestTable
+    conda install h5py lxml numpy Qt=5 PyQt=5 requests pyRestTable -c conda-forge
 
 ============  ===================================
 Package       URL
@@ -71,7 +69,6 @@ Package       URL
 h5py          http://www.h5py.org
 lxml          http://lxml.de
 numpy         http://numpy.scipy.org
-PyGithub      https://github.com/PyGithub/PyGithub
 PyQt4         https://riverbankcomputing.com/software/pyqt/intro
 requests      http://docs.python-requests.org 
 ============  ===================================

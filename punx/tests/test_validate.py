@@ -149,7 +149,7 @@ def test_NXdata_requirement_or_optional(valid_ref, file_set_name, count, hfile):
             # eg.create_dataset("title", data="NXdata group not provided")
 
         validator.validate(hfile)
-        assert u"NXentry/NXdata" not in validator.classpaths
+        assert "NXentry/NXdata" not in validator.classpaths
         group = validator.addresses["/"].validations
 
         # look in "/" for Finding with ERROR because NXdata is required
@@ -455,9 +455,9 @@ def test_wrong_link_target_value(hfile):
 def test_item_names(hfile):
     """issue #104: test non-compliant item names"""
     with h5py.File(hfile, "w") as f:
-        eg = f.create_group(u"entry")
-        eg.attrs[u"NX_class"] = u"NXentry"
-        eg.create_dataset(u"titl:e", data=u"item name is not compliant")
+        eg = f.create_group("entry")
+        eg.attrs["NX_class"] = "NXentry"
+        eg.create_dataset("title:", data="item name is not compliant")
 
     validator = validate.Data_File_Validator(ref=DEFAULT_NXDL_FILE_SET)
     validator.validate(hfile)
@@ -528,8 +528,8 @@ def test_default_plot_v3_pass_multi(hfile):
         eg.attrs["default"] = "data3"
         dg = eg.create_group("data3")
         dg.attrs["NX_class"] = "NXdata"
-        dg.attrs["signal"] = "u"
-        dg.create_dataset("u", data=[1, 2, 3.14])
+        dg.attrs["signal"] = "v"
+        dg.create_dataset("v", data=[1, 2, 3.14])
 
     validator = validate.Data_File_Validator(ref=DEFAULT_NXDL_FILE_SET)
     validator.validate(hfile)
@@ -539,6 +539,7 @@ def test_default_plot_v3_pass_multi(hfile):
 
     flist = locate_findings_by_test(validator, "NeXus default plot")
     assert len(flist) == 1
+    assert isinstance(flist[0], finding.Finding)
     flist = locate_findings_by_test(validator, "NeXus default plot v3 NIAC2014")
     assert len(flist) == 1
     flist = locate_findings_by_test(validator, "NeXus default plot v3, NXdata@signal")

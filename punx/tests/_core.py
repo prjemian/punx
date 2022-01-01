@@ -3,7 +3,7 @@ import pytest
 import shutil
 import tempfile
 
-CANONICAL_RELEASE = u"v3.3"  # TODO: pick a newer?
+CANONICAL_RELEASE = "v3.3"  # TODO: pick a newer?
 DEFAULT_NXDL_FILE_SET = None
 
 _ppath = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))

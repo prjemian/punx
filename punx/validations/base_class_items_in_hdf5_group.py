@@ -54,7 +54,7 @@ def verify(validator, v_item, base_class):
         minOccurs = int(group_object.attributes.get("minOccurs", minOccurs))
         group_object.minOccurs = minOccurs
         # ---------------------------------------------------------
-        pass  # FIXME: report if required item is present, name could be flexible
+        # FIXME: report if required item is present, name could be flexible
 
     for link_name, link_obj in base_class.links.items():  # noqa
         pass  # TODO: complete

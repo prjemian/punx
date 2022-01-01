@@ -363,7 +363,7 @@ class NXDL__base(object):
                 self.__setattr__(k, v.default_value)
 
 
-class NXDL__definition(NXDL__base):
+class NXDL__definition(NXDL__base):  # lgtm [py/missing-call-to-init]
 
     """
     Contents of a *definition* element in a NXDL XML file.

@@ -6,10 +6,10 @@ Cache : :mod:`cache_manager`
 Hierarchy:
 
    
+* :mod:`punx.main`
 * :mod:`punx.nxdl_manager`
 * :mod:`punx.schema_manager`
 * :mod:`punx.cache_manager`
-* :mod:`punx.github_handler`
 
 source code documentation
 *************************

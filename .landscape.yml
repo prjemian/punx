@@ -4,33 +4,32 @@ strictness: medium
 max-line-length: 120
 autodetect: true
 requirements:
-  - pyRestTable
-  - PyGitHub>=1.32
-  - PyQt
-  - numpy
+  - coverage
+  - coveralls
+  - docopt
   - h5py
   - lxml
+  - numpy
+  - PyQt
+  - pyRestTable
   - requests
-  - coverage
-  - docopt
-  - coveralls
 ignore-paths:
+  - _installer.py
   - docs
+  - install_NXDL_file_sets.py
+  - punx/_version.py
   - punx/cache
   - punx/data
   - punx/ignore_now
   - versioneer.py
-  - punx/_version.py
-  - install_NXDL_file_sets.py
-  - _installer.py
 ignore-patterns:
-  - ^example/doc_.*\.py$
   - (^|/)docs(/|$)
+  - ^example/doc_.*\.py$
 python-targets:
   - 3
 pylint:
   disable:
-    - unused-argument
     - arguments-differ
-    - protected-access
     - cyclic-import
+    - protected-access
+    - unused-argument

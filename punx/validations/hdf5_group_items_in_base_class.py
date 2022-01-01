@@ -37,7 +37,17 @@ def child_exists(validator, test_name, v, v_item, a_item):
 
 
 def verify_group_attributes(validator, v_item, base_class):
-    """verify the group's attributes"""
+    """
+    Verify the group's attributes.
+
+    validator obj:
+        Instance of :class:`~punx.validate.Data_File_Validator`
+    v_item obj:
+        Instance of :class:`~punx.validate.ValidationItem`
+    base_class obj:
+        Instance of :class:`~punx.nxdl_manager.NXDL__definition`
+        (a class that represents one of the NXDL specifications)
+    """
     for k, v in sorted(v_item.h5_object.attrs.items()):
         k = utils.decode_byte_string(k)
         v = utils.decode_byte_string(v)

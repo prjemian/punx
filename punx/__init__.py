@@ -44,8 +44,8 @@ __license__ = (
 __description__ = "Python Utilities for NeXus"
 __author_name__ = __author__
 __author_email__ = __email__
-__url__ = u"https://prjemian.github.io/punx"
-__download_url__ = u"https://github.com/prjemian/punx/archive/master.zip"
+__url__ = "https://prjemian.github.io/punx"
+__download_url__ = "https://github.com/prjemian/punx/archive/main.zip"
 __keywords__ = ["NeXus", "HDF5"]
 
 __long_description__ = f"""
@@ -69,9 +69,8 @@ __install_requires__ = [
     "numpy",
     "pyRestTable",
     "requests",
-    # 'PyQt4',
+    # 'PyQt5',
     # see: http://stackoverflow.com/questions/4628519/is-it-possible-to-require-pyqt-from-setuptools-setup-py
-    "PyGithub >= 1.32",
 ]
 __classifiers__ = [
     # 'Development Status :: 5 - Production/Stable',

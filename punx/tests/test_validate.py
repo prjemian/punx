@@ -43,6 +43,16 @@ def avert_exception(fname):
         raise No_Exception
 
 
+def test_avert_exception(hfile):
+    avert_exception(None)
+
+    with h5py.File(hfile, "w") as f:
+        f["item"] = 5
+
+    with pytest.raises(No_Exception):
+        avert_exception(hfile)
+
+
 def test_no_such_file_set_reference():
     with pytest.raises(KeyError):
         validate.Data_File_Validator("no such file set")
@@ -86,7 +96,16 @@ def test_valid_nexus_file_constructed(hfile):
     assert utils.isNeXusFile(hfile)
 
 
-def test_NXdata_requirement_or_optional(hfile):
+@pytest.mark.parametrize(
+    "valid_ref, file_set_name, count",
+    # count: expected # of "/" for Finding with ERROR because NXdata is required
+    [
+        [True, "a4fd52d", 1],
+        [True, "v3.3", 0],
+        [False, "no_such_file_set", None],
+    ]
+)
+def test_NXdata_requirement_or_optional(valid_ref, file_set_name, count, hfile):
     """
     check for changes in NXDL rules
 
@@ -115,45 +134,28 @@ def test_NXdata_requirement_or_optional(hfile):
     It was stated only in the manual that NXdata
     was required.  Not suitable for automated validation.
     """
-    # create a minimal test file
-    with h5py.File(hfile, "w") as f:
-        eg = f.create_group(u"entry")
-        eg.attrs[u"NX_class"] = u"NXentry"
-        # eg.create_dataset(u"title", data=u"NXdata group not provided")
+    if not valid_ref:
+        validator = None
+        with pytest.raises(KeyError):
+            validator = validate.Data_File_Validator(ref=file_set_name)
+        assert validator is None
+    else:
+        validator = validate.Data_File_Validator(ref=file_set_name)
 
-    refs = dict(nxdata_required=u"a4fd52d", nxdata_not_required=u"v3.3")
-    validator = {}
+        # create a minimal test file
+        with h5py.File(hfile, "w") as f:
+            eg = f.create_group("entry")
+            eg.attrs["NX_class"] = "NXentry"
+            # eg.create_dataset("title", data="NXdata group not provided")
 
-    ref = refs["nxdata_required"]
-    try:
-        validator = validate.Data_File_Validator(ref=refs["nxdata_required"])
-    except KeyError:
-        raise RuntimeError(u"NXDL rule set %s not installed, cannot test" % ref)
-    validator.validate(hfile)
-    assert u"NXentry/NXdata" not in validator.classpaths
-    group = validator.addresses[u"/"].validations
+        validator.validate(hfile)
+        assert "NXentry/NXdata" not in validator.classpaths
+        group = validator.addresses["/"].validations
 
-    # look in "/" for Finding with ERROR because NXdata is required
-    found = [v for v in group.values() if v.status == finding.ERROR]
-    assert len(found) == 1
-    validator.close()
-
-    ref = refs["nxdata_not_required"]
-    try:
-        validator = validate.Data_File_Validator(ref=refs["nxdata_not_required"])
-    except KeyError:
-        raise RuntimeError(u"NXDL rule set %s not installed, cannot test" % ref)
-    validator.validate(hfile)
-    assert u"NXentry/NXdata" not in validator.classpaths
-    group = validator.addresses[u"/"].validations
-
-    # look in "/" for absence of Finding with ERROR because NXdata is not required
-    found = [v for v in group.values() if v.status == finding.ERROR]
-    assert len(found) == 0
-
-    # look in "/" for presence of Finding with NOTE because NXdata is not required but recommended
-    found = [v for v in group.values() if v.status == finding.NOTE]
-    assert len(found) == 1
+        # look in "/" for Finding with ERROR because NXdata is required
+        found = [v for v in group.values() if v.status == finding.ERROR]
+        assert len(found) == count
+        validator.close()
 
 
 # class Test_Validate
@@ -320,142 +322,142 @@ def test_wrong_link_target_value(hfile):
 # TODO: need to test non-compliant item names
 
 
-def TODO_test_application_definition(hfile):
-    setup_simple_test_file_validate(hfile)
-    with h5py.File(hfile, "r+") as f:
-        # TODO: pick a simpler application definition
-        f["/entry"].create_dataset("definition", data="NXcanSAS")
-        # TODO: add compliant contents
+# def TODO_test_application_definition(hfile):
+#     setup_simple_test_file_validate(hfile)
+#     with h5py.File(hfile, "r+") as f:
+#         # TODO: pick a simpler application definition
+#         f["/entry"].create_dataset("definition", data="NXcanSAS")
+#         # TODO: add compliant contents
 
-    validator = validate.Data_File_Validator(ref=DEFAULT_NXDL_FILE_SET)
-    validator.validate(hfile)
-    # TODO: assert what now?
-
-
-def TODO_test_contributed_base_class(hfile):
-    setup_simple_test_file_validate(hfile)
-    with h5py.File(hfile, "r+") as f:
-        # TODO: should be under an NXinstrument group
-        group = f["/entry"].create_group("quadrupole_magnet")
-        group.attrs["NX_class"] = "NXquadrupole_magnet"
-
-    validator = validate.Data_File_Validator(ref=DEFAULT_NXDL_FILE_SET)
-    validator.validate(hfile)
-    # TODO: such as NXquadrupole_magnet
+#     validator = validate.Data_File_Validator(ref=DEFAULT_NXDL_FILE_SET)
+#     validator.validate(hfile)
+#     # TODO: assert what now?
 
 
-def TODO_test_contributed_application_definition(hfile):
-    setup_simple_test_file_validate(hfile)
-    with h5py.File(hfile, "r+") as f:
-        f["/entry"].create_dataset("definition", data="NXspecdata")
-        # TODO: add compliant contents
+# def TODO_test_contributed_base_class(hfile):
+#     setup_simple_test_file_validate(hfile)
+#     with h5py.File(hfile, "r+") as f:
+#         # TODO: should be under an NXinstrument group
+#         group = f["/entry"].create_group("quadrupole_magnet")
+#         group.attrs["NX_class"] = "NXquadrupole_magnet"
 
-    validator = validate.Data_File_Validator(ref=DEFAULT_NXDL_FILE_SET)
-    validator.validate(hfile)
-    # TODO: assert what now?
-
-
-def TODO_test_axes_attribute_1D__pass(hfile):
-    with h5py.File(hfile, "w") as f:
-        f.attrs["default"] = "entry"
-
-        eg = f.create_group("entry")
-        eg.attrs["NX_class"] = "NXentry"
-        eg.attrs["default"] = "data"
-
-        dg = eg.create_group("data")
-        dg.attrs["NX_class"] = "NXdata"
-        dg.attrs["signal"] = "data"
-
-        vec = [1, 2, 3.14]
-        ds = dg.create_dataset("data", data=vec)
-        ds.attrs["units"] = "arbitrary"
-
-        ds = dg.create_dataset("x", data=vec)
-        ds.attrs["units"] = "m"
-
-        dg.attrs["axes"] = "x"
-        dg.attrs["x_indices"] = [0]
-
-    validator = validate.Data_File_Validator(ref=DEFAULT_NXDL_FILE_SET)
-    validator.validate(hfile)
-
-    # TODO: assert that @axes has been defined properly
-    # TODO: assert that @x_indices has been defined properly
+#     validator = validate.Data_File_Validator(ref=DEFAULT_NXDL_FILE_SET)
+#     validator.validate(hfile)
+#     # TODO: such as NXquadrupole_magnet
 
 
-def TODO_test_axes_attribute_2D__pass(hfile):
-    with h5py.File(hfile, "w") as f:
-        f.attrs["default"] = "entry"
+# def TODO_test_contributed_application_definition(hfile):
+#     setup_simple_test_file_validate(hfile)
+#     with h5py.File(hfile, "r+") as f:
+#         f["/entry"].create_dataset("definition", data="NXspecdata")
+#         # TODO: add compliant contents
 
-        eg = f.create_group("entry")
-        eg.attrs["NX_class"] = "NXentry"
-        eg.attrs["default"] = "data"
-
-        dg = eg.create_group("data")
-        dg.attrs["NX_class"] = "NXdata"
-        dg.attrs["signal"] = "data"
-
-        vec = [1, 2, 3.14]
-        ds = dg.create_dataset("data", data=[vec, vec, vec])
-        ds.attrs["units"] = "arbitrary"
-
-        ds = dg.create_dataset("x", data=vec)
-        ds.attrs["units"] = "m"
-
-        ds = dg.create_dataset("y", data=vec)
-        ds.attrs["units"] = "mm"
-
-        dg.attrs["axes"] = utils.string_list_to_hdf5(["x", "y"])
-        dg.attrs["x_indices"] = [0]
-        dg.attrs["y_indices"] = [1]
-
-    validator = validate.Data_File_Validator(ref=DEFAULT_NXDL_FILE_SET)
-    validator.validate(hfile)
-
-    # TODO: assert that @axes has been defined properly
-    # TODO: assert that @x_indices has been defined properly
-    # TODO: assert that @y_indices has been defined properly
+#     validator = validate.Data_File_Validator(ref=DEFAULT_NXDL_FILE_SET)
+#     validator.validate(hfile)
+#     # TODO: assert what now?
 
 
-def TODO_test_axes_attribute_2D__fail(hfile):
-    with h5py.File(hfile, "w") as f:
-        f.attrs["default"] = "entry"
+# def TODO_test_axes_attribute_1D__pass(hfile):
+#     with h5py.File(hfile, "w") as f:
+#         f.attrs["default"] = "entry"
 
-        eg = f.create_group("entry")
-        eg.attrs["NX_class"] = "NXentry"
-        eg.attrs["default"] = "data"
+#         eg = f.create_group("entry")
+#         eg.attrs["NX_class"] = "NXentry"
+#         eg.attrs["default"] = "data"
 
-        dg = eg.create_group("data")
-        dg.attrs["NX_class"] = "NXdata"
-        dg.attrs["signal"] = "data"
+#         dg = eg.create_group("data")
+#         dg.attrs["NX_class"] = "NXdata"
+#         dg.attrs["signal"] = "data"
 
-        vec = [1, 2, 3.14]
-        ds = dg.create_dataset("data", data=[vec, vec, vec])
-        ds.attrs["units"] = "arbitrary"
+#         vec = [1, 2, 3.14]
+#         ds = dg.create_dataset("data", data=vec)
+#         ds.attrs["units"] = "arbitrary"
 
-        ds = dg.create_dataset("x", data=vec)
-        ds.attrs["units"] = "m"
+#         ds = dg.create_dataset("x", data=vec)
+#         ds.attrs["units"] = "m"
 
-        ds = dg.create_dataset("y", data=vec)
-        ds.attrs["units"] = "mm"
+#         dg.attrs["axes"] = "x"
+#         dg.attrs["x_indices"] = [0]
 
-        dg.attrs["axes"] = utils.string_list_to_hdf5(["x,y",])
-        dg.attrs["x_indices"] = [0]
-        dg.attrs["y_indices"] = [1]
+#     validator = validate.Data_File_Validator(ref=DEFAULT_NXDL_FILE_SET)
+#     validator.validate(hfile)
 
-    validator = validate.Data_File_Validator(ref=DEFAULT_NXDL_FILE_SET)
-    validator.validate(hfile)
+#     # TODO: assert that @axes has been defined properly
+#     # TODO: assert that @x_indices has been defined properly
 
-    # TODO: assert that @axes has NOT been defined properly
+
+# def TODO_test_axes_attribute_2D__pass(hfile):
+#     with h5py.File(hfile, "w") as f:
+#         f.attrs["default"] = "entry"
+
+#         eg = f.create_group("entry")
+#         eg.attrs["NX_class"] = "NXentry"
+#         eg.attrs["default"] = "data"
+
+#         dg = eg.create_group("data")
+#         dg.attrs["NX_class"] = "NXdata"
+#         dg.attrs["signal"] = "data"
+
+#         vec = [1, 2, 3.14]
+#         ds = dg.create_dataset("data", data=[vec, vec, vec])
+#         ds.attrs["units"] = "arbitrary"
+
+#         ds = dg.create_dataset("x", data=vec)
+#         ds.attrs["units"] = "m"
+
+#         ds = dg.create_dataset("y", data=vec)
+#         ds.attrs["units"] = "mm"
+
+#         dg.attrs["axes"] = utils.string_list_to_hdf5(["x", "y"])
+#         dg.attrs["x_indices"] = [0]
+#         dg.attrs["y_indices"] = [1]
+
+#     validator = validate.Data_File_Validator(ref=DEFAULT_NXDL_FILE_SET)
+#     validator.validate(hfile)
+
+#     # TODO: assert that @axes has been defined properly
+#     # TODO: assert that @x_indices has been defined properly
+#     # TODO: assert that @y_indices has been defined properly
+
+
+# def TODO_test_axes_attribute_2D__fail(hfile):
+#     with h5py.File(hfile, "w") as f:
+#         f.attrs["default"] = "entry"
+
+#         eg = f.create_group("entry")
+#         eg.attrs["NX_class"] = "NXentry"
+#         eg.attrs["default"] = "data"
+
+#         dg = eg.create_group("data")
+#         dg.attrs["NX_class"] = "NXdata"
+#         dg.attrs["signal"] = "data"
+
+#         vec = [1, 2, 3.14]
+#         ds = dg.create_dataset("data", data=[vec, vec, vec])
+#         ds.attrs["units"] = "arbitrary"
+
+#         ds = dg.create_dataset("x", data=vec)
+#         ds.attrs["units"] = "m"
+
+#         ds = dg.create_dataset("y", data=vec)
+#         ds.attrs["units"] = "mm"
+
+#         dg.attrs["axes"] = utils.string_list_to_hdf5(["x,y",])
+#         dg.attrs["x_indices"] = [0]
+#         dg.attrs["y_indices"] = [1]
+
+#     validator = validate.Data_File_Validator(ref=DEFAULT_NXDL_FILE_SET)
+#     validator.validate(hfile)
+
+#     # TODO: assert that @axes has NOT been defined properly
 
 
 def test_item_names(hfile):
     """issue #104: test non-compliant item names"""
     with h5py.File(hfile, "w") as f:
-        eg = f.create_group(u"entry")
-        eg.attrs[u"NX_class"] = u"NXentry"
-        eg.create_dataset(u"titl:e", data=u"item name is not compliant")
+        eg = f.create_group("entry")
+        eg.attrs["NX_class"] = "NXentry"
+        eg.create_dataset("title:", data="item name is not compliant")
 
     validator = validate.Data_File_Validator(ref=DEFAULT_NXDL_FILE_SET)
     validator.validate(hfile)
@@ -526,8 +528,8 @@ def test_default_plot_v3_pass_multi(hfile):
         eg.attrs["default"] = "data3"
         dg = eg.create_group("data3")
         dg.attrs["NX_class"] = "NXdata"
-        dg.attrs["signal"] = "u"
-        dg.create_dataset("u", data=[1, 2, 3.14])
+        dg.attrs["signal"] = "v"
+        dg.create_dataset("v", data=[1, 2, 3.14])
 
     validator = validate.Data_File_Validator(ref=DEFAULT_NXDL_FILE_SET)
     validator.validate(hfile)
@@ -537,19 +539,29 @@ def test_default_plot_v3_pass_multi(hfile):
 
     flist = locate_findings_by_test(validator, "NeXus default plot")
     assert len(flist) == 1
+    assert isinstance(flist[0], finding.Finding)
     flist = locate_findings_by_test(validator, "NeXus default plot v3 NIAC2014")
     assert len(flist) == 1
     flist = locate_findings_by_test(validator, "NeXus default plot v3, NXdata@signal")
     assert len(flist) == 3  # 3 signal attributes
 
 
-def test_default_plot_v3_fail(hfile):
+@pytest.mark.parametrize(
+    "file_set_name, status, occurs",
+    # occurs: # findings with status
+    [
+        [DEFAULT_NXDL_FILE_SET, finding.NOTE, 1],
+        ["a4fd52d", finding.NOTE, 0],
+        ["v3.3", finding.ERROR, 0],
+    ]
+)
+def test_default_plot_v3_fail(file_set_name, status, occurs, hfile):
     setup_simple_test_file_default_plot(hfile)
     with h5py.File(hfile, "r+") as f:
         f.attrs["default"] = "entry"
         f["/entry"].attrs["default"] = "will not be found"
 
-    validator = validate.Data_File_Validator(ref=DEFAULT_NXDL_FILE_SET)
+    validator = validate.Data_File_Validator(ref=file_set_name)
     validator.validate(hfile)
     sum, count, _ = validator.finding_score()
     assert count > 0, "items counted for scoring"
@@ -559,12 +571,8 @@ def test_default_plot_v3_fail(hfile):
     flist = locate_findings_by_test(validator, test_name)
     assert len(flist) == 0
 
-    if validator.manager.classes["NXentry"].groups["data"].minOccurs > 0:
-        expectation = finding.ERROR
-    else:
-        expectation = finding.NOTE
-    flist = locate_findings_by_test(validator, test_name, expectation)
-    assert len(flist) == 1
+    flist = locate_findings_by_test(validator, test_name, status)
+    assert len(flist) == occurs
 
 
 def test_default_plot_v2_pass(hfile):
@@ -590,10 +598,19 @@ def test_default_plot_v2_pass(hfile):
     assert len(flist) == 1
 
 
-def test_default_plot_v2_fail_no_signal(hfile):
+@pytest.mark.parametrize(
+    "file_set_name, status, occurs",
+    # occurs: # findings with status
+    [
+        [DEFAULT_NXDL_FILE_SET, finding.NOTE, 1],
+        ["a4fd52d", finding.NOTE, 0],
+        ["v3.3", finding.ERROR, 0],
+    ]
+)
+def test_default_plot_v2_fail_no_signal(file_set_name, status, occurs, hfile):
     setup_simple_test_file_default_plot(hfile)
 
-    validator = validate.Data_File_Validator(ref=DEFAULT_NXDL_FILE_SET)
+    validator = validate.Data_File_Validator(ref=file_set_name)
     validator.validate(hfile)
     sum, count, _ = validator.finding_score()
     assert count > 0, "items counted for scoring"
@@ -604,21 +621,26 @@ def test_default_plot_v2_fail_no_signal(hfile):
     flist = locate_findings_by_test(validator, test_name)
     assert len(flist) == 0
 
-    if validator.manager.classes["NXentry"].groups["data"].minOccurs > 0:
-        expectation = finding.ERROR
-    else:
-        expectation = finding.NOTE
-    flist = locate_findings_by_test(validator, test_name, expectation)
-    assert len(flist) == 1
+    flist = locate_findings_by_test(validator, test_name, status)
+    assert len(flist) == occurs
 
 
-def test_default_plot_v2_fail_multi_signal(hfile):
+@pytest.mark.parametrize(
+    "file_set_name, status, occurs",
+    # occurs: # findings with status
+    [
+        [DEFAULT_NXDL_FILE_SET, finding.NOTE, 1],
+        ["a4fd52d", finding.NOTE, 0],
+        ["v3.3", finding.ERROR, 0],
+    ]
+)
+def test_default_plot_v2_fail_multi_signal(file_set_name, status, occurs, hfile):
     setup_simple_test_file_default_plot(hfile)
     with h5py.File(hfile, "r+") as f:
         f["/entry/data/x"].attrs["signal"] = 1
         f["/entry/data/y"].attrs["signal"] = 1
 
-    validator = validate.Data_File_Validator(ref=DEFAULT_NXDL_FILE_SET)
+    validator = validate.Data_File_Validator(ref=file_set_name)
     validator.validate(hfile)
     sum, count, _ = validator.finding_score()
     assert count > 0, "items counted for scoring"
@@ -628,12 +650,8 @@ def test_default_plot_v2_fail_multi_signal(hfile):
     flist = locate_findings_by_test(validator, test_name)
     assert len(flist) == 0
 
-    if validator.manager.classes["NXentry"].groups["data"].minOccurs > 0:
-        expectation = finding.ERROR
-    else:
-        expectation = finding.NOTE
-    flist = locate_findings_by_test(validator, test_name, expectation)
-    assert len(flist) == 1
+    flist = locate_findings_by_test(validator, test_name, status)
+    assert len(flist) == occurs
 
     test_name = "NeXus default plot v2, @signal=1"
     flist = locate_findings_by_test(validator, test_name)
@@ -644,14 +662,14 @@ def test_default_plot_v2_fail_multi_signal(hfile):
     assert len(flist) == 1
 
 
-def TODO_test_default_plot_v1_pass(hfile):
-    setup_simple_test_file_default_plot(hfile)
-    # TODO:
+# def TODO_test_default_plot_v1_pass(hfile):
+#     setup_simple_test_file_default_plot(hfile)
+#     # TODO:
 
 
-def TODO_test_default_plot_v1_fail(hfile):
-    setup_simple_test_file_default_plot(hfile)
-    # TODO:
+# def TODO_test_default_plot_v1_fail(hfile):
+#     setup_simple_test_file_default_plot(hfile)
+#     # TODO:
 
 
 @pytest.mark.parametrize(
@@ -686,7 +704,7 @@ def test_report_option(infile, report, observations, capsys):
 
     count = 0
     for line in captured.out.splitlines()[6:]:
-        if (
+        if not (
             # only look at content lines in first table
             len(line.strip()) == 0
             or line.startswith("==")
@@ -695,12 +713,11 @@ def test_report_option(infile, report, observations, capsys):
             or line.startswith("findings")
             or line.startswith("address")
         ):
-            continue
-        if line.startswith("summary statistics"):
-            # end when 2nd (summary) table starts
-            break
-        assert line.split()[1] in reported_statuses
-        count += 1
+            if line.startswith("summary statistics"):
+                # end when 2nd (summary) table starts
+                break
+            assert line.split()[1] in reported_statuses
+            count += 1
     assert count == observations
 
 

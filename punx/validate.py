@@ -64,7 +64,7 @@ class Data_File_Validator(object):
        If so, pick any of these by name as follows::
 
         validator = punx.validate.Data_File_Validator("v3.2")
-        validator = punx.validate.Data_File_Validator("master")
+        validator = punx.validate.Data_File_Validator("main")
 
     2. use to validate a file or files::
 
@@ -177,12 +177,9 @@ class Data_File_Validator(object):
 
         print("data file: " + self.fname)
         print(
-            "NeXus definitions ({}): {}, dated {}, sha={}\n".format(
-                self.manager.nxdl_file_set.ref_type,
-                self.manager.nxdl_file_set.ref,
-                self.manager.nxdl_file_set.last_modified,
-                self.manager.nxdl_file_set.sha,
-            )
+            f"NeXus definitions: {self.manager.nxdl_file_set.ref}"
+            f", dated {self.manager.nxdl_file_set.last_modified}"
+            f", sha={self.manager.nxdl_file_set.sha}\n"
         )
 
         def sort_validations(f):
@@ -326,7 +323,7 @@ class Data_File_Validator(object):
         elif v_item.classpath == "":
             nx_class = "NXroot"  # handle as NXroot
         else:
-            raise ValueError("unexpected: " + str(v_item))
+            raise ValueError(f"unexpected: {v_item}")
 
         # print(str(v_item), v_item.name, v_item.classpath)
         self.validate_NX_class_attribute(v_item, nx_class)

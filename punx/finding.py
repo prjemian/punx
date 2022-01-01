@@ -95,18 +95,20 @@ class Finding(object):
 
     def __str__(self, *args, **kwargs):
         try:
-            s = str(self.status)
-            s += " " + self.h5_address
-            s += ": " + self.test_name
-            s += ": " + self.comment
-            return s
+            s = (
+                f"{self.h5_address}"
+                f", {self.test_name}"
+                f", finding.{self.status}"
+                f", {self.comment}"
+            )
+            return f"finding.Finding({s})"
         except Exception:
             return object.__str__(self, *args, **kwargs)
 
     def make_md5(self):
         """make a unique hash for this finding"""
         h = hashlib.md5()
-        h.update(bytes(self.h5_address))
+        h.update(bytes(self.h5_address, "utf8"))
         h.update(b"\n")
-        h.update(bytes(self.test_name))
+        h.update(bytes(self.test_name, "utf8"))
         return h.hexdigest()

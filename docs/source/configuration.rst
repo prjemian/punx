@@ -13,14 +13,14 @@ of the ``punx`` program.  It shows a table with the available
 
    console> punx configuration
    Locally-available versions of NeXus definitions (NXDL files)
-   ============= ======= ====== =================== ======= =============================
-   NXDL file set type    cache  date & time         commit  path
-   ============= ======= ====== =================== ======= =============================
-   a4fd52d       commit  source 2016-11-19 01:07:45 a4fd52d /path/to/source/cache/a4fd52d
-   v3.3          release source 2017-07-12 17:41:13 9285af9 /path/to/source/cache/v3.3
-   v2018.5       release source 2018-05-15 16:34:19 a3045fd /path/to/source/cache/v2018.5
-   main          branch  user   2021-12-17 21:09:18 041c2c0 /path/to/user/punx/main
-   ============= ======= ====== =================== ======= =============================
+   ============= ====== =================== ======= =============================
+   NXDL file set cache  date & time         commit  path
+   ============= ====== =================== ======= =============================
+   a4fd52d       source 2016-11-19 01:07:45 a4fd52d /path/to/source/cache/a4fd52d
+   v3.3          source 2017-07-12 17:41:13 9285af9 /path/to/source/cache/v3.3
+   v2018.5       source 2018-05-15 16:34:19 a3045fd /path/to/source/cache/v2018.5
+   main          user   2021-12-17 21:09:18 041c2c0 /path/to/user/punx/main
+   ============= ====== =================== ======= =============================
 
    default NXDL file set:  main
 
@@ -31,8 +31,7 @@ files that provide all the default and basic structures of the NXDL
 files.
 
 Above, the user cache has a version of the GitHub *main* branch (
-the main branch contains the latest
-revisions by the developers on that date).
+the main branch contains the latest revisions by the developers on that date).
 
 .. index:: NXDL file set
 
@@ -82,4 +81,4 @@ GitHub as the time the changes were to committed to the repository.
 
 NXDL file sets may be found in the *source cache* (as distributed
 with the program) or in the *user cache* as maintained by the ``punx``
-:ref:`update` subcommand.  The full path to the file set is provided.
+:ref:`cmd_install` subcommand.  The full path to the file set is provided.

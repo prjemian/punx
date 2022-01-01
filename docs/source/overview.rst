@@ -12,7 +12,7 @@ command line help
 
    console> punx -h
    usage: punx [-h] [-v]
-               {configuration,demonstrate,structure,tree,update,validate} ...
+               {configuration,demonstrate,install,tree,validate} ...
    
    Python Utilities for NeXus HDF5 files version: 0.2.6 URL:
    https://prjemian.github.io/punx
@@ -24,12 +24,11 @@ command line help
    subcommand:
      valid subcommands
    
-     {configuration,demonstrate,structure,tree,update,validate}
+     {configuration,demonstrate,install,tree,validate}
        configuration       show configuration details of punx
        demonstrate         demonstrate HDF5 file validation
-       structure           (deprecated) use ``tree``
+       install             update the local cache of NeXus definitions
        tree                show tree structure of HDF5 or NXDL file
-       update              update the local cache of NeXus definitions
        validate            validate a NeXus file
    
    Note: It is only necessary to use the first two (or more) characters of any
@@ -46,7 +45,7 @@ Subcommands
    demo
    hierarchy
    tree
-   update
+   cmd_install
    validate
 
 **punx** uses a subcommand structure to provide several different modules under one
@@ -61,10 +60,8 @@ subcommand                     brief description
 =============================  ====================================================
 :ref:`configuration <config>`  show internal punx configuration
 :ref:`demonstrate <demo>`      demonstrate HDF5 file validation
-:ref:`hierarchy <hierarchy>`   show NeXus base class hierarchy (not implemented yet)
-:ref:`structure <tree>`        (deprecated) use :ref:`tree`
+:ref:`install <install>`       update the local cache of NeXus definitions
 :ref:`tree <tree>`             show tree structure of HDF5 or NXDL file
-:ref:`update <update>`         update the local cache of NeXus definitions
 :ref:`validate <validate>`     validate a NeXus file
 =============================  ====================================================
 

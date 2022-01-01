@@ -703,7 +703,7 @@ def test_report_option(infile, report, observations, capsys):
 
     count = 0
     for line in captured.out.splitlines()[6:]:
-        if (
+        if not (
             # only look at content lines in first table
             len(line.strip()) == 0
             or line.startswith("==")
@@ -712,12 +712,11 @@ def test_report_option(infile, report, observations, capsys):
             or line.startswith("findings")
             or line.startswith("address")
         ):
-            continue
-        if line.startswith("summary statistics"):
-            # end when 2nd (summary) table starts
-            break
-        assert line.split()[1] in reported_statuses
-        count += 1
+            if line.startswith("summary statistics"):
+                # end when 2nd (summary) table starts
+                break
+            assert line.split()[1] in reported_statuses
+            count += 1
     assert count == observations
 
 

@@ -323,7 +323,7 @@ class Data_File_Validator(object):
         elif v_item.classpath == "":
             nx_class = "NXroot"  # handle as NXroot
         else:
-            raise ValueError("unexpected: " + str(v_item))
+            raise ValueError(f"unexpected: {v_item}")
 
         # print(str(v_item), v_item.name, v_item.classpath)
         self.validate_NX_class_attribute(v_item, nx_class)

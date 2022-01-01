@@ -242,7 +242,7 @@ def func_install(args):
 
     cm.find_all_file_sets()
 
-    for file_set_name in args.file_set_list:
+    for file_set_name in args.file_set_name:
         logger.info(
             "cache_manager.download_file_set('%s', '%s', force=%s)",
             file_set_name, cache_dir, args.update
@@ -348,11 +348,12 @@ def parse_command_line_arguments():
     p_sub.set_defaults(func=func_install)
 
     help_text = "name(s) of reference NeXus NXDL file set"
-    help_text += f" -- default {cache_manager.GITHUB_NXDL_BRANCH}"
-    # TODO: don't need the -r switch
+    help_text += f" -- default={cache_manager.GITHUB_NXDL_BRANCH}"
     p_sub.add_argument(
-        # "-r", "--file_set_list", default=[cache_manager.GITHUB_NXDL_BRANCH], nargs="*", help=help_text
-        "file_set_list", default=[cache_manager.GITHUB_NXDL_BRANCH], nargs="*", help=help_text
+        "file_set_name",
+        default=[cache_manager.GITHUB_NXDL_BRANCH],
+        nargs="*",
+        help=help_text
     )
 
     p_sub.add_argument(

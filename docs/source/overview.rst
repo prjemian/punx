@@ -41,19 +41,18 @@ Subcommands
 .. toctree::
    :hidden:
    
-   configuration
-   demo
-   hierarchy
-   tree
+   cmd_configuration
+   cmd_demo
    cmd_install
-   validate
+   cmd_tree
+   cmd_validate
 
 **punx** uses a subcommand structure to provide several different modules under one
 identifiable program.  These are invoked using commands of the form::
 
     punx <subcommand> <other parameters>
     
-where *<subcommand>* is chosen from this table:
+where *<subcommand>* [#]_ is chosen from this table:
 
 =============================  ====================================================
 subcommand                     brief description
@@ -65,11 +64,11 @@ subcommand                     brief description
 :ref:`validate <validate>`     validate a NeXus file
 =============================  ====================================================
 
-and the *<other parameters>* are desribed by the help for each subcommand::
+and the *<other parameters>* are described by the help for each subcommand::
 
     punx <subcommand> -h
 
-Example [#]_ ::
+Example ::
 
    console> punx val -h
    usage: punx validate [-h] [--report REPORT] infile
@@ -83,11 +82,12 @@ Example [#]_ ::
                       COMMENT,ERROR,NOTE,OK,OPTIONAL,TODO,UNUSED,WARN
 
 
-.. [#] tip: Subcommands may be shortened.
+.. [#] **tip**: Subcommands may be shortened to two characters.
 
    It is only necessary to use the first two (or more) characters of any
    subcommand, enough that the short version remains unique and could not be
-   misinterpreted as another subcommand.  The program imposes a minimum limit
-   of at least 2-characters.
+   misinterpreted as another subcommand.
+   
+   .. The program imposes a minimum limit of at least 2-characters.
     
    Such as: ``demonstrate`` can be abbreviated to ``demo`` or even ``de``.

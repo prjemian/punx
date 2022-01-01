@@ -7,7 +7,8 @@ User interface: subcommand: **install**
 **punx** keeps a local copy of the NeXus definition files.
 The originals of these files are located on GitHub.
 
-To *install* the local cache of NeXus definitions, run:
+To *install* the ``main`` of the NeXus definitions into a local directory
+(cache), run:
 
 ..  code-block:: console
 
@@ -54,15 +55,19 @@ showing how the ``main`` file set can be updated:
     ============= ====== =================== ======= ==================================================================
 
 
+You can install different versions (tags, branches, releases, or commits) of the
+NeXus definitions repository, to validate against different versions of the
+NeXus standard.
+
 .. rubric:: command line help
 
 ..  code-block:: console
 
     console> punx install -h
-    usage: punx install [-h] [-u] [file_set_list ...]
+    usage: punx install [-h] [-u] [file_set_name ...]
 
     positional arguments:
-      file_set_list  name(s) of reference NeXus NXDL file set -- default main
+      file_set_name  name(s) of reference NeXus NXDL file set -- default=main
 
     optional arguments:
       -h, --help     show this help message and exit

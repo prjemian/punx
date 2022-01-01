@@ -252,6 +252,7 @@ def func_install(args):
         )
 
     print(cm.table_of_caches())
+    print(f"default file set: {cm.default_file_set.ref}")
 
 
 class MyArgumentParser(argparse.ArgumentParser):

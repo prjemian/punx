@@ -7,7 +7,7 @@ from .. import schema_manager
 
 
 def test_strip_ns_function():
-    assert schema_manager.strip_ns("first:second") == u"second"
+    assert schema_manager.strip_ns("first:second") == "second"
 
 
 def test_raise_error_function():

@@ -85,10 +85,10 @@ DEFAULT_NXDL_SET = "v2018.5"  # most recent file set in source cache
 GITHUB_NXDL_BRANCH = "main"
 GITHUB_NXDL_ORGANIZATION = "nexusformat"
 GITHUB_NXDL_REPOSITORY = "definitions"
-INFO_FILE_NAME = u"__github_info__.json"
+INFO_FILE_NAME = "__github_info__.json"
 SHORT_SHA_LENGTH = 7
-SOURCE_CACHE_SETTINGS_FILENAME = u"punx.ini"
-SOURCE_CACHE_SUBDIR = u"cache"
+SOURCE_CACHE_SETTINGS_FILENAME = "punx.ini"
+SOURCE_CACHE_SUBDIR = "cache"
 GITHUB_RETRY_COUNT = 3
 URL_BASE = (
     "https://github.com/"
@@ -527,9 +527,9 @@ class NXDL_File_Set(object):
         self.info = file_name
         self.path = os.path.abspath(os.path.dirname(file_name))
         if self.path.find(os.path.join("punx", "cache")) > 0:
-            self.cache = u"source"
+            self.cache = "source"
         else:
-            self.cache = u"user"
+            self.cache = "user"
 
         # read the NXDL file set's info file for GitHub information
         obj = read_json_file(file_name)

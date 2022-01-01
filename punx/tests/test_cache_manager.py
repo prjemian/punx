@@ -9,9 +9,9 @@ from .. import cache_manager
 
 
 def test_basic_setup():
-    assert cache_manager.SOURCE_CACHE_SUBDIR == u"cache"
-    assert cache_manager.INFO_FILE_NAME == u"__github_info__.json"
-    assert cache_manager.SOURCE_CACHE_SETTINGS_FILENAME == u"punx.ini"
+    assert cache_manager.SOURCE_CACHE_SUBDIR == "cache"
+    assert cache_manager.INFO_FILE_NAME == "__github_info__.json"
+    assert cache_manager.SOURCE_CACHE_SETTINGS_FILENAME == "punx.ini"
     assert cache_manager.SHORT_SHA_LENGTH == 7
 
 
@@ -30,7 +30,7 @@ def test_selected_file_set():
     if cm is not None:
         fs = cm.select_NXDL_file_set(cache_manager.DEFAULT_NXDL_SET)
         assert fs.ref == cache_manager.DEFAULT_NXDL_SET
-        assert fs.cache == u"source"
+        assert fs.cache == "source"
         cm.cleanup()
 
 

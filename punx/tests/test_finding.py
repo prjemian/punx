@@ -25,21 +25,26 @@ def test_exception(h5_address, test_name, status, comment, xceptn):
             raise No_Exception
 
 
-def test_finding_str_format():
-    f = finding.Finding("A", "this", finding.OK, "looks good")
+@pytest.mark.parametrize(
+    "addr, test_name, status, comment",
+    [
+        [None, None, finding.ERROR, None],
+        ["h5_address", "test_name", finding.NOTE, "comment"],
+        ["A", "this", finding.OK, "looks good"],
+    ]
+)
+def test_str(addr, test_name, status, comment):
+    expect = (
+        "finding.Finding("
+        f"{addr}"
+        f", {test_name}"
+        f", finding.{status}"
+        f", {comment}"
+        ")"
+    )
+    f = finding.Finding(addr, test_name, status, comment)
     assert f is not None
-    assert str(f) == "OK A: this: looks good"
-
-
-def test_str():
-    f = finding.Finding(None, None, finding.OK, None)
-    assert str(f).find("finding.Finding object at") >= 0
-
-    f = finding.Finding("h5_address", "test_name", finding.OK, "comment")
-    assert f.h5_address == "h5_address"
-    assert f.test_name == "test_name"
-    assert f.comment == "comment"
-    assert f.status == finding.OK
+    assert str(f) == expect
 
 
 def test_standard():

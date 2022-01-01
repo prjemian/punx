@@ -95,12 +95,13 @@ class Finding(object):
 
     def __str__(self, *args, **kwargs):
         try:
-            return (
-                f"{self.status}"
-                f" {self.h5_address}"
-                f": {self.test_name}"
-                f": {self.comment}"
+            s = (
+                f"{self.h5_address}"
+                f", {self.test_name}"
+                f", finding.{self.status}"
+                f", {self.comment}"
             )
+            return f"finding.Finding({s})"
         except Exception:
             return object.__str__(self, *args, **kwargs)
 

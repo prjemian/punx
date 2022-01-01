@@ -96,7 +96,16 @@ def test_valid_nexus_file_constructed(hfile):
     assert utils.isNeXusFile(hfile)
 
 
-def test_NXdata_requirement_or_optional(hfile):
+@pytest.mark.parametrize(
+    "valid_ref, file_set_name, count",
+    # count: expected # of "/" for Finding with ERROR because NXdata is required
+    [
+        [True, "a4fd52d", 1],
+        [True, "v3.3", 0],
+        [False, "no_such_file_set", None],
+    ]
+)
+def test_NXdata_requirement_or_optional(valid_ref, file_set_name, count, hfile):
     """
     check for changes in NXDL rules
 
@@ -125,45 +134,28 @@ def test_NXdata_requirement_or_optional(hfile):
     It was stated only in the manual that NXdata
     was required.  Not suitable for automated validation.
     """
-    # create a minimal test file
-    with h5py.File(hfile, "w") as f:
-        eg = f.create_group(u"entry")
-        eg.attrs[u"NX_class"] = u"NXentry"
-        # eg.create_dataset(u"title", data=u"NXdata group not provided")
+    if not valid_ref:
+        validator = None
+        with pytest.raises(KeyError):
+            validator = validate.Data_File_Validator(ref=file_set_name)
+        assert validator is None
+    else:
+        validator = validate.Data_File_Validator(ref=file_set_name)
 
-    refs = dict(nxdata_required=u"a4fd52d", nxdata_not_required=u"v3.3")
-    validator = {}
+        # create a minimal test file
+        with h5py.File(hfile, "w") as f:
+            eg = f.create_group("entry")
+            eg.attrs["NX_class"] = "NXentry"
+            # eg.create_dataset("title", data="NXdata group not provided")
 
-    ref = refs["nxdata_required"]
-    try:
-        validator = validate.Data_File_Validator(ref=refs["nxdata_required"])
-    except KeyError:
-        raise RuntimeError(u"NXDL rule set %s not installed, cannot test" % ref)
-    validator.validate(hfile)
-    assert u"NXentry/NXdata" not in validator.classpaths
-    group = validator.addresses[u"/"].validations
+        validator.validate(hfile)
+        assert u"NXentry/NXdata" not in validator.classpaths
+        group = validator.addresses["/"].validations
 
-    # look in "/" for Finding with ERROR because NXdata is required
-    found = [v for v in group.values() if v.status == finding.ERROR]
-    assert len(found) == 1
-    validator.close()
-
-    ref = refs["nxdata_not_required"]
-    try:
-        validator = validate.Data_File_Validator(ref=refs["nxdata_not_required"])
-    except KeyError:
-        raise RuntimeError(u"NXDL rule set %s not installed, cannot test" % ref)
-    validator.validate(hfile)
-    assert u"NXentry/NXdata" not in validator.classpaths
-    group = validator.addresses[u"/"].validations
-
-    # look in "/" for absence of Finding with ERROR because NXdata is not required
-    found = [v for v in group.values() if v.status == finding.ERROR]
-    assert len(found) == 0
-
-    # look in "/" for presence of Finding with NOTE because NXdata is not required but recommended
-    found = [v for v in group.values() if v.status == finding.NOTE]
-    assert len(found) == 1
+        # look in "/" for Finding with ERROR because NXdata is required
+        found = [v for v in group.values() if v.status == finding.ERROR]
+        assert len(found) == count
+        validator.close()
 
 
 # class Test_Validate

@@ -98,7 +98,7 @@ def test_NXDL_attribute__ignoreExtraGroups():
         ["v2018.5", 99, "/entry/Relaxed", "NOTE", "validItemName", r"relaxed pattern: [A-Za-z_][\w_]*"],
         ["v2018.5", 99, "/entry/strict", "OK", "validItemName", "strict pattern: [a-z_][a-z0-9_]*"],
 
-        # units
+        # units are not yet validated
         # TODO: ["v2018.5", 99, "/entry/_starts_with_underscore@units", "NOTE", "field@units", "does not exist"],
         # TODO: ["v2018.5", 99, "/entry/0_starts_with_number@units", "NOTE", "field@units", "does not exist"],
         # TODO: ["v2018.5", 99, "/entry/also not allowed@units", "NOTE", "field@units", "does not exist"],

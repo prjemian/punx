@@ -315,10 +315,11 @@ class CacheManager(singletons.Singleton):
         logger.debug(" final ref: " + str(ref))
 
         if ref not in self.NXDL_file_sets:
-            # msg = 'unknown NXDL file set: ' + str(ref)
-            msg = "expected one of " + " ".join(sorted(self.NXDL_file_sets.keys()))
-            msg += ", received: " + str(ref)
-            raise KeyError(msg)
+            raise KeyError(
+                f"File set '{ref}' not found."
+                "  Either install it or choose from one of these:"
+                f" {', '.join(sorted(self.NXDL_file_sets.keys()))}"
+            )
         self.default_file_set = self.NXDL_file_sets[ref]
         logger.debug(" default file set: " + str(self.default_file_set))
         return self.default_file_set

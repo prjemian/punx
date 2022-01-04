@@ -84,8 +84,7 @@ class Finding(object):
 
     def __init__(self, h5_address, test_name, status, comment):
         if status not in VALID_STATUS_LIST:
-            msg = "unknown status value: " + status
-            raise ValueError(msg)
+            raise ValueError(f"unknown status value: {status}")
 
         self.test_name = str(test_name)
         self.h5_address = h5_address

@@ -98,6 +98,11 @@ def default_plot_v3(validator):
         t1 = attribute_points_at_target(nxroot, "default", nxentry.h5_address)
         t2 = attribute_points_at_target(nxentry, "default", nxdata.h5_address)
         t3 = attribute_points_at_target(nxdata, "signal", signal_h5_addr)
+        if t3 is False:
+            status = finding.ERROR
+            c = "field described by @signal does not exist"
+            validator.record_finding(v_item, test_name + ", NXdata@signal", status, c)
+            return None  # fail to identify as plottable since @signal is misleading
         t4 = utils.isNeXusDataset(validator.addresses[signal_h5_addr].h5_object)
         if t3 and t4:
             status = finding.OK

@@ -166,8 +166,8 @@ def test_table_of_caches():
     "cache_name, file_set_name, force",
     [
         ["source", "a4fd52d", False],
-        ["source", "v3.3", True],
         ["user", "main", True],
+        ["user", "main", False],
         ["user", "Schema-3.4", False],
     ]
 )

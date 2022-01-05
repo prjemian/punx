@@ -334,7 +334,6 @@ def parse_command_line_arguments():
     subcommand = p.add_subparsers(title="subcommand", description="valid subcommands",)
 
     # --- subcommand: configuration
-    # TODO: issue #11
     help_text = "show configuration details of punx"
     p_sub = subcommand.add_parser("configuration", help=help_text)
     p_sub.set_defaults(func=func_configuration)

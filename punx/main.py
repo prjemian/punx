@@ -62,6 +62,8 @@ import os
 import pathlib
 import sys
 
+from punx import cache_manager
+
 logging.basicConfig(
     level=logging.INFO,
     # level=logging.DEBUG,
@@ -89,7 +91,7 @@ def exit_message(msg, status=None, exit_code=1):
     """
     if status is None:
         status = ERROR
-    logging.info("{} -- {}".format(msg, status))
+    logging.info("%s", msg)
     exit(exit_code)
 
 
@@ -192,13 +194,22 @@ def func_validate(args):
     """
     from . import validate
 
+    cm = cache_manager.CacheManager()
+
     if args.infile.endswith(".nxdl.xml"):
         result = validate.validate_xml(args.infile)
         if result is None:
             print(args.infile, " validates")
         return
 
-    validator = validate.Data_File_Validator()
+    file_sets = list(cm.find_all_file_sets().keys())
+    if args.file_set_name not in file_sets:
+        exit_message(
+            f"File set '{args.file_set_name}' is not available locally."
+            f"  Either install it or use one of these: {', '.join(file_sets)}"
+        )
+
+    validator = validate.Data_File_Validator(args.file_set_name)
 
     # determine which findings are to be reported
     report_choices, trouble = [], []
@@ -208,12 +219,11 @@ def func_validate(args):
         else:
             trouble.append(c)
     if len(trouble) > 0:
-        msg = "invalid choice(s) for *--report* option: "
-        msg += ",".join(trouble)
-        msg += "\n"
-        msg += "\t" + "available choices: "
-        msg += ",".join(sorted(finding.VALID_STATUS_DICT.keys()))
-        exit_message(msg)
+        choices = ",".join(sorted(finding.VALID_STATUS_DICT.keys()))
+        exit_message(
+            f"invalid choice(s) for *--report* option: {','.join(trouble)}\n"
+            "\t available choices: {choices}"
+        )
 
     try:
         # run the validation
@@ -227,6 +237,7 @@ def func_validate(args):
 
     # report the findings from the validation
     validator.print_report(statuses=report_choices)
+    print(f"NeXus definitions version: {args.file_set_name}")
 
 
 def func_install(args):

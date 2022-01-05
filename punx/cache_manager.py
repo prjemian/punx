@@ -279,7 +279,7 @@ class CacheManager(singletons.Singleton):
         self.source = SourceCache()
         self.user = UserCache()
 
-        self.NXDL_file_sets = self.find_all_file_sets()
+        self.NXDL_file_sets = self.find_all_file_sets
         logger.debug(
             " NXDL_file_sets names = %s",
             sorted(list(self.NXDL_file_sets.keys()))
@@ -326,14 +326,15 @@ class CacheManager(singletons.Singleton):
     # - - - - - - - - - - - - - -
     # private
 
+    @property
     def find_all_file_sets(self):
         """return dictionary of all NXDL file sets in both source & user caches"""
-        fs = {k: v for k, v in self.source.find_all_file_sets().items()}
+        fs = {k: v for k, v in self.source.find_all_file_sets.items()}
         msg = " source file set names: "
         msg += str(sorted(list(fs.keys())))
         logger.debug(msg)
 
-        for k, v in self.user.find_all_file_sets().items():
+        for k, v in self.user.find_all_file_sets.items():
             if k not in fs:
                 #     raise ValueError('user cache file set already known: ' + k)
                 # else:
@@ -370,7 +371,7 @@ class CacheManager(singletons.Singleton):
 
         """
         t = pyRestTable.Table()
-        fs = self.find_all_file_sets()
+        fs = self.find_all_file_sets
         t.labels = ["NXDL file set", "cache", "date & time", "commit", "path"]
         for k, v in fs.items():
             # print(k, str(v))
@@ -415,13 +416,14 @@ class Base_Cache(object):
         fn = str(self.qsettings.fileName())
         return fn
 
+    @property
     def find_all_file_sets(self):
         """index all NXDL file sets in this cache"""
         fs = {}
         if self.qsettings is None:
             raise RuntimeError("cache qsettings not defined!")
         cache_path = self.path
-        logger.debug(" cache path: " + str(cache_path))
+        logger.debug(" cache path: %s", cache_path)
 
         for item in os.listdir(cache_path):
             if os.path.isdir(os.path.join(cache_path, item)):

@@ -32,18 +32,19 @@ validate a NeXus file
 
 .. rubric:: command line help
 
-.. code-block:: console
-   :linenos:
+..  code-block:: console
+    :linenos:
 
-   usage: punx validate [-h] [--report REPORT] infile
+    usage: punx validate [-h] [--report REPORT] infile
 
-   positional arguments:
-     infile           HDF5 or NXDL file name
+    positional arguments:
+      infile           HDF5 or NXDL file name
 
-   optional arguments:
-     -h, --help       show this help message and exit
-    --report REPORT  select which validation findings to report, choices: COMMENT,ERROR,NOTE,OK,OPTIONAL,TODO,UNUSED,WARN (separate with comma if more
-                     than one, do not use white space)
+    optional arguments:
+      -h, --help            show this help message and exit
+      -f FILE_SET_NAME, --file_set_name FILE_SET_NAME
+                            NeXus NXDL file set (definitions) name for validation -- default=v2018.5
+      --report REPORT       select which validation findings to report, choices: COMMENT,ERROR,NOTE,OK,OPTIONAL,TODO,UNUSED,WARN (separate with comma if more than one, do not use white space)
 
 The **REPORT** findings are as presented in the table above for each validation step.
 

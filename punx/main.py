@@ -81,16 +81,13 @@ ERROR = 40
 logger = utils.setup_logger(__name__, logging.INFO)
 
 
-def exit_message(msg, status=None, exit_code=1):
+def exit_message(msg, exit_code=1):
     """
     exit this code with a message and a status
 
     :param str msg: text to be reported
-    :param int status: 0 - 50 (default: ERROR = 40)
     :param int exit_code: 0: no error, 1: error (default)
     """
-    if status is None:
-        status = ERROR
     logging.info("%s", msg)
     exit(exit_code)
 

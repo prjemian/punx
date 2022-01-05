@@ -202,7 +202,7 @@ def func_validate(args):
             print(args.infile, " validates")
         return
 
-    file_sets = list(cm.find_all_file_sets.keys())
+    file_sets = list(cm.all_file_sets.keys())
     if args.file_set_name not in file_sets:
         exit_message(
             f"File set '{args.file_set_name}' is not available locally."
@@ -222,7 +222,7 @@ def func_validate(args):
         choices = ",".join(sorted(finding.VALID_STATUS_DICT.keys()))
         exit_message(
             f"invalid choice(s) for *--report* option: {','.join(trouble)}\n"
-            "\t available choices: {choices}"
+            f"\t available choices: {choices}"
         )
 
     try:
@@ -250,8 +250,6 @@ def func_install(args):
 
     cm = cache_manager.CacheManager()
     cache_dir = pathlib.Path(cm.user.path)
-
-    cm.find_all_file_sets
 
     for file_set_name in args.file_set_name:
         logger.info(

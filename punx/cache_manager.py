@@ -269,7 +269,7 @@ class CacheManager(singletons.Singleton):
     .. autosummary::
 
         ~select_NXDL_file_set
-        ~find_all_file_sets
+        ~all_file_sets
         ~cleanup
 
     """
@@ -279,7 +279,7 @@ class CacheManager(singletons.Singleton):
         self.source = SourceCache()
         self.user = UserCache()
 
-        self.NXDL_file_sets = self.find_all_file_sets
+        self.NXDL_file_sets = self.all_file_sets
         logger.debug(
             " NXDL_file_sets names = %s",
             sorted(list(self.NXDL_file_sets.keys()))
@@ -327,24 +327,16 @@ class CacheManager(singletons.Singleton):
     # private
 
     @property
-    def find_all_file_sets(self):
+    def all_file_sets(self):
         """return dictionary of all NXDL file sets in both source & user caches"""
-        fs = {k: v for k, v in self.source.find_all_file_sets.items()}
-        msg = " source file set names: "
-        msg += str(sorted(list(fs.keys())))
-        logger.debug(msg)
-
-        for k, v in self.user.find_all_file_sets.items():
-            if k not in fs:
-                #     raise ValueError('user cache file set already known: ' + k)
-                # else:
-                fs[k] = v
-
-        self.NXDL_file_sets = fs  # remember
-        msg = " all known file set names: "
-        msg += str(sorted(list(fs.keys())))
-        logger.debug(msg)
-        return fs
+        self.NXDL_file_sets = {}
+        for cache in "source user".split():
+            self.NXDL_file_sets.update(getattr(self, cache).all_file_sets)
+        logger.debug(
+            "all known file set names: %s",
+            sorted(list(self.NXDL_file_sets.keys()))
+        )
+        return self.NXDL_file_sets
 
     def cleanup(self):
         """removes any temporary directories"""
@@ -371,13 +363,9 @@ class CacheManager(singletons.Singleton):
 
         """
         t = pyRestTable.Table()
-        fs = self.find_all_file_sets
         t.labels = ["NXDL file set", "cache", "date & time", "commit", "path"]
-        for k, v in fs.items():
-            # print(k, str(v))
-            row = [
-                k,
-            ]
+        for k, v in self.all_file_sets.items():
+            row = [k]
             v.short_sha = get_short_sha(v.sha)
             for w in "cache last_modified short_sha path".split():
                 row.append(str(v.__getattribute__(w)))
@@ -392,7 +380,7 @@ class Base_Cache(object):
 
     .. autosummary::
 
-       ~find_all_file_sets
+       ~all_file_sets
        ~fileName
        ~path
        ~cleanup
@@ -417,7 +405,7 @@ class Base_Cache(object):
         return fn
 
     @property
-    def find_all_file_sets(self):
+    def all_file_sets(self):
         """index all NXDL file sets in this cache"""
         fs = {}
         if self.qsettings is None:

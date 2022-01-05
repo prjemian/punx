@@ -172,8 +172,7 @@ def test_NXDL_Manager_instance():
 )
 def test_count_NXDL_files(file_set, num_nxdl_files):
     cm = cache_manager.CacheManager()
-    all_file_sets = cm.find_all_file_sets
-    assert file_set in all_file_sets
+    assert file_set in cm.all_file_sets
 
     manager = nxdl_manager.NXDL_Manager(file_set)
     assert isinstance(manager, nxdl_manager.NXDL_Manager)

@@ -14,21 +14,62 @@ from .. import finding
 from .. import validate
 
 
-def test_NXcollection_always_generates_a_warning():
+@pytest.mark.parametrize(
+    "file_set, count, addr, status, test_name, comment",
+    [
+        # NX_class attribute must evaluate to OK since it identifies the NXcollection base class
+        ["v2018.5", 61, "/entry/collection@NX_class", "OK", "validItemName", "pattern: NX.+"],
+
+        ["a4fd52d", 63, "/entry/collection", "WARN", "validItemName", "NXcollection contains non-NeXus content"],
+        ["v3.3", 61, "/entry/collection", "WARN", "validItemName", "NXcollection contains non-NeXus content"],
+        ["v2018.5", 61, "/entry/collection", "WARN", "validItemName", "NXcollection contains non-NeXus content"],
+        ["v2018.5", 61, "/entry/collection/also    allowed", "WARN", "validItemName", "NXcollection contains non-NeXus content"],
+        ["v2018.5", 61, "/entry/collection/anything.allowed", "WARN", "validItemName", "NXcollection contains non-NeXus content"],
+
+        # attributes are not validated yet
+        # TODO: ["v2018.5", 61, "/entry/collection@@ignored@", "WARN", "validItemName", "NXcollection contains non-NeXus content"],
+    ]
+)
+def test_NXcollection_always_generates_a_warning(file_set, count, addr, status, test_name, comment, hfile):
     """
+    NXcollection: An unvalidated set of terms
+
     For NeXus validation, NXcollection will always generate a
     warning since it is always an optional group.
     Anything (groups, fields, or attributes) placed in an
     NXcollection group will not be validated.
     """
-    assert True  # TODO:
+    r5 = list(range(5))
+    with h5py.File(hfile, "w") as root:
+        root.attrs["default"] = "entry"
+
+        nxentry = root.create_group("entry")
+        nxentry.attrs["NX_class"] = "NXentry"
+
+        nxcollection = nxentry.create_group("collection")
+        nxcollection.attrs["NX_class"] = "NXcollection"
+        nxcollection.attrs["@ignored@"] = "ignored by NeXus"
+        nxcollection.create_dataset("anything.allowed", data=r5)
+        nxcollection.create_dataset("also    allowed", data=r5)
+
+    validator = validate.Data_File_Validator(file_set)
+    validator.validate(hfile)
+    assert len(validator.validations) == count
+
+    for f in validator.validations:
+        assert isinstance(f, finding.Finding)
+        if f.h5_address == addr:
+            if f.test_name == test_name:
+                note = f"'{f.h5_address}' {f.status.key}  '{f.test_name}'  '{f.comment}'"
+                assert f.status.key == status, note
+                assert f.comment == comment, note
 
 
 def test_note_items_added_to_base_class_and_not_in_NXDL():
     """
-    Validation procedures should treat such additional
-    items (not covered by a base class specification)
-    as notes or warnings rather than errors.
+    Validation procedures should treat such additional items (not covered by a
+    base class specification or application definition) as OPTIONAL rather than
+    notes, warnings, or errors.
     """
     assert True  # TODO:
 
@@ -141,8 +182,8 @@ def test_naming_conventions__issue_65(file_set, count, addr, status, test_name, 
     for f in validator.validations:
         assert isinstance(f, finding.Finding)
         if addr == f.h5_address and test_name == f.test_name:
-            assert status == f.status.key, f"{addr} {f.status.key}"
-            assert comment == f.comment, f"{addr} {f.comment}"
+            assert f.status.key == status, f"{addr} {f.status.key}"
+            assert f.comment == comment, f"{addr} {f.comment}"
             found = True
 
     assert found

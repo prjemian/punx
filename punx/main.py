@@ -302,6 +302,8 @@ def parse_command_line_arguments():
     """process command line"""
     from . import cache_manager
 
+    cm = cache_manager.CacheManager()
+
     doc = __doc__.strip().splitlines()[0]
     doc += "\n  version: " + __version__
     doc += "\n  URL: " + __url__
@@ -393,6 +395,17 @@ def parse_command_line_arguments():
     p_sub = subcommand.add_parser("validate", help="validate a NeXus file")
     p_sub.add_argument("infile", help="HDF5 or NXDL file name")
     p_sub.set_defaults(func=func_validate)
+
+    help_text = "NeXus NXDL file set (definitions) name for validation"
+    help_text += f" -- default={cm.default_file_set.ref}"
+    p_sub.add_argument(
+        "-f",
+        "--file_set_name",
+        default=cm.default_file_set.ref,
+        # nargs="*",
+        help=help_text
+    )
+
     reporting_choices = ",".join(sorted(finding.VALID_STATUS_DICT.keys()))
     help_text = (
         "select which validation findings to report, "

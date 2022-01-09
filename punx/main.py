@@ -62,6 +62,8 @@ import os
 import pathlib
 import sys
 
+from punx import cache_manager
+
 logging.basicConfig(
     level=logging.INFO,
     # level=logging.DEBUG,
@@ -79,17 +81,14 @@ ERROR = 40
 logger = utils.setup_logger(__name__, logging.INFO)
 
 
-def exit_message(msg, status=None, exit_code=1):
+def exit_message(msg, exit_code=1):
     """
     exit this code with a message and a status
 
     :param str msg: text to be reported
-    :param int status: 0 - 50 (default: ERROR = 40)
     :param int exit_code: 0: no error, 1: error (default)
     """
-    if status is None:
-        status = ERROR
-    logging.info("{} -- {}".format(msg, status))
+    logging.info("%s", msg)
     exit(exit_code)
 
 
@@ -192,13 +191,22 @@ def func_validate(args):
     """
     from . import validate
 
+    cm = cache_manager.CacheManager()
+
     if args.infile.endswith(".nxdl.xml"):
         result = validate.validate_xml(args.infile)
         if result is None:
             print(args.infile, " validates")
         return
 
-    validator = validate.Data_File_Validator()
+    file_sets = list(cm.all_file_sets.keys())
+    if args.file_set_name not in file_sets:
+        exit_message(
+            f"File set '{args.file_set_name}' is not available locally."
+            f"  Either install it or use one of these: {', '.join(file_sets)}"
+        )
+
+    validator = validate.Data_File_Validator(args.file_set_name)
 
     # determine which findings are to be reported
     report_choices, trouble = [], []
@@ -208,12 +216,11 @@ def func_validate(args):
         else:
             trouble.append(c)
     if len(trouble) > 0:
-        msg = "invalid choice(s) for *--report* option: "
-        msg += ",".join(trouble)
-        msg += "\n"
-        msg += "\t" + "available choices: "
-        msg += ",".join(sorted(finding.VALID_STATUS_DICT.keys()))
-        exit_message(msg)
+        choices = ",".join(sorted(finding.VALID_STATUS_DICT.keys()))
+        exit_message(
+            f"invalid choice(s) for *--report* option: {','.join(trouble)}\n"
+            f"\t available choices: {choices}"
+        )
 
     try:
         # run the validation
@@ -227,6 +234,7 @@ def func_validate(args):
 
     # report the findings from the validation
     validator.print_report(statuses=report_choices)
+    print(f"NeXus definitions version: {args.file_set_name}")
 
 
 def func_install(args):
@@ -239,8 +247,6 @@ def func_install(args):
 
     cm = cache_manager.CacheManager()
     cache_dir = pathlib.Path(cm.user.path)
-
-    cm.find_all_file_sets()
 
     for file_set_name in args.file_set_name:
         logger.info(
@@ -302,6 +308,8 @@ def parse_command_line_arguments():
     """process command line"""
     from . import cache_manager
 
+    cm = cache_manager.CacheManager()
+
     doc = __doc__.strip().splitlines()[0]
     doc += "\n  version: " + __version__
     doc += "\n  URL: " + __url__
@@ -323,7 +331,6 @@ def parse_command_line_arguments():
     subcommand = p.add_subparsers(title="subcommand", description="valid subcommands",)
 
     # --- subcommand: configuration
-    # TODO: issue #11
     help_text = "show configuration details of punx"
     p_sub = subcommand.add_parser("configuration", help=help_text)
     p_sub.set_defaults(func=func_configuration)
@@ -393,6 +400,17 @@ def parse_command_line_arguments():
     p_sub = subcommand.add_parser("validate", help="validate a NeXus file")
     p_sub.add_argument("infile", help="HDF5 or NXDL file name")
     p_sub.set_defaults(func=func_validate)
+
+    help_text = "NeXus NXDL file set (definitions) name for validation"
+    help_text += f" -- default={cm.default_file_set.ref}"
+    p_sub.add_argument(
+        "-f",
+        "--file_set_name",
+        default=cm.default_file_set.ref,
+        # nargs="*",
+        help=help_text
+    )
+
     reporting_choices = ",".join(sorted(finding.VALID_STATUS_DICT.keys()))
     help_text = (
         "select which validation findings to report, "

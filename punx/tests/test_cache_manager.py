@@ -179,5 +179,5 @@ def test_download_file_set(cache_name, file_set_name, force):
     cache = getattr(cm, cache_name)
     cache_dir = pathlib.Path(cache.path)
     cache_manager.download_file_set(file_set_name, cache_dir, replace=force)
-    fs = cache.find_all_file_sets()
+    fs = cache.all_file_sets
     assert file_set_name in fs

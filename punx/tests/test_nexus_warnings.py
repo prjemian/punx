@@ -131,6 +131,13 @@ def test_NXDL_attribute__ignoreExtraGroups():
         ["v2018.5", 99, "/entry@@@@", "ERROR", "validItemName", "no matching pattern found"],
         ["v2018.5", 99, "/entry@@attribute", "ERROR", "validItemName", "no matching pattern found"],
         ["v2018.5", 99, "/entry@attribute@", "ERROR", "validItemName", "no matching pattern found"],
+
+        ["v2018.5", 99, "/entry@NX_class", "OK", "validItemName", "pattern: NX.+"],
+        ["v2018.5", 99, "/entry@default", "OK", "validItemName", "strict pattern: [a-z_][a-z0-9_]*"],
+        ["v2018.5", 99, "/entry/data@NX_class", "OK", "validItemName", "pattern: NX.+"],
+        ["v2018.5", 99, "/entry/data@signal", "OK", "validItemName", "strict pattern: [a-z_][a-z0-9_]*"],
+        
+        # These items are not strictly part of issue #65, still worthy of testing
         ["v2018.5", 99, "/entry/_starts_with_underscore", "OK", "validItemName", "strict pattern: [a-z_][a-z0-9_]*"],
         ["v2018.5", 99, "/entry/also not allowed", "ERROR", "validItemName", "valid HDF5 item name, not valid with NeXus"],
         ["v2018.5", 99, "/entry/data@signal", "ERROR", "NeXus default plot v3, NXdata@signal", "field described by @signal does not exist"],
@@ -149,6 +156,9 @@ def test_NXDL_attribute__ignoreExtraGroups():
     ]
 )
 def test_naming_conventions__issue_65(file_set, count, addr, status, test_name, comment, hfile):
+    """
+    valid HDF5 attributes, yet invalid with NeXus, can start with a "@"
+    """
     # create the HDF5 content
     r5 = list(range(5))
     with h5py.File(hfile, "w") as root:

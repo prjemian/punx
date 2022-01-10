@@ -138,7 +138,7 @@ def test_NXDL_attribute__ignoreExtraGroups():
         ["v2018.5", 99, "/entry@default", "OK", "validItemName", "strict pattern: [a-z_][a-z0-9_]*"],
         ["v2018.5", 99, "/entry/data@NX_class", "OK", "validItemName", "pattern: NX.+"],
         ["v2018.5", 99, "/entry/data@signal", "OK", "validItemName", "strict pattern: [a-z_][a-z0-9_]*"],
-        
+
         # These items are not strictly part of issue #65, still worthy of testing
         ["v2018.5", 99, "/entry/_starts_with_underscore", "OK", "validItemName", "strict pattern: [a-z_][a-z0-9_]*"],
         ["v2018.5", 99, "/entry/also not allowed", "ERROR", "validItemName", "valid HDF5 item name, not valid with NeXus"],

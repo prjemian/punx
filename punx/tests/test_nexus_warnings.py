@@ -30,7 +30,9 @@ from .. import validate
         # TODO: ["v2018.5", 61, "/entry/collection@@ignored@", "WARN", "validItemName", "NXcollection contains non-NeXus content"],
     ]
 )
-def test_NXcollection_always_generates_a_warning(file_set, count, addr, status, test_name, comment, hfile):
+def test_NXcollection_always_generates_a_warning(
+    file_set, count, addr, status, test_name, comment, hfile
+):
     """
     NXcollection: An unvalidated set of terms
 
@@ -155,7 +157,9 @@ def test_NXDL_attribute__ignoreExtraGroups():
         # TODO: ["v2018.5", 99, "/entry/strict@units", "NOTE", "field@units", "does not exist"],
     ]
 )
-def test_naming_conventions__issue_65(file_set, count, addr, status, test_name, comment, hfile):
+def test_naming_conventions__issue_65(
+    file_set, count, addr, status, test_name, comment, hfile
+):
     """
     valid HDF5 attributes, yet invalid with NeXus, can start with a "@"
     """

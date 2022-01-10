@@ -368,7 +368,7 @@ class CacheManager(singletons.Singleton):
 
         t = pyRestTable.Table()
         t.labels = ["NXDL file set", "cache", "date & time", "commit", "path"]
-        for k, v in self.all_file_sets.items():
+        for k, v in sorted(self.all_file_sets.items(), key=sorter):
             v.short_sha = get_short_sha(v.sha)
             row = [k]
             for w in "cache last_modified short_sha path".split():

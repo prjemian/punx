@@ -68,7 +68,7 @@ def verify(validator, v_item):
         msg = "no name validation on the HDF5 file root node"
         logger.log(INFORMATIVE, msg)
         return
-    if "name" in v_item.validations:
+    if v_item.name in v_item.validations:
         return  # do not repeat this
 
     if v_item.h5_address is not None and v_item.h5_address.endswith("@NX_class"):
@@ -169,7 +169,10 @@ def handle_groups_and_fields(validator, v_item):
     # check against patterns until a match is found
     try:
         k = validItemName_match_key(validator, v_item.name)
-        if k is None:
+        if "NXcollection" in v_item.classpath:
+            status = finding.WARN
+            k = "NXcollection contains non-NeXus content"
+        elif k is None:
             status = finding.ERROR
             k = "valid HDF5 item name, not valid with NeXus"
         elif k.startswith("strict"):

@@ -315,10 +315,11 @@ class CacheManager(singletons.Singleton):
         logger.debug(" final ref: " + str(ref))
 
         if ref not in self.NXDL_file_sets:
-            # msg = 'unknown NXDL file set: ' + str(ref)
-            msg = "expected one of " + " ".join(sorted(self.NXDL_file_sets.keys()))
-            msg += ", received: " + str(ref)
-            raise KeyError(msg)
+            raise KeyError(
+                f"File set '{ref}' not found."
+                "  Either install it or choose from one of these:"
+                f" {', '.join(sorted(self.NXDL_file_sets.keys()))}"
+            )
         self.default_file_set = self.NXDL_file_sets[ref]
         logger.debug(" default file set: " + str(self.default_file_set))
         return self.default_file_set
@@ -362,13 +363,16 @@ class CacheManager(singletons.Singleton):
             ============= ====== =================== ======= ==================================================================
 
         """
+        def sorter(kv):
+            return kv[-1].last_modified
+
         t = pyRestTable.Table()
         t.labels = ["NXDL file set", "cache", "date & time", "commit", "path"]
-        for k, v in self.all_file_sets.items():
-            row = [k]
+        for k, v in sorted(self.all_file_sets.items(), key=sorter):
             v.short_sha = get_short_sha(v.sha)
+            row = [k]
             for w in "cache last_modified short_sha path".split():
-                row.append(str(v.__getattribute__(w)))
+                row.append(str(getattr(v, w)))
             t.rows.append(row)
         return t
 

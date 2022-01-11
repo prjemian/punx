@@ -134,6 +134,7 @@ def func_demo(args):
     print("")
     print("console> punx validate " + args.infile)
     args.report = ",".join(sorted(finding.VALID_STATUS_DICT.keys()))
+    args.file_set_name = cache_manager.GITHUB_NXDL_BRANCH
     func_validate(args)
     del args.report
 

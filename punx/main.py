@@ -134,6 +134,7 @@ def func_demo(args):
     print("")
     print("console> punx validate " + args.infile)
     args.report = ",".join(sorted(finding.VALID_STATUS_DICT.keys()))
+    args.file_set_name = cache_manager.GITHUB_NXDL_BRANCH
     func_validate(args)
     del args.report
 
@@ -274,7 +275,6 @@ class MyArgumentParser(argparse.ArgumentParser):
         permit the first two char (or more) of each subcommand to be accepted
         """
         if args is None and len(sys.argv) > 1 and not sys.argv[1].startswith("-"):
-            # TODO: issue #8: make more robust for variations in optional commands
             sub_cmd = sys.argv[1]
             # make a list of the available subcommand names
             choices = []
@@ -285,18 +285,26 @@ class MyArgumentParser(argparse.ArgumentParser):
                     break
             if len(choices) > 0 and sub_cmd not in choices:
                 if len(sub_cmd) < 2:
-                    msg = "subcommand too short, must match first 2 or more characters, given: %s"
-                    self.error(msg % " ".join(sys.argv[1:]))
+                    self.error(
+                        "subcommand too short,"
+                        " must match first 2 or more characters"
+                        f", given: '{' '.join(sys.argv[1:])}'"
+                    )
                 # look for any matches
                 matches = [c for c in choices if c.startswith(sub_cmd)]
                 # validate the match is unique
                 if len(matches) == 0:
-                    msg = "subcommand unrecognized, given: %s"
-                    self.error(msg % " ".join(sys.argv[1:]))
+                    self.error(
+                        "subcommand unrecognized"
+                        f", given: '{' '.join(sys.argv[1:])}'"
+                        "  (NOTE: options for subcommands are expected"
+                        " _after_ the subcommand.)"
+                    )
                 elif len(matches) > 1:
-                    msg = "subcommand ambiguous (matches: %s)" % " | ".join(matches)
-                    msg += ", given: %s"
-                    self.error(msg % " ".join(sys.argv[1:]))
+                    self.error(
+                        f"subcommand ambiguous (matches: {' | '.join(matches)})"
+                        f", given: '{' '.join(sys.argv[1:])}'"
+                    )
                 else:
                     sub_cmd = matches[0]
                 # re-assign the subcommand

@@ -158,8 +158,8 @@ class Hdf5TreeView(object):
                         obj, link_info
                     ):  # TODO: is obj the "parent"
                         # When "classref" is defined, then external data is available
-                        s += self._renderSingleAttribute(indentation + "  ", "file", link_info.filename)
-                        s += self._renderSingleAttribute(indentation + "  ", "path", link_info.path)
+                        s += [self._renderSingleAttribute(indentation + "  ", "file", link_info.filename)]
+                        s += [self._renderSingleAttribute(indentation + "  ", "path", link_info.path)]
                 else:
                     msg = (
                         "unidentified %s: %s, %s",

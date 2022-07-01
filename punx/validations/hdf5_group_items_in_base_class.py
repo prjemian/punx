@@ -112,7 +112,7 @@ def verify_group_attributes(validator, v_item, base_class):
             test_name = "value of @" + k
             status = finding.TODO
             c = "TODO: need to validate"
-            c += ": @" + k + " = " + v
+            c += ": @" + k + " = " + str(v)
             validator.record_finding(a_item, test_name, status, c)
 
 

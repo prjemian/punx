@@ -30,7 +30,7 @@ def verify(validator, v_item):
     msg = ad_name
     if ad.category == "applications":
         msg += ": known NeXus application definition"
-    elif ad.category == "contributed":
+    elif ad.category == "contributed_definitions":
         msg += ": known NeXus contributed definition used as application definition"
     else:
         status = finding.ERROR

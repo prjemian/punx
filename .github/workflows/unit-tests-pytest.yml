@@ -33,7 +33,12 @@ jobs:
     - name: Install Python package & test requirements
       shell: bash -l {0}
       run: |
-        micromamba install coverage coveralls pytest pyyaml ruamel_yaml yaml -c conda-forge
+        micromamba install coverage coveralls pytest
+
+    # - name: Install YAML packages
+    #   shell: bash -l {0}
+    #   run: |
+    #     micromamba install pyyaml ruamel_yaml yaml -c conda-forge
 
     - name: Diagnostic
       shell: bash -l {0}

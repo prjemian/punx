@@ -38,7 +38,7 @@ jobs:
     - name: Install Python coveralls
       shell: bash -l {0}
       run: |
-      # as seen: https://github.com/bleachbit/bleachbit/commit/c66b604b2702e51b215a9e768c93b099d1331fc4
+        # as seen: https://github.com/bleachbit/bleachbit/commit/c66b604b2702e51b215a9e768c93b099d1331fc4
         pip install coveralls
 
     - name: Diagnostic

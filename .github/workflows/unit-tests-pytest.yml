@@ -33,7 +33,7 @@ jobs:
     - name: Install Python package & test requirements
       shell: bash -l {0}
       run: |
-        micromamba install coverage coveralls pytest
+        micromamba install coverage<=5.0a5 coveralls pytest
 
     # - name: Install YAML packages
     #   shell: bash -l {0}

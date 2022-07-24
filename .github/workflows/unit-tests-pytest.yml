@@ -33,13 +33,13 @@ jobs:
     - name: Install Python package & test requirements
       shell: bash -l {0}
       run: |
-        micromamba install coverage pytest
+        micromamba install -f environment-ci.yml
 
-    - name: Install Python coveralls
-      shell: bash -l {0}
-      run: |
-        # as seen: https://github.com/bleachbit/bleachbit/commit/c66b604b2702e51b215a9e768c93b099d1331fc4
-        pip install coveralls
+    # - name: Install Python coveralls
+    #   shell: bash -l {0}
+    #   run: |
+    #     # as seen: https://github.com/bleachbit/bleachbit/commit/c66b604b2702e51b215a9e768c93b099d1331fc4
+    #     pip install coveralls pyyaml
 
     - name: Diagnostic
       shell: bash -l {0}

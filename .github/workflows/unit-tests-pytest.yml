@@ -31,23 +31,28 @@ jobs:
         printenv | sort
 
     - name: Install Python package & test requirements
+      shell: bash -l {0}
       run: |
         micromamba install coverage coveralls pytest pyyaml ruamel_yaml yaml -c conda-forge
 
     - name: Diagnostic
+      shell: bash -l {0}
       run: |
         micromamba list
 
     - name: Run tests with pytest & coverage
+      shell: bash -l {0}
       run: |
         coverage run --concurrency=thread --parallel-mode -m pytest -vvv .
         coverage combine
 
     - name: Coverage Report
+      shell: bash -l {0}
       run: |
         coverage report
 
     - name: Upload to coveralls
+      shell: bash -l {0}
       # https://github.com/TheKevJames/coveralls-python
       run: |
         coveralls --service=github

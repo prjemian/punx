@@ -31,7 +31,6 @@ from __future__ import print_function
 import collections
 import lxml.etree
 import os
-import six
 
 from .__init__ import FileNotFound, InvalidNxdlFile
 from . import nxdl_schema
@@ -77,7 +76,7 @@ class NXDL_Manager(object):
         if file_set is None:
             cm = cache_manager.CacheManager()
             file_set = cm.default_file_set
-        elif isinstance(file_set, six.string_types):
+        elif isinstance(file_set, str):
             cm = cache_manager.CacheManager()
             cm.select_NXDL_file_set(file_set)
             file_set = cm.default_file_set

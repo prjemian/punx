@@ -8,6 +8,8 @@ import h5py
 import numpy
 import pathlib
 
+USER_FILE = "S2p5min_00070_00001.h5"
+
 
 def test_create_compliant_file_structure(hfile):
     """Create a typical NeXus file structure and test the tree view."""
@@ -108,6 +110,59 @@ def test_create_user_file_structure(hfile):
     mc = h5tree.Hdf5TreeView(hfile)
     assert mc is not None
     tree_list = mc.report()
+    assert tree_list[1:] == expected
+
+    # test nxdetector["data"] for the hardlink to "/entry/instrument/detector/data"
+    with h5py.File(hfile, "r") as h5root:
+        nxdata = h5root["/entry/data"]
+        nxdetector = h5root["/entry/instrument/detector"]
+        assert nxdata["data"] == nxdetector["data"]  # hard linked
+
+        link = nxdata.get("data", getlink=True)
+        assert isinstance(link, h5py.HardLink)
+        link = nxdetector.get("data", getlink=True)
+        assert isinstance(link, h5py.HardLink)
+
+
+def test_user_file():
+    data_path = pathlib.Path(__file__).parent.parent / "data"
+    user_file = data_path / USER_FILE
+    assert user_file.exists()
+    hfile = str(user_file)
+
+    # 2: confirm it is recognized as a NeXus file
+    tree = h5tree.Hdf5TreeView(hfile)
+    assert tree.filename.endswith(hfile)
+    assert tree.isNeXus
+
+    # 4: check the `tree` report for lines containing " data"
+    expected = [
+        # # incorrect matches
+        # '    data:NXdata',
+        # "      data --> b'/entry/instrument/detector/data'",
+        # '        data --> /entry/instrument/detector/data',
+
+        # correct matches
+        "    Metadata:NXcollection",
+        "    data:NXdata",
+        '      @NX_class = "NXdata"',
+        '      @signal = "data"',
+        "      data --> /entry/instrument/detector/data",
+        '        @signal = "data"',
+        "        data:NX_UINT32[3262,3108] = __array",
+        '          @target = "/entry/instrument/detector/data"',  # FIXME
+    ]
+    mc = h5tree.Hdf5TreeView(hfile)
+    assert mc is not None
+    # fmt: off
+    tree_list = [
+        line
+        for line in mc.report()
+        if "data" in line
+        if "12idb" not in line  # exclude PV names
+        if "exc=" not in line  # exclude exceptions
+    ]
+    # fmt: on
     assert tree_list[1:] == expected
 
     # test nxdetector["data"] for the hardlink to "/entry/instrument/detector/data"

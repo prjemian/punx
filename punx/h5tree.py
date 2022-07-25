@@ -199,7 +199,7 @@ class Hdf5TreeView(object):
         """return a [formatted_string] with the name and target of a NeXus linked object"""
         target_addr = utils.decode_byte_string(obj.attrs["target"])
         s = []
-        s.append("%s%s --> %s" % (indentation, name, target_addr))
+        s.append(f"{indentation}{name} --> {target_addr}")
         return s
 
     def _renderDataset(self, dset, name, indentation="  "):
@@ -210,9 +210,7 @@ class Hdf5TreeView(object):
             if "target" in dset.attrs:
                 target_addr = utils.decode_byte_string(dset.attrs["target"])
                 if target_addr != dset.name:
-                    return [
-                        "%s%s --> %s" % (indentation, name, target_addr)
-                    ]
+                    return [f"{indentation}{name} --> {target_addr}"]
         txType = self._renderDsType(dset)
         txShape = self._renderDsShape(dset)
         s = []

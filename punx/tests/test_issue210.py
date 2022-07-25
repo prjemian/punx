@@ -137,12 +137,6 @@ def test_user_file():
 
     # 4: check the `tree` report for lines containing " data"
     expected = [
-        # # incorrect matches
-        # '    data:NXdata',
-        # "      data --> b'/entry/instrument/detector/data'",
-        # '        data --> /entry/instrument/detector/data',
-
-        # correct matches
         "    Metadata:NXcollection",
         "    data:NXdata",
         '      @NX_class = "NXdata"',
@@ -150,7 +144,7 @@ def test_user_file():
         "      data --> /entry/instrument/detector/data",
         '        @signal = "data"',
         "        data:NX_UINT32[3262,3108] = __array",
-        '          @target = "/entry/instrument/detector/data"',  # FIXME
+        '          @target = "/entry/instrument/detector/data"',
     ]
     mc = h5tree.Hdf5TreeView(hfile)
     assert mc is not None
@@ -165,7 +159,8 @@ def test_user_file():
     # fmt: on
     assert tree_list[1:] == expected
 
-    # test nxdetector["data"] for the hardlink to "/entry/instrument/detector/data"
+    # test nxdetector["data"] for the hardlink
+    # to "/entry/instrument/detector/data"
     with h5py.File(hfile, "r") as h5root:
         nxdata = h5root["/entry/data"]
         nxdetector = h5root["/entry/instrument/detector"]

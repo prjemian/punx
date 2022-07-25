@@ -31,6 +31,10 @@ INTERNAL
 
 import collections
 import h5py
+try:  # hdf5plugin loads codecs used by h5py, don't need to call it below
+    import hdf5plugin
+except ImportError:
+    pass  # avoids unused-import report from flake8
 import logging
 import os
 import pyRestTable

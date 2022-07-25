@@ -22,20 +22,18 @@ Python Utilities for NeXus HDF5 files
 # The full license is in the file LICENSE.txt, distributed with this software.
 # -----------------------------------------------------------------------------
 
-import os
-import sys
-
-_path = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-if _path not in sys.path:
-    sys.path.insert(0, _path)
+try:
+    # loads compression codecs used by h5py
+    # don't need to call any hdf5plugin attributes
+    import hdf5plugin
+except ImportError:
+    pass  # avoids unused-import report from flake8
 
 __author__ = "Pete R. Jemian"
 __email__ = "prjemian@gmail.com"
 __copyright__ = "2014-2022, Pete R. Jemian"
 
 __package_name__ = "punx"
-
-_path = os.path.dirname(__file__)
 
 __license_url__ = "http://creativecommons.org/licenses/by/4.0/deed.en_US"
 __license__ = (
@@ -63,15 +61,17 @@ __long_description__ = f"""
 __settings_organization__ = __package_name__
 __settings_package__ = __package_name__
 
-__install_requires__ = [
-    "h5py",
-    "lxml",
-    "numpy",
-    "pyRestTable",
-    "requests",
-    # 'PyQt5',
-    # see: http://stackoverflow.com/questions/4628519/is-it-possible-to-require-pyqt-from-setuptools-setup-py
-]
+__install_requires__ = """
+    h5py
+    hdf5plugin
+    lxml
+    numpy
+    pyRestTable
+    requests
+""".split()
+# 'PyQt5',
+# see: http://stackoverflow.com/questions/4628519/is-it-possible-to-require-pyqt-from-setuptools-setup-py
+
 __classifiers__ = [
     # 'Development Status :: 5 - Production/Stable',
     # 'Development Status :: 4 - Beta',

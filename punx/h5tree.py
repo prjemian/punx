@@ -22,10 +22,6 @@ Describe the tree structure of any HDF5 file
 import logging
 import os
 import h5py
-try:  # hdf5plugin loads codecs used by h5py, don't need to call it below
-    import hdf5plugin
-except ImportError:
-    pass  # avoids unused-import report from flake8
 import numpy
 
 from . import utils
@@ -214,7 +210,7 @@ class Hdf5TreeView(object):
             if "target" in dset.attrs:
                 target_addr = utils.decode_byte_string(dset.attrs["target"])
                 if target_addr != dset.name:
-                    return [f"{indentation}{name} --> {target_addr}"]
+                    return self._renderLinkedObject(dset, name, indentation)
         txType = self._renderDsType(dset)
         txShape = self._renderDsShape(dset)
         s = []

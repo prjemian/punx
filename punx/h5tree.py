@@ -197,8 +197,9 @@ class Hdf5TreeView(object):
 
     def _renderLinkedObject(self, obj, name, indentation="  "):
         """return a [formatted_string] with the name and target of a NeXus linked object"""
+        target_addr = utils.decode_byte_string(obj.attrs["target"])
         s = []
-        s.append("%s%s --> %s" % (indentation, name, obj.attrs["target"]))
+        s.append(f"{indentation}{name} --> {target_addr}")
         return s
 
     def _renderDataset(self, dset, name, indentation="  "):
@@ -207,15 +208,9 @@ class Hdf5TreeView(object):
         # dset.dtype.kind == 'S', nchar = dset.dtype.itemsize
         if self.isNeXus:
             if "target" in dset.attrs:
-                if dset.attrs["target"] != dset.name:
-                    return [
-                        "%s%s --> %s"
-                        % (
-                            indentation,
-                            name,
-                            utils.decode_byte_string(dset.attrs["target"]),
-                        )
-                    ]
+                target_addr = utils.decode_byte_string(dset.attrs["target"])
+                if target_addr != dset.name:
+                    return self._renderLinkedObject(dset, name, indentation)
         txType = self._renderDsType(dset)
         txShape = self._renderDsShape(dset)
         s = []
@@ -320,10 +315,14 @@ class Hdf5TreeView(object):
             elif rank < 4:
                 # this replaces a lot of code: if rank == ...
                 indices = ", ".join([str(key)] + (":" * (rank - 1)).split())
-                part = eval("obj[%s]" % indices)
+                try:
+                    part = eval(f"obj[{indices}]")
+                except OSError as exc:
+                    return f"indices={indices}, obj={obj}, exc={exc}"
+
                 item = self._renderNdArray(part, indents + "  ")  # recursion
             else:
-                item = "rank=%d" % (rank - 1)
+                item = f"rank={rank - 1}"
 
             return item
 

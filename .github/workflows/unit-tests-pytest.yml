@@ -14,69 +14,53 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: Setup Miniconda
-      uses: conda-incubator/setup-miniconda@v2
+    - name: Create Python ${{ matrix.python-version }} environment
+      uses: mamba-org/provision-with-micromamba@v12
       with:
-        activate-environment:
-            anaconda-test-env-py-${{ matrix.python-version }}
-        auto-update-conda: true
-        channel-priority: true
-        channels: defaults,conda-forge
-        # environment-file: environment.yml
-        mamba-version: "*"
-        python-version: ${{ matrix.python-version }}
-        use-only-tar-bz2: true  # required for caching
-    - shell: bash -l {0}
+        environment-file: environment.yml
+        environment-name: anaconda-test-env-py-${{ matrix.python-version }}
+
+    - name: Initial diagnostics
+      shell: bash -l {0}
       run: |
-        conda info
-        conda list
+        micromamba env list
+        micromamba info
+        micromamba list
         conda config --show-sources
         conda config --show
-        conda env list
         printenv | sort
 
-    # $CONDA is an environment variable pointing to the
-    # root of the miniconda directory
-
     - name: Install Python package & test requirements
+      shell: bash -l {0}
       run: |
-        $CONDA/bin/conda env update --file environment.yml --name $ENV_NAME
-        $CONDA/bin/conda install coverage coveralls pytest pyyaml ruamel_yaml yaml -c conda-forge --name $ENV_NAME
-        $CONDA/bin/conda list -r --name $ENV_NAME
-      env:
-        PY_VER: ${{ matrix.python-version }}
-        ENV_NAME: anaconda-test-env-py-${{ matrix.python-version }}
+        micromamba install coverage pytest
+
+    - name: Install Python coveralls
+      shell: bash -l {0}
+      run: |
+        # as seen: https://github.com/bleachbit/bleachbit/commit/c66b604b2702e51b215a9e768c93b099d1331fc4
+        pip install coveralls pyyaml
 
     - name: Diagnostic
+      shell: bash -l {0}
       run: |
-        $CONDA/bin/conda list --name $ENV_NAME
-      env:
-        PY_VER: ${{ matrix.python-version }}
-        ENV_NAME: anaconda-test-env-py-${{ matrix.python-version }}
+        micromamba list
 
     - name: Run tests with pytest & coverage
+      shell: bash -l {0}
       run: |
-        source $CONDA/bin/activate $ENV_NAME
         coverage run --concurrency=thread --parallel-mode -m pytest -vvv .
         coverage combine
-      env:
-        PY_VER: ${{ matrix.python-version }}
-        ENV_NAME: anaconda-test-env-py-${{ matrix.python-version }}
 
     - name: Coverage Report
+      shell: bash -l {0}
       run: |
-        source $CONDA/bin/activate $ENV_NAME
         coverage report
-      env:
-        PY_VER: ${{ matrix.python-version }}
-        ENV_NAME: anaconda-test-env-py-${{ matrix.python-version }}
 
     - name: Upload to coveralls
+      shell: bash -l {0}
       # https://github.com/TheKevJames/coveralls-python
       run: |
-        source $CONDA/bin/activate $ENV_NAME
         coveralls --service=github
       env:
-        PY_VER: ${{ matrix.python-version }}
-        ENV_NAME: anaconda-test-env-py-${{ matrix.python-version }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

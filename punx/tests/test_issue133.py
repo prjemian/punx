@@ -48,7 +48,7 @@ def test_environment_restriction():
 
         # test that _some_ restriction exists
         assert len(item) > len("h5py")
-        req = item[len("h5py"):]
+        req = item[len("h5py"):].strip()
         assert req.startswith(">") or req.startswith("=")
 
         # test that restriction involves v3 or higher

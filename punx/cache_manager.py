@@ -501,12 +501,12 @@ class NXDL_File_Set(object):
         if self.ref is None:
             return object.__str__(self)
 
-        return(
+        return (
             "NXDL_File_Set("
             f"last_modified={self.last_modified}"
             f", cache={self.cache}"
             f", short_sha={get_short_sha(self.sha)}"
-            f", path= {self.path}"
+            f", path={self.path}"
             ")"
         )
 

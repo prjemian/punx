@@ -1,10 +1,10 @@
-import os
+import pathlib
 import pytest
 
 # from ._core import TEST_DATA_DIR
 from .. import validate
 
-DATA_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data"))
+DATA_DIR = pathlib.Path(__file__).parent.parent / "data"
 
 
 @pytest.mark.parametrize(
@@ -21,9 +21,8 @@ DATA_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data")
     ],
 )
 def test_data_file_validations(h5file, expected_finding_average):
-    assert not os.path.exists(h5file)
-    fname = os.path.join(DATA_DIR, h5file)
-    assert os.path.exists(fname)
+    fname = DATA_DIR / h5file
+    assert fname.exists()
 
     validator = validate.Data_File_Validator()
     assert isinstance(validator, validate.Data_File_Validator)

@@ -25,6 +25,7 @@ import hashlib
 VALID_STATUS_DICT = {}
 """dictionary (by names) of all available validations"""
 
+
 class ValidationResultStatus(object):
     """
     summary result of a Finding

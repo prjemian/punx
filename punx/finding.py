@@ -22,6 +22,9 @@ document each item during validation
 import hashlib
 
 
+VALID_STATUS_DICT = {}
+"""dictionary (by names) of all available validations"""
+
 class ValidationResultStatus(object):
     """
     summary result of a Finding
@@ -36,6 +39,7 @@ class ValidationResultStatus(object):
         self.value = value
         self.color = color
         self.description = description
+        VALID_STATUS_DICT[key] = self
 
     def __str__(self, *args, **kwargs):
         return self.key
@@ -61,9 +65,7 @@ OPTIONAL = ValidationResultStatus(
     "OPTIONAL", 99, "grey", "allowed by NeXus specification, not identified"
 )
 
-VALID_STATUS_LIST = (OK, NOTE, WARN, ERROR, TODO, UNUSED, COMMENT, OPTIONAL)
-VALID_STATUS_DICT = {str(f): f for f in VALID_STATUS_LIST}
-"""dictionary (by names) of all available validations"""
+VALID_STATUS_LIST = tuple(VALID_STATUS_DICT.values())
 
 TF_RESULT = {True: OK, False: ERROR}
 

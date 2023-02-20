@@ -14,7 +14,7 @@ from .. import validate
 
 @pytest.fixture(scope="function")
 def tempdir():
-    """EPICS Motor"""
+    """Temporary directory for testing."""
     path = pathlib.Path(tempfile.mkdtemp())
     assert path.exists()
 

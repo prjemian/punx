@@ -681,8 +681,11 @@ def test_default_plot_v2_fail_multi_signal(file_set_name, status, occurs, hfile)
         ["writer_2_1.hdf5", "note", 0],
         ["writer_2_1.hdf5", "TODO", 11],
         ["1998spheres.h5", "ERROR", 2],
+        ["02_03_setup.h5", "NOTE", 98],
+        ["02_03_setup.h5", "OPTIONAL", 70],
+        ["02_03_setup.h5", "ERROR", 0],
         ["02_03_setup.h5", "NOTE,OPTIONAL,ERROR", 98 + 70 + 0],
-        ["prj_test.nexus.hdf5", "", 121],
+        ["prj_test.nexus.hdf5", "", 123],
     ],
 )
 def test_report_option(infile, report, observations, capsys):

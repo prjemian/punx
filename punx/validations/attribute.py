@@ -8,10 +8,10 @@
 # The full license is in the file LICENSE.txt, distributed with this software.
 # -----------------------------------------------------------------------------
 
-from .. import finding
-from .. import utils
-from . import item_name
+import numpy
 
+from .. import finding, utils
+from . import item_name
 
 TEST_NAME = "attribute value"
 
@@ -25,18 +25,7 @@ def verify(validator, v_item):
     if v_item.h5_address.find("@") < 0:
         return
 
-    special_handlers = {
-        "NX_class": nxclass_handler,
-        "target": target_handler,
-        "default": generic_handler,
-        "signal": signal_handler,
-        "axes": axes_handler,
-        "axis": generic_handler,
-        "primary": generic_handler,
-        "units": units_handler,
-    }
-
-    handler = special_handlers.get(v_item.name) or generic_handler
+    handler = HANDLER_DICT.get(v_item.name) or generic_handler
     handler(validator, v_item)
 
 
@@ -70,14 +59,37 @@ def axes_handler(validator, v_item):
     """
     validate @axes
     """
-    # TODO: axes_attr = v_item.h5_object
-    # if this is not an array, make it axes_attr_array
+    axes_attr = v_item.h5_object
+    if not isinstance(axes_attr, (list, numpy.ndarray)):
+        axes_attr = [axes_attr]  # ensure it is array
 
-    # TODO: need to know shape of signal data
-    # TODO: compare len(axes_attr_array) with range of signal data
-    # TODO: check each value of array that is a validItemName and points to actual local field
+    for axis_name in utils.decode_byte_string(v_item.h5_object):
+        # check each value of array that is a validItemName
+        k = item_name.validItemName_match_key(validator, axis_name)
+        test_name = f"valid name @axes['{axis_name}']"
+        if k is None:
+            status = finding.ERROR
+            k = "not a valid NeXus name"
+        else:
+            if k.startswith("strict"):
+                status = finding.OK
+            else:
+                status = finding.NOTE
+        validator.record_finding(v_item, test_name, status, k)
 
-    generic_handler(validator, v_item)
+        # check axis_name names local field (in this group)
+        test_name = f"axes['{axis_name}'] exists"
+        h5parent = v_item.parent.h5_object
+        if h5parent.get(axis_name) is not None:
+            status = finding.OK
+            k = "found field for named axis"
+        else:
+            status = finding.ERROR
+            k = "did not find field for named axis"
+        validator.record_finding(v_item, test_name, status, k)
+
+    test_name = "compare shapes of signal & axes data"
+    validator.record_finding(v_item, TEST_NAME, finding.TODO, "implement")
 
 
 def nxclass_handler(validator, v_item):
@@ -191,3 +203,16 @@ def generic_handler(validator, v_item):
     if v_item.name.endswith("_indices"):
         pass
     validator.record_finding(v_item, TEST_NAME, finding.TODO, "implement")
+
+
+# must define after the handler functions
+HANDLER_DICT = {
+    "NX_class": nxclass_handler,
+    "target": target_handler,
+    "default": generic_handler,
+    "signal": signal_handler,
+    "axes": axes_handler,
+    "axis": generic_handler,
+    "primary": generic_handler,
+    "units": units_handler,
+}

@@ -59,11 +59,11 @@ def axes_handler(validator, v_item):
     """
     validate @axes
     """
-    axes_attr = v_item.h5_object
+    axes_attr = utils.decode_byte_string(v_item.h5_object)
     if not isinstance(axes_attr, (list, numpy.ndarray)):
         axes_attr = [axes_attr]  # ensure it is array
 
-    for axis_name in utils.decode_byte_string(v_item.h5_object):
+    for axis_name in axes_attr:
         # check each value of array that is a validItemName
         k = item_name.validItemName_match_key(validator, axis_name)
         test_name = f"valid name @axes['{axis_name}']"

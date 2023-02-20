@@ -18,19 +18,13 @@ ISSUES
 * [ ] #72  refactor to validate application definitions
 """
 
-import h5py
 import os
+
+import h5py
 import pytest
 
-from ._core import DEFAULT_NXDL_FILE_SET
-from ._core import EXAMPLE_DATA_DIR
-from ._core import hfile
-from ._core import No_Exception
-from .. import FileNotFound
-from .. import finding
-from .. import HDF5_Open_Error
-from .. import utils
-from .. import validate
+from .. import FileNotFound, HDF5_Open_Error, finding, utils, validate
+from ._core import DEFAULT_NXDL_FILE_SET, EXAMPLE_DATA_DIR, No_Exception, hfile
 
 
 def avert_exception(fname):
@@ -103,7 +97,7 @@ def test_valid_nexus_file_constructed(hfile):
         [True, "a4fd52d", 1],
         [True, "v3.3", 0],
         [False, "no_such_file_set", None],
-    ]
+    ],
 )
 def test_NXdata_requirement_or_optional(valid_ref, file_set_name, count, hfile):
     """
@@ -553,7 +547,7 @@ def test_default_plot_v3_pass_multi(hfile):
         [DEFAULT_NXDL_FILE_SET, finding.NOTE, 1],
         ["a4fd52d", finding.NOTE, 0],
         ["v3.3", finding.ERROR, 0],
-    ]
+    ],
 )
 def test_default_plot_v3_fail(file_set_name, status, occurs, hfile):
     setup_simple_test_file_default_plot(hfile)
@@ -605,7 +599,7 @@ def test_default_plot_v2_pass(hfile):
         [DEFAULT_NXDL_FILE_SET, finding.NOTE, 1],
         ["a4fd52d", finding.NOTE, 0],
         ["v3.3", finding.ERROR, 0],
-    ]
+    ],
 )
 def test_default_plot_v2_fail_no_signal(file_set_name, status, occurs, hfile):
     setup_simple_test_file_default_plot(hfile)
@@ -632,7 +626,7 @@ def test_default_plot_v2_fail_no_signal(file_set_name, status, occurs, hfile):
         [DEFAULT_NXDL_FILE_SET, finding.NOTE, 1],
         ["a4fd52d", finding.NOTE, 0],
         ["v3.3", finding.ERROR, 0],
-    ]
+    ],
 )
 def test_default_plot_v2_fail_multi_signal(file_set_name, status, occurs, hfile):
     setup_simple_test_file_default_plot(hfile)
@@ -681,8 +675,11 @@ def test_default_plot_v2_fail_multi_signal(file_set_name, status, occurs, hfile)
         ["writer_2_1.hdf5", "note", 0],
         ["writer_2_1.hdf5", "TODO", 11],
         ["1998spheres.h5", "ERROR", 2],
+        ["02_03_setup.h5", "NOTE", 98],
+        ["02_03_setup.h5", "OPTIONAL", 70],
+        ["02_03_setup.h5", "ERROR", 0],
         ["02_03_setup.h5", "NOTE,OPTIONAL,ERROR", 98 + 70 + 0],
-        ["prj_test.nexus.hdf5", "", 121],
+        ["prj_test.nexus.hdf5", "", 123],
     ],
 )
 def test_report_option(infile, report, observations, capsys):

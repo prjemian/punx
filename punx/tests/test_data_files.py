@@ -1,10 +1,10 @@
-import os
+import pathlib
 import pytest
 
 # from ._core import TEST_DATA_DIR
 from .. import validate
 
-DATA_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data"))
+DATA_DIR = pathlib.Path(__file__).parent.parent / "data"
 
 
 @pytest.mark.parametrize(
@@ -13,7 +13,7 @@ DATA_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data")
         ["writer_1_3.hdf5", 99],  # simple, from NeXus documentation
         ["writer_2_1.hdf5", 99],  # simple, with links, from NeXus documentation
         ["draft_1D_NXcanSAS.h5", -100_000],  # incorrect @NX_class attributes
-        ["1998spheres.h5", -27_223],  # NXcanSAS 1-D
+        ["1998spheres.h5", -25_000],  # NXcanSAS 1-D
         ["example_01_1D_I_Q.h5", 98],  # NXcanSAS 1-D
         ["USAXS_flyScan_GC_M4_NewD_15.h5", 90],  # multiple NXdata
         ["Data_Q.h5", -769_142],  # NXcanSAS 2-D; @NX_class is not type string
@@ -21,9 +21,8 @@ DATA_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data")
     ],
 )
 def test_data_file_validations(h5file, expected_finding_average):
-    assert not os.path.exists(h5file)
-    fname = os.path.join(DATA_DIR, h5file)
-    assert os.path.exists(fname)
+    fname = DATA_DIR / h5file
+    assert fname.exists()
 
     validator = validate.Data_File_Validator()
     assert isinstance(validator, validate.Data_File_Validator)

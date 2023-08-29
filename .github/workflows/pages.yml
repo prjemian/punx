@@ -1,23 +1,23 @@
 name: Publish Sphinx Docs to GitHub Pages
 
-on: [push]
-  # # Build the docs on pushes to main branch, PRs to main branch, and new tags.
-  # # Publish only on demand.
-  # push:
-  #   branches:
-  #     - main
-  #   tags:
-  #     - '*'  # all tags
-  # pull_request:
-  #   branches:
-  #     - main
-  # workflow_dispatch:   # allow manual triggering
-  #   inputs:
-  #     deploy:
-  #       description: 'Deploy documentation'
-  #       type: boolean
-  #       required: true
-  #       default: false
+on:
+  # Build the docs on pushes to main branch, PRs to main branch, and new tags.
+  # Publish only on demand.
+  push:
+    branches:
+      - main
+    tags:
+      - '*'  # all tags
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:   # allow manual triggering
+    inputs:
+      deploy:
+        description: 'Deploy documentation'
+        type: boolean
+        required: true
+        default: false
 
 jobs:
 
@@ -35,7 +35,7 @@ jobs:
       uses: szenius/set-timezone@v1.2
       # with:
       #   timezoneLinux: "America/Chicago"
-          
+
     - name: Make Temporary Directory for Sphinx content
       run: |
         echo "SRC_DIR=$(pwd)" >> ${GITHUB_ENV}
@@ -66,12 +66,15 @@ jobs:
       run: |
         sphinx-build -M html ./docs/source "${TMP_DIR}/build"
 
-    - name: Diagnostics
+    - name: Define ... HTML_DIR
       run: |
         echo "HTML_DIR=${TMP_DIR}/build/html" >> ${GITHUB_ENV}
+
+    - name: Diagnostics
+      run: |
         ls -lAFghR "${HTML_DIR}"
   
-    - name: Publish (push gh-pages branch) only on demand
+      - name: Publish (push gh-pages branch) only on demand
       uses: peaceiris/actions-gh-pages@v3
       if: ${{ github.event.inputs.deploy }}
       with:

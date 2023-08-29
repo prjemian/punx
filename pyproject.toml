@@ -1,0 +1,75 @@
+[build-system]
+requires = [
+  "h5py",
+  "hdf5plugin",
+  "lxml",
+  "numpy",
+  "pyRestTable",
+  "requests",
+  "setuptools_scm[toml]>=6.2",
+  "setuptools>=61.0",
+]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "punx"
+description = "Python Utilities for NeXus HDF5 files."
+authors = [
+  { name="Pete Jemian", email="prjemian@gmail.com" },
+]
+dynamic = ["version"]
+readme = "README.md"
+requires-python = ">=3.8"
+keywords = ["NeXus", "HDF5"]
+# https://packaging.python.org/en/latest/specifications/declaring-project-metadata/?highlight=license
+license = {file = "punx/LICENSE.txt"}
+# https://pypi.org/classifiers/
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: Science/Research",
+    "License :: Freely Distributable",
+    "License :: Public Domain",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python",
+    "Topic :: Scientific/Engineering :: Astronomy",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+    "Topic :: Scientific/Engineering :: Biology",
+    "Topic :: Scientific/Engineering :: Chemistry",
+    "Topic :: Scientific/Engineering :: Geology",
+    "Topic :: Scientific/Engineering :: Information Analysis",
+    "Topic :: Scientific/Engineering :: Interface Engine/Protocol Translator",
+    "Topic :: Scientific/Engineering :: Mathematics",
+    "Topic :: Scientific/Engineering :: Physics",
+    "Topic :: Scientific/Engineering :: Visualization",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Utilities",
+]
+
+[tool.setuptools_scm]
+
+[project.urls]
+"Homepage" = "https://prjemian.github.io/punx/"
+"Source" = "https://github.com/BCDA-APS/punx"
+"Bug Tracker" = "https://github.com/BCDA-APS/punx/issues"
+
+[project.scripts]
+punx = "punx.main:main"
+
+[tool.flake8]
+max-line-length = 88
+extend-ignore = ["E501"]
+
+[tool.isort]
+force_single_line = true
+# multi_line_output = 1
+line_length = 88
+include_trailing_comma = true
+
+[tool.black]
+line_length = 88

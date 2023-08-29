@@ -6,4 +6,6 @@ include punx/cache/*/*.xsd
 include punx/cache/*/*/*.xml
 include punx/cache/*/*/*.xsl
 include punx/_version.py
-include versioneer.py 
+include versioneer.py
+
+exclude _old_setup

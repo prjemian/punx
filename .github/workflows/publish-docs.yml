@@ -1,37 +1,56 @@
 name: Publish Sphinx Docs to GitHub Pages
-on: [push]
 
-# see: https://sphinx-notes.github.io/pages/
-# see: https://github.com/marketplace/actions/sphinx-to-github-pages
+on:
+  # Build the docs on pushes to main branch, PRs to main branch, and new tags.
+  # Publish only on demand.
+  push:
+    branches:
+      - main
+    tags:
+      - '*'  # all tags
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:   # allow manual triggering
+    inputs:
+      deploy:
+        description: 'Deploy documentation'
+        type: boolean
+        required: true
+        default: false
 
 jobs:
 
-  build:
+  pages:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@master
-      with:
-        fetch-depth: 0 # otherwise, you will fail to push refs to dest repo
 
-    - name: Install package
+    - name: Deploy Information
+      if: ${{ github.event.inputs.deploy }}
       run: |
-        pip install -e .
+        echo "The docs will be published from this workflow run."
 
-    - name: Install sphinx-rtd-theme
+    - name: Make Temporary Directory for Sphinx content
       run: |
-        pip install sphinx-rtd-theme
+        echo "SRC_DIR=$(pwd)" >> ${GITHUB_ENV}
+        echo "TMP_DIR=$(mktemp -d)" >> ${GITHUB_ENV}
+        # next step also creates _version.py file
+        echo "VERSION=$(./setup.py --version)" >> ${GITHUB_ENV}
 
     - name: Build and Commit
-      uses: sphinx-notes/pages@master
+      uses: sphinx-notes/pages@v3
       with:
         # path to conf.py directory
-        documentation_path: docs/source
+        documentation_path: ./docs/source
+        requirements_path: ./docs/requirements.txt
+        publish: false
 
-    - name: Push changes if refs/tags
-      if: startsWith(github.ref, 'refs/tags')
-      uses: ad-m/github-push-action@master
+    - name: Publish (push gh-pages branch) only on demand
+      uses: peaceiris/actions-gh-pages@v3
+      if: ${{ github.event.inputs.deploy }}
       with:
+        publish_branch: gh-pages
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        branch: gh-pages
+        publish_dir: ${{ env.TMP_DIR }}
+        force_orphan: true

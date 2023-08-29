@@ -33,7 +33,7 @@ jobs:
           pytest-cov
           python=${{ matrix.python-version }}
           pyyaml
-        #   setuptools-scm
+          setuptools-scm
         cache-environment: true
         cache-environment-key: env-key-${{ matrix.python-version }}
 

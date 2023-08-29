@@ -31,24 +31,50 @@ jobs:
       run: |
         echo "The docs will be published from this workflow run."
 
+    - name: Set timezone
+      uses: szenius/set-timezone@v1.2
+      # with:
+      #   timezoneLinux: "America/Chicago"
+          
     - name: Make Temporary Directory for Sphinx content
       run: |
         echo "SRC_DIR=$(pwd)" >> ${GITHUB_ENV}
         echo "TMP_DIR=$(mktemp -d)" >> ${GITHUB_ENV}
 
-    - name: Build and Commit
-      uses: sphinx-notes/pages@v3
+    - name: Checkout
+      uses: actions/checkout@v3
       with:
-        # path to conf.py directory
-        documentation_path: ./docs/source
-        requirements_path: ./docs/requirements.txt
-        publish: false
+        fetch-depth: 0 # otherwise, you will failed to push refs to dest repo
 
-    - name: Publish (push gh-pages branch) only on demand
-      uses: peaceiris/actions-gh-pages@v3
-      if: ${{ github.event.inputs.deploy }}
+    - uses: actions/setup-python@v4
       with:
-        publish_branch: gh-pages
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ${{ env.TMP_DIR }}
-        force_orphan: true
+        python-version: "3.11"
+
+    - name: Install Sphinx build requirements
+      run: pip install -r ./docs/requirements.txt
+
+    - name: Install our package
+      run: |
+        pip install --no-deps -e . -vv
+
+    - name: Show Environment variables
+      run: |
+        echo "SRC_DIR=${SRC_DIR}"
+        echo "TMP_DIR=${TMP_DIR}"
+
+    - name: Sphinx
+      run: |
+        sphinx-build -M html ./docs/source "${TMP_DIR}/build"
+
+    - name: Diagnostics
+      run: |
+        ls -lAFghR "${TMP_DIR}"
+  
+    # - name: Publish (push gh-pages branch) only on demand
+    #   uses: peaceiris/actions-gh-pages@v3
+    #   if: ${{ github.event.inputs.deploy }}
+    #   with:
+    #     publish_branch: gh-pages
+    #     github_token: ${{ secrets.GITHUB_TOKEN }}
+    #     publish_dir: ${{ env.TMP_DIR }}
+    #     force_orphan: true

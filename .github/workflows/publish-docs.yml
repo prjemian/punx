@@ -10,18 +10,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    # - name: Checkout
-    #   uses: actions/checkout@master
-    #   with:
-    #     fetch-depth: 0 # otherwise, you will fail to push refs to dest repo
-
-    # - name: Install package
-    #   run: |
-    #     pip install .
-
-    # - name: Install sphinx-rtd-theme
-    #   run: |
-    #     pip install sphinx-rtd-theme
 
     - name: Build and Commit
       uses: sphinx-notes/pages@v3
@@ -31,9 +19,9 @@ jobs:
         requirements_path: ./docs/requirements.txt
         publish: false
 
-    # - name: Push changes if refs/tags
-    #   if: startsWith(github.ref, 'refs/tags')
-    #   uses: ad-m/github-push-action@master
-    #   with:
-    #     github_token: ${{ secrets.GITHUB_TOKEN }}
-    #     branch: gh-pages
+    - name: Push changes if refs/tags
+      if: startsWith(github.ref, 'refs/tags')
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        branch: gh-pages

@@ -74,7 +74,7 @@ jobs:
       run: |
         ls -lAFghR "${HTML_DIR}"
   
-      - name: Publish (push gh-pages branch) only on demand
+    - name: Publish (push gh-pages branch) only on demand
       uses: peaceiris/actions-gh-pages@v3
       if: ${{ github.event.inputs.deploy }}
       with:

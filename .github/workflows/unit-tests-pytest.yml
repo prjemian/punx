@@ -29,16 +29,19 @@ jobs:
           channel-priority: flexible
         init-shell: bash
         create-args: >-
-          coverage
-          coveralls
           pytest
           pytest-cov
           python=${{ matrix.python-version }}
           pyyaml
-          setuptools-scm
+        #   setuptools-scm
         cache-environment: true
         cache-environment-key: env-key-${{ matrix.python-version }}
 
+    - name: Install code coverage requirements by pip
+      run: |
+        # https://github.com/pradyunsg/furo/discussions/308#discussioncomment-3064061
+        pip install coverage coveralls
+  
     - name: Initial diagnostics
       shell: bash -l {0}
       run: |

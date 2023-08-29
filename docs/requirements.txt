@@ -1,1 +1,2 @@
+setuptools-scm
 sphinx-rtd-theme

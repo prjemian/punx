@@ -25,11 +25,11 @@ project = punx.__package_name__
 copyright = punx.__copyright__
 author = punx.__author__
 
-versioneer_version = punx.__version__.split("+")
-release = versioneer_version[0]
-if len(versioneer_version) == 2:
+app_version = punx.__version__.split("+")
+release = app_version[0]
+if len(app_version) == 2:
     # additional details (if available)
-    version = versioneer_version[1]
+    version = app_version[1]
 else:
     version = ""
 
@@ -67,7 +67,8 @@ exclude_patterns = []
 # html_theme = "sphinxdoc"
 # html_theme = 'agogo'  # NO, poor navigation tools
 # html_theme = 'sphinx_rtd_theme'
-html_theme = "bizstyle"
+# html_theme = "bizstyle"
+html_theme = "pydata_sphinx_theme"
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,

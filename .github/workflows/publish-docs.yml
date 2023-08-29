@@ -35,8 +35,6 @@ jobs:
       run: |
         echo "SRC_DIR=$(pwd)" >> ${GITHUB_ENV}
         echo "TMP_DIR=$(mktemp -d)" >> ${GITHUB_ENV}
-        # next step also creates _version.py file
-        echo "VERSION=$(./setup.py --version)" >> ${GITHUB_ENV}
 
     - name: Build and Commit
       uses: sphinx-notes/pages@v3

@@ -10,11 +10,11 @@ jobs:
       matrix:
         python-version:
           # - "3.12"  # 2023-08-28: not available now
-          # - "3.11"
-          # - "3.10"
+          - "3.11"
+          - "3.10"
           - "3.9"
-          # - "3.8"
-          # - "3.7"
+          - "3.8"
+          - "3.7"
       max-parallel: 5
 
     steps:
@@ -55,37 +55,37 @@ jobs:
         coverage run --concurrency=thread --parallel-mode -m pytest -vvv --exitfirst .
         coverage combine
 
-  #   - name: Coverage Report
-  #     shell: bash -l {0}
-  #     run: |
-  #       coverage report --precision 3
+    - name: Coverage Report
+      shell: bash -l {0}
+      run: |
+        coverage report --precision 3
 
-  #   - name: Upload to coveralls
-  #     shell: bash -l {0}
-  #     # https://github.com/TheKevJames/coveralls-python
-  #     run: |
-  #       coveralls debug
-  #       coveralls --service=github
-  #     env:
-  #       COVERALLS_FLAG_NAME: ${{ matrix.python-version }}
-  #       COVERALLS_PARALLEL: true
-  #       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Upload to coveralls
+      shell: bash -l {0}
+      # https://github.com/TheKevJames/coveralls-python
+      run: |
+        coveralls debug
+        coveralls --service=github
+      env:
+        COVERALLS_FLAG_NAME: ${{ matrix.python-version }}
+        COVERALLS_PARALLEL: true
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  # # https://coveralls-python.readthedocs.io/en/latest/usage/configuration.html#github-actions-support
-  # coveralls:
-  #   name: Report unit test coverage to coveralls
-  #   needs: test-matrix
-  #   runs-on: ubuntu-latest
-  #   container: python:3-slim
+  # https://coveralls-python.readthedocs.io/en/latest/usage/configuration.html#github-actions-support
+  coveralls:
+    name: Report unit test coverage to coveralls
+    needs: test-matrix
+    runs-on: ubuntu-latest
+    container: python:3-slim
 
-  #   steps:
-  #     - name: Gather coverage and report to Coveralls
-  #       run: |
-  #         echo "Finally!"
-  #         pip3 install --upgrade coveralls
-  #         # debug mode: output prepared json and reported files list to stdout
-  #         # https://coveralls-python.readthedocs.io/en/latest/troubleshooting.html
-  #         coveralls debug
-  #         coveralls --service=github --finish
-  #       env:
-  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Gather coverage and report to Coveralls
+        run: |
+          echo "Finally!"
+          pip3 install --upgrade coveralls
+          # debug mode: output prepared json and reported files list to stdout
+          # https://coveralls-python.readthedocs.io/en/latest/troubleshooting.html
+          coveralls debug
+          coveralls --service=github --finish
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

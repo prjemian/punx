@@ -9,9 +9,9 @@ dependencies:
   - hdf5plugin
   - lxml
   - numpy
-  - python=3
+  - python >=3.8
   - pip
-  - pyqt
+  - pyqt =5
   - pyRestTable
   - requests
   - sip

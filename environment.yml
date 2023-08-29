@@ -16,5 +16,4 @@ dependencies:
   - requests
   - sip
   - sphinx
-  - versioneer
   - sphinx_rtd_theme

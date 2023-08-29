@@ -15,5 +15,3 @@ dependencies:
   - pyRestTable
   - requests
   - sip
-  - sphinx
-  - sphinx_rtd_theme

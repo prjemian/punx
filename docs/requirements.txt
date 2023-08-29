@@ -1,2 +1,4 @@
+numpy
+pydata-sphinx-theme
 setuptools-scm
-sphinx-rtd-theme
+sphinx

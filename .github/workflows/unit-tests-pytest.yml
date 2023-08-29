@@ -39,7 +39,7 @@ jobs:
 
     - name: Install code coverage requirements by pip
       run: |
-        # https://github.com/pradyunsg/furo/discussions/308#discussioncomment-3064061
+        # avoids: ImportError: cannot import name 'Reporter' from 'coverage.report'
         pip install coverage coveralls
   
     - name: Initial diagnostics

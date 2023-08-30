@@ -1,10 +1,12 @@
 # punx - Python Utilities for NeXus HDF5 files
 
-[![image](https://img.shields.io/github/release/prjemian/punx.svg)](https://github.com/prjemian/punx/releases)
-[![image](https://img.shields.io/github/tag/prjemian/punx.svg)](https://github.com/prjemian/punx/tags)
-[![Build Status](https://img.shields.io/github/workflow/status/prjemian/punx/Unit%20Tests)](https://github.com/prjemian/punx/actions?query=workflow%3A%22Unit+Tests%22+branch%3Amain)
-[![PyPI](https://img.shields.io/pypi/v/punx.svg)](https://pypi.python.org/pypi/punx)
-[![conda-forge](https://img.shields.io/conda/vn/conda-forge/punx)](https://anaconda.org/conda-forge/punx)
+GH tag | GH release | PyPI | conda-forge | cf downloads
+--- | --- | --- | --- | ---
+[![tag](https://img.shields.io/github/tag/prjemian/punx.svg)](https://github.com/prjemian/punx/tags) | [![release](https://img.shields.io/github/release/prjemian/punx.svg)](https://github.com/prjemian/punx/releases) | [![PyPi](https://img.shields.io/pypi/v/punx.svg)](https://pypi.python.org/pypi/punx) | [![conda-forge](https://img.shields.io/conda/vn/conda-forge/punx)](https://anaconda.org/conda-forge/punx) | [![Conda Downloads](https://img.shields.io/conda/dn/conda-forge/punx.svg)](https://anaconda.org/conda-forge/punx)
+
+Python version(s) | Unit Tests | Code Coverage | License
+--- | --- | --- | ---
+[![Python version](https://img.shields.io/pypi/pyversions/punx.svg)](https://pypi.python.org/pypi/punx) | [![Unit Tests](https://github.com/prjemian/punx/workflows/Unit%20Tests/badge.svg)](https://github.com/prjemian/punx/actions/workflows/unit_tests.yml) | [![Coverage Status](https://coveralls.io/repos/github/prjemian/punx/badge.svg?branch=main)](https://coveralls.io/github/prjemian/punx?branch=main) | [![license: ANL](https://img.shields.io/badge/license-ANL-brightgreen)](/LICENSE.txt)
 
 ## [Documentation](https://prjemian.github.io/punx)
 

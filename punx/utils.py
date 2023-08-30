@@ -114,13 +114,14 @@ def isNeXusFile(filename):
     if not os.path.exists(filename):
         return None
 
-    f = h5py.File(filename, "r")
-    if isHdf5FileObject(f):
-        for item in f:
-            if isNeXusGroup(f[item], "NXentry"):
-                f.close()
-                return True
-    f.close()
+    with h5py.File(filename, "r") as root:
+        if isHdf5FileObject(root):
+            for item in root:
+                try:
+                    if isNeXusGroup(root[item], "NXentry"):
+                        return True
+                except KeyError:
+                    pass
     return False
 
 

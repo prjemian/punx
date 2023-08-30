@@ -1,7 +1,7 @@
 # punx - Python Utilities for NeXus HDF5 files
 
 GitHub | PyPI | conda-forge
---- | --- | --- | ---
+--- | --- | ---
 [![tag](https://img.shields.io/github/tag/prjemian/punx.svg)](https://github.com/prjemian/punx/tags) [![release](https://img.shields.io/github/release/prjemian/punx.svg)](https://github.com/prjemian/punx/releases) | [![PyPi](https://img.shields.io/pypi/v/punx.svg)](https://pypi.python.org/pypi/punx) | [![conda-forge](https://img.shields.io/conda/vn/conda-forge/punx)](https://anaconda.org/conda-forge/punx) [![Conda Downloads](https://img.shields.io/conda/dn/conda-forge/punx.svg)](https://anaconda.org/conda-forge/punx)
 
 Python version(s) | Unit Tests | Code Coverage | License

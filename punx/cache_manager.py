@@ -437,12 +437,10 @@ class SourceCache(Base_Cache):
     """manage the source directory cache of NXDL files"""
 
     def __init__(self):
-        path = os.path.abspath(
-            os.path.join(os.path.dirname(__file__), SOURCE_CACHE_SUBDIR)
-        )
-
-        ini_file = os.path.abspath(os.path.join(path, SOURCE_CACHE_SETTINGS_FILENAME))
-        self.qsettings = QtCore.QSettings(ini_file, QtCore.QSettings.IniFormat)
+        path = pathlib.Path(__file__).parent.absolute()
+        ini_file = path / SOURCE_CACHE_SUBDIR / SOURCE_CACHE_SETTINGS_FILENAME
+        logger.debug("ini_file=%s", ini_file)
+        self.qsettings = QtCore.QSettings(str(ini_file), QtCore.QSettings.IniFormat)
 
 
 class UserCache(Base_Cache):
@@ -457,9 +455,11 @@ class UserCache(Base_Cache):
             __settings_package__,
         )
 
-        path = self.path
-        if not os.path.exists(path):
-            os.mkdir(path)
+        path = pathlib.Path(self.path)
+        logger.debug("exists=%s  path=%s", path.exists, str(path))
+        path.mkdir(parents=True, exist_ok=True)
+        if not path.exists():
+            raise RuntimeError(f"Could not create settings directory: {path}")
 
 
 class NXDL_File_Set(object):

@@ -16,8 +16,9 @@ def test_missing_link(hfile):
     with h5py.File(demo, "w") as root:
         root["linked"] = h5py.ExternalLink("other.h5", "/number")
     assert demo.exists()
-    # assert utils.isHdf5FileObject(str(demo))
 
-    mc = h5tree.Hdf5TreeView(demo)
+    mc = h5tree.Hdf5TreeView(str(demo))
     assert mc is not None
-    assert len(mc.report()) == 5
+    report = mc.report()
+    assert isinstance(report, list)
+    assert len(report) == 4

@@ -29,7 +29,3 @@ The *punx* package provides these features:
 - git:   <https://github.com/prjemian/punx>
 - issues:   <https://github.com/prjemian/punx/issues>
 - citation:   [![DOI: 10.5281/zenodo.1471686](https://zenodo.org/badge/DOI/10.5281/zenodo.1471686.svg)](https://doi.org/10.5281/zenodo.1471686)
-- static code analyses:
-  [![Code Coverage](https://coveralls.io/repos/github/prjemian/punx/badge.svg?branch=main)](https://coveralls.io/github/prjemian/punx?branch=main)
-  [![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/prjemian/punx.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/prjemian/punx/context:python)
-  [![Total alerts](https://img.shields.io/lgtm/alerts/g/prjemian/punx.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/prjemian/punx/alerts/)

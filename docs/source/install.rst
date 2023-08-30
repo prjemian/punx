@@ -4,8 +4,12 @@
 Installation
 ############
 
-Released versions of punx are available on `PyPI 
-<https://pypi.python.org/pypi/punx>`_. 
+Released versions of *punx* are available on 
+`Conda Forge <https://anaconda.org/conda-forge/punx>`_
+and
+`PyPI <https://pypi.python.org/pypi/punx>`_. 
+The source code is available on
+`GitHub <https://github.com/prjemian/punx>`_.
 
 .. tabs::
 
@@ -25,8 +29,8 @@ Released versions of punx are available on `PyPI
 
    .. tab:: source
 
-      The latest development versions of punx can be
-      downloaded from the GitHub repository:
+      The source code of *punx*, including the latest development
+      versions, can be downloaded from the GitHub repository:
 
       .. code-block:: console
          :linenos:
@@ -83,6 +87,6 @@ Package       URL
 pyRestTable   https://pyresttable.readthedocs.io
 ============  ===================================
 
-The *pyRestTable* package is used for various reports in the punx application.
-   If using the punx package as a library and developing your own custom 
+The *pyRestTable* package is used for various reports in the *punx* application.
+   If using the *punx* package as a library and developing your own custom 
    reporting, this package is not required.

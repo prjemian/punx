@@ -314,7 +314,7 @@ class CacheManager(singletons.Singleton):
         if ref not in file_set_keys:
             choice = file_set_keys[0]
             logger.info(
-                "File set %s not found, choosing latest: %s", 
+                "File set %s not found, choosing latest: %s",
                 ref, choice
             )
             ref = choice  # the latest one

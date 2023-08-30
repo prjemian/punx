@@ -13,11 +13,33 @@ NOTE: project is under initial construction
 
 Use these steps to :ref:`install <install>` and try the :ref:`demo <demo>`:
 
-.. code-block:: console
-   :linenos:
+.. tabs::
 
-    pip install punx
-    punx demo
+   .. tab:: conda
+
+      .. code-block:: console
+         :linenos:
+
+         conda install punx -c conda-forge
+         punx demo
+
+   .. tab:: pip
+
+      .. code-block:: console
+         :linenos:
+
+         pip install punx
+         punx demo
+
+   .. tab:: source
+
+      .. code-block:: console
+         :linenos:
+
+         git clone https://github.com/prjemian/punx
+         cd punx
+         pip install -e .
+         punx demo
 
 
 .. toctree::
@@ -31,7 +53,7 @@ for more details.
 
 :author:    Pete R. Jemian
 :email:     prjemian@gmail.com
-:copyright: 2014-2022, Pete R. Jemian
+:copyright: 2014-2023, Pete R. Jemian
 :license:   Creative Commons Attribution 4.0 International Public License (see *LICENSE.txt*)
 :URL:       https://prjemian.github.io/punx
 :git:       https://github.com/prjemian/punx

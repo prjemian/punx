@@ -7,33 +7,44 @@ Installation
 Released versions of punx are available on `PyPI 
 <https://pypi.python.org/pypi/punx>`_. 
 
-If you have ``pip`` installed, then you can install::
+.. tabs::
 
-    $ pip install punx 
+   .. tab:: conda
 
-The latest development versions of punx can be downloaded from the
-GitHub repository listed above::
+      .. code-block:: console
+         :linenos:
 
-    $ cd /some/directory
-    $ git clone http://github.com/prjemian/punx.git
+         conda install punx -c conda-forge
 
-To install in the standard Python location::
+   .. tab:: pip
 
-    $ cd punx
-    $ pip install .
+      .. code-block:: console
+         :linenos:
+
+         pip install punx
+
+   .. tab:: source
+
+      The latest development versions of punx can be
+      downloaded from the GitHub repository:
+
+      .. code-block:: console
+         :linenos:
+
+         cd /some/directory
+         git clone https://github.com/prjemian/punx.git
+         cd punx
+         pip install -e .
 
 Updating
 ********
 
-:pip:  If you have installed previously with *pip*::
+If you have installed previously, as above, choose one of these
+that corresponds with your installation::
 
+    $ conda update punx -c conda-forge
     $ pip install -U --no-deps punx
-
-:git:  assuming you have cloned as shown above::
-
-    $ cd /some/directory/punx
-    $ git pull
-    $ pip install -U --no-deps .
+    $ git pull  # (in the cloned directory)
 
 
 Required Packages

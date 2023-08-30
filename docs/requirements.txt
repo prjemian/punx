@@ -2,3 +2,4 @@ numpy
 pydata-sphinx-theme
 setuptools-scm
 sphinx
+sphinx-tabs

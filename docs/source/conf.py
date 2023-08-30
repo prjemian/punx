@@ -48,6 +48,7 @@ extensions = """
     sphinx.ext.todo
     sphinx.ext.viewcode
 """.split()
+extensions.append("sphinx_tabs.tabs")  # this must be last
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]

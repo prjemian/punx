@@ -1,5 +1,8 @@
 name: punx
 
+# conda env create --force -n punx --force -f ./environment.yml --solver=libmamba
+# conda activate punx
+
 channels:
   - defaults
   - conda-forge

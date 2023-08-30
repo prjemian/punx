@@ -75,5 +75,5 @@ try:
 except (LookupError, ModuleNotFoundError):
     from importlib.metadata import version
 
-    __version__ = version("pkgdemo")
+    __version__ = version("punx")
     del version

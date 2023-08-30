@@ -6,7 +6,7 @@ GitHub | PyPI | conda-forge
 
 Python version(s) | Unit Tests | Code Coverage | License
 --- | --- | --- | ---
-[![Python version](https://img.shields.io/pypi/pyversions/punx.svg)](https://pypi.python.org/pypi/punx) | [![Unit Tests](https://github.com/prjemian/punx/workflows/Unit%20Tests/badge.svg)](https://github.com/prjemian/punx/actions/workflows/unit_tests.yml) | [![Coverage Status](https://coveralls.io/repos/github/prjemian/punx/badge.svg?branch=main)](https://coveralls.io/github/prjemian/punx?branch=main) | [![license: ANL](https://img.shields.io/badge/license-ANL-brightgreen)](/LICENSE.txt)
+[![Python version](https://img.shields.io/pypi/pyversions/punx.svg)](https://pypi.python.org/pypi/punx) | [![Unit Tests](https://github.com/prjemian/punx/workflows/Unit%20Tests/badge.svg)](https://github.com/prjemian/punx/actions/workflows/unit_tests.yml) | [![Coverage Status](https://coveralls.io/repos/github/prjemian/punx/badge.svg?branch=main)](https://coveralls.io/github/prjemian/punx?branch=main) | [![license: CCA4](https://img.shields.io/badge/license-CCA4-darkblue)](/LICENSE.txt)
 
 ## [Documentation](https://prjemian.github.io/punx)
 

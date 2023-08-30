@@ -12,7 +12,7 @@ Production
 Development
 ***********
 
-.. :0.3.4: tba
+.. :0.3.5: tba
 
 :0.3.4: 2023-08-30 -- Test with Py3.8 - Py3.11.
 :0.3.0: 2022-01-01 -- Github API access token no longer needed, ``update`` subcommand is now ``install``

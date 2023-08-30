@@ -37,8 +37,9 @@ def test_selected_file_set():
 def test_missing_file_set():
     cm = cache_manager.CacheManager()
     if cm is not None:
-        with pytest.raises(KeyError):
-            cm.select_NXDL_file_set("**missing**")
+        requested = "**will-not-be-found**"
+        fs = cm.select_NXDL_file_set(requested)
+        assert fs.ref != requested
         cm.cleanup()
 
 

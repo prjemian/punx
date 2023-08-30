@@ -309,18 +309,18 @@ class CacheManager(singletons.Singleton):
         def sorter(value):
             return self.NXDL_file_sets[value].last_modified
 
-        if ref is None and len(self.NXDL_file_sets) > 0:
-            ref = ref or sorted(self.NXDL_file_sets, key=sorter, reverse=True)[0]
-        ref = ref or GITHUB_NXDL_BRANCH
-        logger.debug(" final ref: " + str(ref))
+        file_set_keys = sorted(self.NXDL_file_sets, key=sorter, reverse=True)
 
-        if ref not in self.NXDL_file_sets:
-            raise KeyError(
-                f"File set '{ref}' not found."
-                "  Either install it or choose from one of these:"
-                f" {', '.join(sorted(self.NXDL_file_sets.keys()))}"
+        if ref not in file_set_keys:
+            choice = file_set_keys[0]
+            logger.info(
+                "File set %s not found, choosing latest: %s", 
+                ref, choice
             )
+            ref = choice  # the latest one
+        logger.debug(" final ref: " + str(ref))
         self.default_file_set = self.NXDL_file_sets[ref]
+        # print(f"{ref=}  {self.default_file_set=}")
         logger.debug(" default file set: " + str(self.default_file_set))
         return self.default_file_set
 

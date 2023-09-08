@@ -4,7 +4,7 @@
 # -----------------------------------------------------------------------------
 # :author:    Pete R. Jemian
 # :email:     prjemian@gmail.com
-# :copyright: (c) 2014-2022, Pete R. Jemian
+# :copyright: (c) 2014-2023, Pete R. Jemian
 #
 # Distributed under the terms of the Creative Commons Attribution 4.0 International Public License.
 #
@@ -144,9 +144,10 @@ class Data_File_Validator(object):
 
     def finding_summary(self, report_statuses=None):
         """
-        return a summary dictionary of the count of findings by status
+        Return a summary dictionary of the count of findings by status.
 
-        summary statistics
+        Summary Statistics
+
         ======= ===== ===========================================================
         status  count description
         ======= ===== ===========================================================

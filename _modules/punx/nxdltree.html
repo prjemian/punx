@@ -1,0 +1,514 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>punx.nxdltree &#8212; punx 0.3.5.dev12 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../../_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+
+  
+  <link href="../../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=eafc0fe6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/tabs.css?v=a5c4661c" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
+
+    <script src="../../_static/documentation_options.js?v=5272e078"></script>
+    <script src="../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/tabs.js?v=3030b3cb"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/punx/nxdltree';</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  <div class="navbar-header-items__start">
+    
+      <div class="navbar-item">
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+    <p class="title logo__title">punx 0.3.5.dev12 documentation</p>
+  
+</a></div>
+    
+  </div>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item"><nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../contents.html">
+                        Table of Contents
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+  </button>
+`);
+</script>
+        </div>
+      
+      
+        <div class="navbar-item">
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+  </button>
+`);
+</script>
+    </div>
+  
+
+  
+</div>
+
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item"><nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../contents.html">
+                        Table of Contents
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumbs">
+  <ul class="bd-breadcrumbs" role="navigation" aria-label="Breadcrumb">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">punx.nxdltree</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <h1>Source code for punx.nxdltree</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="c1"># -----------------------------------------------------------------------------</span>
+<span class="c1"># :author:    Pete R. Jemian</span>
+<span class="c1"># :email:     prjemian@gmail.com</span>
+<span class="c1"># :copyright: (c) 2014-2022, Pete R. Jemian</span>
+<span class="c1">#</span>
+<span class="c1"># Distributed under the terms of the Creative Commons Attribution 4.0 International Public License.</span>
+<span class="c1">#</span>
+<span class="c1"># The full license is in the file LICENSE.txt, distributed with this software.</span>
+<span class="c1"># -----------------------------------------------------------------------------</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Describe the tree structure of a NXDL XML file</span>
+
+<span class="sd">.. autosummary::</span>
+
+<span class="sd">    ~NxdlTreeView</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">lxml.etree</span>
+
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">cache_manager</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="NxdlTreeView">
+<a class="viewcode-back" href="../../api/nxdltree.html#punx.nxdltree.NxdlTreeView">[docs]</a>
+<span class="k">class</span> <span class="nc">NxdlTreeView</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Describe the tree structure of a NXDL XML file</span>
+
+<span class="sd">    Example usage showing default display::</span>
+
+<span class="sd">        mc = NxdlTreeView(nxdl_file_name)</span>
+<span class="sd">        mc.array_items_shown = 5</span>
+<span class="sd">        show_attributes = False</span>
+<span class="sd">        txt = mc.report(show_attributes)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nxdl_file</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;store nxdl_file and test if file is NeXus HDF5&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">requested_nxdl_file</span> <span class="o">=</span> <span class="n">nxdl_file</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nxdl_file</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">show_attributes</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">nxdl_file</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">nxdl_file</span> <span class="o">=</span> <span class="n">nxdl_file</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">nxdl_category</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_determine_category_</span><span class="p">()</span>
+
+<div class="viewcode-block" id="NxdlTreeView.report">
+<a class="viewcode-back" href="../../api/nxdltree.html#punx.nxdltree.NxdlTreeView.report">[docs]</a>
+    <span class="k">def</span> <span class="nf">report</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">show_attributes</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        return the structure of the NXDL file in a list of strings</span>
+
+<span class="sd">        The work of parsing the data file is done in this method.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cm</span> <span class="o">=</span> <span class="n">cache_manager</span><span class="o">.</span><span class="n">CacheManager</span><span class="p">()</span>
+        <span class="n">file_set</span> <span class="o">=</span> <span class="n">cm</span><span class="o">.</span><span class="n">default_file_set</span>
+
+        <span class="n">xslt_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">file_set</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nxdl_category</span><span class="p">,</span> <span class="s2">&quot;nxdlformat.xsl&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">xslt_file</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;XSLT file not found: &quot;</span> <span class="o">+</span> <span class="n">xslt_file</span><span class="p">)</span>
+
+        <span class="n">text</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_xslt_</span><span class="p">(</span><span class="n">xslt_file</span><span class="p">)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s2">&quot;file: &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">nxdl_file</span><span class="p">,</span>
+            <span class="s2">&quot;XSLT: &quot;</span> <span class="o">+</span> <span class="n">xslt_file</span><span class="p">,</span>
+        <span class="p">]</span>
+        <span class="n">result</span> <span class="o">+=</span> <span class="n">text</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">result</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_determine_category_</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;determine the NXDL category of this file</span>
+
+<span class="sd">        Could be:</span>
+
+<span class="sd">        * base_classes</span>
+<span class="sd">        * applications</span>
+<span class="sd">        * contributed_definition</span>
+<span class="sd">        * None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">xref</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+            <span class="n">application</span><span class="o">=</span><span class="s2">&quot;applications&quot;</span><span class="p">,</span>
+            <span class="n">base</span><span class="o">=</span><span class="s2">&quot;base_classes&quot;</span><span class="p">,</span>
+            <span class="n">contributed</span><span class="o">=</span><span class="s2">&quot;contributed_definitions&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">doc</span> <span class="o">=</span> <span class="n">__parse_xml__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nxdl_file</span><span class="p">)</span>
+        <span class="n">root</span> <span class="o">=</span> <span class="n">doc</span><span class="o">.</span><span class="n">getroot</span><span class="p">()</span>
+        <span class="n">category</span> <span class="o">=</span> <span class="n">root</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;category&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">category</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;missing category attribute in NXDL file: &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">nxdl_file</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">xref</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">category</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;unknown category (</span><span class="si">%s</span><span class="s2">) in NXDL file: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">category</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nxdl_file</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">path</span>
+
+    <span class="k">def</span> <span class="nf">_xslt_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xslt_file</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        convenience routine for XSLT transformations</span>
+
+<span class="sd">        For a given XSLT file *abcdefg.xsl*, will produce a file *abcdefg.html*::</span>
+
+<span class="sd">            abcdefg.xsl + xml_data  --&gt; abcdefg.html</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">buf</span> <span class="o">=</span> <span class="n">xslt_transformation</span><span class="p">(</span><span class="n">xslt_file</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nxdl_file</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">buf</span></div>
+
+
+
+<div class="viewcode-block" id="xslt_transformation">
+<a class="viewcode-back" href="../../api/nxdltree.html#punx.nxdltree.xslt_transformation">[docs]</a>
+<span class="k">def</span> <span class="nf">xslt_transformation</span><span class="p">(</span><span class="n">xslt_file</span><span class="p">,</span> <span class="n">src_xml_file</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    return the transform of an XML file using an XSLT</span>
+
+<span class="sd">    :param str xslt_file: name of XSLT file</span>
+<span class="sd">    :param str src_xml_file: name of XML file</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">src_doc</span> <span class="o">=</span> <span class="n">__parse_xml__</span><span class="p">(</span><span class="n">src_xml_file</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">src_doc</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span>
+
+    <span class="n">xslt_doc</span> <span class="o">=</span> <span class="n">__parse_xml__</span><span class="p">(</span><span class="n">xslt_file</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">xslt_doc</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span>
+
+    <span class="n">transform</span> <span class="o">=</span> <span class="n">lxml</span><span class="o">.</span><span class="n">etree</span><span class="o">.</span><span class="n">XSLT</span><span class="p">(</span><span class="n">xslt_doc</span><span class="p">)</span>
+    <span class="n">result_doc</span> <span class="o">=</span> <span class="n">transform</span><span class="p">(</span><span class="n">src_doc</span><span class="p">)</span>
+    <span class="n">_r</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">result_doc</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">_r</span></div>
+
+
+
+<span class="k">def</span> <span class="nf">__parse_xml__</span><span class="p">(</span><span class="n">xml_file_name</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    common handler for lxml.etree.parse to catch certain exceptions</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">src_doc</span> <span class="o">=</span> <span class="n">lxml</span><span class="o">.</span><span class="n">etree</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">xml_file_name</span><span class="p">)</span>
+    <span class="k">except</span> <span class="p">(</span><span class="ne">IOError</span><span class="p">,</span> <span class="n">lxml</span><span class="o">.</span><span class="n">etree</span><span class="o">.</span><span class="n">XMLSyntaxError</span><span class="p">)</span> <span class="k">as</span> <span class="n">_exc</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;problem with </span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">xml_file_name</span><span class="p">,</span> <span class="n">_exc</span><span class="p">)</span>
+        <span class="k">return</span>
+    <span class="k">return</span> <span class="n">src_doc</span>
+</pre></div>
+
+                </article>
+              
+              
+              
+                <footer class="bd-footer-article">
+                  
+<div class="footer-article-items footer-article__inner">
+  
+    <div class="footer-article-item"><!-- Previous / next buttons -->
+<div class="prev-next-area">
+</div></div>
+  
+</div>
+
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
+<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+  <p class="copyright">
+    
+      © Copyright 2014-2023, Pete R. Jemian.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.5.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item"><p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.13.3.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

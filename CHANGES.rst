@@ -14,8 +14,8 @@ Development
 
 .. :0.3.5: tba
 
-.. :0.3.5: 2024-11-dd -- Test with Py3.9 - Py3.12.
-
+.. :0.3.6: 2024-11-dd -- Test with Py3.9 - Py3.12.
+:0.3.5: 2024-11-11 -- Fix dependencies for pip installation.
 :0.3.4: 2023-08-30 -- Test with Py3.8 - Py3.11.
 :0.3.0: 2022-01-01 -- Github API access token no longer needed, ``update`` subcommand is now ``install``
 :0.2.7: 2021-12-24 -- publish documentation on GitHub Pages

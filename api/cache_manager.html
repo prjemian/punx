@@ -1,0 +1,774 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Cache : cache_manager &#8212; punx 0.3.5 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!-- 
+    this give us a css class that will be invisible only if js is disabled 
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=26a4bc78f4c0ddb94549"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549" />
+
+    <script src="../_static/documentation_options.js?v=ba50482b"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'api/cache_manager';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Findings : finding" href="finding.html" />
+    <link rel="prev" title="License" href="../license.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">punx 0.3.5 documentation</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../contents.html">
+    Table of Contents
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../contents.html">
+    Table of Contents
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../overview.html">Project Overview</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../cmd_configuration.html">User interface: subcommand: <strong>configuration</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../cmd_demo.html">User interface: subcommand: <strong>demo</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../cmd_install.html">User interface: subcommand: <strong>install</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../cmd_tree.html">User interface: subcommand: <strong>tree</strong></a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../cmd_validate.html">Validation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../data_file_validation.html">Data File Validation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../nxdl_file_validation.html">NXDL File Validation</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changes.html">Change History</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../license.html">License</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Cache : <code class="xref py py-mod docutils literal notranslate"><span class="pre">cache_manager</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="finding.html">Findings : <code class="xref py py-mod docutils literal notranslate"><span class="pre">finding</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="h5tree.html">HDF5 Data File Tree Structure : <code class="xref py py-mod docutils literal notranslate"><span class="pre">h5tree</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="main.html">User interface : <code class="xref py py-mod docutils literal notranslate"><span class="pre">main</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="nxdl_manager.html">NXDL Manager : <code class="xref py py-mod docutils literal notranslate"><span class="pre">nxdl_manager</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="nxdl_schema.html">NXDL Rules: The XML Schema files : <code class="xref py py-mod docutils literal notranslate"><span class="pre">nxdl_schema</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="nxdltree.html">NXDL Definition File Tree Structure : <code class="xref py py-mod docutils literal notranslate"><span class="pre">nxdltree</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="schema_manager.html">Manage the XML Schema files : <code class="xref py py-mod docutils literal notranslate"><span class="pre">schema_manager</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="validate.html">Validation : <code class="xref py py-mod docutils literal notranslate"><span class="pre">validate</span></code></a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../contents.html" class="nav-link">Table of Contents</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Cache : <code class="xref py py-mod docutils literal notranslate"><span class="pre">cache_manager</span></code></span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="cache-cache-manager">
+<h1>Cache : <code class="xref py py-mod docutils literal notranslate"><span class="pre">cache_manager</span></code><a class="headerlink" href="#cache-cache-manager" title="Link to this heading">#</a></h1>
+<p id="index-0">Hierarchy:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="main.html#module-punx.main" title="punx.main: manage the application's user interface"><code class="xref py py-mod docutils literal notranslate"><span class="pre">punx.main</span></code></a></p></li>
+<li><p><a class="reference internal" href="nxdl_manager.html#module-punx.nxdl_manager" title="punx.nxdl_manager: Load and/or document the structure of a NeXus NXDL class specification"><code class="xref py py-mod docutils literal notranslate"><span class="pre">punx.nxdl_manager</span></code></a></p></li>
+<li><p><a class="reference internal" href="schema_manager.html#module-punx.schema_manager" title="punx.schema_manager: manages the XML Schema of this project"><code class="xref py py-mod docutils literal notranslate"><span class="pre">punx.schema_manager</span></code></a></p></li>
+<li><p><a class="reference internal" href="#module-punx.cache_manager" title="punx.cache_manager: manages the NXDL cache directories of this project"><code class="xref py py-mod docutils literal notranslate"><span class="pre">punx.cache_manager</span></code></a></p></li>
+</ul>
+<section id="module-punx.cache_manager">
+<span id="source-code-documentation"></span><h2>source code documentation<a class="headerlink" href="#module-punx.cache_manager" title="Link to this heading">#</a></h2>
+<p>Manage the NXDL cache directories of this project.</p>
+<p>A key component necessary to validate both NeXus data files and
+NXDL class files is a current set of the NXDL definitions.</p>
+<p>There are two cache directories:</p>
+<ul class="simple">
+<li><p>the source cache</p></li>
+<li><p>the user cache</p></li>
+</ul>
+<p>Within each of these cache directories,
+there may be one or more subdirectories, each
+containing the NeXus definitions subdirectories and files (<code class="docutils literal notranslate"><span class="pre">*.xml</span></code>,
+<code class="docutils literal notranslate"><span class="pre">*.xsl</span></code>, &amp; <code class="docutils literal notranslate"><span class="pre">*.xsd</span></code>) of a specific branch, release, tag, or commit hash
+from the NeXus definitions repository.</p>
+<dl class="field-list simple">
+<dt class="field-odd">source cache<span class="colon">:</span></dt>
+<dd class="field-odd"><p>contains default set of NeXus NXDL files</p>
+</dd>
+<dt class="field-even">user cache<span class="colon">:</span></dt>
+<dd class="field-even"><p>contains additional set(s) of NeXus NXDL files, installed by user</p>
+</dd>
+</dl>
+<p>The <a class="reference internal" href="#module-punx.cache_manager" title="punx.cache_manager: manages the NXDL cache directories of this project"><code class="xref py py-mod docutils literal notranslate"><span class="pre">cache_manager</span></code></a> is called by
+<a class="reference internal" href="main.html#module-punx.main" title="punx.main: manage the application's user interface"><code class="xref py py-mod docutils literal notranslate"><span class="pre">main</span></code></a>,
+<a class="reference internal" href="schema_manager.html#module-punx.schema_manager" title="punx.schema_manager: manages the XML Schema of this project"><code class="xref py py-mod docutils literal notranslate"><span class="pre">schema_manager</span></code></a>,
+and <a class="reference internal" href="nxdl_manager.html#module-punx.nxdl_manager" title="punx.nxdl_manager: Load and/or document the structure of a NeXus NXDL class specification"><code class="xref py py-mod docutils literal notranslate"><span class="pre">nxdl_manager</span></code></a>.</p>
+<p class="rubric">Public interface</p>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#punx.cache_manager.CacheManager" title="punx.cache_manager.CacheManager"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CacheManager</span></code></a>(*args, **kwargs)</p></td>
+<td><p>manager both source and user caches</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class="rubric">Internal interface</p>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#punx.cache_manager.get_short_sha" title="punx.cache_manager.get_short_sha"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_short_sha</span></code></a>(full_sha)</p></td>
+<td><p>return the first few unique characters of the git commit hash (SHA)</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#punx.cache_manager.read_json_file" title="punx.cache_manager.read_json_file"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_json_file</span></code></a>(filename)</p></td>
+<td><p>read a structured object from the JSON file <code class="docutils literal notranslate"><span class="pre">file_name</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#punx.cache_manager.write_json_file" title="punx.cache_manager.write_json_file"><code class="xref py py-obj docutils literal notranslate"><span class="pre">write_json_file</span></code></a>(filename, obj)</p></td>
+<td><p>write the structured <code class="docutils literal notranslate"><span class="pre">obj</span></code> to the JSON file <code class="docutils literal notranslate"><span class="pre">file_name</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#punx.cache_manager.is_extractable" title="punx.cache_manager.is_extractable"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_extractable</span></code></a>(item, allowed_endings, ...)</p></td>
+<td><p>decide if this item should be extracted from the ZIP download.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#punx.cache_manager.download_NeXus_zip_archive" title="punx.cache_manager.download_NeXus_zip_archive"><code class="xref py py-obj docutils literal notranslate"><span class="pre">download_NeXus_zip_archive</span></code></a>(url)</p></td>
+<td><p>Download the NXDL definitions described by <code class="docutils literal notranslate"><span class="pre">url</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#punx.cache_manager.download_file_set" title="punx.cache_manager.download_file_set"><code class="xref py py-obj docutils literal notranslate"><span class="pre">download_file_set</span></code></a>(file_set_name, cache_path)</p></td>
+<td><p>Download &amp; extract NXDL file set into a subdirectory of <code class="docutils literal notranslate"><span class="pre">cache_path</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#punx.cache_manager.table_of_caches" title="punx.cache_manager.table_of_caches"><code class="xref py py-obj docutils literal notranslate"><span class="pre">table_of_caches</span></code></a>()</p></td>
+<td><p>return a pyRestTable table describing all known file sets in both source and user caches</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#punx.cache_manager.Base_Cache" title="punx.cache_manager.Base_Cache"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Base_Cache</span></code></a>()</p></td>
+<td><p>provides comon methods to get the QSettings path and file name</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#punx.cache_manager.SourceCache" title="punx.cache_manager.SourceCache"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SourceCache</span></code></a>()</p></td>
+<td><p>manage the source directory cache of NXDL files</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#punx.cache_manager.UserCache" title="punx.cache_manager.UserCache"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UserCache</span></code></a>()</p></td>
+<td><p>manage the user directory cache of NXDL files</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#punx.cache_manager.NXDL_File_Set" title="punx.cache_manager.NXDL_File_Set"><code class="xref py py-obj docutils literal notranslate"><span class="pre">NXDL_File_Set</span></code></a>()</p></td>
+<td><p>describe a single set of NXDL files</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<dl class="py class">
+<dt class="sig sig-object py" id="punx.cache_manager.Base_Cache">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">punx.cache_manager.</span></span><span class="sig-name descname"><span class="pre">Base_Cache</span></span><a class="reference internal" href="../_modules/punx/cache_manager.html#Base_Cache"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#punx.cache_manager.Base_Cache" title="Link to this definition">#</a></dt>
+<dd><p>provides comon methods to get the QSettings path and file name</p>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#punx.cache_manager.Base_Cache.all_file_sets" title="punx.cache_manager.Base_Cache.all_file_sets"><code class="xref py py-obj docutils literal notranslate"><span class="pre">all_file_sets</span></code></a></p></td>
+<td><p>index all NXDL file sets in this cache</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#punx.cache_manager.Base_Cache.fileName" title="punx.cache_manager.Base_Cache.fileName"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fileName</span></code></a>()</p></td>
+<td><p>full path of the QSettings file</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#punx.cache_manager.Base_Cache.path" title="punx.cache_manager.Base_Cache.path"><code class="xref py py-obj docutils literal notranslate"><span class="pre">path</span></code></a></p></td>
+<td><p>directory containing the QSettings file</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#punx.cache_manager.Base_Cache.cleanup" title="punx.cache_manager.Base_Cache.cleanup"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cleanup</span></code></a>()</p></td>
+<td><p>removes any temporary directories</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<dl class="py property">
+<dt class="sig sig-object py" id="punx.cache_manager.Base_Cache.all_file_sets">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">all_file_sets</span></span><a class="headerlink" href="#punx.cache_manager.Base_Cache.all_file_sets" title="Link to this definition">#</a></dt>
+<dd><p>index all NXDL file sets in this cache</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="punx.cache_manager.Base_Cache.cleanup">
+<span class="sig-name descname"><span class="pre">cleanup</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/punx/cache_manager.html#Base_Cache.cleanup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#punx.cache_manager.Base_Cache.cleanup" title="Link to this definition">#</a></dt>
+<dd><p>removes any temporary directories</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="punx.cache_manager.Base_Cache.fileName">
+<span class="sig-name descname"><span class="pre">fileName</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/punx/cache_manager.html#Base_Cache.fileName"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#punx.cache_manager.Base_Cache.fileName" title="Link to this definition">#</a></dt>
+<dd><p>full path of the QSettings file</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="punx.cache_manager.Base_Cache.path">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">path</span></span><a class="headerlink" href="#punx.cache_manager.Base_Cache.path" title="Link to this definition">#</a></dt>
+<dd><p>directory containing the QSettings file</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="punx.cache_manager.CacheManager">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">punx.cache_manager.</span></span><span class="sig-name descname"><span class="pre">CacheManager</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/punx/cache_manager.html#CacheManager"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#punx.cache_manager.CacheManager" title="Link to this definition">#</a></dt>
+<dd><p>manager both source and user caches</p>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#punx.cache_manager.CacheManager.select_NXDL_file_set" title="punx.cache_manager.CacheManager.select_NXDL_file_set"><code class="xref py py-obj docutils literal notranslate"><span class="pre">select_NXDL_file_set</span></code></a>([ref])</p></td>
+<td><p>Return the named self.default_file_set instance.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#punx.cache_manager.CacheManager.all_file_sets" title="punx.cache_manager.CacheManager.all_file_sets"><code class="xref py py-obj docutils literal notranslate"><span class="pre">all_file_sets</span></code></a></p></td>
+<td><p>return dictionary of all NXDL file sets in both source &amp; user caches</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#punx.cache_manager.CacheManager.cleanup" title="punx.cache_manager.CacheManager.cleanup"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cleanup</span></code></a>()</p></td>
+<td><p>removes any temporary directories</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<dl class="py property">
+<dt class="sig sig-object py" id="punx.cache_manager.CacheManager.all_file_sets">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">all_file_sets</span></span><a class="headerlink" href="#punx.cache_manager.CacheManager.all_file_sets" title="Link to this definition">#</a></dt>
+<dd><p>return dictionary of all NXDL file sets in both source &amp; user caches</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="punx.cache_manager.CacheManager.cleanup">
+<span class="sig-name descname"><span class="pre">cleanup</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/punx/cache_manager.html#CacheManager.cleanup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#punx.cache_manager.CacheManager.cleanup" title="Link to this definition">#</a></dt>
+<dd><p>removes any temporary directories</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="punx.cache_manager.CacheManager.select_NXDL_file_set">
+<span class="sig-name descname"><span class="pre">select_NXDL_file_set</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ref</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/punx/cache_manager.html#CacheManager.select_NXDL_file_set"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#punx.cache_manager.CacheManager.select_NXDL_file_set" title="Link to this definition">#</a></dt>
+<dd><p>Return the named self.default_file_set instance.</p>
+<p>Raise KeyError exception if unknown.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return obj<span class="colon">:</span></dt>
+<dd class="field-odd"><p></p></dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="punx.cache_manager.CacheManager.table_of_caches">
+<span class="sig-name descname"><span class="pre">table_of_caches</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/punx/cache_manager.html#CacheManager.table_of_caches"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#punx.cache_manager.CacheManager.table_of_caches" title="Link to this definition">#</a></dt>
+<dd><p>return a pyRestTable table describing all known file sets in both source and user caches</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns obj<span class="colon">:</span></dt>
+<dd class="field-odd"><p>instance of pyRestTable.Table with all known file sets</p>
+</dd>
+</dl>
+<p><strong>Example</strong>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">=============</span> <span class="o">======</span> <span class="o">===================</span> <span class="o">=======</span> <span class="o">==================================================================</span>
+<span class="n">NXDL</span> <span class="n">file</span> <span class="nb">set</span> <span class="n">cache</span>  <span class="n">date</span> <span class="o">&amp;</span> <span class="n">time</span>         <span class="n">commit</span>  <span class="n">path</span>
+<span class="o">=============</span> <span class="o">======</span> <span class="o">===================</span> <span class="o">=======</span> <span class="o">==================================================================</span>
+<span class="n">a4fd52d</span>       <span class="n">source</span> <span class="mi">2016</span><span class="o">-</span><span class="mi">11</span><span class="o">-</span><span class="mi">19</span> <span class="mi">01</span><span class="p">:</span><span class="mi">07</span><span class="p">:</span><span class="mi">45</span> <span class="n">a4fd52d</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">prjemian</span><span class="o">/</span><span class="n">Documents</span><span class="o">/</span><span class="n">projects</span><span class="o">/</span><span class="n">prjemian</span><span class="o">/</span><span class="n">punx</span><span class="o">/</span><span class="n">punx</span><span class="o">/</span><span class="n">cache</span><span class="o">/</span><span class="n">a4fd52d</span>
+<span class="n">v3</span><span class="mf">.3</span>          <span class="n">source</span> <span class="mi">2017</span><span class="o">-</span><span class="mi">07</span><span class="o">-</span><span class="mi">12</span> <span class="mi">10</span><span class="p">:</span><span class="mi">41</span><span class="p">:</span><span class="mi">12</span> <span class="mi">9285</span><span class="n">af9</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">prjemian</span><span class="o">/</span><span class="n">Documents</span><span class="o">/</span><span class="n">projects</span><span class="o">/</span><span class="n">prjemian</span><span class="o">/</span><span class="n">punx</span><span class="o">/</span><span class="n">punx</span><span class="o">/</span><span class="n">cache</span><span class="o">/</span><span class="n">v3</span><span class="mf">.3</span>
+<span class="n">v2018</span><span class="mf">.5</span>       <span class="n">source</span> <span class="mi">2018</span><span class="o">-</span><span class="mi">05</span><span class="o">-</span><span class="mi">15</span> <span class="mi">16</span><span class="p">:</span><span class="mi">34</span><span class="p">:</span><span class="mi">19</span> <span class="n">a3045fd</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">prjemian</span><span class="o">/</span><span class="n">Documents</span><span class="o">/</span><span class="n">projects</span><span class="o">/</span><span class="n">prjemian</span><span class="o">/</span><span class="n">punx</span><span class="o">/</span><span class="n">punx</span><span class="o">/</span><span class="n">cache</span><span class="o">/</span><span class="n">v2018</span><span class="mf">.5</span>
+<span class="n">Schema</span><span class="o">-</span><span class="mf">3.4</span>    <span class="n">user</span>   <span class="mi">2018</span><span class="o">-</span><span class="mi">05</span><span class="o">-</span><span class="mi">15</span> <span class="mi">08</span><span class="p">:</span><span class="mi">24</span><span class="p">:</span><span class="mi">34</span> <span class="n">aa1ccd1</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">prjemian</span><span class="o">/.</span><span class="n">config</span><span class="o">/</span><span class="n">punx</span><span class="o">/</span><span class="n">Schema</span><span class="o">-</span><span class="mf">3.4</span>
+<span class="n">main</span>          <span class="n">user</span>   <span class="mi">2021</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">17</span> <span class="mi">13</span><span class="p">:</span><span class="mi">09</span><span class="p">:</span><span class="mi">18</span> <span class="mi">041</span><span class="n">c2c0</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">prjemian</span><span class="o">/.</span><span class="n">config</span><span class="o">/</span><span class="n">punx</span><span class="o">/</span><span class="n">main</span>
+<span class="o">=============</span> <span class="o">======</span> <span class="o">===================</span> <span class="o">=======</span> <span class="o">==================================================================</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="punx.cache_manager.NXDL_File_Set">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">punx.cache_manager.</span></span><span class="sig-name descname"><span class="pre">NXDL_File_Set</span></span><a class="reference internal" href="../_modules/punx/cache_manager.html#NXDL_File_Set"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#punx.cache_manager.NXDL_File_Set" title="Link to this definition">#</a></dt>
+<dd><p>describe a single set of NXDL files</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="punx.cache_manager.SourceCache">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">punx.cache_manager.</span></span><span class="sig-name descname"><span class="pre">SourceCache</span></span><a class="reference internal" href="../_modules/punx/cache_manager.html#SourceCache"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#punx.cache_manager.SourceCache" title="Link to this definition">#</a></dt>
+<dd><p>manage the source directory cache of NXDL files</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="punx.cache_manager.UserCache">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">punx.cache_manager.</span></span><span class="sig-name descname"><span class="pre">UserCache</span></span><a class="reference internal" href="../_modules/punx/cache_manager.html#UserCache"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#punx.cache_manager.UserCache" title="Link to this definition">#</a></dt>
+<dd><p>manage the user directory cache of NXDL files</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="punx.cache_manager.download_NeXus_zip_archive">
+<span class="sig-prename descclassname"><span class="pre">punx.cache_manager.</span></span><span class="sig-name descname"><span class="pre">download_NeXus_zip_archive</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/punx/cache_manager.html#download_NeXus_zip_archive"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#punx.cache_manager.download_NeXus_zip_archive" title="Link to this definition">#</a></dt>
+<dd><p>Download the NXDL definitions described by <code class="docutils literal notranslate"><span class="pre">url</span></code>.</p>
+<p>Return the downloaded content in memory.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="punx.cache_manager.download_file_set">
+<span class="sig-prename descclassname"><span class="pre">punx.cache_manager.</span></span><span class="sig-name descname"><span class="pre">download_file_set</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_set_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">replace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/punx/cache_manager.html#download_file_set"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#punx.cache_manager.download_file_set" title="Link to this definition">#</a></dt>
+<dd><p>Download &amp; extract NXDL file set into a subdirectory of <code class="docutils literal notranslate"><span class="pre">cache_path</span></code>.</p>
+<dl class="simple">
+<dt>file_set_name str :</dt><dd><p>Name of the NXDL file_set to be downloaded.</p>
+</dd>
+<dt>cache_path obj :</dt><dd><p>Directory with NXDL file_sets (instance of <code class="docutils literal notranslate"><span class="pre">pathlib.Path</span></code>).
+(A file_set is a directory with a version of the NeXus definitions
+repository.)</p>
+</dd>
+<dt>replace bool :</dt><dd><p>If <code class="docutils literal notranslate"><span class="pre">True</span></code> and file set exists, replace it.
+(default: <code class="docutils literal notranslate"><span class="pre">False</span></code>)</p>
+</dd>
+</dl>
+<p>USAGE:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">download_file_set</span><span class="p">(</span><span class="n">file_set_name</span><span class="p">,</span> <span class="n">cache_path</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="punx.cache_manager.get_short_sha">
+<span class="sig-prename descclassname"><span class="pre">punx.cache_manager.</span></span><span class="sig-name descname"><span class="pre">get_short_sha</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">full_sha</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/punx/cache_manager.html#get_short_sha"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#punx.cache_manager.get_short_sha" title="Link to this definition">#</a></dt>
+<dd><p>return the first few unique characters of the git commit hash (SHA)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>full_sha</strong> (<em>str</em>) – hash code from Github</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="punx.cache_manager.is_extractable">
+<span class="sig-prename descclassname"><span class="pre">punx.cache_manager.</span></span><span class="sig-name descname"><span class="pre">is_extractable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">item</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allowed_endings</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allowed_parents</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/punx/cache_manager.html#is_extractable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#punx.cache_manager.is_extractable" title="Link to this definition">#</a></dt>
+<dd><p>decide if this item should be extracted from the ZIP download.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return bool<span class="colon">:</span></dt>
+<dd class="field-odd"><p></p></dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="punx.cache_manager.read_json_file">
+<span class="sig-prename descclassname"><span class="pre">punx.cache_manager.</span></span><span class="sig-name descname"><span class="pre">read_json_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/punx/cache_manager.html#read_json_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#punx.cache_manager.read_json_file" title="Link to this definition">#</a></dt>
+<dd><p>read a structured object from the JSON file <code class="docutils literal notranslate"><span class="pre">file_name</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">See<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.5/library/json.html#json.loads">https://docs.python.org/3.5/library/json.html#json.loads</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="punx.cache_manager.table_of_caches">
+<span class="sig-prename descclassname"><span class="pre">punx.cache_manager.</span></span><span class="sig-name descname"><span class="pre">table_of_caches</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/punx/cache_manager.html#table_of_caches"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#punx.cache_manager.table_of_caches" title="Link to this definition">#</a></dt>
+<dd><p>return a pyRestTable table describing all known file sets in both source and user caches</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns obj<span class="colon">:</span></dt>
+<dd class="field-odd"><p>instance of pyRestTable.Table with all known file sets</p>
+</dd>
+</dl>
+<p><strong>Example</strong>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">=============</span> <span class="o">======</span> <span class="o">===================</span> <span class="o">=======</span> <span class="o">==================================================================</span>
+<span class="n">NXDL</span> <span class="n">file</span> <span class="nb">set</span> <span class="n">cache</span>  <span class="n">date</span> <span class="o">&amp;</span> <span class="n">time</span>         <span class="n">commit</span>  <span class="n">path</span>
+<span class="o">=============</span> <span class="o">======</span> <span class="o">===================</span> <span class="o">=======</span> <span class="o">==================================================================</span>
+<span class="n">a4fd52d</span>       <span class="n">source</span> <span class="mi">2016</span><span class="o">-</span><span class="mi">11</span><span class="o">-</span><span class="mi">19</span> <span class="mi">01</span><span class="p">:</span><span class="mi">07</span><span class="p">:</span><span class="mi">45</span> <span class="n">a4fd52d</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">prjemian</span><span class="o">/</span><span class="n">Documents</span><span class="o">/</span><span class="n">projects</span><span class="o">/</span><span class="n">prjemian</span><span class="o">/</span><span class="n">punx</span><span class="o">/</span><span class="n">punx</span><span class="o">/</span><span class="n">cache</span><span class="o">/</span><span class="n">a4fd52d</span>
+<span class="n">v3</span><span class="mf">.3</span>          <span class="n">source</span> <span class="mi">2017</span><span class="o">-</span><span class="mi">07</span><span class="o">-</span><span class="mi">12</span> <span class="mi">10</span><span class="p">:</span><span class="mi">41</span><span class="p">:</span><span class="mi">12</span> <span class="mi">9285</span><span class="n">af9</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">prjemian</span><span class="o">/</span><span class="n">Documents</span><span class="o">/</span><span class="n">projects</span><span class="o">/</span><span class="n">prjemian</span><span class="o">/</span><span class="n">punx</span><span class="o">/</span><span class="n">punx</span><span class="o">/</span><span class="n">cache</span><span class="o">/</span><span class="n">v3</span><span class="mf">.3</span>
+<span class="n">v2018</span><span class="mf">.5</span>       <span class="n">source</span> <span class="mi">2018</span><span class="o">-</span><span class="mi">05</span><span class="o">-</span><span class="mi">15</span> <span class="mi">16</span><span class="p">:</span><span class="mi">34</span><span class="p">:</span><span class="mi">19</span> <span class="n">a3045fd</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">prjemian</span><span class="o">/</span><span class="n">Documents</span><span class="o">/</span><span class="n">projects</span><span class="o">/</span><span class="n">prjemian</span><span class="o">/</span><span class="n">punx</span><span class="o">/</span><span class="n">punx</span><span class="o">/</span><span class="n">cache</span><span class="o">/</span><span class="n">v2018</span><span class="mf">.5</span>
+<span class="n">Schema</span><span class="o">-</span><span class="mf">3.4</span>    <span class="n">user</span>   <span class="mi">2018</span><span class="o">-</span><span class="mi">05</span><span class="o">-</span><span class="mi">15</span> <span class="mi">08</span><span class="p">:</span><span class="mi">24</span><span class="p">:</span><span class="mi">34</span> <span class="n">aa1ccd1</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">prjemian</span><span class="o">/.</span><span class="n">config</span><span class="o">/</span><span class="n">punx</span><span class="o">/</span><span class="n">Schema</span><span class="o">-</span><span class="mf">3.4</span>
+<span class="n">main</span>          <span class="n">user</span>   <span class="mi">2021</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">17</span> <span class="mi">13</span><span class="p">:</span><span class="mi">09</span><span class="p">:</span><span class="mi">18</span> <span class="mi">041</span><span class="n">c2c0</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">prjemian</span><span class="o">/.</span><span class="n">config</span><span class="o">/</span><span class="n">punx</span><span class="o">/</span><span class="n">main</span>
+<span class="o">=============</span> <span class="o">======</span> <span class="o">===================</span> <span class="o">=======</span> <span class="o">==================================================================</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="punx.cache_manager.write_json_file">
+<span class="sig-prename descclassname"><span class="pre">punx.cache_manager.</span></span><span class="sig-name descname"><span class="pre">write_json_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/punx/cache_manager.html#write_json_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#punx.cache_manager.write_json_file" title="Link to this definition">#</a></dt>
+<dd><p>write the structured <code class="docutils literal notranslate"><span class="pre">obj</span></code> to the JSON file <code class="docutils literal notranslate"><span class="pre">file_name</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">See<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.5/library/json.html#json.dumps">https://docs.python.org/3.5/library/json.html#json.dumps</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../license.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">License</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="finding.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Findings : <code class="xref py py-mod docutils literal notranslate"><span class="pre">finding</span></code></p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-punx.cache_manager">source code documentation</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#punx.cache_manager.Base_Cache"><code class="docutils literal notranslate"><span class="pre">Base_Cache</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#punx.cache_manager.Base_Cache.all_file_sets"><code class="docutils literal notranslate"><span class="pre">Base_Cache.all_file_sets</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#punx.cache_manager.Base_Cache.cleanup"><code class="docutils literal notranslate"><span class="pre">Base_Cache.cleanup()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#punx.cache_manager.Base_Cache.fileName"><code class="docutils literal notranslate"><span class="pre">Base_Cache.fileName()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#punx.cache_manager.Base_Cache.path"><code class="docutils literal notranslate"><span class="pre">Base_Cache.path</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#punx.cache_manager.CacheManager"><code class="docutils literal notranslate"><span class="pre">CacheManager</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#punx.cache_manager.CacheManager.all_file_sets"><code class="docutils literal notranslate"><span class="pre">CacheManager.all_file_sets</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#punx.cache_manager.CacheManager.cleanup"><code class="docutils literal notranslate"><span class="pre">CacheManager.cleanup()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#punx.cache_manager.CacheManager.select_NXDL_file_set"><code class="docutils literal notranslate"><span class="pre">CacheManager.select_NXDL_file_set()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#punx.cache_manager.CacheManager.table_of_caches"><code class="docutils literal notranslate"><span class="pre">CacheManager.table_of_caches()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#punx.cache_manager.NXDL_File_Set"><code class="docutils literal notranslate"><span class="pre">NXDL_File_Set</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#punx.cache_manager.SourceCache"><code class="docutils literal notranslate"><span class="pre">SourceCache</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#punx.cache_manager.UserCache"><code class="docutils literal notranslate"><span class="pre">UserCache</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#punx.cache_manager.download_NeXus_zip_archive"><code class="docutils literal notranslate"><span class="pre">download_NeXus_zip_archive()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#punx.cache_manager.download_file_set"><code class="docutils literal notranslate"><span class="pre">download_file_set()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#punx.cache_manager.get_short_sha"><code class="docutils literal notranslate"><span class="pre">get_short_sha()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#punx.cache_manager.is_extractable"><code class="docutils literal notranslate"><span class="pre">is_extractable()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#punx.cache_manager.read_json_file"><code class="docutils literal notranslate"><span class="pre">read_json_file()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#punx.cache_manager.table_of_caches"><code class="docutils literal notranslate"><span class="pre">table_of_caches()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#punx.cache_manager.write_json_file"><code class="docutils literal notranslate"><span class="pre">write_json_file()</span></code></a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../_sources/api/cache_manager.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2014-2023, Pete R. Jemian.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.0.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

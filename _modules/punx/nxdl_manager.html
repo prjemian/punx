@@ -1,0 +1,1139 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>punx.nxdl_manager &#8212; punx 0.3.5 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!-- 
+    this give us a css class that will be invisible only if js is disabled 
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../_static/scripts/fontawesome.js?digest=26a4bc78f4c0ddb94549"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549" />
+
+    <script src="../../_static/documentation_options.js?v=ba50482b"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/punx/nxdl_manager';</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">punx 0.3.5 documentation</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../contents.html">
+    Table of Contents
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../contents.html">
+    Table of Contents
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">punx.nxdl_manager</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for punx.nxdl_manager</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="c1"># -----------------------------------------------------------------------------</span>
+<span class="c1"># :author:    Pete R. Jemian</span>
+<span class="c1"># :email:     prjemian@gmail.com</span>
+<span class="c1"># :copyright: (c) 2014-2022, Pete R. Jemian</span>
+<span class="c1">#</span>
+<span class="c1"># Distributed under the terms of the Creative Commons Attribution 4.0 International Public License.</span>
+<span class="c1">#</span>
+<span class="c1"># The full license is in the file LICENSE.txt, distributed with this software.</span>
+<span class="c1"># -----------------------------------------------------------------------------</span>
+
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Python representation of an NeXus NXDL class specification.</span>
+
+<span class="sd">* The *nxdl_manager* calls *schema_manager*</span>
+<span class="sd">* It gets a specific file_set from *cache_manager*</span>
+<span class="sd">* It is called from *validate*</span>
+
+<span class="sd">A *file_set* refers to a directory containing a complete set of the NXDL files</span>
+<span class="sd">and XML Schema files that comprise a version of the NeXus definitions standard.</span>
+<span class="sd">It is identified by a name (release name, tag name, short commit hash, or branch</span>
+<span class="sd">name).</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span>
+
+<span class="kn">import</span> <span class="nn">collections</span>
+<span class="kn">import</span> <span class="nn">lxml.etree</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="kn">from</span> <span class="nn">.__init__</span> <span class="kn">import</span> <span class="n">FileNotFound</span><span class="p">,</span> <span class="n">InvalidNxdlFile</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">nxdl_schema</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">cache_manager</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">utils</span>
+
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">setup_logger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="NXDL_Manager">
+<a class="viewcode-back" href="../../api/nxdl_manager.html#punx.nxdl_manager.NXDL_Manager">[docs]</a>
+<span class="k">class</span> <span class="nc">NXDL_Manager</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Python access to the NXDL classes found in ``nxdl_dir``.</span>
+
+<span class="sd">    Attributes</span>
+
+<span class="sd">    classes dict :</span>
+<span class="sd">        Dictionary of the NXDL classes found in ``nxdl_dir`` where the key</span>
+<span class="sd">        is the NeXus class name and the value is an instance of the</span>
+<span class="sd">        :class:`~punx.nxdl_manager.NXDL__definition()` class (defined below)</span>
+<span class="sd">        which describes the NXDL structure.</span>
+
+<span class="sd">    nxdl_file_set str :</span>
+<span class="sd">        Absolute path to a directory which contains a complete set of the</span>
+<span class="sd">        NeXus definitions.  This directory will have this content:</span>
+<span class="sd">        * file ``nxdl.xsd`` : The XML Schema defining the NeXus NXDL language</span>
+<span class="sd">        * file ``nxdlTypes.xsd`` : data and engineering units types used by ``nxdl.xsd``</span>
+<span class="sd">        * file ``__github_info__.json`` : description of the git repository for this file set</span>
+<span class="sd">        * directory ``applications`` : contains NXDL files of NeXus application definitions</span>
+<span class="sd">        * directory ``base_classes`` : contains NXDL files of NeXus base classes</span>
+<span class="sd">        * directory ``contributed_definitions`` : contains NXDL files of NeXus contributed definitions</span>
+
+<span class="sd">    nxdl_defaults obj :</span>
+<span class="sd">        Instance of :class:`punx.nxdl_schema.NXDL_Summary()` or ``None``.</span>
+<span class="sd">        If not ``None``, default values for all NXDL as defined by the ``nxdl.xsd``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">nxdl_file_set</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">nxdl_defaults</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_set</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">file_set</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">cm</span> <span class="o">=</span> <span class="n">cache_manager</span><span class="o">.</span><span class="n">CacheManager</span><span class="p">()</span>
+            <span class="n">file_set</span> <span class="o">=</span> <span class="n">cm</span><span class="o">.</span><span class="n">default_file_set</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">file_set</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">cm</span> <span class="o">=</span> <span class="n">cache_manager</span><span class="o">.</span><span class="n">CacheManager</span><span class="p">()</span>
+            <span class="n">cm</span><span class="o">.</span><span class="n">select_NXDL_file_set</span><span class="p">(</span><span class="n">file_set</span><span class="p">)</span>
+            <span class="n">file_set</span> <span class="o">=</span> <span class="n">cm</span><span class="o">.</span><span class="n">default_file_set</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">file_set</span><span class="p">,</span> <span class="n">cache_manager</span><span class="o">.</span><span class="n">NXDL_File_Set</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">file_set</span><span class="o">.</span><span class="n">path</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">file_set</span><span class="o">.</span><span class="n">path</span><span class="p">):</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;NXDL directory: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">file_set</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">FileNotFound</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">nxdl_file_set</span> <span class="o">=</span> <span class="n">file_set</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nxdl_defaults</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_nxdl_defaults</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">classes</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">OrderedDict</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">nxdl_file_name</span> <span class="ow">in</span> <span class="n">get_NXDL_file_list</span><span class="p">(</span><span class="n">file_set</span><span class="o">.</span><span class="n">path</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;reading NXDL file: &quot;</span> <span class="o">+</span> <span class="n">nxdl_file_name</span><span class="p">)</span>
+            <span class="n">definition</span> <span class="o">=</span> <span class="n">NXDL__definition</span><span class="p">(</span><span class="n">nxdl_manager</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>  <span class="c1"># the default</span>
+            <span class="n">definition</span><span class="o">.</span><span class="n">set_file</span><span class="p">(</span><span class="n">nxdl_file_name</span><span class="p">)</span>  <span class="c1"># defines definition.title</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">classes</span><span class="p">[</span><span class="n">definition</span><span class="o">.</span><span class="n">title</span><span class="p">]</span> <span class="o">=</span> <span class="n">definition</span>
+            <span class="n">definition</span><span class="o">.</span><span class="n">parse_nxdl_xml</span><span class="p">()</span>
+
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">definition</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="s2">&quot;attributes groups fields links&quot;</span><span class="o">.</span><span class="n">split</span><span class="p">():</span>
+                <span class="n">dd</span> <span class="o">=</span> <span class="n">definition</span><span class="o">.</span><span class="fm">__getattribute__</span><span class="p">(</span><span class="n">j</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">dd</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">dd</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
+            <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">definition</span><span class="o">.</span><span class="n">symbols</span><span class="p">):</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;symbol: &quot;</span> <span class="o">+</span> <span class="n">v</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;-&quot;</span> <span class="o">*</span> <span class="mi">50</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="s2">&quot;NXDL_Manager(&quot;</span>
+        <span class="n">count</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">classes</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">category</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">count</span><span class="p">:</span>
+                <span class="n">count</span><span class="p">[</span><span class="n">v</span><span class="o">.</span><span class="n">category</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">count</span><span class="p">[</span><span class="n">v</span><span class="o">.</span><span class="n">category</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="o">+</span> <span class="s2">&quot;:</span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">count</span><span class="o">.</span><span class="n">items</span><span class="p">())]</span>
+        <span class="n">s</span> <span class="o">+=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+        <span class="n">s</span> <span class="o">+=</span> <span class="s2">&quot;)&quot;</span>
+        <span class="k">return</span> <span class="n">s</span>
+
+<div class="viewcode-block" id="NXDL_Manager.get_nxdl_defaults">
+<a class="viewcode-back" href="../../api/nxdl_manager.html#punx.nxdl_manager.NXDL_Manager.get_nxdl_defaults">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_nxdl_defaults</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get default values for this NXDL type from the NXDL Schema.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">schema_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nxdl_file_set</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">nxdl_schema</span><span class="o">.</span><span class="n">NXDL_XSD_NAME</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">schema_file</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">nxdl_schema</span><span class="o">.</span><span class="n">NXDL_Summary</span><span class="p">(</span><span class="n">schema_file</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="get_NXDL_file_list">
+<a class="viewcode-back" href="../../api/nxdl_manager.html#punx.nxdl_manager.get_NXDL_file_list">[docs]</a>
+<span class="k">def</span> <span class="nf">get_NXDL_file_list</span><span class="p">(</span><span class="n">nxdl_dir</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return a list of all NXDL files in the ``nxdl_dir``.</span>
+
+<span class="sd">    The list is sorted by NXDL category (base_classes, applications,</span>
+<span class="sd">    contributed_definitions) and then alphabetically within each category.</span>
+
+<span class="sd">    PARAMETERS</span>
+
+<span class="sd">    nxdl_dir str:</span>
+<span class="sd">        Absolute path to the directory of a ``file_set`` (defined above).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">nxdl_dir</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;NXDL directory: &quot;</span> <span class="o">+</span> <span class="n">nxdl_dir</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">FileNotFound</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+    <span class="n">NXDL_categories</span> <span class="o">=</span> <span class="s2">&quot;base_classes applications contributed_definitions&quot;</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+    <span class="n">nxdl_file_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">category</span> <span class="ow">in</span> <span class="n">NXDL_categories</span><span class="p">:</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">nxdl_dir</span><span class="p">,</span> <span class="n">category</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;no definition available, cannot find &quot;</span> <span class="o">+</span> <span class="n">path</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">fname</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">path</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="n">fname</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.nxdl.xml&quot;</span><span class="p">):</span>
+                <span class="n">nxdl_file_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">fname</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">nxdl_file_list</span></div>
+
+
+
+<div class="viewcode-block" id="validate_xml_tree">
+<a class="viewcode-back" href="../../api/nxdl_manager.html#punx.nxdl_manager.validate_xml_tree">[docs]</a>
+<span class="k">def</span> <span class="nf">validate_xml_tree</span><span class="p">(</span><span class="n">xml_tree</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Validate an NXDL XML file against its NeXus NXDL XML Schema file.</span>
+
+<span class="sd">    :param str xml_file_name: name of XML file</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">schema_manager</span>
+
+    <span class="n">schema</span> <span class="o">=</span> <span class="n">schema_manager</span><span class="o">.</span><span class="n">get_default_schema_manager</span><span class="p">()</span><span class="o">.</span><span class="n">lxml_schema</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">schema</span><span class="o">.</span><span class="n">assertValid</span><span class="p">(</span><span class="n">xml_tree</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">lxml</span><span class="o">.</span><span class="n">etree</span><span class="o">.</span><span class="n">DocumentInvalid</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">exc</span><span class="p">))</span>
+        <span class="k">raise</span> <span class="n">InvalidNxdlFile</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">result</span></div>
+
+
+
+<div class="viewcode-block" id="NXDL__base">
+<a class="viewcode-back" href="../../api/nxdl_manager.html#punx.nxdl_manager.NXDL__base">[docs]</a>
+<span class="k">class</span> <span class="nc">NXDL__base</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Base class for each NXDL structure.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nxdl_definition</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nxdl_definition</span> <span class="o">=</span> <span class="n">nxdl_definition</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">xml_attributes</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">nxdl_schema</span><span class="o">.</span><span class="n">render_class_str</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+<div class="viewcode-block" id="NXDL__base.parse_nxdl_xml">
+<a class="viewcode-back" href="../../api/nxdl_manager.html#punx.nxdl_manager.NXDL__base.parse_nxdl_xml">[docs]</a>
+    <span class="k">def</span> <span class="nf">parse_nxdl_xml</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the XML node and assemble NXDL structure.&quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;must override parse_nxdl_xml() in subclass&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="NXDL__base.parse_xml_attributes">
+<a class="viewcode-back" href="../../api/nxdl_manager.html#punx.nxdl_manager.NXDL__base.parse_xml_attributes">[docs]</a>
+    <span class="k">def</span> <span class="nf">parse_xml_attributes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">defaults</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parse the XML attributes of an NXDL element tag.</span>
+
+<span class="sd">        PARAMETERS</span>
+
+<span class="sd">        defaults obj:</span>
+<span class="sd">            Instance of nxdl_schema.NXDL_schema__element.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">defaults</span><span class="o">.</span><span class="n">attributes</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">xml_attributes</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span></div>
+
+
+<div class="viewcode-block" id="NXDL__base.parse_attributes">
+<a class="viewcode-back" href="../../api/nxdl_manager.html#punx.nxdl_manager.NXDL__base.parse_attributes">[docs]</a>
+    <span class="k">def</span> <span class="nf">parse_attributes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xml_node</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parse NXDL ``&lt;attribute&gt;`` elements in ``xml_node``.</span>
+
+<span class="sd">        PARAMETERS</span>
+
+<span class="sd">        xml_node obj:</span>
+<span class="sd">            Instance of XML element in NXDL file with ``&lt;attribute&gt;`` nodes.</span>
+
+<span class="sd">            Element is one of the NXDL elements: field, group, attribute, link, ...</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ns</span> <span class="o">=</span> <span class="n">nxdl_schema</span><span class="o">.</span><span class="n">get_xml_namespace_dictionary</span><span class="p">()</span>
+        <span class="n">manager</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nxdl_definition</span><span class="o">.</span><span class="n">nxdl_manager</span>
+        <span class="n">nxdl_defaults</span> <span class="o">=</span> <span class="n">manager</span><span class="o">.</span><span class="n">nxdl_defaults</span>
+
+        <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">xml_node</span><span class="o">.</span><span class="n">xpath</span><span class="p">(</span><span class="s2">&quot;nx:attribute&quot;</span><span class="p">,</span> <span class="n">namespaces</span><span class="o">=</span><span class="n">ns</span><span class="p">):</span>
+            <span class="n">obj</span> <span class="o">=</span> <span class="n">NXDL__attribute</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nxdl_definition</span><span class="p">,</span> <span class="n">nxdl_defaults</span><span class="o">=</span><span class="n">nxdl_defaults</span><span class="p">)</span>
+            <span class="n">obj</span><span class="o">.</span><span class="n">parse_nxdl_xml</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">nxdl_definition</span><span class="o">.</span><span class="n">category</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;applications&quot;</span><span class="p">,):</span>
+                <span class="c1"># handle contributed definitions as base classes (for now, minOccurs = 0)</span>
+                <span class="c1"># TODO: test for hasattr(base class, &quot;definition&quot;)</span>
+                <span class="n">obj</span><span class="o">.</span><span class="n">xml_attributes</span><span class="p">[</span><span class="s2">&quot;optional&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">default_value</span> <span class="o">=</span> <span class="kc">False</span>
+
+            <span class="c1"># Does a default already exist?</span>
+            <span class="k">if</span> <span class="n">obj</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">attributes</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;replace attribute @&quot;</span> <span class="o">+</span> <span class="n">obj</span><span class="o">.</span><span class="n">name</span>
+                <span class="n">msg</span> <span class="o">+=</span> <span class="s2">&quot; in &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">attributes</span><span class="p">[</span><span class="n">obj</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">obj</span></div>
+
+
+<div class="viewcode-block" id="NXDL__base.parse_fields">
+<a class="viewcode-back" href="../../api/nxdl_manager.html#punx.nxdl_manager.NXDL__base.parse_fields">[docs]</a>
+    <span class="k">def</span> <span class="nf">parse_fields</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xml_node</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parse NXDL ``&lt;field&gt;`` elements in ``xml_node``.</span>
+
+<span class="sd">        PARAMETERS</span>
+
+<span class="sd">        xml_node obj:</span>
+<span class="sd">            Instance of XML element in NXDL file with ``&lt;field&gt;`` nodes.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ns</span> <span class="o">=</span> <span class="n">nxdl_schema</span><span class="o">.</span><span class="n">get_xml_namespace_dictionary</span><span class="p">()</span>
+        <span class="n">manager</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nxdl_definition</span><span class="o">.</span><span class="n">nxdl_manager</span>
+        <span class="n">nxdl_defaults</span> <span class="o">=</span> <span class="n">manager</span><span class="o">.</span><span class="n">nxdl_defaults</span>
+
+        <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">xml_node</span><span class="o">.</span><span class="n">xpath</span><span class="p">(</span><span class="s2">&quot;nx:field&quot;</span><span class="p">,</span> <span class="n">namespaces</span><span class="o">=</span><span class="n">ns</span><span class="p">):</span>
+            <span class="n">obj</span> <span class="o">=</span> <span class="n">NXDL__field</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nxdl_definition</span><span class="p">,</span> <span class="n">nxdl_defaults</span><span class="o">=</span><span class="n">nxdl_defaults</span><span class="p">)</span>
+            <span class="n">obj</span><span class="o">.</span><span class="n">parse_nxdl_xml</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">nxdl_definition</span><span class="o">.</span><span class="n">category</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;applications&quot;</span><span class="p">,):</span>
+                <span class="c1"># handle contributed definitions as base classes (for now, minOccurs = 0)</span>
+                <span class="n">obj</span><span class="o">.</span><span class="n">xml_attributes</span><span class="p">[</span><span class="s2">&quot;minOccurs&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">default_value</span> <span class="o">=</span> <span class="mi">1</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">ensure_unique_name</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="n">obj</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">obj</span></div>
+
+
+<div class="viewcode-block" id="NXDL__base.parse_groups">
+<a class="viewcode-back" href="../../api/nxdl_manager.html#punx.nxdl_manager.NXDL__base.parse_groups">[docs]</a>
+    <span class="k">def</span> <span class="nf">parse_groups</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xml_node</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parse NXDL ``&lt;group&gt;`` elements in ``xml_node``.</span>
+
+<span class="sd">        PARAMETERS</span>
+
+<span class="sd">        xml_node obj:</span>
+<span class="sd">            Instance of XML element in NXDL file with ``&lt;group&gt;`` nodes.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ns</span> <span class="o">=</span> <span class="n">nxdl_schema</span><span class="o">.</span><span class="n">get_xml_namespace_dictionary</span><span class="p">()</span>
+        <span class="n">manager</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nxdl_definition</span><span class="o">.</span><span class="n">nxdl_manager</span>
+        <span class="n">nxdl_defaults</span> <span class="o">=</span> <span class="n">manager</span><span class="o">.</span><span class="n">nxdl_defaults</span>
+
+        <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">xml_node</span><span class="o">.</span><span class="n">xpath</span><span class="p">(</span><span class="s2">&quot;nx:group&quot;</span><span class="p">,</span> <span class="n">namespaces</span><span class="o">=</span><span class="n">ns</span><span class="p">):</span>
+            <span class="n">obj</span> <span class="o">=</span> <span class="n">NXDL__group</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nxdl_definition</span><span class="p">,</span> <span class="n">nxdl_defaults</span><span class="o">=</span><span class="n">nxdl_defaults</span><span class="p">)</span>
+            <span class="n">obj</span><span class="o">.</span><span class="n">parse_nxdl_xml</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">nxdl_definition</span><span class="o">.</span><span class="n">category</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;applications&quot;</span><span class="p">,):</span>
+                <span class="c1"># handle contributed definitions as base classes (for now, minOccurs = 0)</span>
+                <span class="n">obj</span><span class="o">.</span><span class="n">xml_attributes</span><span class="p">[</span><span class="s2">&quot;minOccurs&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">default_value</span> <span class="o">=</span> <span class="mi">1</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">ensure_unique_name</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">groups</span><span class="p">[</span><span class="n">obj</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">obj</span></div>
+
+
+<div class="viewcode-block" id="NXDL__base.parse_links">
+<a class="viewcode-back" href="../../api/nxdl_manager.html#punx.nxdl_manager.NXDL__base.parse_links">[docs]</a>
+    <span class="k">def</span> <span class="nf">parse_links</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xml_node</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parse NXDL ``&lt;link&gt;`` elements in ``xml_node``.</span>
+
+<span class="sd">        PARAMETERS</span>
+
+<span class="sd">        xml_node obj:</span>
+<span class="sd">            Instance of XML element in NXDL file with ``&lt;link&gt;`` nodes.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ns</span> <span class="o">=</span> <span class="n">nxdl_schema</span><span class="o">.</span><span class="n">get_xml_namespace_dictionary</span><span class="p">()</span>
+        <span class="n">manager</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nxdl_definition</span><span class="o">.</span><span class="n">nxdl_manager</span>
+        <span class="n">nxdl_defaults</span> <span class="o">=</span> <span class="n">manager</span><span class="o">.</span><span class="n">nxdl_defaults</span>
+
+        <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">xml_node</span><span class="o">.</span><span class="n">xpath</span><span class="p">(</span><span class="s2">&quot;nx:link&quot;</span><span class="p">,</span> <span class="n">namespaces</span><span class="o">=</span><span class="n">ns</span><span class="p">):</span>
+            <span class="n">obj</span> <span class="o">=</span> <span class="n">NXDL__link</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nxdl_definition</span><span class="p">,</span> <span class="n">nxdl_defaults</span><span class="o">=</span><span class="n">nxdl_defaults</span><span class="p">)</span>
+            <span class="n">obj</span><span class="o">.</span><span class="n">parse_nxdl_xml</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">obj</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;link with no content!&quot;</span>
+                <span class="n">msg</span> <span class="o">+=</span> <span class="s2">&quot; line: </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">node</span><span class="o">.</span><span class="n">sourceline</span>
+                <span class="n">msg</span> <span class="o">+=</span> <span class="s2">&quot; file: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">node</span><span class="o">.</span><span class="n">base</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ensure_unique_name</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">links</span><span class="p">[</span><span class="n">obj</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">obj</span></div>
+
+
+<div class="viewcode-block" id="NXDL__base.parse_symbols">
+<a class="viewcode-back" href="../../api/nxdl_manager.html#punx.nxdl_manager.NXDL__base.parse_symbols">[docs]</a>
+    <span class="k">def</span> <span class="nf">parse_symbols</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xml_node</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parse NXDL ``&lt;symbols&gt;`` elements in ``xml_node``.</span>
+
+<span class="sd">        PARAMETERS</span>
+
+<span class="sd">        xml_node obj:</span>
+<span class="sd">            Instance of XML element in NXDL file with ``&lt;symbols&gt;`` nodes.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ns</span> <span class="o">=</span> <span class="n">nxdl_schema</span><span class="o">.</span><span class="n">get_xml_namespace_dictionary</span><span class="p">()</span>
+        <span class="n">manager</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nxdl_definition</span><span class="o">.</span><span class="n">nxdl_manager</span>
+        <span class="n">nxdl_defaults</span> <span class="o">=</span> <span class="n">manager</span><span class="o">.</span><span class="n">nxdl_defaults</span>
+
+        <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">xml_node</span><span class="o">.</span><span class="n">xpath</span><span class="p">(</span><span class="s2">&quot;nx:symbols&quot;</span><span class="p">,</span> <span class="n">namespaces</span><span class="o">=</span><span class="n">ns</span><span class="p">):</span>
+            <span class="n">obj</span> <span class="o">=</span> <span class="n">NXDL__symbols</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nxdl_definition</span><span class="p">,</span> <span class="n">nxdl_defaults</span><span class="o">=</span><span class="n">nxdl_defaults</span><span class="p">)</span>
+            <span class="n">obj</span><span class="o">.</span><span class="n">parse_nxdl_xml</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">symbols</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">symbols</span> <span class="o">+=</span> <span class="n">obj</span><span class="o">.</span><span class="n">symbols</span></div>
+
+
+<div class="viewcode-block" id="NXDL__base.ensure_unique_name">
+<a class="viewcode-back" href="../../api/nxdl_manager.html#punx.nxdl_manager.NXDL__base.ensure_unique_name">[docs]</a>
+    <span class="k">def</span> <span class="nf">ensure_unique_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check ``obj.name``, replace to make unique if needed.</span>
+
+<span class="sd">        EXAMPLE:</span>
+
+<span class="sd">        * First name of ``item`` will stay ``item``.</span>
+<span class="sd">        * Second name of ``item`` will become ``item1``.</span>
+<span class="sd">        * Third name of ``item`` will become ``item2``.</span>
+
+<span class="sd">        PARAMETERS</span>
+
+<span class="sd">        obj obj:</span>
+<span class="sd">            Instance of nxdl_manager.NXDL__base subclass.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">name_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="s2">&quot;groups fields links&quot;</span><span class="o">.</span><span class="n">split</span><span class="p">():</span>
+            <span class="n">name_list</span> <span class="o">+=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="fm">__getattribute__</span><span class="p">(</span><span class="n">k</span><span class="p">)</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="k">if</span> <span class="n">obj</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">name_list</span><span class="p">:</span>
+            <span class="n">base_name</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">name</span>
+            <span class="n">index</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="k">while</span> <span class="n">base_name</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">index</span><span class="p">)</span> <span class="ow">in</span> <span class="n">name_list</span><span class="p">:</span>
+                <span class="n">index</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">obj</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">base_name</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">index</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="NXDL__base.assign_defaults">
+<a class="viewcode-back" href="../../api/nxdl_manager.html#punx.nxdl_manager.NXDL__base.assign_defaults">[docs]</a>
+    <span class="k">def</span> <span class="nf">assign_defaults</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set default values for required components now.&quot;&quot;&quot;</span>
+        <span class="c1"># FIXME: Clarify. The specific intent of this method is ambiguous.</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xml_attributes</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+            <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">required</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="o">.</span><span class="n">default_value</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="NXDL__definition">
+<a class="viewcode-back" href="../../api/nxdl_manager.html#punx.nxdl_manager.NXDL__definition">[docs]</a>
+<span class="k">class</span> <span class="nc">NXDL__definition</span><span class="p">(</span><span class="n">NXDL__base</span><span class="p">):</span>  <span class="c1"># lgtm [py/missing-call-to-init]</span>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Contents of a *definition* element in a NXDL XML file.</span>
+
+<span class="sd">    nxdl_manager obj :</span>
+<span class="sd">        Instance of :class:`~punx.nxdl_manager.NXDL_Manager()`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nxdl_manager</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nxdl_definition</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nxdl_manager</span> <span class="o">=</span> <span class="n">nxdl_manager</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nxdl_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nxdl_manager</span><span class="o">.</span><span class="n">nxdl_file_set</span><span class="o">.</span><span class="n">path</span>
+
+        <span class="c1"># shortcut: absolute path to NXDL definitions directory</span>
+        <span class="c1"># (the directory which has file ``nxdl.xsd``)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">schema_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nxdl_path</span><span class="p">,</span> <span class="n">nxdl_schema</span><span class="o">.</span><span class="n">NXDL_XSD_NAME</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">schema_file</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">category</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">attributes</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">xml_attributes</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fields</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">groups</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">links</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">symbols</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">nxdl_defaults</span> <span class="o">=</span> <span class="n">nxdl_manager</span><span class="o">.</span><span class="n">get_nxdl_defaults</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_init_defaults_from_schema</span><span class="p">(</span><span class="n">nxdl_defaults</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">title</span> <span class="o">+</span> <span class="s2">&quot;(&quot;</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;category=&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">category</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="s2">&quot;attributes fields groups links symbols&quot;</span><span class="o">.</span><span class="n">split</span><span class="p">():</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">k</span> <span class="o">+</span> <span class="s2">&quot;:</span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="fm">__getattribute__</span><span class="p">(</span><span class="n">k</span><span class="p">)))</span>
+        <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;attributes:</span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">attributes</span><span class="p">))</span>
+        <span class="n">s</span> <span class="o">+=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+        <span class="n">s</span> <span class="o">+=</span> <span class="s2">&quot;)&quot;</span>
+        <span class="k">return</span> <span class="n">s</span>
+
+    <span class="k">def</span> <span class="nf">_init_defaults_from_schema</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nxdl_defaults</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        NXDL ``definition`` has structure of a group AND a symbols table.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">minOccurs</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">maxOccurs</span> <span class="o">=</span> <span class="mi">1</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">parse_xml_attributes</span><span class="p">(</span><span class="n">nxdl_defaults</span><span class="o">.</span><span class="n">definition</span><span class="p">)</span>
+
+        <span class="c1"># remove the recursion part</span>
+        <span class="k">if</span> <span class="s2">&quot;(group)&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">groups</span><span class="p">:</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">groups</span><span class="p">[</span><span class="s2">&quot;(group)&quot;</span><span class="p">]</span>
+
+<div class="viewcode-block" id="NXDL__definition.set_file">
+<a class="viewcode-back" href="../../api/nxdl_manager.html#punx.nxdl_manager.NXDL__definition.set_file">[docs]</a>
+    <span class="k">def</span> <span class="nf">set_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        self.category: base_classes | applications | contributed_definitions</span>
+
+<span class="sd">        determine the category of this NXDL</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span> <span class="o">=</span> <span class="n">fname</span>
+        <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">fname</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">category</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">fname</span><span class="p">))[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="NXDL__definition.parse_nxdl_xml">
+<a class="viewcode-back" href="../../api/nxdl_manager.html#punx.nxdl_manager.NXDL__definition.parse_nxdl_xml">[docs]</a>
+    <span class="k">def</span> <span class="nf">parse_nxdl_xml</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;parse the XML content&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_name</span><span class="p">):</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;NXDL file: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_name</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">FileNotFound</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="n">lxml_tree</span> <span class="o">=</span> <span class="n">lxml</span><span class="o">.</span><span class="n">etree</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_name</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">validate_xml_tree</span><span class="p">(</span><span class="n">lxml_tree</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">InvalidNxdlFile</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;NXDL file is not valid: &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span>
+            <span class="n">msg</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">InvalidNxdlFile</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="n">root_node</span> <span class="o">=</span> <span class="n">lxml_tree</span><span class="o">.</span><span class="n">getroot</span><span class="p">()</span>
+
+        <span class="c1"># parse the XML content of this NXDL definition element</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parse_symbols</span><span class="p">(</span><span class="n">root_node</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parse_attributes</span><span class="p">(</span><span class="n">root_node</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parse_groups</span><span class="p">(</span><span class="n">root_node</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parse_fields</span><span class="p">(</span><span class="n">root_node</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parse_links</span><span class="p">(</span><span class="n">root_node</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="NXDL__attribute">
+<a class="viewcode-back" href="../../api/nxdl_manager.html#punx.nxdl_manager.NXDL__attribute">[docs]</a>
+<span class="k">class</span> <span class="nc">NXDL__attribute</span><span class="p">(</span><span class="n">NXDL__base</span><span class="p">):</span>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Contents of a *attribute* structure (XML element) in a NXDL XML file.</span>
+
+<span class="sd">    ~parse_nxdl_xml</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nxdl_definition</span><span class="p">,</span> <span class="n">nxdl_defaults</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">NXDL__base</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nxdl_definition</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">enumerations</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;groups&quot;</span><span class="p">):</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">groups</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;minOccurs&quot;</span><span class="p">):</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">minOccurs</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;maxOccurs&quot;</span><span class="p">):</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">maxOccurs</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_init_defaults_from_schema</span><span class="p">(</span><span class="n">nxdl_defaults</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_init_defaults_from_schema</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nxdl_defaults</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parse_xml_attributes</span><span class="p">(</span><span class="n">nxdl_defaults</span><span class="o">.</span><span class="n">attribute</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assign_defaults</span><span class="p">()</span>
+
+<div class="viewcode-block" id="NXDL__attribute.parse_nxdl_xml">
+<a class="viewcode-back" href="../../api/nxdl_manager.html#punx.nxdl_manager.NXDL__attribute.parse_nxdl_xml">[docs]</a>
+    <span class="k">def</span> <span class="nf">parse_nxdl_xml</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xml_node</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        parse the XML content</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">xml_node</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
+
+        <span class="n">ns</span> <span class="o">=</span> <span class="n">nxdl_schema</span><span class="o">.</span><span class="n">get_xml_namespace_dictionary</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">enum_node</span> <span class="ow">in</span> <span class="n">xml_node</span><span class="o">.</span><span class="n">xpath</span><span class="p">(</span><span class="s2">&quot;nx:enumeration&quot;</span><span class="p">,</span> <span class="n">namespaces</span><span class="o">=</span><span class="n">ns</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">enum_node</span><span class="o">.</span><span class="n">xpath</span><span class="p">(</span><span class="s2">&quot;nx:item&quot;</span><span class="p">,</span> <span class="n">namespaces</span><span class="o">=</span><span class="n">ns</span><span class="p">):</span>
+                <span class="n">v</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">attrib</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;value&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">enumerations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="NXDL__dim">
+<a class="viewcode-back" href="../../api/nxdl_manager.html#punx.nxdl_manager.NXDL__dim">[docs]</a>
+<span class="k">class</span> <span class="nc">NXDL__dim</span><span class="p">(</span><span class="n">NXDL__base</span><span class="p">):</span>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Contents of a *dim* structure (XML element) in a NXDL XML file.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nxdl_definition</span><span class="p">,</span> <span class="n">nxdl_defaults</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">NXDL__base</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nxdl_definition</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_init_defaults_from_schema</span><span class="p">(</span><span class="n">nxdl_defaults</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_init_defaults_from_schema</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nxdl_defaults</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parse_xml_attributes</span><span class="p">(</span>
+            <span class="n">nxdl_defaults</span><span class="o">.</span><span class="n">field</span><span class="o">.</span><span class="n">components</span><span class="p">[</span><span class="s2">&quot;dimensions&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">components</span><span class="p">[</span><span class="s2">&quot;dim&quot;</span><span class="p">]</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="NXDL__dim.parse_nxdl_xml">
+<a class="viewcode-back" href="../../api/nxdl_manager.html#punx.nxdl_manager.NXDL__dim.parse_nxdl_xml">[docs]</a>
+    <span class="k">def</span> <span class="nf">parse_nxdl_xml</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xml_node</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        parse the XML content</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="s2">&quot;index value ref refindex incr&quot;</span><span class="o">.</span><span class="n">split</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">xml_node</span><span class="o">.</span><span class="n">attrib</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">k</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="NXDL__dimensions">
+<a class="viewcode-back" href="../../api/nxdl_manager.html#punx.nxdl_manager.NXDL__dimensions">[docs]</a>
+<span class="k">class</span> <span class="nc">NXDL__dimensions</span><span class="p">(</span><span class="n">NXDL__base</span><span class="p">):</span>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Contents of a *dimensions* structure (XML element) in a NXDL XML file.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nxdl_definition</span><span class="p">,</span> <span class="n">nxdl_defaults</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">NXDL__base</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nxdl_definition</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">rank</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dims</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">OrderedDict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_init_defaults_from_schema</span><span class="p">(</span><span class="n">nxdl_defaults</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_init_defaults_from_schema</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nxdl_defaults</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parse_xml_attributes</span><span class="p">(</span><span class="n">nxdl_defaults</span><span class="o">.</span><span class="n">field</span><span class="o">.</span><span class="n">components</span><span class="p">[</span><span class="s2">&quot;dimensions&quot;</span><span class="p">])</span>
+
+<div class="viewcode-block" id="NXDL__dimensions.parse_nxdl_xml">
+<a class="viewcode-back" href="../../api/nxdl_manager.html#punx.nxdl_manager.NXDL__dimensions.parse_nxdl_xml">[docs]</a>
+    <span class="k">def</span> <span class="nf">parse_nxdl_xml</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xml_node</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        parse the XML content</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ns</span> <span class="o">=</span> <span class="n">nxdl_schema</span><span class="o">.</span><span class="n">get_xml_namespace_dictionary</span><span class="p">()</span>
+        <span class="n">nxdl_defaults</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nxdl_definition</span><span class="o">.</span><span class="n">nxdl_manager</span><span class="o">.</span><span class="n">nxdl_defaults</span>
+
+        <span class="c1"># nxdl.xsd says NX_CHAR but should be NX_UINT? issue #571</span>
+        <span class="c1"># Per NeXusformat/definitions#571,</span>
+        <span class="c1"># Value [of &quot;rank&quot;] could be either an unsigned integer or</span>
+        <span class="c1"># a symbol as defined in the *symbol* table of the NXDL file.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rank</span> <span class="o">=</span> <span class="n">xml_node</span><span class="o">.</span><span class="n">attrib</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="s2">&quot;rank&quot;</span>
+        <span class="p">)</span>
+        <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">xml_node</span><span class="o">.</span><span class="n">xpath</span><span class="p">(</span><span class="s2">&quot;nx:dim&quot;</span><span class="p">,</span> <span class="n">namespaces</span><span class="o">=</span><span class="n">ns</span><span class="p">):</span>
+            <span class="n">obj</span> <span class="o">=</span> <span class="n">NXDL__dim</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nxdl_definition</span><span class="p">,</span> <span class="n">nxdl_defaults</span><span class="o">=</span><span class="n">nxdl_defaults</span><span class="p">)</span>
+            <span class="n">obj</span><span class="o">.</span><span class="n">parse_nxdl_xml</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dims</span><span class="p">[</span><span class="n">obj</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">obj</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="NXDL__field">
+<a class="viewcode-back" href="../../api/nxdl_manager.html#punx.nxdl_manager.NXDL__field">[docs]</a>
+<span class="k">class</span> <span class="nc">NXDL__field</span><span class="p">(</span><span class="n">NXDL__base</span><span class="p">):</span>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Contents of a *field* structure (XML element) in a NXDL XML file.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nxdl_definition</span><span class="p">,</span> <span class="n">nxdl_defaults</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">NXDL__base</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nxdl_definition</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">attributes</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dimensions</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">enumerations</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_init_defaults_from_schema</span><span class="p">(</span><span class="n">nxdl_defaults</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_init_defaults_from_schema</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nxdl_defaults</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parse_xml_attributes</span><span class="p">(</span><span class="n">nxdl_defaults</span><span class="o">.</span><span class="n">field</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assign_defaults</span><span class="p">()</span>
+
+<div class="viewcode-block" id="NXDL__field.parse_nxdl_xml">
+<a class="viewcode-back" href="../../api/nxdl_manager.html#punx.nxdl_manager.NXDL__field.parse_nxdl_xml">[docs]</a>
+    <span class="k">def</span> <span class="nf">parse_nxdl_xml</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xml_node</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;parse the XML content&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">xml_node</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">parse_attributes</span><span class="p">(</span><span class="n">xml_node</span><span class="p">)</span>
+
+        <span class="n">ns</span> <span class="o">=</span> <span class="n">nxdl_schema</span><span class="o">.</span><span class="n">get_xml_namespace_dictionary</span><span class="p">()</span>
+        <span class="n">nxdl_defaults</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nxdl_definition</span><span class="o">.</span><span class="n">nxdl_manager</span><span class="o">.</span><span class="n">nxdl_defaults</span>
+
+        <span class="n">dims_nodes</span> <span class="o">=</span> <span class="n">xml_node</span><span class="o">.</span><span class="n">xpath</span><span class="p">(</span><span class="s2">&quot;nx:dimensions&quot;</span><span class="p">,</span> <span class="n">namespaces</span><span class="o">=</span><span class="n">ns</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dims_nodes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dimensions</span> <span class="o">=</span> <span class="n">NXDL__dimensions</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">nxdl_definition</span><span class="p">,</span> <span class="n">nxdl_defaults</span><span class="o">=</span><span class="n">nxdl_defaults</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dimensions</span><span class="o">.</span><span class="n">parse_nxdl_xml</span><span class="p">(</span><span class="n">dims_nodes</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+        <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">xml_node</span><span class="o">.</span><span class="n">xpath</span><span class="p">(</span><span class="s2">&quot;nx:enumeration/nx:item&quot;</span><span class="p">,</span> <span class="n">namespaces</span><span class="o">=</span><span class="n">ns</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">enumerations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">attrib</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;value&quot;</span><span class="p">))</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="NXDL__group">
+<a class="viewcode-back" href="../../api/nxdl_manager.html#punx.nxdl_manager.NXDL__group">[docs]</a>
+<span class="k">class</span> <span class="nc">NXDL__group</span><span class="p">(</span><span class="n">NXDL__base</span><span class="p">):</span>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Contents of a *group* structure (XML element) in a NXDL XML file.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nxdl_definition</span><span class="p">,</span> <span class="n">nxdl_defaults</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">NXDL__base</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nxdl_definition</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">attributes</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fields</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">groups</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">links</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_init_defaults_from_schema</span><span class="p">(</span><span class="n">nxdl_defaults</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_init_defaults_from_schema</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nxdl_defaults</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parse_xml_attributes</span><span class="p">(</span><span class="n">nxdl_defaults</span><span class="o">.</span><span class="n">group</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assign_defaults</span><span class="p">()</span>
+
+<div class="viewcode-block" id="NXDL__group.parse_nxdl_xml">
+<a class="viewcode-back" href="../../api/nxdl_manager.html#punx.nxdl_manager.NXDL__group.parse_nxdl_xml">[docs]</a>
+    <span class="k">def</span> <span class="nf">parse_nxdl_xml</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xml_node</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;parse the XML content&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">xml_node</span><span class="o">.</span><span class="n">attrib</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="n">xml_node</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">][</span><span class="mi">2</span><span class="p">:])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">parse_attributes</span><span class="p">(</span><span class="n">xml_node</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">xml_node</span><span class="o">.</span><span class="n">attrib</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">):</span>
+                <span class="c1"># https://github.com/prjemian/punx/issues/165</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">attributes</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>  <span class="c1"># FIXME: should be NXDL__attribute instance</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parse_groups</span><span class="p">(</span><span class="n">xml_node</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parse_fields</span><span class="p">(</span><span class="n">xml_node</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parse_links</span><span class="p">(</span><span class="n">xml_node</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="NXDL__link">
+<a class="viewcode-back" href="../../api/nxdl_manager.html#punx.nxdl_manager.NXDL__link">[docs]</a>
+<span class="k">class</span> <span class="nc">NXDL__link</span><span class="p">(</span><span class="n">NXDL__base</span><span class="p">):</span>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Contents of a *link* structure (XML element) in a NXDL XML file.</span>
+
+<span class="sd">    example from NXmonopd::</span>
+
+<span class="sd">        &lt;link name=&quot;polar_angle&quot; target=&quot;/NXentry/NXinstrument/NXdetector/polar_angle&quot;&gt;</span>
+<span class="sd">            &lt;doc&gt;Link to polar angle in /NXentry/NXinstrument/NXdetector&lt;/doc&gt;</span>
+<span class="sd">        &lt;/link&gt;</span>
+<span class="sd">        &lt;link name=&quot;data&quot; target=&quot;/NXentry/NXinstrument/NXdetector/data&quot;&gt;</span>
+<span class="sd">            &lt;doc&gt;Link to data in /NXentry/NXinstrument/NXdetector&lt;/doc&gt;</span>
+<span class="sd">        &lt;/link&gt;</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nxdl_definition</span><span class="p">,</span> <span class="n">nxdl_defaults</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">NXDL__base</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nxdl_definition</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">target</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="NXDL__link.parse_nxdl_xml">
+<a class="viewcode-back" href="../../api/nxdl_manager.html#punx.nxdl_manager.NXDL__link.parse_nxdl_xml">[docs]</a>
+    <span class="k">def</span> <span class="nf">parse_nxdl_xml</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xml_node</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;parse the XML content&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">xml_node</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">target</span> <span class="o">=</span> <span class="n">xml_node</span><span class="o">.</span><span class="n">attrib</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;target&quot;</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="NXDL__symbols">
+<a class="viewcode-back" href="../../api/nxdl_manager.html#punx.nxdl_manager.NXDL__symbols">[docs]</a>
+<span class="k">class</span> <span class="nc">NXDL__symbols</span><span class="p">(</span><span class="n">NXDL__base</span><span class="p">):</span>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Contents of a *symbols* structure (XML element) in a NXDL XML file.</span>
+
+<span class="sd">    example from NXcrystal::</span>
+
+<span class="sd">      &lt;symbols&gt;</span>
+<span class="sd">        &lt;doc&gt;These symbols will be used below to coordinate dimensions with the same lengths.&lt;/doc&gt;</span>
+<span class="sd">        &lt;symbol name=&quot;n_comp&quot;&gt;&lt;doc&gt;number of different unit cells to be described&lt;/doc&gt;&lt;/symbol&gt;</span>
+<span class="sd">        &lt;symbol name=&quot;i&quot;&gt;&lt;doc&gt;number of wavelengths&lt;/doc&gt;&lt;/symbol&gt;</span>
+<span class="sd">      &lt;/symbols&gt;</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nxdl_definition</span><span class="p">,</span> <span class="n">nxdl_defaults</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">NXDL__base</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nxdl_definition</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">symbols</span> <span class="o">=</span> <span class="p">[]</span>
+
+<div class="viewcode-block" id="NXDL__symbols.parse_nxdl_xml">
+<a class="viewcode-back" href="../../api/nxdl_manager.html#punx.nxdl_manager.NXDL__symbols.parse_nxdl_xml">[docs]</a>
+    <span class="k">def</span> <span class="nf">parse_nxdl_xml</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">symbols_node</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;parse the XML content&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">symbols_node</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">lxml</span><span class="o">.</span><span class="n">etree</span><span class="o">.</span><span class="n">_Comment</span><span class="p">):</span>
+                <span class="k">continue</span>
+
+            <span class="n">element_type</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">tag</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;}&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">element_type</span> <span class="o">==</span> <span class="s2">&quot;symbol&quot;</span><span class="p">:</span>
+                <span class="n">nm</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">attrib</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">nm</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">symbols</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nm</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2014-2023, Pete R. Jemian.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.0.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

@@ -1,0 +1,734 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Validation : validate &#8212; punx 0.3.5 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!-- 
+    this give us a css class that will be invisible only if js is disabled 
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=26a4bc78f4c0ddb94549"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549" />
+
+    <script src="../_static/documentation_options.js?v=ba50482b"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'api/validate';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="Manage the XML Schema files : schema_manager" href="schema_manager.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">punx 0.3.5 documentation</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../contents.html">
+    Table of Contents
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../contents.html">
+    Table of Contents
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../overview.html">Project Overview</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../cmd_configuration.html">User interface: subcommand: <strong>configuration</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../cmd_demo.html">User interface: subcommand: <strong>demo</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../cmd_install.html">User interface: subcommand: <strong>install</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../cmd_tree.html">User interface: subcommand: <strong>tree</strong></a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../cmd_validate.html">Validation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../data_file_validation.html">Data File Validation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../nxdl_file_validation.html">NXDL File Validation</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changes.html">Change History</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cache_manager.html">Cache : <code class="xref py py-mod docutils literal notranslate"><span class="pre">cache_manager</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="finding.html">Findings : <code class="xref py py-mod docutils literal notranslate"><span class="pre">finding</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="h5tree.html">HDF5 Data File Tree Structure : <code class="xref py py-mod docutils literal notranslate"><span class="pre">h5tree</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="main.html">User interface : <code class="xref py py-mod docutils literal notranslate"><span class="pre">main</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="nxdl_manager.html">NXDL Manager : <code class="xref py py-mod docutils literal notranslate"><span class="pre">nxdl_manager</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="nxdl_schema.html">NXDL Rules: The XML Schema files : <code class="xref py py-mod docutils literal notranslate"><span class="pre">nxdl_schema</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="nxdltree.html">NXDL Definition File Tree Structure : <code class="xref py py-mod docutils literal notranslate"><span class="pre">nxdltree</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="schema_manager.html">Manage the XML Schema files : <code class="xref py py-mod docutils literal notranslate"><span class="pre">schema_manager</span></code></a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Validation : <code class="xref py py-mod docutils literal notranslate"><span class="pre">validate</span></code></a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../contents.html" class="nav-link">Table of Contents</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Validation : <code class="xref py py-mod docutils literal notranslate"><span class="pre">validate</span></code></span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="validation-validate">
+<span id="source-validate"></span><h1>Validation : <code class="xref py py-mod docutils literal notranslate"><span class="pre">validate</span></code><a class="headerlink" href="#validation-validate" title="Link to this heading">#</a></h1>
+<p id="index-1"><span id="index-0"></span>The process of validation compares each item in an HDF5 data file
+and compares it with the NeXus standards to check that the item is valid
+within that standard.  Each test is assigned a <em>finding</em> result, a
+<code class="xref py py-class docutils literal notranslate"><span class="pre">Severity</span></code> object, with values and meanings
+as shown in the table below.</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>value</p></th>
+<th class="head"><p>color</p></th>
+<th class="head"><p>meaning</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>OK</p></td>
+<td><p>green</p></td>
+<td><p>meets NeXus specification</p></td>
+</tr>
+<tr class="row-odd"><td><p>NOTE</p></td>
+<td><p>palegreen</p></td>
+<td><p>does not meet NeXus specification, but acceptable</p></td>
+</tr>
+<tr class="row-even"><td><p>WARN</p></td>
+<td><p>yellow</p></td>
+<td><p>does not meet NeXus specification, not generally acceptable</p></td>
+</tr>
+<tr class="row-odd"><td><p>ERROR</p></td>
+<td><p>red</p></td>
+<td><p>violates NeXus specification</p></td>
+</tr>
+<tr class="row-even"><td><p>TODO</p></td>
+<td><p>blue</p></td>
+<td><p>validation not implemented yet</p></td>
+</tr>
+<tr class="row-odd"><td><p>UNUSED</p></td>
+<td><p>grey</p></td>
+<td><p>optional NeXus item not used in data file</p></td>
+</tr>
+<tr class="row-even"><td><p>COMMENT</p></td>
+<td><p>grey</p></td>
+<td><p>comment from the <em>punx</em> source code</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Items marked with the WARN <em>severity</em> status are as noted in either the
+NeXus manual <a class="footnote-reference brackets" href="#id6" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>, the NXDL language specification <a class="footnote-reference brackets" href="#id7" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>, or
+the NeXus Definition Language (NXDL) files <a class="footnote-reference brackets" href="#id8" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a>.</p>
+<p>The <em>color</em> is a suggestion for use in a GUI.</p>
+<p>Numerical values are associated with each finding value.
+The sum of these values is averaged to produce a numerical
+indication of the validation of the file against the NeXus standard.
+An average of 100 indicates that the file meets the NeXus
+specification for every validation test applied.
+An average that is less than zero indicates that the
+file contains content that is not valid with the NeXus standard.</p>
+<section id="nexus-hdf5-data-files">
+<h2>NeXus HDF5 Data Files<a class="headerlink" href="#nexus-hdf5-data-files" title="Link to this heading">#</a></h2>
+<p>NeXus data files are HDF5 <a class="footnote-reference brackets" href="#id9" id="id4" role="doc-noteref"><span class="fn-bracket">[</span>4<span class="fn-bracket">]</span></a> and are validated against the suite of NXDL files
+using tools provided by this package.  The strategy is to compare the structure
+of the HDF file with the structure of the NXDL file(s) as specified by the
+<code class="docutils literal notranslate"><span class="pre">NX_class</span></code> attributes of the various HDF groups in the data file.</p>
+</section>
+<section id="nexus-nxdl-definition-language-files">
+<h2>NeXus NXDL Definition Language Files<a class="headerlink" href="#nexus-nxdl-definition-language-files" title="Link to this heading">#</a></h2>
+<p>NXDL files are XML and are validated against the XML Schema file: <code class="docutils literal notranslate"><span class="pre">nxdl.xsd</span></code>.
+See the GitHub repository <a class="footnote-reference brackets" href="#id10" id="id5" role="doc-noteref"><span class="fn-bracket">[</span>5<span class="fn-bracket">]</span></a> for this file.</p>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id6" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p>NeXus manual:
+<a class="reference external" href="http://download.nexusformat.org/doc/html/user_manual.html">http://download.nexusformat.org/doc/html/user_manual.html</a></p>
+</aside>
+<aside class="footnote brackets" id="id7" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">2</a><span class="fn-bracket">]</span></span>
+<p>NXDL Language:
+<a class="reference external" href="http://download.nexusformat.org/doc/html/nxdl.html">http://download.nexusformat.org/doc/html/nxdl.html</a></p>
+</aside>
+<aside class="footnote brackets" id="id8" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">3</a><span class="fn-bracket">]</span></span>
+<p>NeXus Class Definitions (NXDL files):
+<a class="reference external" href="http://download.nexusformat.org/doc/html/classes/index.html">http://download.nexusformat.org/doc/html/classes/index.html</a></p>
+</aside>
+<aside class="footnote brackets" id="id9" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id4">4</a><span class="fn-bracket">]</span></span>
+<p>HDF5:
+<a class="reference external" href="https://support.hdfgroup.org/HDF5/">https://support.hdfgroup.org/HDF5/</a></p>
+</aside>
+<aside class="footnote brackets" id="id10" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id5">5</a><span class="fn-bracket">]</span></span>
+<p>NeXus GitHub Definitions repository:
+<a class="github reference external" href="https://github.com/nexusformat/definitions">nexusformat/definitions</a></p>
+</aside>
+</aside>
+<hr class="docutils" />
+<section id="module-punx.validate">
+<span id="source-code-documentation"></span><h3>source code documentation<a class="headerlink" href="#module-punx.validate" title="Link to this heading">#</a></h3>
+<p>validate files against the NeXus/HDF5 standard</p>
+<p>PUBLIC</p>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#punx.validate.Data_File_Validator" title="punx.validate.Data_File_Validator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Data_File_Validator</span></code></a>([ref])</p></td>
+<td><p>manage the validation of a NeXus HDF5 data file</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>INTERNAL</p>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#punx.validate.ValidationItem" title="punx.validate.ValidationItem"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ValidationItem</span></code></a>(parent, obj[, attribute_name])</p></td>
+<td><p>HDF5 data file object for validation</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<dl class="py class">
+<dt class="sig sig-object py" id="punx.validate.Data_File_Validator">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">punx.validate.</span></span><span class="sig-name descname"><span class="pre">Data_File_Validator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ref</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/punx/validate.html#Data_File_Validator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#punx.validate.Data_File_Validator" title="Link to this definition">#</a></dt>
+<dd><p>manage the validation of a NeXus HDF5 data file</p>
+<p>USAGE</p>
+<ol class="arabic">
+<li><p>make a validator with a certain schema:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">validator</span> <span class="o">=</span> <span class="n">punx</span><span class="o">.</span><span class="n">validate</span><span class="o">.</span><span class="n">Data_File_Validator</span><span class="p">()</span>    <span class="c1"># default</span>
+</pre></div>
+</div>
+<p>You may have downloaded additional NeXus Schema (NXDL file sets).
+If so, pick any of these by name as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">validator</span> <span class="o">=</span> <span class="n">punx</span><span class="o">.</span><span class="n">validate</span><span class="o">.</span><span class="n">Data_File_Validator</span><span class="p">(</span><span class="s2">&quot;v3.2&quot;</span><span class="p">)</span>
+<span class="n">validator</span> <span class="o">=</span> <span class="n">punx</span><span class="o">.</span><span class="n">validate</span><span class="o">.</span><span class="n">Data_File_Validator</span><span class="p">(</span><span class="s2">&quot;main&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p>use to validate a file or files:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">result</span> <span class="o">=</span> <span class="n">validator</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">hdf5_file_name</span><span class="p">)</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">validator</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">another_file</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p>close the HDF5 file when done with validation:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">validator</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+</div>
+</li>
+</ol>
+<p>PUBLIC METHODS</p>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#punx.validate.Data_File_Validator.close" title="punx.validate.Data_File_Validator.close"><code class="xref py py-obj docutils literal notranslate"><span class="pre">close</span></code></a>()</p></td>
+<td><p>close the HDF5 file (if it is open)</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#punx.validate.Data_File_Validator.validate" title="punx.validate.Data_File_Validator.validate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate</span></code></a>(fname)</p></td>
+<td><p>start the validation process from the file root</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#punx.validate.Data_File_Validator.print_report" title="punx.validate.Data_File_Validator.print_report"><code class="xref py py-obj docutils literal notranslate"><span class="pre">print_report</span></code></a>([statuses])</p></td>
+<td><p>Print a validation report.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>INTERNAL METHODS</p>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#punx.validate.Data_File_Validator.build_address_catalog" title="punx.validate.Data_File_Validator.build_address_catalog"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_address_catalog</span></code></a>()</p></td>
+<td><p>find all HDF5 addresses and NeXus class paths in the data file</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_group_address_catalog_</span></code>(parent, group)</p></td>
+<td><p>catalog this group's address and all its contents</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate_item_name</span></code>(v_item)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="punx.validate.Data_File_Validator.build_address_catalog">
+<span class="sig-name descname"><span class="pre">build_address_catalog</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/punx/validate.html#Data_File_Validator.build_address_catalog"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#punx.validate.Data_File_Validator.build_address_catalog" title="Link to this definition">#</a></dt>
+<dd><p>find all HDF5 addresses and NeXus class paths in the data file</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="punx.validate.Data_File_Validator.close">
+<span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/punx/validate.html#Data_File_Validator.close"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#punx.validate.Data_File_Validator.close" title="Link to this definition">#</a></dt>
+<dd><p>close the HDF5 file (if it is open)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="punx.validate.Data_File_Validator.finding_score">
+<span class="sig-name descname"><span class="pre">finding_score</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/punx/validate.html#Data_File_Validator.finding_score"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#punx.validate.Data_File_Validator.finding_score" title="Link to this definition">#</a></dt>
+<dd><p>return a numerical score for the set of findings</p>
+<p>count: number of findings
+total: sum of status values for all findings
+score: total / count – average status / finding</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="punx.validate.Data_File_Validator.finding_summary">
+<span class="sig-name descname"><span class="pre">finding_summary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">report_statuses</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/punx/validate.html#Data_File_Validator.finding_summary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#punx.validate.Data_File_Validator.finding_summary" title="Link to this definition">#</a></dt>
+<dd><p>Return a summary dictionary of the count of findings by status.</p>
+<p>Summary Statistics</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="punx.validate.Data_File_Validator.print_report">
+<span class="sig-name descname"><span class="pre">print_report</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">statuses</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/punx/validate.html#Data_File_Validator.print_report"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#punx.validate.Data_File_Validator.print_report" title="Link to this definition">#</a></dt>
+<dd><p>Print a validation report.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="punx.validate.Data_File_Validator.record_finding">
+<span class="sig-name descname"><span class="pre">record_finding</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">v_item</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">status</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comment</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/punx/validate.html#Data_File_Validator.record_finding"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#punx.validate.Data_File_Validator.record_finding" title="Link to this definition">#</a></dt>
+<dd><p>prepare the finding object and record it</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="punx.validate.Data_File_Validator.usedAsBaseClass">
+<span class="sig-name descname"><span class="pre">usedAsBaseClass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nx_class</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/punx/validate.html#Data_File_Validator.usedAsBaseClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#punx.validate.Data_File_Validator.usedAsBaseClass" title="Link to this definition">#</a></dt>
+<dd><p>returns bool: is the nx_class a base class?</p>
+<p>NXDL specifications in the contributed definitions directory
+could be intended as either a base class or an
+application definition.  NeXus provides no easy identifier
+for this difference.  The most obvious distinction between
+them is the presence of the <cite>definition</cite> field
+in the <cite>NXentry</cite> group of an application definition.
+This field is not present in base classes.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="punx.validate.Data_File_Validator.validate">
+<span class="sig-name descname"><span class="pre">validate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/punx/validate.html#Data_File_Validator.validate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#punx.validate.Data_File_Validator.validate" title="Link to this definition">#</a></dt>
+<dd><p>start the validation process from the file root</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="punx.validate.Data_File_Validator.validate_application_definition">
+<span class="sig-name descname"><span class="pre">validate_application_definition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">v_item</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/punx/validate.html#Data_File_Validator.validate_application_definition"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#punx.validate.Data_File_Validator.validate_application_definition" title="Link to this definition">#</a></dt>
+<dd><p>validate group as a NeXus application definition</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="punx.validate.Data_File_Validator.validate_group">
+<span class="sig-name descname"><span class="pre">validate_group</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">v_item</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/punx/validate.html#Data_File_Validator.validate_group"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#punx.validate.Data_File_Validator.validate_group" title="Link to this definition">#</a></dt>
+<dd><p>validate the NeXus content of a HDF5 data file group</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="punx.validate.ValidationItem">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">punx.validate.</span></span><span class="sig-name descname"><span class="pre">ValidationItem</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attribute_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/punx/validate.html#ValidationItem"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#punx.validate.ValidationItem" title="Link to this definition">#</a></dt>
+<dd><p>HDF5 data file object for validation</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="punx.validate.ValidationItem.determine_NeXus_classpath">
+<span class="sig-name descname"><span class="pre">determine_NeXus_classpath</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/punx/validate.html#ValidationItem.determine_NeXus_classpath"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#punx.validate.ValidationItem.determine_NeXus_classpath" title="Link to this definition">#</a></dt>
+<dd><p>determine the NeXus class path</p>
+<dl class="field-list simple">
+<dt class="field-odd">See<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="http://download.nexusformat.org/sphinx/preface.html#class-path-specification">http://download.nexusformat.org/sphinx/preface.html#class-path-specification</a></p>
+</dd>
+</dl>
+<p>EXAMPLE</p>
+<p>Given this NeXus data file structure:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/</span>
+    <span class="n">entry</span><span class="p">:</span> <span class="n">NXentry</span>
+        <span class="n">data</span><span class="p">:</span> <span class="n">NXdata</span>
+            <span class="nd">@signal</span> <span class="o">=</span> <span class="n">data</span>
+            <span class="n">data</span><span class="p">:</span> <span class="n">NX_NUMBER</span>
+</pre></div>
+</div>
+<p>For the “signal” attribute of this HDF5 address: <code class="docutils literal notranslate"><span class="pre">/entry/data</span></code>,
+its NeXus class path is: <code class="docutils literal notranslate"><span class="pre">/NXentry/NXdata&#64;signal</span></code></p>
+<p>The <code class="docutils literal notranslate"><span class="pre">&#64;signal</span></code> attribute has the value of <code class="docutils literal notranslate"><span class="pre">data</span></code> which means
+that the local field named <code class="docutils literal notranslate"><span class="pre">data</span></code> is the plottable data.</p>
+<p>The HDF5 address of the plottable data is: <code class="docutils literal notranslate"><span class="pre">/entry/data/data</span></code>,
+its NeXus class path is: <code class="docutils literal notranslate"><span class="pre">/NXentry/NXdata/data</span></code></p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="schema_manager.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Manage the XML Schema files : <code class="xref py py-mod docutils literal notranslate"><span class="pre">schema_manager</span></code></p>
+      </div>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#nexus-hdf5-data-files">NeXus HDF5 Data Files</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#nexus-nxdl-definition-language-files">NeXus NXDL Definition Language Files</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#module-punx.validate">source code documentation</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#punx.validate.Data_File_Validator"><code class="docutils literal notranslate"><span class="pre">Data_File_Validator</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#punx.validate.Data_File_Validator.build_address_catalog"><code class="docutils literal notranslate"><span class="pre">Data_File_Validator.build_address_catalog()</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#punx.validate.Data_File_Validator.close"><code class="docutils literal notranslate"><span class="pre">Data_File_Validator.close()</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#punx.validate.Data_File_Validator.finding_score"><code class="docutils literal notranslate"><span class="pre">Data_File_Validator.finding_score()</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#punx.validate.Data_File_Validator.finding_summary"><code class="docutils literal notranslate"><span class="pre">Data_File_Validator.finding_summary()</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#punx.validate.Data_File_Validator.print_report"><code class="docutils literal notranslate"><span class="pre">Data_File_Validator.print_report()</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#punx.validate.Data_File_Validator.record_finding"><code class="docutils literal notranslate"><span class="pre">Data_File_Validator.record_finding()</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#punx.validate.Data_File_Validator.usedAsBaseClass"><code class="docutils literal notranslate"><span class="pre">Data_File_Validator.usedAsBaseClass()</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#punx.validate.Data_File_Validator.validate"><code class="docutils literal notranslate"><span class="pre">Data_File_Validator.validate()</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#punx.validate.Data_File_Validator.validate_application_definition"><code class="docutils literal notranslate"><span class="pre">Data_File_Validator.validate_application_definition()</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#punx.validate.Data_File_Validator.validate_group"><code class="docutils literal notranslate"><span class="pre">Data_File_Validator.validate_group()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#punx.validate.ValidationItem"><code class="docutils literal notranslate"><span class="pre">ValidationItem</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#punx.validate.ValidationItem.determine_NeXus_classpath"><code class="docutils literal notranslate"><span class="pre">ValidationItem.determine_NeXus_classpath()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../_sources/api/validate.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2014-2023, Pete R. Jemian.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.0.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

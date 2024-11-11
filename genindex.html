@@ -1,0 +1,859 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Index &#8212; punx 0.3.5 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!-- 
+    this give us a css class that will be invisible only if js is disabled 
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=4ae1632d" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="_static/scripts/fontawesome.js?digest=26a4bc78f4c0ddb94549"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549" />
+
+    <script src="_static/documentation_options.js?v=ba50482b"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'genindex';</script>
+    <link rel="index" title="Index" href="#" />
+    <link rel="search" title="Search" href="search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">punx 0.3.5 documentation</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="contents.html">
+    Table of Contents
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="contents.html">
+    Table of Contents
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none"></div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+
+<h1 id="index">Index</h1>
+
+<div class="genindex-jumpbox">
+ <a href="#A"><strong>A</strong></a>
+ | <a href="#B"><strong>B</strong></a>
+ | <a href="#C"><strong>C</strong></a>
+ | <a href="#D"><strong>D</strong></a>
+ | <a href="#E"><strong>E</strong></a>
+ | <a href="#F"><strong>F</strong></a>
+ | <a href="#G"><strong>G</strong></a>
+ | <a href="#H"><strong>H</strong></a>
+ | <a href="#I"><strong>I</strong></a>
+ | <a href="#M"><strong>M</strong></a>
+ | <a href="#N"><strong>N</strong></a>
+ | <a href="#P"><strong>P</strong></a>
+ | <a href="#R"><strong>R</strong></a>
+ | <a href="#S"><strong>S</strong></a>
+ | <a href="#T"><strong>T</strong></a>
+ | <a href="#U"><strong>U</strong></a>
+ | <a href="#V"><strong>V</strong></a>
+ | <a href="#W"><strong>W</strong></a>
+ | <a href="#X"><strong>X</strong></a>
+ 
+</div>
+<h2 id="A">A</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/cache_manager.html#punx.cache_manager.Base_Cache.all_file_sets">all_file_sets (punx.cache_manager.Base_Cache property)</a>
+
+      <ul>
+        <li><a href="api/cache_manager.html#punx.cache_manager.CacheManager.all_file_sets">(punx.cache_manager.CacheManager property)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/nxdl_manager.html#punx.nxdl_manager.NXDL__base.assign_defaults">assign_defaults() (punx.nxdl_manager.NXDL__base method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="B">B</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/cache_manager.html#punx.cache_manager.Base_Cache">Base_Cache (class in punx.cache_manager)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/validate.html#punx.validate.Data_File_Validator.build_address_catalog">build_address_catalog() (punx.validate.Data_File_Validator method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="C">C</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="cmd_configuration.html#index-3">cache</a>, <a href="cmd_configuration.html#index-3">[1]</a>
+</li>
+      <li><a href="api/main.html#index-1">cache update</a>
+</li>
+      <li><a href="api/cache_manager.html#punx.cache_manager.CacheManager">CacheManager (class in punx.cache_manager)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/cache_manager.html#punx.cache_manager.Base_Cache.cleanup">cleanup() (punx.cache_manager.Base_Cache method)</a>
+
+      <ul>
+        <li><a href="api/cache_manager.html#punx.cache_manager.CacheManager.cleanup">(punx.cache_manager.CacheManager method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/validate.html#punx.validate.Data_File_Validator.close">close() (punx.validate.Data_File_Validator method)</a>
+</li>
+      <li><a href="cmd_configuration.html#index-0">configuration</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="D">D</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/validate.html#punx.validate.Data_File_Validator">Data_File_Validator (class in punx.validate)</a>
+</li>
+      <li><a href="api/main.html#index-0">demo</a>, <a href="cmd_demo.html#index-0">[1]</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/validate.html#punx.validate.ValidationItem.determine_NeXus_classpath">determine_NeXus_classpath() (punx.validate.ValidationItem method)</a>
+</li>
+      <li><a href="api/cache_manager.html#punx.cache_manager.download_file_set">download_file_set() (in module punx.cache_manager)</a>
+</li>
+      <li><a href="api/cache_manager.html#punx.cache_manager.download_NeXus_zip_archive">download_NeXus_zip_archive() (in module punx.cache_manager)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="E">E</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/nxdl_manager.html#punx.nxdl_manager.NXDL__base.ensure_unique_name">ensure_unique_name() (punx.nxdl_manager.NXDL__base method)</a>
+</li>
+      <li>
+    examples
+
+      <ul>
+        <li><a href="api/h5tree.html#index-0">h5tree</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/main.html#punx.main.exit_message">exit_message() (in module punx.main)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="F">F</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/cache_manager.html#punx.cache_manager.Base_Cache.fileName">fileName() (punx.cache_manager.Base_Cache method)</a>
+</li>
+      <li><a href="api/finding.html#punx.finding.Finding">Finding (class in punx.finding)</a>
+</li>
+      <li><a href="api/validate.html#punx.validate.Data_File_Validator.finding_score">finding_score() (punx.validate.Data_File_Validator method)</a>
+</li>
+      <li><a href="api/validate.html#punx.validate.Data_File_Validator.finding_summary">finding_summary() (punx.validate.Data_File_Validator method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/main.html#punx.main.func_configuration">func_configuration() (in module punx.main)</a>
+</li>
+      <li><a href="api/main.html#punx.main.func_demo">func_demo() (in module punx.main)</a>
+</li>
+      <li><a href="api/main.html#punx.main.func_install">func_install() (in module punx.main)</a>
+</li>
+      <li><a href="api/main.html#punx.main.func_tree">func_tree() (in module punx.main)</a>
+</li>
+      <li><a href="api/main.html#punx.main.func_validate">func_validate() (in module punx.main)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="G">G</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/schema_manager.html#punx.schema_manager.get_default_schema_manager">get_default_schema_manager() (in module punx.schema_manager)</a>
+</li>
+      <li><a href="api/nxdl_schema.html#punx.nxdl_schema.get_named_parent_node">get_named_parent_node() (in module punx.nxdl_schema)</a>
+</li>
+      <li><a href="api/nxdl_manager.html#punx.nxdl_manager.NXDL_Manager.get_nxdl_defaults">get_nxdl_defaults() (punx.nxdl_manager.NXDL_Manager method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/nxdl_manager.html#punx.nxdl_manager.get_NXDL_file_list">get_NXDL_file_list() (in module punx.nxdl_manager)</a>
+</li>
+      <li><a href="api/nxdl_schema.html#punx.nxdl_schema.get_reference_keys">get_reference_keys() (in module punx.nxdl_schema)</a>
+</li>
+      <li><a href="api/cache_manager.html#punx.cache_manager.get_short_sha">get_short_sha() (in module punx.cache_manager)</a>
+</li>
+      <li><a href="api/nxdl_schema.html#punx.nxdl_schema.get_xml_namespace_dictionary">get_xml_namespace_dictionary() (in module punx.nxdl_schema)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="H">H</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/h5tree.html#punx.h5tree.Hdf5TreeView">Hdf5TreeView (class in punx.h5tree)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="I">I</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="cmd_install.html#index-0">install</a>, <a href="install.html#index-0">[1]</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/cache_manager.html#punx.cache_manager.is_extractable">is_extractable() (in module punx.cache_manager)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="M">M</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/finding.html#punx.finding.Finding.make_md5">make_md5() (punx.finding.Finding method)</a>
+</li>
+      <li>
+    module
+
+      <ul>
+        <li><a href="api/cache_manager.html#module-punx.cache_manager">punx.cache_manager</a>
+</li>
+        <li><a href="api/finding.html#module-punx.finding">punx.finding</a>
+</li>
+        <li><a href="api/h5tree.html#module-punx.h5tree">punx.h5tree</a>
+</li>
+        <li><a href="api/main.html#module-punx.main">punx.main</a>
+</li>
+        <li><a href="api/nxdl_manager.html#module-punx.nxdl_manager">punx.nxdl_manager</a>
+</li>
+        <li><a href="api/nxdl_schema.html#module-punx.nxdl_schema">punx.nxdl_schema</a>
+</li>
+        <li><a href="api/nxdltree.html#module-punx.nxdltree">punx.nxdltree</a>
+</li>
+        <li><a href="api/schema_manager.html#module-punx.schema_manager">punx.schema_manager</a>
+</li>
+        <li><a href="api/validate.html#module-punx.validate">punx.validate</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/main.html#punx.main.MyArgumentParser">MyArgumentParser (class in punx.main)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="N">N</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/cache_manager.html#index-0">NeXus definitions</a>
+</li>
+      <li><a href="cmd_configuration.html#index-1">NXDL file set</a>, <a href="cmd_configuration.html#index-2">[1]</a>
+</li>
+      <li><a href="api/nxdl_manager.html#punx.nxdl_manager.NXDL__attribute">NXDL__attribute (class in punx.nxdl_manager)</a>
+</li>
+      <li><a href="api/nxdl_manager.html#punx.nxdl_manager.NXDL__base">NXDL__base (class in punx.nxdl_manager)</a>
+</li>
+      <li><a href="api/nxdl_manager.html#punx.nxdl_manager.NXDL__definition">NXDL__definition (class in punx.nxdl_manager)</a>
+</li>
+      <li><a href="api/nxdl_manager.html#punx.nxdl_manager.NXDL__dim">NXDL__dim (class in punx.nxdl_manager)</a>
+</li>
+      <li><a href="api/nxdl_manager.html#punx.nxdl_manager.NXDL__dimensions">NXDL__dimensions (class in punx.nxdl_manager)</a>
+</li>
+      <li><a href="api/nxdl_manager.html#punx.nxdl_manager.NXDL__field">NXDL__field (class in punx.nxdl_manager)</a>
+</li>
+      <li><a href="api/nxdl_manager.html#punx.nxdl_manager.NXDL__group">NXDL__group (class in punx.nxdl_manager)</a>
+</li>
+      <li><a href="api/nxdl_manager.html#punx.nxdl_manager.NXDL__link">NXDL__link (class in punx.nxdl_manager)</a>
+</li>
+      <li><a href="api/nxdl_manager.html#punx.nxdl_manager.NXDL__symbols">NXDL__symbols (class in punx.nxdl_manager)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/cache_manager.html#punx.cache_manager.NXDL_File_Set">NXDL_File_Set (class in punx.cache_manager)</a>
+</li>
+      <li><a href="api/nxdl_schema.html#punx.nxdl_schema.NXDL_item_catalog">NXDL_item_catalog (class in punx.nxdl_schema)</a>
+</li>
+      <li><a href="api/nxdl_manager.html#punx.nxdl_manager.NXDL_Manager">NXDL_Manager (class in punx.nxdl_manager)</a>
+</li>
+      <li><a href="api/nxdl_schema.html#punx.nxdl_schema.NXDL_schema__attribute">NXDL_schema__attribute (class in punx.nxdl_schema)</a>
+</li>
+      <li><a href="api/nxdl_schema.html#punx.nxdl_schema.NXDL_schema__attributeGroup">NXDL_schema__attributeGroup (class in punx.nxdl_schema)</a>
+</li>
+      <li><a href="api/nxdl_schema.html#punx.nxdl_schema.NXDL_schema__complexType">NXDL_schema__complexType (class in punx.nxdl_schema)</a>
+</li>
+      <li><a href="api/nxdl_schema.html#punx.nxdl_schema.NXDL_schema__element">NXDL_schema__element (class in punx.nxdl_schema)</a>
+</li>
+      <li><a href="api/nxdl_schema.html#punx.nxdl_schema.NXDL_schema__group">NXDL_schema__group (class in punx.nxdl_schema)</a>
+</li>
+      <li><a href="api/nxdl_schema.html#punx.nxdl_schema.NXDL_schema_named_simpleType">NXDL_schema_named_simpleType (class in punx.nxdl_schema)</a>
+</li>
+      <li><a href="api/nxdl_schema.html#punx.nxdl_schema.NXDL_Summary">NXDL_Summary (class in punx.nxdl_schema)</a>
+</li>
+      <li><a href="api/nxdltree.html#punx.nxdltree.NxdlTreeView">NxdlTreeView (class in punx.nxdltree)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="P">P</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/nxdl_schema.html#punx.nxdl_schema.NXDL_schema__attribute.parse">parse() (punx.nxdl_schema.NXDL_schema__attribute method)</a>
+
+      <ul>
+        <li><a href="api/nxdl_schema.html#punx.nxdl_schema.NXDL_schema__attributeGroup.parse">(punx.nxdl_schema.NXDL_schema__attributeGroup method)</a>
+</li>
+        <li><a href="api/nxdl_schema.html#punx.nxdl_schema.NXDL_schema__complexType.parse">(punx.nxdl_schema.NXDL_schema__complexType method)</a>
+</li>
+        <li><a href="api/nxdl_schema.html#punx.nxdl_schema.NXDL_schema__element.parse">(punx.nxdl_schema.NXDL_schema__element method)</a>
+</li>
+        <li><a href="api/nxdl_schema.html#punx.nxdl_schema.NXDL_schema__group.parse">(punx.nxdl_schema.NXDL_schema__group method)</a>
+</li>
+        <li><a href="api/nxdl_schema.html#punx.nxdl_schema.NXDL_schema_named_simpleType.parse">(punx.nxdl_schema.NXDL_schema_named_simpleType method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/main.html#punx.main.MyArgumentParser.parse_args">parse_args() (punx.main.MyArgumentParser method)</a>
+</li>
+      <li><a href="api/nxdl_manager.html#punx.nxdl_manager.NXDL__base.parse_attributes">parse_attributes() (punx.nxdl_manager.NXDL__base method)</a>
+</li>
+      <li><a href="api/main.html#punx.main.parse_command_line_arguments">parse_command_line_arguments() (in module punx.main)</a>
+</li>
+      <li><a href="api/nxdl_manager.html#punx.nxdl_manager.NXDL__base.parse_fields">parse_fields() (punx.nxdl_manager.NXDL__base method)</a>
+</li>
+      <li><a href="api/nxdl_manager.html#punx.nxdl_manager.NXDL__base.parse_groups">parse_groups() (punx.nxdl_manager.NXDL__base method)</a>
+</li>
+      <li><a href="api/nxdl_manager.html#punx.nxdl_manager.NXDL__base.parse_links">parse_links() (punx.nxdl_manager.NXDL__base method)</a>
+</li>
+      <li><a href="api/schema_manager.html#punx.schema_manager.SchemaManager.parse_nxdl_patterns">parse_nxdl_patterns() (punx.schema_manager.SchemaManager method)</a>
+</li>
+      <li><a href="api/nxdl_manager.html#punx.nxdl_manager.NXDL__attribute.parse_nxdl_xml">parse_nxdl_xml() (punx.nxdl_manager.NXDL__attribute method)</a>
+
+      <ul>
+        <li><a href="api/nxdl_manager.html#punx.nxdl_manager.NXDL__base.parse_nxdl_xml">(punx.nxdl_manager.NXDL__base method)</a>
+</li>
+        <li><a href="api/nxdl_manager.html#punx.nxdl_manager.NXDL__definition.parse_nxdl_xml">(punx.nxdl_manager.NXDL__definition method)</a>
+</li>
+        <li><a href="api/nxdl_manager.html#punx.nxdl_manager.NXDL__dim.parse_nxdl_xml">(punx.nxdl_manager.NXDL__dim method)</a>
+</li>
+        <li><a href="api/nxdl_manager.html#punx.nxdl_manager.NXDL__dimensions.parse_nxdl_xml">(punx.nxdl_manager.NXDL__dimensions method)</a>
+</li>
+        <li><a href="api/nxdl_manager.html#punx.nxdl_manager.NXDL__field.parse_nxdl_xml">(punx.nxdl_manager.NXDL__field method)</a>
+</li>
+        <li><a href="api/nxdl_manager.html#punx.nxdl_manager.NXDL__group.parse_nxdl_xml">(punx.nxdl_manager.NXDL__group method)</a>
+</li>
+        <li><a href="api/nxdl_manager.html#punx.nxdl_manager.NXDL__link.parse_nxdl_xml">(punx.nxdl_manager.NXDL__link method)</a>
+</li>
+        <li><a href="api/nxdl_manager.html#punx.nxdl_manager.NXDL__symbols.parse_nxdl_xml">(punx.nxdl_manager.NXDL__symbols method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/schema_manager.html#punx.schema_manager.SchemaManager.parse_nxdlTypes">parse_nxdlTypes() (punx.schema_manager.SchemaManager method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/schema_manager.html#punx.schema_manager.Schema_Root.parse_sequence">parse_sequence() (punx.schema_manager.Schema_Root method)</a>
+</li>
+      <li><a href="api/nxdl_manager.html#punx.nxdl_manager.NXDL__base.parse_symbols">parse_symbols() (punx.nxdl_manager.NXDL__base method)</a>
+</li>
+      <li><a href="api/nxdl_manager.html#punx.nxdl_manager.NXDL__base.parse_xml_attributes">parse_xml_attributes() (punx.nxdl_manager.NXDL__base method)</a>
+</li>
+      <li><a href="api/cache_manager.html#punx.cache_manager.Base_Cache.path">path (punx.cache_manager.Base_Cache property)</a>
+</li>
+      <li><a href="api/validate.html#punx.validate.Data_File_Validator.print_report">print_report() (punx.validate.Data_File_Validator method)</a>
+</li>
+      <li>
+    punx.cache_manager
+
+      <ul>
+        <li><a href="api/cache_manager.html#module-punx.cache_manager">module</a>
+</li>
+      </ul></li>
+      <li>
+    punx.finding
+
+      <ul>
+        <li><a href="api/finding.html#module-punx.finding">module</a>
+</li>
+      </ul></li>
+      <li>
+    punx.h5tree
+
+      <ul>
+        <li><a href="api/h5tree.html#module-punx.h5tree">module</a>
+</li>
+      </ul></li>
+      <li>
+    punx.main
+
+      <ul>
+        <li><a href="api/main.html#module-punx.main">module</a>
+</li>
+      </ul></li>
+      <li>
+    punx.nxdl_manager
+
+      <ul>
+        <li><a href="api/nxdl_manager.html#module-punx.nxdl_manager">module</a>
+</li>
+      </ul></li>
+      <li>
+    punx.nxdl_schema
+
+      <ul>
+        <li><a href="api/nxdl_schema.html#module-punx.nxdl_schema">module</a>
+</li>
+      </ul></li>
+      <li>
+    punx.nxdltree
+
+      <ul>
+        <li><a href="api/nxdltree.html#module-punx.nxdltree">module</a>
+</li>
+      </ul></li>
+      <li>
+    punx.schema_manager
+
+      <ul>
+        <li><a href="api/schema_manager.html#module-punx.schema_manager">module</a>
+</li>
+      </ul></li>
+      <li>
+    punx.validate
+
+      <ul>
+        <li><a href="api/validate.html#module-punx.validate">module</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="R">R</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/schema_manager.html#punx.schema_manager.raise_error">raise_error() (in module punx.schema_manager)</a>
+</li>
+      <li><a href="api/cache_manager.html#punx.cache_manager.read_json_file">read_json_file() (in module punx.cache_manager)</a>
+</li>
+      <li><a href="api/validate.html#punx.validate.Data_File_Validator.record_finding">record_finding() (punx.validate.Data_File_Validator method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="cmd_configuration.html#index-2"><strong>ref</strong></a>, <a href="cmd_configuration.html#index-2">[1]</a>
+</li>
+      <li><a href="api/nxdl_schema.html#punx.nxdl_schema.render_class_str">render_class_str() (in module punx.nxdl_schema)</a>
+</li>
+      <li><a href="api/h5tree.html#punx.h5tree.Hdf5TreeView.report">report() (punx.h5tree.Hdf5TreeView method)</a>
+
+      <ul>
+        <li><a href="api/nxdltree.html#punx.nxdltree.NxdlTreeView.report">(punx.nxdltree.NxdlTreeView method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="S">S</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/schema_manager.html#punx.schema_manager.Schema_Attribute">Schema_Attribute (class in punx.schema_manager)</a>
+</li>
+      <li><a href="api/schema_manager.html#punx.schema_manager.Schema_Element">Schema_Element (class in punx.schema_manager)</a>
+</li>
+      <li><a href="api/schema_manager.html#punx.schema_manager.Schema_nxdlType">Schema_nxdlType (class in punx.schema_manager)</a>
+</li>
+      <li><a href="api/schema_manager.html#punx.schema_manager.Schema_pattern">Schema_pattern (class in punx.schema_manager)</a>
+</li>
+      <li><a href="api/schema_manager.html#punx.schema_manager.Schema_Root">Schema_Root (class in punx.schema_manager)</a>
+</li>
+      <li><a href="api/schema_manager.html#punx.schema_manager.Schema_Type">Schema_Type (class in punx.schema_manager)</a>
+</li>
+      <li><a href="api/schema_manager.html#punx.schema_manager.SchemaManager">SchemaManager (class in punx.schema_manager)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/cache_manager.html#punx.cache_manager.CacheManager.select_NXDL_file_set">select_NXDL_file_set() (punx.cache_manager.CacheManager method)</a>
+</li>
+      <li><a href="api/nxdl_manager.html#punx.nxdl_manager.NXDL__definition.set_file">set_file() (punx.nxdl_manager.NXDL__definition method)</a>
+</li>
+      <li><a href="api/validate.html#index-1">severity</a>
+</li>
+      <li><a href="cmd_configuration.html#index-3">source</a>
+</li>
+      <li><a href="cmd_configuration.html#index-3">source cache</a>
+</li>
+      <li><a href="api/cache_manager.html#punx.cache_manager.SourceCache">SourceCache (class in punx.cache_manager)</a>
+</li>
+      <li><a href="api/schema_manager.html#punx.schema_manager.strip_ns">strip_ns() (in module punx.schema_manager)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="T">T</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/cache_manager.html#punx.cache_manager.table_of_caches">table_of_caches() (in module punx.cache_manager)</a>
+
+      <ul>
+        <li><a href="api/cache_manager.html#punx.cache_manager.CacheManager.table_of_caches">(punx.cache_manager.CacheManager method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="cmd_tree.html#index-0">tree</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="U">U</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/validate.html#punx.validate.Data_File_Validator.usedAsBaseClass">usedAsBaseClass() (punx.validate.Data_File_Validator method)</a>
+</li>
+      <li><a href="cmd_configuration.html#index-3">user</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="cmd_configuration.html#index-3">user cache</a>
+</li>
+      <li><a href="api/cache_manager.html#punx.cache_manager.UserCache">UserCache (class in punx.cache_manager)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="V">V</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/finding.html#punx.finding.VALID_STATUS_DICT">VALID_STATUS_DICT (in module punx.finding)</a>
+</li>
+      <li><a href="cmd_validate.html#index-0">validate</a>
+</li>
+      <li><a href="api/validate.html#punx.validate.Data_File_Validator.validate">validate() (punx.validate.Data_File_Validator method)</a>
+</li>
+      <li><a href="api/validate.html#punx.validate.Data_File_Validator.validate_application_definition">validate_application_definition() (punx.validate.Data_File_Validator method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/validate.html#punx.validate.Data_File_Validator.validate_group">validate_group() (punx.validate.Data_File_Validator method)</a>
+</li>
+      <li><a href="api/nxdl_manager.html#punx.nxdl_manager.validate_xml_tree">validate_xml_tree() (in module punx.nxdl_manager)</a>
+</li>
+      <li><a href="api/validate.html#index-0">validation</a>, <a href="cmd_validate.html#index-0">[1]</a>
+</li>
+      <li><a href="api/validate.html#punx.validate.ValidationItem">ValidationItem (class in punx.validate)</a>
+</li>
+      <li><a href="api/finding.html#punx.finding.ValidationResultStatus">ValidationResultStatus (class in punx.finding)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="W">W</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/cache_manager.html#punx.cache_manager.write_json_file">write_json_file() (in module punx.cache_manager)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="X">X</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/nxdltree.html#punx.nxdltree.xslt_transformation">xslt_transformation() (in module punx.nxdltree)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2014-2023, Pete R. Jemian.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.0.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

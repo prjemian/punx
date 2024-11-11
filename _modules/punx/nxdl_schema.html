@@ -1,0 +1,1074 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>punx.nxdl_schema &#8212; punx 0.3.5 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!-- 
+    this give us a css class that will be invisible only if js is disabled 
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../_static/scripts/fontawesome.js?digest=26a4bc78f4c0ddb94549"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549" />
+
+    <script src="../../_static/documentation_options.js?v=ba50482b"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/punx/nxdl_schema';</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">punx 0.3.5 documentation</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../contents.html">
+    Table of Contents
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../contents.html">
+    Table of Contents
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">punx.nxdl_schema</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for punx.nxdl_schema</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="c1"># -----------------------------------------------------------------------------</span>
+<span class="c1"># :author:    Pete R. Jemian</span>
+<span class="c1"># :email:     prjemian@gmail.com</span>
+<span class="c1"># :copyright: (c) 2014-2022, Pete R. Jemian</span>
+<span class="c1">#</span>
+<span class="c1"># Distributed under the terms of the Creative Commons Attribution 4.0 International Public License.</span>
+<span class="c1">#</span>
+<span class="c1"># The full license is in the file LICENSE.txt, distributed with this software.</span>
+<span class="c1"># -----------------------------------------------------------------------------</span>
+
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Read the NeXus XML Schema</span>
+
+<span class="sd">.. autosummary::</span>
+
+<span class="sd">   ~NXDL_Summary</span>
+<span class="sd">   ~render_class_str</span>
+<span class="sd">   ~get_reference_keys</span>
+<span class="sd">   ~get_named_parent_node</span>
+<span class="sd">   ~get_xml_namespace_dictionary</span>
+
+<span class="sd">The ``NXDL_item_catalog.definition_element`` will provide the</span>
+<span class="sd">defaults for the definition, group, field, link, and symbols</span>
+<span class="sd">NXDL structures.  These internal structures are used:</span>
+
+<span class="sd">.. autosummary::</span>
+
+<span class="sd">   ~NXDL_item_catalog</span>
+<span class="sd">   ~NXDL_schema__attribute</span>
+<span class="sd">   ~NXDL_schema__attributeGroup</span>
+<span class="sd">   ~NXDL_schema__complexType</span>
+<span class="sd">   ~NXDL_schema__element</span>
+<span class="sd">   ~NXDL_schema__group</span>
+<span class="sd">   ~NXDL_schema_named_simpleType</span>
+
+<span class="sd">Note there is a recursion within :class:`NXDL_schema__group`</span>
+<span class="sd">since a *group* may contain a child *group*.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span>
+
+<span class="kn">import</span> <span class="nn">lxml.etree</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">utils</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">setup_logger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<span class="n">NXDL_XSD_NAME</span> <span class="o">=</span> <span class="s2">&quot;nxdl.xsd&quot;</span>
+<span class="n">NXDL_TEST_FILE</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s2">&quot;cache&quot;</span><span class="p">,</span> <span class="s2">&quot;v3.3&quot;</span><span class="p">,</span> <span class="n">NXDL_XSD_NAME</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="get_xml_namespace_dictionary">
+<a class="viewcode-back" href="../../api/nxdl_schema.html#punx.nxdl_schema.get_xml_namespace_dictionary">[docs]</a>
+<span class="k">def</span> <span class="nf">get_xml_namespace_dictionary</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;return the NeXus XML namespace dictionary&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span>  <span class="c1"># TODO: generalize this</span>
+        <span class="n">nx</span><span class="o">=</span><span class="s2">&quot;http://definition.nexusformat.org/nxdl/3.1&quot;</span><span class="p">,</span>
+        <span class="n">xs</span><span class="o">=</span><span class="s2">&quot;http://www.w3.org/2001/XMLSchema&quot;</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="get_named_parent_node">
+<a class="viewcode-back" href="../../api/nxdl_schema.html#punx.nxdl_schema.get_named_parent_node">[docs]</a>
+<span class="k">def</span> <span class="nf">get_named_parent_node</span><span class="p">(</span><span class="n">xml_node</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;return closest XML ancestor node with a ``name`` attribute or the schema node&quot;&quot;&quot;</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">xml_node</span><span class="o">.</span><span class="n">getparent</span><span class="p">()</span>
+    <span class="k">if</span> <span class="s2">&quot;name&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">parent</span><span class="o">.</span><span class="n">attrib</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">parent</span><span class="o">.</span><span class="n">tag</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;}schema&quot;</span><span class="p">):</span>
+        <span class="n">parent</span> <span class="o">=</span> <span class="n">get_named_parent_node</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">parent</span></div>
+
+
+
+<div class="viewcode-block" id="get_reference_keys">
+<a class="viewcode-back" href="../../api/nxdl_schema.html#punx.nxdl_schema.get_reference_keys">[docs]</a>
+<span class="k">def</span> <span class="nf">get_reference_keys</span><span class="p">(</span><span class="n">xml_node</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;reference an xml_node in the catalog: ``catalog[section][line]``&quot;&quot;&quot;</span>
+    <span class="n">section</span> <span class="o">=</span> <span class="n">xml_node</span><span class="o">.</span><span class="n">tag</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;}&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">line</span> <span class="o">=</span> <span class="s2">&quot;Line </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">xml_node</span><span class="o">.</span><span class="n">sourceline</span>
+    <span class="k">return</span> <span class="n">section</span><span class="p">,</span> <span class="n">line</span></div>
+
+
+
+<div class="viewcode-block" id="render_class_str">
+<a class="viewcode-back" href="../../api/nxdl_schema.html#punx.nxdl_schema.render_class_str">[docs]</a>
+<span class="k">def</span> <span class="nf">render_class_str</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    useful optimization for classes</span>
+
+<span class="sd">    USAGE::</span>
+
+<span class="sd">        def __str__(self):</span>
+<span class="sd">            return render_class_str(self)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">excluded</span> <span class="o">=</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
+    <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">(&quot;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span>
+    <span class="n">l</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">k</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">type</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">excluded</span><span class="p">:</span>
+            <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">=</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">)</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)))</span>
+    <span class="n">msg</span> <span class="o">+=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">l</span><span class="p">)</span>
+    <span class="n">msg</span> <span class="o">+=</span> <span class="s2">&quot;)&quot;</span>
+    <span class="k">return</span> <span class="n">msg</span></div>
+
+
+
+<span class="k">class</span> <span class="nc">NXDL_schema__Mixin</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">render_class_str</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="NXDL_schema__attribute">
+<a class="viewcode-back" href="../../api/nxdl_schema.html#punx.nxdl_schema.NXDL_schema__attribute">[docs]</a>
+<span class="k">class</span> <span class="nc">NXDL_schema__attribute</span><span class="p">(</span><span class="n">NXDL_schema__Mixin</span><span class="p">):</span>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    node matches XPath query: ``//xs:attribute``</span>
+
+<span class="sd">    xml_node is ``xs:attribute``</span>
+
+<span class="sd">    a complete description of a specific NXDL attribute element</span>
+
+<span class="sd">    NOTES ON ATTRIBUTES</span>
+
+<span class="sd">    In nxdl.xsd, &quot;attributeType&quot; is used by fieldType and groupGroup to define</span>
+<span class="sd">    the NXDL &quot;attribute&quot; element used in fields and groups, respectively.</span>
+<span class="sd">    It is not necessary for this code to parse &quot;attributeType&quot; from the rules.</span>
+
+<span class="sd">    Each of these XML *complexType* elements defines its own set of</span>
+<span class="sd">    attributes and defaults for use in corresponding NXDL components:</span>
+
+<span class="sd">    * attributeType</span>
+<span class="sd">    * basicComponent</span>
+<span class="sd">    * definitionType</span>
+<span class="sd">    * enumerationType</span>
+<span class="sd">    * fieldType</span>
+<span class="sd">    * groupType</span>
+<span class="sd">    * linkType</span>
+
+<span class="sd">    There is also an &quot;xs:attributeGroup&quot; which may appear as a sibling</span>
+<span class="sd">    to any ``xs:attribute`` element.  The ``xs:attributeGroup`` provides</span>
+<span class="sd">    a list of additional ``xs:attribute`` elements to add to the list.</span>
+<span class="sd">    This is the only one known at this time (2017-01-08):</span>
+
+<span class="sd">    * ``deprecatedAttributeGroup``</span>
+
+<span class="sd">    When the content under ``xs:complexType`` is described within</span>
+<span class="sd">    an ``xs:complexContent/xs:extension`` element, the ``xs:extension``</span>
+<span class="sd">    element has a ``base`` attribute which names a ``xs:complexType``</span>
+<span class="sd">    element to use as a starting point (like a superclass) for the</span>
+<span class="sd">    additional content described within the ``xs:extension`` element.</span>
+
+<span class="sd">    The content may be found at any of these nodes under the parent</span>
+<span class="sd">    XML element.  Parse them in the order shown:</span>
+
+<span class="sd">    * ``xs:complexContent/xs:extension/xs:attribute``</span>
+<span class="sd">    * ``xs:attribute``</span>
+<span class="sd">    * (``xs:attributeGroup/``)``xs:attribute``</span>
+
+<span class="sd">    This will get picked up when parsing the ``xs:sequence/xs:element``.</span>
+
+<span class="sd">    * ``xs:sequence/xs:element/xs:complexType/xs:attribute`` (</span>
+
+<span class="sd">    The XPath query for ``//xs:attribute`` from the root node will</span>
+<span class="sd">    pick up all of these.  It will be necessary to walk through the</span>
+<span class="sd">    parent nodes to determine where each should be applied.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s2">&quot;str&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">required</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">default_value</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">enum</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">patterns</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">maxLength</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nxdl_attributes</span> <span class="o">=</span> <span class="p">{}</span>
+
+<div class="viewcode-block" id="NXDL_schema__attribute.parse">
+<a class="viewcode-back" href="../../api/nxdl_schema.html#punx.nxdl_schema.NXDL_schema__attribute.parse">[docs]</a>
+    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xml_node</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        read the attribute node content from the XML Schema</span>
+
+<span class="sd">        xml_node is xs:attribute</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="n">xml_node</span><span class="o">.</span><span class="n">tag</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;}attribute&quot;</span><span class="p">)</span>
+        <span class="n">ns</span> <span class="o">=</span> <span class="n">get_xml_namespace_dictionary</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">xml_node</span><span class="o">.</span><span class="n">attrib</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">xml_node</span><span class="o">.</span><span class="n">attrib</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;type&quot;</span><span class="p">,</span> <span class="s2">&quot;nx:NX_CHAR&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">required</span> <span class="o">=</span> <span class="n">xml_node</span><span class="o">.</span><span class="n">attrib</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;use&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">required</span><span class="p">)</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;required&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">default_value</span> <span class="o">=</span> <span class="n">xml_node</span><span class="o">.</span><span class="n">attrib</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;default&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_value</span><span class="p">)</span>
+
+        <span class="n">nodelist</span> <span class="o">=</span> <span class="n">xml_node</span><span class="o">.</span><span class="n">xpath</span><span class="p">(</span>
+            <span class="s2">&quot;xs:simpleType/xs:restriction/xs:pattern&quot;</span><span class="p">,</span> <span class="n">namespaces</span><span class="o">=</span><span class="n">ns</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">nodelist</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">patterns</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nodelist</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;value&quot;</span><span class="p">])</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="NXDL_schema__attributeGroup">
+<a class="viewcode-back" href="../../api/nxdl_schema.html#punx.nxdl_schema.NXDL_schema__attributeGroup">[docs]</a>
+<span class="k">class</span> <span class="nc">NXDL_schema__attributeGroup</span><span class="p">(</span><span class="n">NXDL_schema__Mixin</span><span class="p">):</span>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    node matches XPath query: ``/xs:schema/xs:attributeGroup``</span>
+
+<span class="sd">    xml_node is ``xs:attributeGroup``</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="p">[]</span>
+
+<div class="viewcode-block" id="NXDL_schema__attributeGroup.parse">
+<a class="viewcode-back" href="../../api/nxdl_schema.html#punx.nxdl_schema.NXDL_schema__attributeGroup.parse">[docs]</a>
+    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xml_node</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        read the attributeGroup node content from the XML Schema</span>
+
+<span class="sd">        xml_node is xs:attributeGroup</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="n">xml_node</span><span class="o">.</span><span class="n">tag</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;}attributeGroup&quot;</span><span class="p">)</span>
+        <span class="n">ns</span> <span class="o">=</span> <span class="n">get_xml_namespace_dictionary</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">xml_node</span><span class="o">.</span><span class="n">attrib</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">xml_node</span><span class="o">.</span><span class="n">xpath</span><span class="p">(</span><span class="s2">&quot;xs:attribute&quot;</span><span class="p">,</span> <span class="n">namespaces</span><span class="o">=</span><span class="n">ns</span><span class="p">):</span>
+            <span class="n">obj</span> <span class="o">=</span> <span class="n">NXDL_schema__attribute</span><span class="p">()</span>
+            <span class="n">obj</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="NXDL_schema__complexType">
+<a class="viewcode-back" href="../../api/nxdl_schema.html#punx.nxdl_schema.NXDL_schema__complexType">[docs]</a>
+<span class="k">class</span> <span class="nc">NXDL_schema__complexType</span><span class="p">(</span><span class="n">NXDL_schema__Mixin</span><span class="p">):</span>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    node matches XPath query: ``/xs:schema/xs:complexType``</span>
+
+<span class="sd">    xml_node is ``xs:complexType``</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="NXDL_schema__complexType.parse">
+<a class="viewcode-back" href="../../api/nxdl_schema.html#punx.nxdl_schema.NXDL_schema__complexType.parse">[docs]</a>
+    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xml_node</span><span class="p">,</span> <span class="n">catalog</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;read the element node content from the XML Schema&quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="n">xml_node</span><span class="o">.</span><span class="n">tag</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;}complexType&quot;</span><span class="p">)</span>
+        <span class="n">ns</span> <span class="o">=</span> <span class="n">get_xml_namespace_dictionary</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">xml_node</span><span class="o">.</span><span class="n">attrib</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+        <span class="n">handlers</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+            <span class="n">sequence</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_parse_sequence</span><span class="p">,</span>
+            <span class="n">complexContent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_parse_complexContent</span><span class="p">,</span>
+            <span class="n">group</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_parse_group</span><span class="p">,</span>
+            <span class="n">attribute</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_parse_attribute</span><span class="p">,</span>
+            <span class="n">attributeGroup</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_parse_attributeGroup</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">element_list</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;sequence complexContent</span>
+<span class="s2">                          group attribute attributeGroup&quot;&quot;&quot;</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">element_type</span> <span class="ow">in</span> <span class="n">element_list</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">xml_node</span><span class="o">.</span><span class="n">xpath</span><span class="p">(</span><span class="s2">&quot;xs:&quot;</span> <span class="o">+</span> <span class="n">element_type</span><span class="p">,</span> <span class="n">namespaces</span><span class="o">=</span><span class="n">ns</span><span class="p">):</span>
+                <span class="n">tag</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">tag</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;}&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">handlers</span><span class="p">[</span><span class="n">tag</span><span class="p">](</span><span class="n">node</span><span class="p">,</span> <span class="n">catalog</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_parse_attribute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xml_node</span><span class="p">,</span> <span class="n">catalog</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;parse a xs:attribute node&quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="n">xml_node</span><span class="o">.</span><span class="n">tag</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;}attribute&quot;</span><span class="p">)</span>
+        <span class="n">section</span><span class="p">,</span> <span class="n">line</span> <span class="o">=</span> <span class="n">get_reference_keys</span><span class="p">(</span><span class="n">xml_node</span><span class="p">)</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="n">catalog</span><span class="p">[</span><span class="n">section</span><span class="p">][</span><span class="n">line</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_parse_attributeGroup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xml_node</span><span class="p">,</span> <span class="n">catalog</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;parse a xs:attributeGroup node&quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="n">xml_node</span><span class="o">.</span><span class="n">tag</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;}attributeGroup&quot;</span><span class="p">)</span>
+        <span class="n">ref</span> <span class="o">=</span> <span class="n">xml_node</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;ref&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="n">catalog</span><span class="p">[</span><span class="s2">&quot;schema&quot;</span><span class="p">][</span><span class="n">ref</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">children</span> <span class="o">+=</span> <span class="n">obj</span><span class="o">.</span><span class="n">children</span>
+
+    <span class="k">def</span> <span class="nf">_parse_complexContent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xml_node</span><span class="p">,</span> <span class="n">catalog</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;parse a xs:complexContent node&quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="n">xml_node</span><span class="o">.</span><span class="n">tag</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;}complexContent&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parse_extension</span><span class="p">(</span><span class="n">xml_node</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">catalog</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_parse_element</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xml_node</span><span class="p">,</span> <span class="n">catalog</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;parse a xs:element node&quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="n">xml_node</span><span class="o">.</span><span class="n">tag</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;}element&quot;</span><span class="p">)</span>
+        <span class="n">section</span><span class="p">,</span> <span class="n">line</span> <span class="o">=</span> <span class="n">get_reference_keys</span><span class="p">(</span><span class="n">xml_node</span><span class="p">)</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="n">catalog</span><span class="p">[</span><span class="n">section</span><span class="p">][</span><span class="n">line</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_parse_extension</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xml_node</span><span class="p">,</span> <span class="n">catalog</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;parse a xs:extension node&quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="n">xml_node</span><span class="o">.</span><span class="n">tag</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;}extension&quot;</span><span class="p">)</span>
+        <span class="n">ns</span> <span class="o">=</span> <span class="n">get_xml_namespace_dictionary</span><span class="p">()</span>
+
+        <span class="n">base</span> <span class="o">=</span> <span class="n">xml_node</span><span class="o">.</span><span class="n">attrib</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;base&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">base</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">base</span> <span class="o">=</span> <span class="n">base</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">obj</span> <span class="o">=</span> <span class="n">catalog</span><span class="p">[</span><span class="s2">&quot;schema&quot;</span><span class="p">][</span><span class="n">base</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">children</span> <span class="o">+=</span> <span class="n">obj</span><span class="o">.</span><span class="n">children</span>
+
+        <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">xml_node</span><span class="o">.</span><span class="n">xpath</span><span class="p">(</span><span class="s2">&quot;xs:sequence&quot;</span><span class="p">,</span> <span class="n">namespaces</span><span class="o">=</span><span class="n">ns</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_parse_sequence</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">catalog</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">xml_node</span><span class="o">.</span><span class="n">xpath</span><span class="p">(</span><span class="s2">&quot;xs:attribute&quot;</span><span class="p">,</span> <span class="n">namespaces</span><span class="o">=</span><span class="n">ns</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_parse_attribute</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">catalog</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_parse_group</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xml_node</span><span class="p">,</span> <span class="n">catalog</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;parse a xs:group node&quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="n">xml_node</span><span class="o">.</span><span class="n">tag</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;}group&quot;</span><span class="p">)</span>
+        <span class="n">section</span><span class="p">,</span> <span class="n">line</span> <span class="o">=</span> <span class="n">get_reference_keys</span><span class="p">(</span><span class="n">xml_node</span><span class="p">)</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="n">catalog</span><span class="p">[</span><span class="n">section</span><span class="p">][</span><span class="n">line</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_parse_sequence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xml_node</span><span class="p">,</span> <span class="n">catalog</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;parse a xs:sequence node&quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="n">xml_node</span><span class="o">.</span><span class="n">tag</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;}sequence&quot;</span><span class="p">)</span>
+        <span class="n">ns</span> <span class="o">=</span> <span class="n">get_xml_namespace_dictionary</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">xml_node</span><span class="o">.</span><span class="n">xpath</span><span class="p">(</span><span class="s2">&quot;xs:element&quot;</span><span class="p">,</span> <span class="n">namespaces</span><span class="o">=</span><span class="n">ns</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_parse_element</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">catalog</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">xml_node</span><span class="o">.</span><span class="n">xpath</span><span class="p">(</span><span class="s2">&quot;xs:group&quot;</span><span class="p">,</span> <span class="n">namespaces</span><span class="o">=</span><span class="n">ns</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_parse_group</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">catalog</span><span class="p">)</span></div>
+
+        <span class="c1"># for node in xml_node.xpath(&#39;xs:any&#39;, namespaces=ns):</span>
+        <span class="c1">#     pass        # and do what?</span>
+
+
+<div class="viewcode-block" id="NXDL_schema__element">
+<a class="viewcode-back" href="../../api/nxdl_schema.html#punx.nxdl_schema.NXDL_schema__element">[docs]</a>
+<span class="k">class</span> <span class="nc">NXDL_schema__element</span><span class="p">(</span><span class="n">NXDL_schema__Mixin</span><span class="p">):</span>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;a complete description of a specific NXDL xs:element node&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s2">&quot;str&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">minOccurs</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">maxOccurs</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="NXDL_schema__element.parse">
+<a class="viewcode-back" href="../../api/nxdl_schema.html#punx.nxdl_schema.NXDL_schema__element.parse">[docs]</a>
+    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xml_node</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;read the element node content from the XML Schema&quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="n">xml_node</span><span class="o">.</span><span class="n">tag</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;}element&quot;</span><span class="p">)</span>
+        <span class="n">ns</span> <span class="o">=</span> <span class="n">get_xml_namespace_dictionary</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">xml_node</span><span class="o">.</span><span class="n">attrib</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">xml_node</span><span class="o">.</span><span class="n">attrib</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;type&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">minOccurs</span> <span class="o">=</span> <span class="n">xml_node</span><span class="o">.</span><span class="n">attrib</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;minOccurs&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">minOccurs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">maxOccurs</span> <span class="o">=</span> <span class="n">xml_node</span><span class="o">.</span><span class="n">attrib</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;maxOccurs&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">maxOccurs</span><span class="p">)</span>
+
+        <span class="n">nodes</span> <span class="o">=</span> <span class="n">xml_node</span><span class="o">.</span><span class="n">xpath</span><span class="p">(</span><span class="s2">&quot;xs:complexType&quot;</span><span class="p">,</span> <span class="n">namespaces</span><span class="o">=</span><span class="n">ns</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">nodes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">nodes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">xpath</span><span class="p">(</span><span class="s2">&quot;xs:sequence/xs:element&quot;</span><span class="p">,</span> <span class="n">namespaces</span><span class="o">=</span><span class="n">ns</span><span class="p">):</span>
+                <span class="n">obj</span> <span class="o">=</span> <span class="n">NXDL_schema__element</span><span class="p">()</span>
+                <span class="n">obj</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">nodes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">xpath</span><span class="p">(</span><span class="s2">&quot;xs:attribute&quot;</span><span class="p">,</span> <span class="n">namespaces</span><span class="o">=</span><span class="n">ns</span><span class="p">):</span>
+                <span class="n">obj</span> <span class="o">=</span> <span class="n">NXDL_schema__attribute</span><span class="p">()</span>
+                <span class="n">obj</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="NXDL_schema__group">
+<a class="viewcode-back" href="../../api/nxdl_schema.html#punx.nxdl_schema.NXDL_schema__group">[docs]</a>
+<span class="k">class</span> <span class="nc">NXDL_schema__group</span><span class="p">(</span><span class="n">NXDL_schema__Mixin</span><span class="p">):</span>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    node matches XPath query: ``//xs:group``</span>
+
+<span class="sd">    xml_node is ``xs:group``</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ref</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">minOccurs</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">maxOccurs</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="NXDL_schema__group.parse">
+<a class="viewcode-back" href="../../api/nxdl_schema.html#punx.nxdl_schema.NXDL_schema__group.parse">[docs]</a>
+    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xml_node</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;read the element node content from the XML Schema&quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="n">xml_node</span><span class="o">.</span><span class="n">tag</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;}group&quot;</span><span class="p">)</span>
+        <span class="n">ns</span> <span class="o">=</span> <span class="n">get_xml_namespace_dictionary</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">xml_node</span><span class="o">.</span><span class="n">attrib</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ref</span> <span class="o">=</span> <span class="n">xml_node</span><span class="o">.</span><span class="n">attrib</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;ref&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ref</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ref</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ref</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ref</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">minOccurs</span> <span class="o">=</span> <span class="n">xml_node</span><span class="o">.</span><span class="n">attrib</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;minOccurs&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">minOccurs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">maxOccurs</span> <span class="o">=</span> <span class="n">xml_node</span><span class="o">.</span><span class="n">attrib</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;maxOccurs&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">maxOccurs</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">xml_node</span><span class="o">.</span><span class="n">xpath</span><span class="p">(</span><span class="s2">&quot;xs:sequence/xs:element&quot;</span><span class="p">,</span> <span class="n">namespaces</span><span class="o">=</span><span class="n">ns</span><span class="p">):</span>
+            <span class="n">obj</span> <span class="o">=</span> <span class="n">NXDL_schema__element</span><span class="p">()</span>
+            <span class="n">obj</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="NXDL_schema_named_simpleType">
+<a class="viewcode-back" href="../../api/nxdl_schema.html#punx.nxdl_schema.NXDL_schema_named_simpleType">[docs]</a>
+<span class="k">class</span> <span class="nc">NXDL_schema_named_simpleType</span><span class="p">(</span><span class="n">NXDL_schema__Mixin</span><span class="p">):</span>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    node matches XPath query: ``/xs:schema/xs:simpleType``</span>
+
+<span class="sd">    xml_node is ``xs:simpleType``</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">base</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">patterns</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">maxLength</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="c1"># self.enums = []</span>
+
+<div class="viewcode-block" id="NXDL_schema_named_simpleType.parse">
+<a class="viewcode-back" href="../../api/nxdl_schema.html#punx.nxdl_schema.NXDL_schema_named_simpleType.parse">[docs]</a>
+    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xml_node</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;read the attribute node content from the XML Schema&quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="n">xml_node</span><span class="o">.</span><span class="n">tag</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;}simpleType&quot;</span><span class="p">)</span>
+        <span class="n">ns</span> <span class="o">=</span> <span class="n">get_xml_namespace_dictionary</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">xml_node</span><span class="o">.</span><span class="n">attrib</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">xml_node</span><span class="o">.</span><span class="n">xpath</span><span class="p">(</span><span class="s2">&quot;xs:annotation&quot;</span><span class="p">,</span> <span class="n">namespaces</span><span class="o">=</span><span class="n">ns</span><span class="p">):</span>
+            <span class="k">pass</span>
+        <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">xml_node</span><span class="o">.</span><span class="n">xpath</span><span class="p">(</span><span class="s2">&quot;xs:union&quot;</span><span class="p">,</span> <span class="n">namespaces</span><span class="o">=</span><span class="n">ns</span><span class="p">):</span>
+            <span class="c1"># TODO: nonNegativeUnbounded</span>
+            <span class="c1"># either xs:nonNegativeInteger or xs:string = &quot;unbounded&quot;</span>
+            <span class="c1"># How to represent this?</span>
+            <span class="k">pass</span>
+        <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">xml_node</span><span class="o">.</span><span class="n">xpath</span><span class="p">(</span><span class="s2">&quot;xs:restriction&quot;</span><span class="p">,</span> <span class="n">namespaces</span><span class="o">=</span><span class="n">ns</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">base</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">attrib</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;base&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">base</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">base</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">base</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">base</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">subnode</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">xpath</span><span class="p">(</span><span class="s2">&quot;xs:pattern&quot;</span><span class="p">,</span> <span class="n">namespaces</span><span class="o">=</span><span class="n">ns</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">patterns</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">subnode</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;value&quot;</span><span class="p">])</span>
+            <span class="k">for</span> <span class="n">subnode</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">xpath</span><span class="p">(</span><span class="s2">&quot;xs:maxLength&quot;</span><span class="p">,</span> <span class="n">namespaces</span><span class="o">=</span><span class="n">ns</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">maxLength</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">subnode</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;value&quot;</span><span class="p">])</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="NXDL_item_catalog">
+<a class="viewcode-back" href="../../api/nxdl_schema.html#punx.nxdl_schema.NXDL_item_catalog">[docs]</a>
+<span class="k">class</span> <span class="nc">NXDL_item_catalog</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    content from the NeXus XML Schema (``nxdl.xsd``)</span>
+
+<span class="sd">    EXAMPLE:</span>
+
+<span class="sd">        nxdl_xsd_file_name = os.path.join(&#39;cache&#39;, &#39;v3.2&#39;,&#39;nxdl.xsd&#39;)</span>
+<span class="sd">        catalog = NXDL_item_catalog(nxdl_xsd_file_name)</span>
+<span class="sd">        definition = catalog.definition_element</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nxdl_file_name</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="n">doc</span> <span class="o">=</span> <span class="n">lxml</span><span class="o">.</span><span class="n">etree</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">nxdl_file_name</span><span class="p">)</span>
+        <span class="n">root</span> <span class="o">=</span> <span class="n">doc</span><span class="o">.</span><span class="n">getroot</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ns</span> <span class="o">=</span> <span class="n">get_xml_namespace_dictionary</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parse_nxdl_simpleType_nodes</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parse_nxdl_attribute_nodes</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parse_nxdl_attributeGroup_nodes</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parse_nxdl_element_nodes</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parse_nxdl_group_nodes</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parse_nxdl_complexType_nodes</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_init_definition_element</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>  <span class="c1"># Now, start from the &quot;definition&quot; element</span>
+
+    <span class="k">def</span> <span class="nf">_init_definition_element</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root</span><span class="p">):</span>
+        <span class="kn">import</span> <span class="nn">copy</span>
+
+        <span class="n">nodes</span> <span class="o">=</span> <span class="n">root</span><span class="o">.</span><span class="n">xpath</span><span class="p">(</span><span class="s2">&quot;xs:element&quot;</span><span class="p">,</span> <span class="n">namespaces</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ns</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">nodes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">definition_element</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="p">[</span><span class="s2">&quot;element&quot;</span><span class="p">][</span><span class="s2">&quot;Line </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">nodes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">sourceline</span><span class="p">]</span>
+        <span class="n">reference_type_name</span> <span class="o">=</span> <span class="n">nodes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">definition_element</span><span class="o">.</span><span class="n">children</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="p">[</span><span class="s2">&quot;schema&quot;</span><span class="p">][</span>
+            <span class="n">reference_type_name</span>
+        <span class="p">]</span><span class="o">.</span><span class="n">children</span>
+
+        <span class="k">def</span> <span class="nf">apply_substitutions</span><span class="p">(</span><span class="n">parent_node</span><span class="p">,</span> <span class="n">catalog</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">parent_node</span><span class="o">.</span><span class="n">children</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">nm</span> <span class="ow">in</span> <span class="s2">&quot;type base ref&quot;</span><span class="o">.</span><span class="n">split</span><span class="p">():</span>
+                    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">nm</span><span class="p">):</span>
+                        <span class="n">key</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="fm">__getattribute__</span><span class="p">(</span><span class="n">nm</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">catalog</span><span class="p">[</span><span class="s2">&quot;schema&quot;</span><span class="p">]:</span>
+                            <span class="n">reference</span> <span class="o">=</span> <span class="n">catalog</span><span class="p">[</span><span class="s2">&quot;schema&quot;</span><span class="p">][</span><span class="n">key</span><span class="p">]</span>
+
+                            <span class="c1"># once the substitution has been made,</span>
+                            <span class="c1"># mark up the key so the substitution process is not repeated</span>
+                            <span class="n">node</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="n">nm</span><span class="p">,</span> <span class="s2">&quot;__&quot;</span> <span class="o">+</span> <span class="n">key</span><span class="p">)</span>
+
+                            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="s2">&quot;children&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span>
+                                <span class="n">reference</span><span class="p">,</span> <span class="s2">&quot;children&quot;</span>
+                            <span class="p">):</span>
+                                <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">reference</span><span class="o">.</span><span class="n">children</span><span class="p">:</span>
+                                    <span class="k">if</span> <span class="p">(</span>
+                                        <span class="nb">type</span><span class="p">(</span><span class="n">item</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;group&quot;</span>
+                                        <span class="ow">or</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="s2">&quot;ref&quot;</span><span class="p">)</span>
+                                        <span class="ow">or</span> <span class="n">item</span><span class="o">.</span><span class="n">ref</span> <span class="o">!=</span> <span class="s2">&quot;groupGroup&quot;</span>
+                                    <span class="p">):</span>
+                                        <span class="c1"># avoid a recursion (group can have child group)</span>
+                                        <span class="n">node</span><span class="o">.</span><span class="n">children</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">item</span><span class="p">))</span>
+
+                                <span class="c1"># substitutions in the children</span>
+                                <span class="n">apply_substitutions</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">catalog</span><span class="p">)</span>
+
+                            <span class="k">for</span> <span class="n">attribute_name</span> <span class="ow">in</span> <span class="s2">&quot;patterns maxLength&quot;</span><span class="o">.</span><span class="n">split</span><span class="p">():</span>
+                                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">reference</span><span class="p">,</span> <span class="n">attribute_name</span><span class="p">):</span>
+                                    <span class="n">node</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span>
+                                        <span class="n">attribute_name</span><span class="p">,</span>
+                                        <span class="n">reference</span><span class="o">.</span><span class="fm">__getattribute__</span><span class="p">(</span><span class="n">attribute_name</span><span class="p">),</span>
+                                    <span class="p">)</span>
+
+        <span class="n">apply_substitutions</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">definition_element</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">add_to_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; &quot;&quot;&quot;</span>
+        <span class="n">section</span><span class="p">,</span> <span class="n">line</span> <span class="o">=</span> <span class="n">get_reference_keys</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+        <span class="n">section</span> <span class="o">=</span> <span class="n">key</span> <span class="ow">or</span> <span class="n">section</span>
+        <span class="k">if</span> <span class="n">section</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="p">[</span><span class="n">section</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="p">[</span><span class="n">section</span><span class="p">][</span><span class="n">line</span><span class="p">]</span> <span class="o">=</span> <span class="n">obj</span>
+
+    <span class="k">def</span> <span class="nf">_parse_nxdl_attribute_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">root</span><span class="o">.</span><span class="n">xpath</span><span class="p">(</span><span class="s2">&quot;//xs:attribute&quot;</span><span class="p">,</span> <span class="n">namespaces</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ns</span><span class="p">):</span>
+            <span class="n">obj</span> <span class="o">=</span> <span class="n">NXDL_schema__attribute</span><span class="p">()</span>
+            <span class="n">obj</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_to_catalog</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_parse_nxdl_attributeGroup_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">root</span><span class="o">.</span><span class="n">xpath</span><span class="p">(</span><span class="s2">&quot;xs:attributeGroup&quot;</span><span class="p">,</span> <span class="n">namespaces</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ns</span><span class="p">):</span>
+            <span class="n">obj</span> <span class="o">=</span> <span class="n">NXDL_schema__attributeGroup</span><span class="p">()</span>
+            <span class="n">obj</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_to_catalog</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="s2">&quot;schema&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="p">[</span><span class="s2">&quot;schema&quot;</span><span class="p">][</span><span class="n">obj</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">obj</span>  <span class="c1"># for cross-reference</span>
+
+    <span class="k">def</span> <span class="nf">_parse_nxdl_complexType_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root</span><span class="p">):</span>
+        <span class="c1"># only look at root node children: &#39;xs:complexType&#39;, not &#39;//xs:complexType&#39;</span>
+        <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">root</span><span class="o">.</span><span class="n">xpath</span><span class="p">(</span><span class="s2">&quot;xs:complexType&quot;</span><span class="p">,</span> <span class="n">namespaces</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ns</span><span class="p">):</span>
+            <span class="k">if</span> <span class="s2">&quot;name&quot;</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">attrib</span><span class="p">:</span>
+                <span class="n">obj</span> <span class="o">=</span> <span class="n">NXDL_schema__complexType</span><span class="p">()</span>
+                <span class="n">obj</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">add_to_catalog</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="s2">&quot;schema&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="p">[</span><span class="s2">&quot;schema&quot;</span><span class="p">][</span><span class="n">obj</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">obj</span>  <span class="c1"># for cross-reference</span>
+
+    <span class="k">def</span> <span class="nf">_parse_nxdl_element_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">root</span><span class="o">.</span><span class="n">xpath</span><span class="p">(</span><span class="s2">&quot;//xs:element&quot;</span><span class="p">,</span> <span class="n">namespaces</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ns</span><span class="p">):</span>
+            <span class="n">obj</span> <span class="o">=</span> <span class="n">NXDL_schema__element</span><span class="p">()</span>
+            <span class="n">obj</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_to_catalog</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_parse_nxdl_group_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">root</span><span class="o">.</span><span class="n">xpath</span><span class="p">(</span><span class="s2">&quot;//xs:group&quot;</span><span class="p">,</span> <span class="n">namespaces</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ns</span><span class="p">):</span>
+            <span class="n">obj</span> <span class="o">=</span> <span class="n">NXDL_schema__group</span><span class="p">()</span>
+            <span class="n">obj</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_to_catalog</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">obj</span><span class="o">.</span><span class="n">name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="p">[</span><span class="s2">&quot;schema&quot;</span><span class="p">][</span><span class="n">obj</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">obj</span>  <span class="c1"># for cross-reference</span>
+
+    <span class="k">def</span> <span class="nf">_parse_nxdl_simpleType_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root</span><span class="p">):</span>
+        <span class="n">xref</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">root</span><span class="o">.</span><span class="n">xpath</span><span class="p">(</span><span class="s2">&quot;/xs:schema/xs:simpleType&quot;</span><span class="p">,</span> <span class="n">namespaces</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ns</span><span class="p">):</span>
+            <span class="n">obj</span> <span class="o">=</span> <span class="n">NXDL_schema_named_simpleType</span><span class="p">()</span>
+            <span class="n">obj</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_to_catalog</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="s2">&quot;simpleType&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s2">&quot;schema&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="p">[</span><span class="s2">&quot;schema&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="p">[</span><span class="s2">&quot;schema&quot;</span><span class="p">][</span><span class="n">obj</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">obj</span>  <span class="c1"># for cross-reference</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="p">[</span><span class="s2">&quot;simpleType&quot;</span><span class="p">][</span><span class="n">obj</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">obj</span>  <span class="c1"># for cross-reference</span>
+            <span class="n">xref</span><span class="p">[</span><span class="n">obj</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">obj</span>
+
+        <span class="c1"># apply_substitutions base values defined in NXDL</span>
+        <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">xref</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="s2">&quot;base&quot;</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">base</span> <span class="ow">in</span> <span class="n">xref</span><span class="p">:</span>
+                    <span class="n">known_base</span> <span class="o">=</span> <span class="n">xref</span><span class="p">[</span><span class="n">v</span><span class="o">.</span><span class="n">base</span><span class="p">]</span>
+                    <span class="n">v</span><span class="o">.</span><span class="n">maxLength</span> <span class="o">=</span> <span class="n">known_base</span><span class="o">.</span><span class="n">maxLength</span>
+                    <span class="n">v</span><span class="o">.</span><span class="n">patterns</span> <span class="o">+=</span> <span class="n">known_base</span><span class="o">.</span><span class="n">patterns</span>
+                    <span class="n">v</span><span class="o">.</span><span class="n">base</span> <span class="o">=</span> <span class="n">known_base</span><span class="o">.</span><span class="n">base</span></div>
+
+
+
+<div class="viewcode-block" id="NXDL_Summary">
+<a class="viewcode-back" href="../../api/nxdl_schema.html#punx.nxdl_schema.NXDL_Summary">[docs]</a>
+<span class="k">class</span> <span class="nc">NXDL_Summary</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Default values for all NXDL as defined by the ``nxdl.xsd``.</span>
+
+<span class="sd">    Provide an easy interface to the default values defined in</span>
+<span class="sd">    the XML Schema for the NXDL language.</span>
+
+<span class="sd">    USAGE::</span>
+
+<span class="sd">        summary = NXDL_Summary(nxdl_xsd_file_name)</span>
+<span class="sd">        ...</span>
+<span class="sd">        summary.simpleType[&#39;validItemName&#39;].patterns</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nxdl_xsd_file_name</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">definition</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">attribute</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">doc</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">field</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">group</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">link</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">symbols</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">simpleType</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">nxdl_xsd_file_name</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nxdl_xsd_file_name</span><span class="p">):</span>
+        <span class="n">catalog</span> <span class="o">=</span> <span class="n">NXDL_item_catalog</span><span class="p">(</span><span class="n">nxdl_xsd_file_name</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">build_tree</span><span class="p">(</span><span class="n">catalog</span><span class="o">.</span><span class="n">definition_element</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">definition</span> <span class="o">=</span> <span class="n">catalog</span><span class="o">.</span><span class="n">definition_element</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">group</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">definition</span><span class="o">.</span><span class="n">groups</span><span class="o">.</span><span class="n">values</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">attributes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">components</span><span class="p">[</span><span class="s2">&quot;group&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">attributes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">attribute</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">components</span><span class="p">[</span><span class="s2">&quot;attribute&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">doc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">components</span><span class="p">[</span><span class="s2">&quot;doc&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">field</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">components</span><span class="p">[</span><span class="s2">&quot;field&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">components</span><span class="p">[</span><span class="s2">&quot;group&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;recursion&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">link</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">components</span><span class="p">[</span><span class="s2">&quot;link&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">symbols</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">definition</span><span class="o">.</span><span class="n">components</span><span class="o">.</span><span class="n">values</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">simpleType</span> <span class="o">=</span> <span class="n">catalog</span><span class="o">.</span><span class="n">db</span><span class="p">[</span><span class="s2">&quot;simpleType&quot;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">build_tree</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="n">obj</span><span class="o">.</span><span class="n">attributes</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">obj</span><span class="o">.</span><span class="n">elements</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">obj</span><span class="o">.</span><span class="n">groups</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s2">&quot;children&quot;</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">obj</span><span class="o">.</span><span class="n">children</span><span class="p">:</span>
+                <span class="k">if</span> <span class="p">(</span>
+                    <span class="nb">isinstance</span><span class="p">(</span><span class="n">child</span><span class="p">,</span> <span class="n">NXDL_schema__attribute</span><span class="p">)</span>
+                    <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">child</span><span class="p">,</span> <span class="n">NXDL_schema__element</span><span class="p">)</span>
+                    <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">child</span><span class="p">,</span> <span class="n">NXDL_schema__group</span><span class="p">)</span>
+                <span class="p">):</span>
+                    <span class="n">kind</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">child</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="n">target</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="fm">__getattribute__</span><span class="p">(</span><span class="n">kind</span> <span class="o">+</span> <span class="s2">&quot;s&quot;</span><span class="p">)</span>
+                    <span class="n">nm</span> <span class="o">=</span> <span class="n">child</span><span class="o">.</span><span class="n">name</span> <span class="ow">or</span> <span class="s2">&quot;(</span><span class="si">%s</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="n">kind</span>
+                    <span class="n">target</span><span class="p">[</span><span class="n">nm</span><span class="p">]</span> <span class="o">=</span> <span class="n">child</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">build_tree</span><span class="p">(</span><span class="n">child</span><span class="p">)</span>
+
+        <span class="c1"># rename this</span>
+        <span class="n">obj</span><span class="o">.</span><span class="n">components</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">elements</span>
+        <span class="k">del</span> <span class="n">obj</span><span class="o">.</span><span class="n">elements</span></div>
+
+
+
+<span class="k">def</span> <span class="nf">print_tree</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; &quot;&quot;&quot;</span>
+    <span class="n">indent</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span> <span class="o">*</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">level</span>
+    <span class="n">k</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">count</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">db</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="mi">1</span><span class="p">}</span>
+
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">obj</span><span class="o">.</span><span class="n">name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">nm</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">nm</span> <span class="o">=</span> <span class="s2">&quot;(</span><span class="si">%s</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">NXDL_schema__attribute</span><span class="p">):</span>
+        <span class="n">nm</span> <span class="o">=</span> <span class="s2">&quot;@&quot;</span> <span class="o">+</span> <span class="n">nm</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">indent</span> <span class="o">+</span> <span class="n">nm</span> <span class="o">+</span> <span class="s2">&quot; : &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">obj</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">keep_stats</span><span class="p">(</span><span class="n">count</span><span class="p">,</span> <span class="n">db</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">):</span>
+        <span class="n">count</span> <span class="o">+=</span> <span class="n">c</span>
+        <span class="k">for</span> <span class="n">item</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">item</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">db</span><span class="p">:</span>
+                <span class="n">db</span><span class="p">[</span><span class="n">item</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">db</span><span class="p">[</span><span class="n">item</span><span class="p">]</span> <span class="o">+=</span> <span class="n">value</span>
+        <span class="k">return</span> <span class="n">count</span>
+
+    <span class="c1"># show the children in order: attributes, elements, groups</span>
+    <span class="k">for</span> <span class="n">kind</span> <span class="ow">in</span> <span class="s2">&quot;attributes elements groups&quot;</span><span class="o">.</span><span class="n">split</span><span class="p">():</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">kind</span><span class="p">):</span>
+            <span class="n">item</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="fm">__getattribute__</span><span class="p">(</span><span class="n">kind</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">nm</span><span class="p">,</span> <span class="n">child</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+                <span class="n">c</span><span class="p">,</span> <span class="n">d</span> <span class="o">=</span> <span class="n">print_tree</span><span class="p">(</span><span class="n">child</span><span class="p">,</span> <span class="n">level</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="n">count</span> <span class="o">=</span> <span class="n">keep_stats</span><span class="p">(</span><span class="n">count</span><span class="p">,</span> <span class="n">db</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">count</span><span class="p">,</span> <span class="n">db</span>
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2014-2023, Pete R. Jemian.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.0.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

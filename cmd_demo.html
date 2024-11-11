@@ -1,0 +1,569 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>User interface: subcommand: demo &#8212; punx 0.3.5 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!-- 
+    this give us a css class that will be invisible only if js is disabled 
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=4ae1632d" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="_static/scripts/fontawesome.js?digest=26a4bc78f4c0ddb94549"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549" />
+
+    <script src="_static/documentation_options.js?v=ba50482b"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'cmd_demo';</script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="User interface: subcommand: install" href="cmd_install.html" />
+    <link rel="prev" title="User interface: subcommand: configuration" href="cmd_configuration.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">punx 0.3.5 documentation</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="contents.html">
+    Table of Contents
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="contents.html">
+    Table of Contents
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="overview.html">Project Overview</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="cmd_configuration.html">User interface: subcommand: <strong>configuration</strong></a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">User interface: subcommand: <strong>demo</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_install.html">User interface: subcommand: <strong>install</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_tree.html">User interface: subcommand: <strong>tree</strong></a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="cmd_validate.html">Validation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="data_file_validation.html">Data File Validation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="nxdl_file_validation.html">NXDL File Validation</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changes.html">Change History</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/cache_manager.html">Cache : <code class="xref py py-mod docutils literal notranslate"><span class="pre">cache_manager</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/finding.html">Findings : <code class="xref py py-mod docutils literal notranslate"><span class="pre">finding</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/h5tree.html">HDF5 Data File Tree Structure : <code class="xref py py-mod docutils literal notranslate"><span class="pre">h5tree</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/main.html">User interface : <code class="xref py py-mod docutils literal notranslate"><span class="pre">main</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/nxdl_manager.html">NXDL Manager : <code class="xref py py-mod docutils literal notranslate"><span class="pre">nxdl_manager</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/nxdl_schema.html">NXDL Rules: The XML Schema files : <code class="xref py py-mod docutils literal notranslate"><span class="pre">nxdl_schema</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/nxdltree.html">NXDL Definition File Tree Structure : <code class="xref py py-mod docutils literal notranslate"><span class="pre">nxdltree</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/schema_manager.html">Manage the XML Schema files : <code class="xref py py-mod docutils literal notranslate"><span class="pre">schema_manager</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/validate.html">Validation : <code class="xref py py-mod docutils literal notranslate"><span class="pre">validate</span></code></a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="contents.html" class="nav-link">Table of Contents</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="overview.html" class="nav-link">Project Overview</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">User interface: subcommand: <strong>demo</strong></span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="user-interface-subcommand-demo">
+<span id="index-0"></span><span id="demo"></span><h1>User interface: subcommand: <strong>demo</strong><a class="headerlink" href="#user-interface-subcommand-demo" title="Link to this heading">#</a></h1>
+<p>The <em>demo</em> subcommand is useful to
+demonstrate HDF5 file validation
+and to verify correct program operation.
+It uses an example NeXus HDF5 data file supplied
+with the <em>punx</em> software, the <em>writer_1_3.hdf5</em>
+example from the NeXus manual.</p>
+<p class="rubric">command line help</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">console&gt; punx demo -h</span>
+<span class="go">punx demo -h</span>
+<span class="go">usage: punx demo [-h]</span>
+
+<span class="go">optional arguments:</span>
+<span class="go">  -h, --help  show this help message and exit</span>
+</pre></div>
+</div>
+<section id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Link to this heading">#</a></h2>
+<p>One example of how to use <strong>punx</strong> is shown in the <em>demo</em> mode.
+This can be used directly after installing the python package.</p>
+<p>Type this command …:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">punx</span> <span class="n">demo</span>
+</pre></div>
+</div>
+<p>… and this output will appear on the console,
+showing a validation of <em>writer_1_3.hdf5</em>, an example
+NeXus HDF5 data file from the NeXus documentation.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="go">C:\Users\Pete\Documents\eclipse\punx\src\punx\main.py</span>
+<span class="linenos"> 2</span>
+<span class="linenos"> 3</span><span class="go">!!! WARNING: this program is not ready for distribution.</span>
+<span class="linenos"> 4</span>
+<span class="linenos"> 5</span>
+<span class="linenos"> 6</span><span class="go">console&gt; punx validate C:\Users\Pete\Documents\eclipse\punx\src\punx\data\writer_1_3.hdf5</span>
+<span class="linenos"> 7</span><span class="go">data file: C:\Users\Pete\Documents\eclipse\punx\src\punx\data\writer_1_3.hdf5</span>
+<span class="linenos"> 8</span><span class="go">NeXus definitions (branch): master, dated 2018-05-16 02:07:48, sha=2dc081ee4265eebf80a953080a2ed275c1799a21</span>
+<span class="linenos"> 9</span>
+<span class="linenos">10</span><span class="go">findings</span>
+<span class="linenos">11</span><span class="go">============================ ====== ==================================== =============================================</span>
+<span class="linenos">12</span><span class="go">address                      status test                                 comments                                     </span>
+<span class="linenos">13</span><span class="go">============================ ====== ==================================== =============================================</span>
+<span class="linenos">14</span><span class="go">/                            TODO   NeXus base class                     NXroot: more validations needed              </span>
+<span class="linenos">15</span><span class="go">/                            OK     known NXDL                           NXroot: recognized NXDL specification        </span>
+<span class="linenos">16</span><span class="go">/                            OK     NeXus base class                     NXroot: known NeXus base class               </span>
+<span class="linenos">17</span><span class="go">/                            OK     NeXus default plot                   found by v3: /Scan/data/counts               </span>
+<span class="linenos">18</span><span class="go">/Scan                        TODO   NeXus base class                     NXentry: more validations needed             </span>
+<span class="linenos">19</span><span class="go">/Scan                        OK     group in base class                  not defined: NXroot/Scan                     </span>
+<span class="linenos">20</span><span class="go">/Scan                        OK     known NXDL                           NXentry: recognized NXDL specification       </span>
+<span class="linenos">21</span><span class="go">/Scan                        OK     NeXus base class                     NXentry: known NeXus base class              </span>
+<span class="linenos">22</span><span class="go">/Scan                        OK     NXDL group in data file              found:  in /Scan/data                        </span>
+<span class="linenos">23</span><span class="go">/Scan                        NOTE   validItemName                        relaxed pattern: [A-Za-z_][\w_]*             </span>
+<span class="linenos">24</span><span class="go">/Scan@NX_class               OK     validItemName                        pattern: NX.+                                </span>
+<span class="linenos">25</span><span class="go">/Scan@NX_class               OK     attribute value                      recognized NXDL base class: NXentry          </span>
+<span class="linenos">26</span><span class="go">/Scan@NX_class               OK     known attribute                      known: NXentry@NX_class                      </span>
+<span class="linenos">27</span><span class="go">/Scan/data                   TODO   NeXus base class                     NXdata: more validations needed              </span>
+<span class="linenos">28</span><span class="go">/Scan/data                   OK     validItemName                        strict pattern: [a-z_][a-z0-9_]*             </span>
+<span class="linenos">29</span><span class="go">/Scan/data                   OK     group in base class                  defined: NXentry/data                        </span>
+<span class="linenos">30</span><span class="go">/Scan/data                   OK     known NXDL                           NXdata: recognized NXDL specification        </span>
+<span class="linenos">31</span><span class="go">/Scan/data                   OK     NeXus base class                     NXdata: known NeXus base class               </span>
+<span class="linenos">32</span><span class="go">/Scan/data@NX_class          OK     validItemName                        pattern: NX.+                                </span>
+<span class="linenos">33</span><span class="go">/Scan/data@NX_class          OK     attribute value                      recognized NXDL base class: NXdata           </span>
+<span class="linenos">34</span><span class="go">/Scan/data@NX_class          OK     known attribute                      known: NXdata@NX_class                       </span>
+<span class="linenos">35</span><span class="go">/Scan/data@axes              TODO   attribute value                      implement                                    </span>
+<span class="linenos">36</span><span class="go">/Scan/data@axes              OK     validItemName                        strict pattern: [a-z_][a-z0-9_]*             </span>
+<span class="linenos">37</span><span class="go">/Scan/data@axes              OK     known attribute                      known: NXdata@axes                           </span>
+<span class="linenos">38</span><span class="go">/Scan/data@signal            OK     validItemName                        strict pattern: [a-z_][a-z0-9_]*             </span>
+<span class="linenos">39</span><span class="go">/Scan/data@signal            OK     valid name @signal=counts            strict pattern: [a-z_][a-z0-9_]*             </span>
+<span class="linenos">40</span><span class="go">/Scan/data@signal            OK     attribute value                      found: @signal=counts                        </span>
+<span class="linenos">41</span><span class="go">/Scan/data@signal            OK     known attribute                      known: NXdata@signal                         </span>
+<span class="linenos">42</span><span class="go">/Scan/data@signal            OK     value of @signal                     found: /Scan/data/counts                     </span>
+<span class="linenos">43</span><span class="go">/Scan/data@signal            OK     NeXus default plot v3, NXdata@signal correct default plot setup in /NXentry/NXdata</span>
+<span class="linenos">44</span><span class="go">/Scan/data@two_theta_indices TODO   attribute value                      implement                                    </span>
+<span class="linenos">45</span><span class="go">/Scan/data@two_theta_indices OK     validItemName                        strict pattern: [a-z_][a-z0-9_]*             </span>
+<span class="linenos">46</span><span class="go">/Scan/data@two_theta_indices OK     known attribute                      unknown: NXdata@two_theta_indices            </span>
+<span class="linenos">47</span><span class="go">/Scan/data/counts            OK     validItemName                        strict pattern: [a-z_][a-z0-9_]*             </span>
+<span class="linenos">48</span><span class="go">/Scan/data/counts            OK     field in base class                  not defined: NXdata/counts                   </span>
+<span class="linenos">49</span><span class="go">/Scan/data/counts@units      TODO   attribute value                      implement                                    </span>
+<span class="linenos">50</span><span class="go">/Scan/data/counts@units      OK     validItemName                        strict pattern: [a-z_][a-z0-9_]*             </span>
+<span class="linenos">51</span><span class="go">/Scan/data/two_theta         OK     validItemName                        strict pattern: [a-z_][a-z0-9_]*             </span>
+<span class="linenos">52</span><span class="go">/Scan/data/two_theta         OK     field in base class                  not defined: NXdata/two_theta                </span>
+<span class="linenos">53</span><span class="go">/Scan/data/two_theta@units   TODO   attribute value                      implement                                    </span>
+<span class="linenos">54</span><span class="go">/Scan/data/two_theta@units   OK     validItemName                        strict pattern: [a-z_][a-z0-9_]*             </span>
+<span class="linenos">55</span><span class="go">============================ ====== ==================================== =============================================</span>
+<span class="linenos">56</span>
+<span class="linenos">57</span>
+<span class="linenos">58</span><span class="go">summary statistics</span>
+<span class="linenos">59</span><span class="go">======== ===== =========================================================== =========</span>
+<span class="linenos">60</span><span class="go">status   count description                                                 (value)  </span>
+<span class="linenos">61</span><span class="go">======== ===== =========================================================== =========</span>
+<span class="linenos">62</span><span class="go">OK       33    meets NeXus specification                                   100      </span>
+<span class="linenos">63</span><span class="go">NOTE     1     does not meet NeXus specification, but acceptable           75       </span>
+<span class="linenos">64</span><span class="go">WARN     0     does not meet NeXus specification, not generally acceptable 25       </span>
+<span class="linenos">65</span><span class="go">ERROR    0     violates NeXus specification                                -10000000</span>
+<span class="linenos">66</span><span class="go">TODO     7     validation not implemented yet                              0        </span>
+<span class="linenos">67</span><span class="go">UNUSED   0     optional NeXus item not used in data file                   0        </span>
+<span class="linenos">68</span><span class="go">COMMENT  0     comment from the punx source code                           0        </span>
+<span class="linenos">69</span><span class="go">OPTIONAL 38    allowed by NeXus specification, not identified              99       </span>
+<span class="linenos">70</span><span class="go">         --                                                                         </span>
+<span class="linenos">71</span><span class="go">TOTAL    79                                                                         </span>
+<span class="linenos">72</span><span class="go">======== ===== =========================================================== =========</span>
+<span class="linenos">73</span>
+<span class="linenos">74</span><span class="go">&lt;finding&gt;=99.125000 of 72 items reviewed</span>
+<span class="linenos">75</span>
+<span class="linenos">76</span><span class="go">console&gt; punx tree C:\Users\Pete\Documents\eclipse\punx\src\punx\data\writer_1_3.hdf5</span>
+<span class="linenos">77</span><span class="go">C:\Users\Pete\Documents\eclipse\punx\src\punx\data\writer_1_3.hdf5 : NeXus data file</span>
+<span class="linenos">78</span><span class="go">  Scan:NXentry</span>
+<span class="linenos">79</span><span class="go">    @NX_class = NXentry</span>
+<span class="linenos">80</span><span class="go">    data:NXdata</span>
+<span class="linenos">81</span><span class="go">      @NX_class = NXdata</span>
+<span class="linenos">82</span><span class="go">      @signal = counts</span>
+<span class="linenos">83</span><span class="go">      @axes = two_theta</span>
+<span class="linenos">84</span><span class="go">      @two_theta_indices = 0</span>
+<span class="linenos">85</span><span class="go">      counts:NX_INT32[31] = [1037, 1318, 1704, &#39;...&#39;, 1321]</span>
+<span class="linenos">86</span><span class="go">        @units = counts</span>
+<span class="linenos">87</span><span class="go">      two_theta:NX_FLOAT64[31] = [17.92608, 17.92591, 17.92575, &#39;...&#39;, 17.92108]</span>
+<span class="linenos">88</span><span class="go">        @units = degrees</span>
+</pre></div>
+</div>
+<section id="problems-when-running-the-demo">
+<h3>Problems when running the demo<a class="headerlink" href="#problems-when-running-the-demo" title="Link to this heading">#</a></h3>
+<p>Sometimes, problems happen when running the demo.
+In this section are some common problems encountered and
+what was done to resolve them.</p>
+</section>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="cmd_configuration.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">User interface: subcommand: <strong>configuration</strong></p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="cmd_install.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">User interface: subcommand: <strong>install</strong></p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#examples">Examples</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#problems-when-running-the-demo">Problems when running the demo</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="_sources/cmd_demo.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2014-2023, Pete R. Jemian.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.0.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

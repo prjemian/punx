@@ -1,0 +1,935 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>punx.cache_manager &#8212; punx 0.3.5 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!-- 
+    this give us a css class that will be invisible only if js is disabled 
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../_static/scripts/fontawesome.js?digest=26a4bc78f4c0ddb94549"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549" />
+
+    <script src="../../_static/documentation_options.js?v=ba50482b"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/punx/cache_manager';</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">punx 0.3.5 documentation</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../contents.html">
+    Table of Contents
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../contents.html">
+    Table of Contents
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">punx.cache_manager</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for punx.cache_manager</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="c1"># -----------------------------------------------------------------------------</span>
+<span class="c1"># :author:    Pete R. Jemian</span>
+<span class="c1"># :email:     prjemian@gmail.com</span>
+<span class="c1"># :copyright: (c) 2014-2022, Pete R. Jemian</span>
+<span class="c1">#</span>
+<span class="c1"># Distributed under the terms of the Creative Commons Attribution 4.0 International Public License.</span>
+<span class="c1">#</span>
+<span class="c1"># The full license is in the file LICENSE.txt, distributed with this software.</span>
+<span class="c1"># -----------------------------------------------------------------------------</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Manage the NXDL cache directories of this project.</span>
+
+<span class="sd">A key component necessary to validate both NeXus data files and</span>
+<span class="sd">NXDL class files is a current set of the NXDL definitions.</span>
+
+<span class="sd">There are two cache directories:</span>
+
+<span class="sd">* the source cache</span>
+<span class="sd">* the user cache</span>
+
+<span class="sd">Within each of these cache directories,</span>
+<span class="sd">there may be one or more subdirectories, each</span>
+<span class="sd">containing the NeXus definitions subdirectories and files (``*.xml``,</span>
+<span class="sd">``*.xsl``, &amp; ``*.xsd``) of a specific branch, release, tag, or commit hash</span>
+<span class="sd">from the NeXus definitions repository.</span>
+
+<span class="sd">:source cache: contains default set of NeXus NXDL files</span>
+<span class="sd">:user cache: contains additional set(s) of NeXus NXDL files, installed by user</span>
+
+<span class="sd">The :mod:`~punx.cache_manager` is called by</span>
+<span class="sd">:mod:`~punx.main`,</span>
+<span class="sd">:mod:`~punx.schema_manager`,</span>
+<span class="sd">and :mod:`~punx.nxdl_manager`.</span>
+
+<span class="sd">.. rubric:: Public interface</span>
+
+<span class="sd">.. autosummary::</span>
+
+<span class="sd">   ~CacheManager</span>
+
+
+<span class="sd">.. rubric:: Internal interface</span>
+
+<span class="sd">.. autosummary::</span>
+
+<span class="sd">   ~get_short_sha</span>
+<span class="sd">   ~read_json_file</span>
+<span class="sd">   ~write_json_file</span>
+<span class="sd">   ~is_extractable</span>
+<span class="sd">   ~download_NeXus_zip_archive</span>
+<span class="sd">   ~download_file_set</span>
+<span class="sd">   ~table_of_caches</span>
+<span class="sd">   ~Base_Cache</span>
+<span class="sd">   ~SourceCache</span>
+<span class="sd">   ~UserCache</span>
+<span class="sd">   ~NXDL_File_Set</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">pathlib</span>
+<span class="kn">import</span> <span class="nn">pyRestTable</span>
+<span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+
+<span class="kn">from</span> <span class="nn">PyQt5</span> <span class="kn">import</span> <span class="n">QtCore</span>
+<span class="kn">from</span> <span class="nn">requests.packages.urllib3</span> <span class="kn">import</span> <span class="n">disable_warnings</span>
+<span class="kn">from</span> <span class="nn">requests.packages.urllib3.exceptions</span> <span class="kn">import</span> <span class="n">InsecureRequestWarning</span>
+
+<span class="kn">from</span> <span class="nn">.__init__</span> <span class="kn">import</span> <span class="n">__settings_organization__</span><span class="p">,</span> <span class="n">__settings_package__</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">singletons</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">utils</span>
+
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">setup_logger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<span class="n">DOWNLOAD_COMPRESS_FORMAT</span> <span class="o">=</span> <span class="s2">&quot;zip&quot;</span>  <span class="c1"># or &quot;tar.gz&quot;</span>
+<span class="n">DEFAULT_NXDL_SET</span> <span class="o">=</span> <span class="s2">&quot;v2018.5&quot;</span>  <span class="c1"># most recent file set in source cache</span>
+<span class="n">GITHUB_NXDL_BRANCH</span> <span class="o">=</span> <span class="s2">&quot;main&quot;</span>
+<span class="n">GITHUB_NXDL_ORGANIZATION</span> <span class="o">=</span> <span class="s2">&quot;nexusformat&quot;</span>
+<span class="n">GITHUB_NXDL_REPOSITORY</span> <span class="o">=</span> <span class="s2">&quot;definitions&quot;</span>
+<span class="n">INFO_FILE_NAME</span> <span class="o">=</span> <span class="s2">&quot;__github_info__.json&quot;</span>
+<span class="n">SHORT_SHA_LENGTH</span> <span class="o">=</span> <span class="mi">7</span>
+<span class="n">SOURCE_CACHE_SETTINGS_FILENAME</span> <span class="o">=</span> <span class="s2">&quot;punx.ini&quot;</span>
+<span class="n">SOURCE_CACHE_SUBDIR</span> <span class="o">=</span> <span class="s2">&quot;cache&quot;</span>
+<span class="n">GITHUB_RETRY_COUNT</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="n">URL_BASE</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s2">&quot;https://github.com/&quot;</span>
+    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">GITHUB_NXDL_ORGANIZATION</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">GITHUB_NXDL_REPOSITORY</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="s2">&quot;/archive&quot;</span>
+<span class="p">)</span>
+
+
+<div class="viewcode-block" id="get_short_sha">
+<a class="viewcode-back" href="../../api/cache_manager.html#punx.cache_manager.get_short_sha">[docs]</a>
+<span class="k">def</span> <span class="nf">get_short_sha</span><span class="p">(</span><span class="n">full_sha</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    return the first few unique characters of the git commit hash (SHA)</span>
+
+<span class="sd">    :param str full_sha: hash code from Github</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">full_sha</span><span class="p">[:</span> <span class="nb">min</span><span class="p">(</span><span class="n">SHORT_SHA_LENGTH</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">full_sha</span><span class="p">))]</span></div>
+
+
+
+<div class="viewcode-block" id="write_json_file">
+<a class="viewcode-back" href="../../api/cache_manager.html#punx.cache_manager.write_json_file">[docs]</a>
+<span class="k">def</span> <span class="nf">write_json_file</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    write the structured ``obj`` to the JSON file ``file_name``</span>
+
+<span class="sd">    :see: https://docs.python.org/3.5/library/json.html#json.dumps</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="read_json_file">
+<a class="viewcode-back" href="../../api/cache_manager.html#punx.cache_manager.read_json_file">[docs]</a>
+<span class="k">def</span> <span class="nf">read_json_file</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    read a structured object from the JSON file ``file_name``</span>
+
+<span class="sd">    :see: https://docs.python.org/3.5/library/json.html#json.loads</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">())</span></div>
+
+
+
+<div class="viewcode-block" id="is_extractable">
+<a class="viewcode-back" href="../../api/cache_manager.html#punx.cache_manager.is_extractable">[docs]</a>
+<span class="k">def</span> <span class="nf">is_extractable</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">allowed_endings</span><span class="p">,</span> <span class="n">allowed_parents</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    decide if this item should be extracted from the ZIP download.</span>
+
+<span class="sd">    :return bool:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="n">path</span><span class="o">.</span><span class="n">suffix</span> <span class="ow">in</span> <span class="n">allowed_endings</span>
+        <span class="ow">and</span>
+        <span class="n">path</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">allowed_parents</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="download_NeXus_zip_archive">
+<a class="viewcode-back" href="../../api/cache_manager.html#punx.cache_manager.download_NeXus_zip_archive">[docs]</a>
+<span class="k">def</span> <span class="nf">download_NeXus_zip_archive</span><span class="p">(</span><span class="n">url</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Download the NXDL definitions described by ``url``.</span>
+
+<span class="sd">    Return the downloaded content in memory.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">io</span>
+    <span class="kn">import</span> <span class="nn">zipfile</span>
+
+    <span class="c1"># disable warnings about GitHub self-signed https certificates</span>
+    <span class="n">disable_warnings</span><span class="p">(</span><span class="n">InsecureRequestWarning</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">_retry</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">GITHUB_RETRY_COUNT</span><span class="p">):</span>  <span class="c1"># noqa</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Requesting download from </span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">archive</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">verify</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZipFile</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">(</span><span class="n">archive</span><span class="o">.</span><span class="n">content</span><span class="p">))</span>
+        <span class="k">except</span> <span class="n">requests</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">ConnectionError</span> <span class="k">as</span> <span class="n">_exc</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;ConnectionError from </span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="se">\n</span><span class="si">{</span><span class="n">_exc</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="download_file_set">
+<a class="viewcode-back" href="../../api/cache_manager.html#punx.cache_manager.download_file_set">[docs]</a>
+<span class="k">def</span> <span class="nf">download_file_set</span><span class="p">(</span><span class="n">file_set_name</span><span class="p">,</span> <span class="n">cache_path</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Download &amp; extract NXDL file set into a subdirectory of ``cache_path``.</span>
+
+<span class="sd">    file_set_name str :</span>
+<span class="sd">        Name of the NXDL file_set to be downloaded.</span>
+<span class="sd">    cache_path obj :</span>
+<span class="sd">        Directory with NXDL file_sets (instance of ``pathlib.Path``).</span>
+<span class="sd">        (A file_set is a directory with a version of the NeXus definitions</span>
+<span class="sd">        repository.)</span>
+<span class="sd">    replace bool :</span>
+<span class="sd">        If ``True`` and file set exists, replace it.</span>
+<span class="sd">        (default: ``False``)</span>
+
+<span class="sd">    USAGE::</span>
+
+<span class="sd">        download_file_set(file_set_name, cache_path, replace=False)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">NXDL_refs_dir_name</span> <span class="o">=</span> <span class="n">cache_path</span> <span class="o">/</span> <span class="n">file_set_name</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Downloading file set: </span><span class="si">{</span><span class="n">file_set_name</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">NXDL_refs_dir_name</span><span class="si">}</span><span class="s2"> ...&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">NXDL_refs_dir_name</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">replace</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Replacing existing file set &#39;</span><span class="si">{</span><span class="n">file_set_name</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;File set &#39;</span><span class="si">{</span><span class="n">file_set_name</span><span class="si">}</span><span class="s2">&#39; exists.  Will not replace.&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+
+    <span class="n">url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">URL_BASE</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">file_set_name</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">DOWNLOAD_COMPRESS_FORMAT</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="n">zip_content</span> <span class="o">=</span> <span class="n">download_NeXus_zip_archive</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">zip_content</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Could not download file set: </span><span class="si">{</span><span class="n">file_set_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span>
+
+    <span class="n">NXDL_categories</span> <span class="o">=</span> <span class="s2">&quot;base_classes applications contributed_definitions&quot;</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+    <span class="n">NXDL_file_endings_list</span> <span class="o">=</span> <span class="s2">&quot;.xsd .xml .xsl&quot;</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+
+    <span class="n">download_path</span> <span class="o">=</span> <span class="n">cache_path</span> <span class="o">/</span> <span class="n">zip_content</span><span class="o">.</span><span class="n">filelist</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">filename</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">allowed_parents</span> <span class="o">=</span> <span class="n">NXDL_categories</span>  <span class="c1"># directories</span>
+    <span class="n">allowed_parents</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">download_path</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+    <span class="n">item_count</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">dt</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1980</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>  <span class="c1"># start with pre-NeXus date</span>
+    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">zip_content</span><span class="o">.</span><span class="n">namelist</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">is_extractable</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">NXDL_file_endings_list</span><span class="p">,</span> <span class="n">allowed_parents</span><span class="p">):</span>
+            <span class="n">zip_content</span><span class="o">.</span><span class="n">extract</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">cache_path</span><span class="p">)</span>
+            <span class="n">dt</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">zip_content</span><span class="o">.</span><span class="n">getinfo</span><span class="p">(</span><span class="n">item</span><span class="p">)</span><span class="o">.</span><span class="n">date_time</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span>
+            <span class="n">item_count</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">item_count</span><span class="si">}</span><span class="s2"> Extracted: </span><span class="si">{</span><span class="n">item</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">item_count</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;no NXDL content downloaded&quot;</span><span class="p">)</span>
+
+    <span class="n">ymd_hms</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span>
+        <span class="o">*</span><span class="n">dt</span><span class="p">[:</span><span class="mi">3</span><span class="p">],</span> <span class="n">hour</span><span class="o">=</span><span class="n">dt</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">minute</span><span class="o">=</span><span class="n">dt</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="n">second</span><span class="o">=</span><span class="n">dt</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span>
+    <span class="p">)</span>
+
+    <span class="n">info</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+        <span class="n">ref</span><span class="o">=</span><span class="n">file_set_name</span><span class="p">,</span>
+        <span class="n">sha</span><span class="o">=</span><span class="n">zip_content</span><span class="o">.</span><span class="n">comment</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf8&quot;</span><span class="p">),</span>
+        <span class="n">zip_url</span><span class="o">=</span><span class="n">url</span><span class="p">,</span>
+        <span class="n">last_modified</span><span class="o">=</span><span class="n">ymd_hms</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(</span><span class="n">sep</span><span class="o">=</span><span class="s2">&quot; &quot;</span><span class="p">),</span>
+    <span class="p">)</span>
+    <span class="n">info</span><span class="p">[</span><span class="s2">&quot;# description&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;NXDL files downloaded from GitHub repository&quot;</span>
+    <span class="n">info</span><span class="p">[</span><span class="s2">&quot;# written&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">())</span>
+    <span class="c1"># TODO: move this code into the NXDL_File_Set class</span>
+    <span class="n">infofile</span> <span class="o">=</span> <span class="n">download_path</span> <span class="o">/</span> <span class="n">INFO_FILE_NAME</span>
+    <span class="n">write_json_file</span><span class="p">(</span><span class="n">infofile</span><span class="p">,</span> <span class="n">info</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Created: </span><span class="si">{</span><span class="n">infofile</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1"># last, rename the ``download_path`` directory to ``file_set_name``</span>
+    <span class="k">if</span> <span class="n">NXDL_refs_dir_name</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+        <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">NXDL_refs_dir_name</span><span class="p">,</span> <span class="n">ignore_errors</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">shutil</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">download_path</span><span class="p">,</span> <span class="n">NXDL_refs_dir_name</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Installed in directory: </span><span class="si">{</span><span class="n">NXDL_refs_dir_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="table_of_caches">
+<a class="viewcode-back" href="../../api/cache_manager.html#punx.cache_manager.table_of_caches">[docs]</a>
+<span class="k">def</span> <span class="nf">table_of_caches</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    return a pyRestTable table describing all known file sets in both source and user caches</span>
+
+<span class="sd">    :returns obj: instance of pyRestTable.Table with all known file sets</span>
+
+<span class="sd">    **Example**::</span>
+
+<span class="sd">        ============= ====== =================== ======= ==================================================================</span>
+<span class="sd">        NXDL file set cache  date &amp; time         commit  path</span>
+<span class="sd">        ============= ====== =================== ======= ==================================================================</span>
+<span class="sd">        a4fd52d       source 2016-11-19 01:07:45 a4fd52d /home/prjemian/Documents/projects/prjemian/punx/punx/cache/a4fd52d</span>
+<span class="sd">        v3.3          source 2017-07-12 10:41:12 9285af9 /home/prjemian/Documents/projects/prjemian/punx/punx/cache/v3.3</span>
+<span class="sd">        v2018.5       source 2018-05-15 16:34:19 a3045fd /home/prjemian/Documents/projects/prjemian/punx/punx/cache/v2018.5</span>
+<span class="sd">        Schema-3.4    user   2018-05-15 08:24:34 aa1ccd1 /home/prjemian/.config/punx/Schema-3.4</span>
+<span class="sd">        main          user   2021-12-17 13:09:18 041c2c0 /home/prjemian/.config/punx/main</span>
+<span class="sd">        ============= ====== =================== ======= ==================================================================</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">cm</span> <span class="o">=</span> <span class="n">CacheManager</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">cm</span><span class="o">.</span><span class="n">table_of_caches</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="CacheManager">
+<a class="viewcode-back" href="../../api/cache_manager.html#punx.cache_manager.CacheManager">[docs]</a>
+<span class="k">class</span> <span class="nc">CacheManager</span><span class="p">(</span><span class="n">singletons</span><span class="o">.</span><span class="n">Singleton</span><span class="p">):</span>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    manager both source and user caches</span>
+
+<span class="sd">    .. autosummary::</span>
+
+<span class="sd">        ~select_NXDL_file_set</span>
+<span class="sd">        ~all_file_sets</span>
+<span class="sd">        ~cleanup</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">default_file_set</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">source</span> <span class="o">=</span> <span class="n">SourceCache</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">user</span> <span class="o">=</span> <span class="n">UserCache</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">NXDL_file_sets</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_file_sets</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+            <span class="s2">&quot; NXDL_file_sets names = </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">NXDL_file_sets</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+        <span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">select_NXDL_file_set</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_file_set</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot; CacheManager: no default_file_set selected yet&quot;</span><span class="p">)</span>
+
+        <span class="c1"># TODO: update the .ini file as needed (remember the default_file_set value</span>
+
+    <span class="c1"># - - - - - - - - - - - - - -</span>
+    <span class="c1"># public</span>
+
+<div class="viewcode-block" id="CacheManager.select_NXDL_file_set">
+<a class="viewcode-back" href="../../api/cache_manager.html#punx.cache_manager.CacheManager.select_NXDL_file_set">[docs]</a>
+    <span class="k">def</span> <span class="nf">select_NXDL_file_set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ref</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the named self.default_file_set instance.</span>
+
+<span class="sd">        Raise KeyError exception if unknown.</span>
+
+<span class="sd">        :return obj:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot; given ref: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">ref</span><span class="p">))</span>
+
+        <span class="k">def</span> <span class="nf">sorter</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">NXDL_file_sets</span><span class="p">[</span><span class="n">value</span><span class="p">]</span><span class="o">.</span><span class="n">last_modified</span>
+
+        <span class="n">file_set_keys</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">NXDL_file_sets</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">sorter</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">ref</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">file_set_keys</span><span class="p">:</span>
+            <span class="n">choice</span> <span class="o">=</span> <span class="n">file_set_keys</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="s2">&quot;File set </span><span class="si">%s</span><span class="s2"> not found, choosing latest: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="n">ref</span><span class="p">,</span> <span class="n">choice</span>
+            <span class="p">)</span>
+            <span class="n">ref</span> <span class="o">=</span> <span class="n">choice</span>  <span class="c1"># the latest one</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot; final ref: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">ref</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">default_file_set</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">NXDL_file_sets</span><span class="p">[</span><span class="n">ref</span><span class="p">]</span>
+        <span class="c1"># print(f&quot;{ref=}  {self.default_file_set=}&quot;)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot; default file set: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">default_file_set</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_file_set</span></div>
+
+
+    <span class="c1"># - - - - - - - - - - - - - -</span>
+    <span class="c1"># private</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">all_file_sets</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;return dictionary of all NXDL file sets in both source &amp; user caches&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">NXDL_file_sets</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">cache</span> <span class="ow">in</span> <span class="s2">&quot;source user&quot;</span><span class="o">.</span><span class="n">split</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">NXDL_file_sets</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cache</span><span class="p">)</span><span class="o">.</span><span class="n">all_file_sets</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+            <span class="s2">&quot;all known file set names: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">NXDL_file_sets</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">NXDL_file_sets</span>
+
+<div class="viewcode-block" id="CacheManager.cleanup">
+<a class="viewcode-back" href="../../api/cache_manager.html#punx.cache_manager.CacheManager.cleanup">[docs]</a>
+    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;removes any temporary directories&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">source</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="CacheManager.table_of_caches">
+<a class="viewcode-back" href="../../api/cache_manager.html#punx.cache_manager.CacheManager.table_of_caches">[docs]</a>
+    <span class="k">def</span> <span class="nf">table_of_caches</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        return a pyRestTable table describing all known file sets in both source and user caches</span>
+
+<span class="sd">        :returns obj: instance of pyRestTable.Table with all known file sets</span>
+
+<span class="sd">        **Example**::</span>
+
+<span class="sd">            ============= ====== =================== ======= ==================================================================</span>
+<span class="sd">            NXDL file set cache  date &amp; time         commit  path</span>
+<span class="sd">            ============= ====== =================== ======= ==================================================================</span>
+<span class="sd">            a4fd52d       source 2016-11-19 01:07:45 a4fd52d /home/prjemian/Documents/projects/prjemian/punx/punx/cache/a4fd52d</span>
+<span class="sd">            v3.3          source 2017-07-12 10:41:12 9285af9 /home/prjemian/Documents/projects/prjemian/punx/punx/cache/v3.3</span>
+<span class="sd">            v2018.5       source 2018-05-15 16:34:19 a3045fd /home/prjemian/Documents/projects/prjemian/punx/punx/cache/v2018.5</span>
+<span class="sd">            Schema-3.4    user   2018-05-15 08:24:34 aa1ccd1 /home/prjemian/.config/punx/Schema-3.4</span>
+<span class="sd">            main          user   2021-12-17 13:09:18 041c2c0 /home/prjemian/.config/punx/main</span>
+<span class="sd">            ============= ====== =================== ======= ==================================================================</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">def</span> <span class="nf">sorter</span><span class="p">(</span><span class="n">kv</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">kv</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">last_modified</span>
+
+        <span class="n">t</span> <span class="o">=</span> <span class="n">pyRestTable</span><span class="o">.</span><span class="n">Table</span><span class="p">()</span>
+        <span class="n">t</span><span class="o">.</span><span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;NXDL file set&quot;</span><span class="p">,</span> <span class="s2">&quot;cache&quot;</span><span class="p">,</span> <span class="s2">&quot;date &amp; time&quot;</span><span class="p">,</span> <span class="s2">&quot;commit&quot;</span><span class="p">,</span> <span class="s2">&quot;path&quot;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">all_file_sets</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="n">sorter</span><span class="p">):</span>
+            <span class="n">v</span><span class="o">.</span><span class="n">short_sha</span> <span class="o">=</span> <span class="n">get_short_sha</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">sha</span><span class="p">)</span>
+            <span class="n">row</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="s2">&quot;cache last_modified short_sha path&quot;</span><span class="o">.</span><span class="n">split</span><span class="p">():</span>
+                <span class="n">row</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">w</span><span class="p">)))</span>
+            <span class="n">t</span><span class="o">.</span><span class="n">rows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">t</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="Base_Cache">
+<a class="viewcode-back" href="../../api/cache_manager.html#punx.cache_manager.Base_Cache">[docs]</a>
+<span class="k">class</span> <span class="nc">Base_Cache</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    provides comon methods to get the QSettings path and file name</span>
+
+<span class="sd">    .. autosummary::</span>
+
+<span class="sd">       ~all_file_sets</span>
+<span class="sd">       ~fileName</span>
+<span class="sd">       ~path</span>
+<span class="sd">       ~cleanup</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">qsettings</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">is_temporary_directory</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;directory containing the QSettings file&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">qsettings</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;cache qsettings not defined!&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fileName</span><span class="p">())</span>
+
+<div class="viewcode-block" id="Base_Cache.fileName">
+<a class="viewcode-back" href="../../api/cache_manager.html#punx.cache_manager.Base_Cache.fileName">[docs]</a>
+    <span class="k">def</span> <span class="nf">fileName</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;full path of the QSettings file&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">qsettings</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;cache qsettings not defined!&quot;</span><span class="p">)</span>
+        <span class="n">fn</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">qsettings</span><span class="o">.</span><span class="n">fileName</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">fn</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">all_file_sets</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;index all NXDL file sets in this cache&quot;&quot;&quot;</span>
+        <span class="n">fs</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">qsettings</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;cache qsettings not defined!&quot;</span><span class="p">)</span>
+        <span class="n">cache_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot; cache path: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">cache_path</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">cache_path</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cache_path</span><span class="p">,</span> <span class="n">item</span><span class="p">)):</span>
+                <span class="n">info_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cache_path</span><span class="p">,</span> <span class="n">item</span><span class="p">,</span> <span class="n">INFO_FILE_NAME</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">info_file</span><span class="p">):</span>
+                    <span class="n">fs</span><span class="p">[</span><span class="n">item</span><span class="p">]</span> <span class="o">=</span> <span class="n">NXDL_File_Set</span><span class="p">()</span>
+                    <span class="n">fs</span><span class="p">[</span><span class="n">item</span><span class="p">]</span><span class="o">.</span><span class="n">read_info_file</span><span class="p">(</span><span class="n">info_file</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">fs</span>
+
+<div class="viewcode-block" id="Base_Cache.cleanup">
+<a class="viewcode-back" href="../../api/cache_manager.html#punx.cache_manager.Base_Cache.cleanup">[docs]</a>
+    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;removes any temporary directories&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_temporary_directory</span><span class="p">:</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">removedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">is_temporary_directory</span> <span class="o">=</span> <span class="kc">False</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="SourceCache">
+<a class="viewcode-back" href="../../api/cache_manager.html#punx.cache_manager.SourceCache">[docs]</a>
+<span class="k">class</span> <span class="nc">SourceCache</span><span class="p">(</span><span class="n">Base_Cache</span><span class="p">):</span>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;manage the source directory cache of NXDL files&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">absolute</span><span class="p">()</span>
+        <span class="n">ini_file</span> <span class="o">=</span> <span class="n">path</span> <span class="o">/</span> <span class="n">SOURCE_CACHE_SUBDIR</span> <span class="o">/</span> <span class="n">SOURCE_CACHE_SETTINGS_FILENAME</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;ini_file=</span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">ini_file</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">qsettings</span> <span class="o">=</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">QSettings</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">ini_file</span><span class="p">),</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">QSettings</span><span class="o">.</span><span class="n">IniFormat</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="UserCache">
+<a class="viewcode-back" href="../../api/cache_manager.html#punx.cache_manager.UserCache">[docs]</a>
+<span class="k">class</span> <span class="nc">UserCache</span><span class="p">(</span><span class="n">Base_Cache</span><span class="p">):</span>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;manage the user directory cache of NXDL files&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">qsettings</span> <span class="o">=</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">QSettings</span><span class="p">(</span>
+            <span class="n">QtCore</span><span class="o">.</span><span class="n">QSettings</span><span class="o">.</span><span class="n">IniFormat</span><span class="p">,</span>
+            <span class="n">QtCore</span><span class="o">.</span><span class="n">QSettings</span><span class="o">.</span><span class="n">UserScope</span><span class="p">,</span>
+            <span class="n">__settings_organization__</span><span class="p">,</span>
+            <span class="n">__settings_package__</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">path</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;exists=</span><span class="si">%s</span><span class="s2">  path=</span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
+        <span class="n">path</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Could not create settings directory: </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="NXDL_File_Set">
+<a class="viewcode-back" href="../../api/cache_manager.html#punx.cache_manager.NXDL_File_Set">[docs]</a>
+<span class="k">class</span> <span class="nc">NXDL_File_Set</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;describe a single set of NXDL files&quot;&quot;&quot;</span>
+
+    <span class="n">path</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">cache</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">info</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">ref</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">sha</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">zip_url</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">last_modified</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="c1"># these keys are written and read to the JSON info files in each downloaded file set</span>
+    <span class="n">json_file_keys</span> <span class="o">=</span> <span class="s2">&quot;ref sha zip_url last_modified&quot;</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+
+    <span class="c1"># TODO: #94 consider defining the SchemaManager here (perhaps lazy load)?</span>
+    <span class="c1"># see nxdl_manager for example code:  __getattribute__()</span>
+    <span class="n">schema_manager</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">__schema_manager_loaded__</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">def</span> <span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;implement lazy load of definition content&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+            <span class="ow">and</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;schema_manager&quot;</span>
+            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__schema_manager_loaded__</span>
+        <span class="p">):</span>
+            <span class="kn">from</span> <span class="nn">punx</span> <span class="kn">import</span> <span class="n">schema_manager</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">schema_manager</span> <span class="o">=</span> <span class="n">schema_manager</span><span class="o">.</span><span class="n">SchemaManager</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__schema_manager_loaded__</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="nb">object</span><span class="o">.</span><span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ref</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">object</span><span class="o">.</span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="s2">&quot;NXDL_File_Set(&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;last_modified=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">last_modified</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;, cache=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;, short_sha=</span><span class="si">{</span><span class="n">get_short_sha</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sha</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;, path=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;)&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">read_info_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">file_name</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">ref</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;NXDL_File_Set() does not refer to any files&quot;</span><span class="p">)</span>
+
+        <span class="n">file_name</span> <span class="o">=</span> <span class="n">file_name</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">file_name</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;info file not found: </span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span> <span class="o">=</span> <span class="n">file_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">file_name</span><span class="p">))</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;punx&quot;</span><span class="p">,</span> <span class="s2">&quot;cache&quot;</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cache</span> <span class="o">=</span> <span class="s2">&quot;source&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cache</span> <span class="o">=</span> <span class="s2">&quot;user&quot;</span>
+
+        <span class="c1"># read the NXDL file set&#39;s info file for GitHub information</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="n">read_json_file</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">json_file_keys</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">obj</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">k</span><span class="p">))</span></div>
+
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2014-2023, Pete R. Jemian.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.0.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

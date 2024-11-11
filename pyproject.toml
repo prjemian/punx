@@ -1,23 +1,17 @@
 [build-system]
-requires = [
-  "h5py",
-  "hdf5plugin",
-  "lxml",
-  "numpy",
-  "pyRestTable",
-  "requests",
-  "setuptools_scm[toml]>=6.2",
-  "setuptools>=61.0",
-]
 build-backend = "setuptools.build_meta"
+requires = [
+  "setuptools_scm[toml]>=8.0",
+  "setuptools>=64",
+]
 
 [project]
 name = "punx"
+dynamic = ["version"]
 description = "Python Utilities for NeXus HDF5 files."
 authors = [
   { name="Pete Jemian", email="prjemian@gmail.com" },
 ]
-dynamic = ["version"]
 readme = "README.md"
 requires-python = ">=3.8"
 keywords = ["NeXus", "HDF5"]

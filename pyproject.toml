@@ -23,6 +23,15 @@ requires-python = ">=3.8"
 keywords = ["NeXus", "HDF5"]
 # https://packaging.python.org/en/latest/specifications/declaring-project-metadata/?highlight=license
 license = {file = "punx/LICENSE.txt"}
+dependencies = [
+  "h5py",
+  "hdf5plugin",
+  "lxml",
+  "numpy",
+  "PyQt5",
+  "pyRestTable",
+  "requests",
+]
 # https://pypi.org/classifiers/
 classifiers = [
     "Development Status :: 3 - Alpha",
@@ -31,10 +40,6 @@ classifiers = [
     "License :: Freely Distributable",
     "License :: Public Domain",
     "Operating System :: OS Independent",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python",
     "Topic :: Scientific/Engineering :: Astronomy",

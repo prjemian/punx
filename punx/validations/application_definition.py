@@ -8,6 +8,8 @@
 # The full license is in the file LICENSE.txt, distributed with this software.
 # -----------------------------------------------------------------------------
 
+import numpy
+
 from .. import finding
 from .. import utils
 from ..validate import ValidationItem
@@ -17,7 +19,10 @@ def verify(validator, v_item):
     """
     Verify items specified in application definition are present in HDF5 data file
     """
-    ad_name = str(utils.decode_byte_string(v_item.h5_object["definition"][()]))
+    item = v_item.h5_object["definition"][()]
+    if isinstance(item, (list, tuple, numpy.ndarray)):
+        item = item[0]
+    ad_name = str(utils.decode_byte_string(item))
     key = "NeXus application definition"
 
     ad = validator.manager.classes.get(ad_name)
@@ -58,7 +63,10 @@ def verify(validator, v_item):
         if len(spec.enumerations) > 0:
             found = False
             for enum in spec.enumerations:
-                found = enum == utils.decode_byte_string(h5_obj[()])
+                obj = h5_obj[()]
+                if isinstance(obj, (list, tuple, numpy.ndarray)):
+                    obj = obj[0]
+                found = enum == utils.decode_byte_string(obj)
                 if found:
                     break
             msg = "%s:%s" % (ad_name, field)
